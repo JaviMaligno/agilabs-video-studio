@@ -10,7 +10,7 @@ import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { VIDEOS } from '../src/timeline.ts';
 import { SETTINGS } from '../src/settings.ts';
-import type { Lang, Word } from '../src/types.ts';
+import { spokenText, type Lang, type Word } from '../src/types.ts';
 import config from '../video.config.mjs';
 import { at, secret, findFfmpeg, wavSeconds, CARTESIA, cartesiaHeaders } from './lib.mjs';
 import { chooseEngine, cartesiaUnavailable } from './tts-engine.mjs';
@@ -124,7 +124,7 @@ function kokoroBatch(jobs: { text: string; out: string }[], voice: KokoroVoice) 
 
 const linesOf = (lang: Lang): Map<string, string> => {
   const lines = new Map<string, string>();
-  for (const cut of Object.values(VIDEOS[lang] ?? {})) for (const scene of cut) for (const l of scene.lines) lines.set(l.key, l.text[lang]);
+  for (const cut of Object.values(VIDEOS[lang] ?? {})) for (const scene of cut) for (const l of scene.lines) lines.set(l.key, spokenText(l, lang));
   return lines;
 };
 

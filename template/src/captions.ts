@@ -2,7 +2,7 @@
 // A cue is what is on screen at once: at most two rows of `maxChars` characters.
 // No Remotion imports, so plain `node --test` can load it.
 import { WORDS } from './audio.generated.ts';
-import type { Lang, Line } from './types.ts';
+import { spokenText, type Lang, type Line } from './types.ts';
 
 /**
  * One written word with its time on screen, in scene seconds. `glued` marks a piece of a word too
@@ -58,14 +58,17 @@ const splitLong = (tok: Token, maxChars: number): Token[] => {
 
 /**
  * The written words of a line, timed in scene seconds. When the line is subtitled in its own
- * voice and the TTS returned one timestamp per written word, those times are used as they are.
- * Otherwise (numbers or symbols read out as several words, or a translation under another
- * voice) the line's duration is spread over the words in proportion to their length.
+ * voice, the TTS read the written text, and it returned one timestamp per written word, those
+ * times are used as they are. Otherwise (numbers or symbols read out as several words, a spoken
+ * form that differs from the caption, or a translation under another voice) the line's duration
+ * is spread over the written words in proportion to their length.
  */
 export const tokensOf = (line: Line, subs: Lang): Token[] => {
   const words = line.text[subs].split(/\s+/).filter(Boolean);
   const end = line.start + line.dur;
-  const spoken = subs === line.voice ? WORDS[line.voice]?.[line.key] : undefined;
+  // TTS timestamps belong to the spoken words: only usable when the caption is that same text.
+  const ownText = subs === line.voice && spokenText(line, subs) === line.text[subs];
+  const spoken = ownText ? WORDS[line.voice]?.[line.key] : undefined;
   if (spoken && spoken.length === words.length) {
     let prev = line.start;
     return words.map((text, i) => {

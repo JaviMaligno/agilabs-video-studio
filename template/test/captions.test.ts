@@ -122,3 +122,16 @@ test('a word longer than a row (a URL) is split at its slashes and dashes', () =
 test('glue words include the usual EN and ES function words', () => {
   for (const w of ['the', 'of', 'a', 'de', 'la', 'el', 'and', 'y']) assert.ok(GLUE.has(w), w);
 });
+
+test('a spoken form keeps the written caption, timed proportionally', () => {
+  // Same word count by coincidence: the TTS timestamps belong to other words, so they are ignored.
+  WORDS.en = { 'spk-01': [['About', 0, 0.1], ['eighty-three', 0.1, 0.2], ['percent.', 0.2, 0.3]] };
+  try {
+    const l: Line = { ...line('spk-01', 'About 83 %.', 0, 3), spoken: { en: 'About eighty-three percent.' } };
+    const toks = cuesOf(l, 'en').flatMap((c) => c.tokens);
+    assert.deepEqual(toks.map((t) => t.text), ['About', '83', '%.']);
+    assert.ok(toks.at(-1)!.end > 2.5, 'proportional over the whole line, not the 0.3 s of the timestamps');
+  } finally {
+    WORDS.en = {};
+  }
+});

@@ -40,7 +40,7 @@ caption.
 - **At most 17 characters per second** on screen (`npm run lint` checks it). A line that reads
   too fast needs fewer words, not a faster voice.
 - Write numbers in the caption as the article does. If the TTS should say them differently,
-  that is handled in narration (see the `narration` skill), not by changing the caption.
+  give the line a spoken form (see the `narration` skill); never change the caption for it.
 - Avoid long URLs and code identifiers in narration; they wrap badly and read worse.
 
 ## EN and ES

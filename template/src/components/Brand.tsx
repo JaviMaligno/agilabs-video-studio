@@ -2,7 +2,10 @@ import React from 'react';
 import { BRAND, C } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 
-/** The AGILabs text badge, styled like the website header: small caps, thin border, muted text. */
+/**
+ * The AGILabs text badge, styled like the website header (uppercase, letter-spaced, thin border).
+ * The site draws its text muted; here it is full white so it stays legible at video size.
+ */
 export const Badge: React.FC<{ size?: number; style?: React.CSSProperties }> = ({ size = 1, style }) => (
   <div
     style={{

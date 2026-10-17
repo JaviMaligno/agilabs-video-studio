@@ -38,8 +38,10 @@ export const VIDEOS = videos(build);
 export const TIMELINE = VIDEOS.en.main;
 ```
 
-- `say(at, en, es)`: one narration line. `at` is the earliest scene second it may start; lines
-  never overlap (0.35 s gap), and the scene lasts until its last line ends plus 0.8 s, or `min`.
+- `say(at, en, es, spoken?)`: one narration line. `at` is the earliest scene second it may
+  start; lines never overlap (0.35 s gap), and the scene lasts until its last line ends plus
+  0.8 s, or `min`. `spoken` (`{ en?, es? }`) is what the TTS reads when it differs from the
+  caption text (see `narration`).
 - **Beats.** The start time of each line in a scene is a beat. Components play step *i* on beat
   *i* (bar *i* grows, node *i* appears, tile *i* pops), so write one line per step you want to
   reveal. Before TTS the beats come from a length estimate; after `npm run tts` they come from

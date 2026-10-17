@@ -2,7 +2,7 @@
 // lines play one after another, and their start times ("beats") drive the animation.
 import { AUDIO } from './audio.generated.ts';
 import { SETTINGS } from './settings.ts';
-import type { Cuts, Label, Lang, Line, Scene } from './types.ts';
+import { spokenText, type Cuts, type Label, type Lang, type Line, type Scene, type Text } from './types.ts';
 
 /** Silence between two lines, in seconds. */
 export const GAP = 0.35;
@@ -29,9 +29,14 @@ export const videos = (build: () => Cuts): Record<Lang, Cuts> => {
 /** Bilingual on-screen label. */
 export const L = (en: string, es: string): Label => ({ en, es });
 
-/** One narration line: `at` is the earliest scene second it may start. */
-export type Spec = { at: number; en: string; es: string };
-export const say = (at: number, en: string, es: string): Spec => ({ at, en, es });
+/**
+ * One narration line: `at` is the earliest scene second it may start. `spoken` optionally gives
+ * what the TTS should read per language when it differs from the caption text (numbers, symbols,
+ * version strings): `say(0, 'It solved 14/20.', '…', { en: 'It solved fourteen out of twenty.' })`.
+ */
+export type Spec = { at: number; en: string; es: string; spoken?: Partial<Text> };
+export const say = (at: number, en: string, es: string, spoken?: Partial<Text>): Spec =>
+  spoken ? { at, en, es, spoken } : { at, en, es };
 
 const CHARS_PER_SECOND: Record<Lang, number> = { en: 14.5, es: 15.5 };
 
@@ -49,9 +54,10 @@ const place = (id: string, specs: Spec[]): Line[] => {
   let prevEnd: number | null = null;
   specs.forEach((spec, i) => {
     const key = `${id}-${String(i + 1).padStart(2, '0')}`;
-    const dur = lineSeconds(key, spec[current], current);
+    const text = { en: spec.en, es: spec.es };
+    const dur = lineSeconds(key, spokenText({ text, spoken: spec.spoken }, current), current);
     const start = prevEnd === null ? Math.max(0, spec.at) : Math.max(spec.at, prevEnd + GAP);
-    lines.push({ key, start: round(start), dur, text: { en: spec.en, es: spec.es }, voice: current });
+    lines.push({ key, start: round(start), dur, text, voice: current, ...(spec.spoken ? { spoken: spec.spoken } : {}) });
     prevEnd = start + dur;
   });
   return lines;

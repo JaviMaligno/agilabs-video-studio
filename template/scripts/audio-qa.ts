@@ -11,7 +11,7 @@ import { spawnSync } from 'node:child_process';
 import { VIDEOS } from '../src/timeline.ts';
 import { SETTINGS } from '../src/settings.ts';
 import { estimateSeconds } from '../src/narrate.ts';
-import type { Lang } from '../src/types.ts';
+import { spokenText, type Lang } from '../src/types.ts';
 import { at, ffmpegReport, findFfmpeg, loudness, wavSeconds, LOUDNESS, CARTESIA } from './lib.mjs';
 
 /** A line this much longer than its estimate is worth a listen. */
@@ -70,7 +70,7 @@ for (const lang of langs) {
           fs.writeFileSync(doneFile, JSON.stringify(done, null, 1));
         }
         const seconds = wavSeconds(fs.readFileSync(file));
-        const expected = estimateSeconds(line.text[lang], lang);
+        const expected = estimateSeconds(spokenText(line, lang), lang);
         if (seconds > expected * TOO_LONG) issues.push(`${seconds.toFixed(1)} s for an expected ${expected.toFixed(1)} s: listen for garbled or repeated words`);
         report.push(`| ${line.key} | ${seconds.toFixed(2)} | ${issues.join('; ') || 'ok'} |`);
       }

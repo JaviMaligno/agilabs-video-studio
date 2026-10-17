@@ -45,18 +45,25 @@ voice library, listen to a sample line from the script, record its id in `video.
 
 ## Pronunciation
 
-The TTS reads the narration text. Captions show the written words; when the spoken words do not
-match the written ones one to one, the captions fall back to proportional timing and still show
-the written text. So:
+The TTS reads the narration text; the captions show the written text. When the TTS misreads
+a number or symbol, give the line a **spoken form** as the fourth argument of `say`, and keep
+the article's written form as the caption:
 
-- Write the line the way the article writes it ("14/20", "83 %", "p = 0.0018") when the TTS
-  reads it correctly.
-- When it does not, write the spoken form in the narration ("fourteen out of twenty",
-  "eighty-three percent", "gpt five point six") and keep the written form on screen in the
-  component (`display`, `value`, `label`). Check that the caption still reads well; if the
-  caption must show the written form, prefer moving the number into the component.
-- Slashes, version strings, file names and acronyms are the usual trouble. Listen to each line
-  that has one.
+```ts
+say(0.3, 'It solved 14/20 tasks.', 'Resolvió 14/20 tareas.', {
+  en: 'It solved fourteen out of twenty tasks.',
+  es: 'Resolvió catorce de veinte tareas.',
+})
+```
+
+- The TTS voices the spoken form (and the cache re-voices the line when it changes); the line
+  length comes from it.
+- The caption shows the written text, timed proportionally over the line (word timestamps
+  belong to the spoken words, so they are not used for that line).
+- Write the line plainly ("14/20", "83 %", "p = 0.0018") and add a spoken form only when a
+  listen shows the TTS gets it wrong.
+- Slashes, version strings ("gpt-5.6"), file names and acronyms are the usual trouble. Listen to
+  each line that has one.
 
 ## Audio QA
 

@@ -11,8 +11,15 @@ export function tx(label: Label, lang: Lang): string {
   return label[lang] || label.en;
 }
 
-/** One narration line. `start` and `dur` are seconds from the start of its scene. */
-export type Line = { key: string; start: number; dur: number; text: Text; voice: Lang };
+/**
+ * One narration line. `start` and `dur` are seconds from the start of its scene. `text` is the
+ * written form (captions); `spoken`, when set for a language, is what the TTS reads instead
+ * ("fourteen out of twenty" for "14/20"), and the captions keep the written form.
+ */
+export type Line = { key: string; start: number; dur: number; text: Text; voice: Lang; spoken?: Partial<Text> };
+
+/** What the TTS reads for a line: its spoken form when one is given, else the written text. */
+export const spokenText = (line: Pick<Line, 'text' | 'spoken'>, lang: Lang): string => line.spoken?.[lang] || line.text[lang];
 
 /** A spoken word from TTS: [word, start, end] in seconds from the start of its line. */
 export type Word = [string, number, number];

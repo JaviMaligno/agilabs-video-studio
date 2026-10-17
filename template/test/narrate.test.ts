@@ -73,3 +73,14 @@ test('settings defaults and placeholder timeline', () => {
   assert.equal(TIMELINE[1].anim?.name, 'KeyQuote');
   assert.equal(VIDEOS.en.main, TIMELINE);
 });
+
+test('a spoken form drives the TTS length estimate and is kept on the line', () => {
+  const s = anim('num', 'Counter', {}, [say(0, 'It solved 14/20.', 'Resolvió 14/20.', { en: 'It solved fourteen out of twenty.' })]);
+  const [l] = s.lines;
+  assert.equal(l.text.en, 'It solved 14/20.');
+  assert.deepEqual(l.spoken, { en: 'It solved fourteen out of twenty.' });
+  near(l.dur, 'It solved fourteen out of twenty.'.length / 14.5);
+  // No spoken form: the line carries none.
+  assert.equal(say(0, 'a', 'b').spoken, undefined);
+  assert.equal(intro('plain', [say(0, 'Plain line.', 'Línea.')]).lines[0].spoken, undefined);
+});
