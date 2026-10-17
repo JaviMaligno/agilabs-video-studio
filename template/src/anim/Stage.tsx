@@ -1,15 +1,14 @@
 import React from 'react';
 import { C } from '../brand.ts';
-import { fontFamily, SAFE } from '../theme.ts';
+import { fontFamily } from '../theme.ts';
+import { STAGE } from '../layout.ts';
 
 /**
- * Where animations may draw: below the AGILabs badge and above the caption area. Vertical keeps
- * clear of the platform UI (SAFE) and of two caption rows; landscape leaves room for the same.
+ * Where animations may draw: below the AGILabs badge and above the caption box (layout.ts).
+ * Vertical keeps clear of the platform UI (SAFE) and of two caption rows; landscape leaves room
+ * for the same.
  */
-export const STAGE = {
-  vertical: { top: 280, bottom: 640, side: SAFE.side, w: 1080 - 2 * SAFE.side, h: 1920 - 280 - 640 },
-  landscape: { top: 140, bottom: 250, side: 160, w: 1920 - 2 * 160, h: 1080 - 140 - 250 },
-} as const;
+export { STAGE };
 
 export const stageOf = (vertical: boolean) => (vertical ? STAGE.vertical : STAGE.landscape);
 

@@ -1,15 +1,17 @@
 import React, { useMemo } from 'react';
 import { interpolate, useCurrentFrame, useVideoConfig } from 'remotion';
 import { C, alpha } from '../brand.ts';
-import { fontFamily, SAFE } from '../theme.ts';
+import { fontFamily } from '../theme.ts';
+import { CAPTION, LANDSCAPE_CAPTION_BOTTOM, V, VERTICAL } from '../layout.ts';
 import { cuesOfLines, cueRowTokens, type Token } from '../captions.ts';
 import type { Lang, Line } from '../types.ts';
 
-/** Characters per caption row: narrow on vertical so a row stays within ~900 px. */
+/** Characters per caption row: narrow on vertical so a row stays within the rail-free width. */
 export const ROW_CHARS = { vertical: 32, landscape: 42 } as const;
 
-const VERTICAL_STYLE = { fontSize: 50, width: 936, bottomGap: 60 };
-const LANDSCAPE_STYLE = { fontSize: 46, width: 1500, bottomGap: 70 };
+// Vertical: the box's bottom edge on the bottom safe line, no wider than the rail-free width.
+const VERTICAL_STYLE = { ...CAPTION.vertical, width: V.captionWidth, bottom: VERTICAL.h - V.captionBottom };
+const LANDSCAPE_STYLE = { ...CAPTION.landscape, width: 1500, bottom: LANDSCAPE_CAPTION_BOTTOM };
 
 /**
  * Karaoke captions: the current cue in one or two rows, the word being spoken in the accent text
@@ -24,7 +26,6 @@ export const Captions: React.FC<{ lines: Line[]; lang: Lang; vertical: boolean }
   const cue = cues.find((c) => t >= c.start && t < c.end);
   if (!cue) return null;
   const st = vertical ? VERTICAL_STYLE : LANDSCAPE_STYLE;
-  const bottom = vertical ? SAFE.bottom + st.bottomGap : st.bottomGap;
   const fadeIn = interpolate(t - cue.start, [0, 0.12], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
   const rows = cueRowTokens(cue, maxChars);
   const word = (tok: Token, i: number) => {
@@ -41,7 +42,7 @@ export const Captions: React.FC<{ lines: Line[]; lang: Lang; vertical: boolean }
         position: 'absolute',
         left: 0,
         right: 0,
-        bottom,
+        bottom: st.bottom,
         display: 'flex',
         justifyContent: 'center',
         opacity: fadeIn,
@@ -52,14 +53,14 @@ export const Captions: React.FC<{ lines: Line[]; lang: Lang; vertical: boolean }
       <div
         style={{
           maxWidth: st.width,
-          padding: '18px 30px',
+          padding: `${st.padY}px ${st.padX}px`,
           borderRadius: 22,
           background: alpha(C.bg0, 0.72),
           border: `1px solid ${alpha('#ffffff', 0.08)}`,
           fontFamily,
           fontSize: st.fontSize,
           fontWeight: 700,
-          lineHeight: 1.22,
+          lineHeight: st.lineHeight,
           textAlign: 'center',
           letterSpacing: '-0.005em',
         }}

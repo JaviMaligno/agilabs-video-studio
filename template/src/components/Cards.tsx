@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
 import { C, GRADIENT } from '../brand.ts';
-import { fontFamily, SAFE } from '../theme.ts';
+import { fontFamily, SAFE, V } from '../theme.ts';
 import { SETTINGS } from '../settings.ts';
 import { tokensOf } from '../captions.ts';
 import { tx, type Lang, type Line } from '../types.ts';
@@ -29,7 +29,7 @@ export const Intro: React.FC<{ hook?: Line; lang: Lang; vertical: boolean }> = (
   const size = hookSize(text.length, vertical);
   return (
     <div style={{ position: 'absolute', inset: 0, fontFamily }}>
-      <div style={{ position: 'absolute', top: vertical ? SAFE.top : 80, left: 0, right: 0, display: 'flex', justifyContent: 'center', opacity: enter }}>
+      <div style={{ position: 'absolute', top: vertical ? V.badgeTop : 80, left: 0, right: 0, display: 'flex', justifyContent: 'center', opacity: enter }}>
         <Badge size={vertical ? 1.5 : 1.2} />
       </div>
       <div
@@ -77,8 +77,9 @@ export const Outro: React.FC<{ lang: Lang; vertical: boolean }> = ({ lang, verti
       style={{
         position: 'absolute',
         inset: 0,
-        // Vertical: keep the block above the caption area.
-        paddingBottom: vertical ? 420 : 140,
+        // Vertical: centred between the badge line and the caption box.
+        paddingTop: vertical ? V.badgeTop : 0,
+        paddingBottom: vertical ? 1920 - V.stageBottom : 140,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',

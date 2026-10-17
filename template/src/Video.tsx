@@ -8,7 +8,7 @@ import { FPS, SCENE_TRANSITION, linesInVideo, sceneFrames } from './timing.ts';
 import { SETTINGS } from './settings.ts';
 import { musicVolume } from './music.ts';
 import { C } from './brand.ts';
-import { fontFamily, SAFE } from './theme.ts';
+import { fontFamily, V } from './theme.ts';
 import { ANIMS } from './anim/index.ts';
 import { Background } from './components/Background.tsx';
 import { Intro, Outro } from './components/Cards.tsx';
@@ -61,7 +61,7 @@ const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p 
       {scene.kind === 'anim' && (
         <>
           <AnimView scene={scene} p={p} />
-          <div style={{ position: 'absolute', top: p.vertical ? SAFE.top - 90 : 48, left: 0, right: 0, display: 'flex', justifyContent: 'center' }}>
+          <div style={{ position: 'absolute', top: p.vertical ? V.badgeTop : 48, left: 0, right: 0, display: 'flex', justifyContent: 'center' }}>
             <Badge size={p.vertical ? 1.1 : 0.9} />
           </div>
         </>
