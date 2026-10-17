@@ -50,6 +50,9 @@ export const GUESSES = [
 /** How far ahead an arrow points, in seconds of running. */
 export const ARROW_SECONDS = 1.6;
 
+/** Scene second the real ball appears in the reveal scene. */
+export const REVEAL_AT = 0.7;
+
 const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
 const fin = (x: number, d = 0) => (Number.isFinite(x) ? x : d);
 
@@ -132,9 +135,10 @@ export function frameState(p: PitchProps, time: number, beats: number[], dur: nu
   let ballOpacity = 1;
   let glow = 0;
   if (mode === 'hidden' || mode === 'guess' || mode === 'arrows') ballOpacity = 0;
+  // Revealed only once the scene has faded in (the transition takes 0.6 s), with a long glow.
   if (mode === 'reveal') {
-    ballOpacity = progress(t, fit(0.25, 0.2, d), 0.2);
-    glow = 1 - progress(t, fit(0.25, 1.4, d), 1.4);
+    ballOpacity = progress(t, fit(REVEAL_AT, 0.2, d), 0.2);
+    glow = 1 - 0.6 * progress(t, fit(REVEAL_AT + 0.4, 2.2, d), 2.2);
   }
 
   // "?" pulsing: over the middle of the action while the ball is hidden, over the still ball later.
@@ -142,7 +146,8 @@ export function frameState(p: PitchProps, time: number, beats: number[], dur: nu
   let qOpacity = 0;
   let qx = 70;
   let qy = 22;
-  if (mode === 'hidden') qOpacity = progress(t, fit(0.2, 0.4, d), 0.4);
+  // On from the very first frame: the opening frame is the feed thumbnail and the hook.
+  if (mode === 'hidden') qOpacity = 1;
   if (mode === 'guess') qOpacity = 1 - progress(t, fit(b1, 0.5, d), 0.5) * 0.6;
   if (mode === 'still') {
     qOpacity = progress(t, fit(b1, 0.5, d), 0.5);
@@ -150,27 +155,31 @@ export function frameState(p: PitchProps, time: number, beats: number[], dur: nu
     qy = s.ball.y - 8;
   }
 
-  // AI guess markers: drop in on beat 2 of the guess scene; scatter once the ball is revealed.
+  // AI guess markers: drop in on beat 2 of the guess scene; crossed out once the ball is revealed.
   const guesses = GUESSES.map((g, i) => {
     let drop = 0;
     let scatter = 0;
     if (mode === 'guess') drop = easeOutCubic(progress(t, fit(b1 + 0.2 + i * 0.25, 0.5, d), 0.5));
     if (mode === 'reveal') {
       drop = 1;
-      scatter = easeOutCubic(progress(t, fit(0.6 + i * 0.1, 0.7, d), 0.7));
+      scatter = easeOutCubic(progress(t, fit(REVEAL_AT + 1.0 + i * 0.15, 0.7, d), 0.7));
     }
-    const dx = g.x - s.ball.x;
-    const dy = g.y - s.ball.y;
-    const n = Math.hypot(dx, dy) || 1;
     return {
       label: g.label,
-      x: g.x + (dx / n) * 7 * scatter + (i - 1) * 2 * scatter,
-      y: g.y + (dy / n) * 7 * scatter,
+      x: g.x,
+      y: g.y,
       drop,
-      opacity: drop * (1 - 0.6 * scatter),
+      opacity: drop * (1 - 0.45 * scatter),
       scatter,
     };
   });
+  // Miss lines from each guess to the revealed ball, drawn one after another.
+  const misses = guesses.map((g, i) => ({
+    x: g.x,
+    y: g.y,
+    draw: mode === 'reveal' ? easeOutCubic(progress(t, fit(REVEAL_AT + 0.35 + i * 0.15, 0.6, d), 0.6)) : 0,
+    opacity: 1,
+  }));
 
   // The 60 kB net: appears off the ball and snaps onto it.
   let net = { x: 0, y: 0, opacity: 0, snap: 0, ring: 0 };
@@ -222,18 +231,27 @@ export function frameState(p: PitchProps, time: number, beats: number[], dur: nu
       })()
     : null;
 
+  // Pitch overlays give way to the headline figure, so nothing ghosts behind it.
+  const under = counter ? 1 - counter.appear : 1;
+  guesses.forEach((g) => (g.opacity *= under));
+  misses.forEach((m) => (m.opacity *= under));
+  net.opacity *= under;
+
   return {
     playT,
     players,
     ball: { x: s.ball.x, y: s.ball.y, opacity: ballOpacity, glow },
     question: { x: qx, y: qy, opacity: qOpacity, pulse },
     guesses,
+    misses,
     net,
     centroid,
     arrows: { grow, opacity: mode === 'arrows' || mode === 'centroid' || mode === 'still' ? 1 : 0 },
     counter,
     /** Pitch dimming under an overlay (counter or quote), 0..1. */
     dim: mode === 'quote' ? 0.72 : counter ? 0.82 * counter.appear : 0,
-    chip: { opacity: p.chip ? progress(t, fit(0.2, 0.4, d), 0.4) : 0 },
+    // In at the start; out just before the scene hands over (the last 0.6 s), so two chips never
+    // overlap when the next scene cross-fades in on the same pitch.
+    chip: { opacity: p.chip ? progress(t, fit(0.2, 0.4, d), 0.4) * (1 - progress(t, d - 0.9, 0.3)) : 0 },
   };
 }

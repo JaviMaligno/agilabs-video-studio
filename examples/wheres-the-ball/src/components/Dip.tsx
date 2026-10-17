@@ -16,3 +16,17 @@ const DipView: React.FC<TransitionPresentationComponentProps<DipProps>> = ({ chi
 };
 
 export const dip = (): TransitionPresentation<DipProps> => ({ component: DipView, props: {} });
+
+// The incoming scene fades in over the first half while the outgoing one stays fully drawn, then
+// the outgoing one fades out: for two scenes on the same pitch at the same play second, the pitch
+// never dims and only what differs (overlays, chip) cross-fades.
+const BlendView: React.FC<TransitionPresentationComponentProps<DipProps>> = ({ children, presentationDirection, presentationProgress }) => {
+  const p = presentationProgress;
+  const opacity =
+    presentationDirection === 'exiting'
+      ? interpolate(p, [0.5, 1], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
+      : interpolate(p, [0, 0.5], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  return <AbsoluteFill style={{ opacity }}>{children}</AbsoluteFill>;
+};
+
+export const blend = (): TransitionPresentation<DipProps> => ({ component: BlendView, props: {} });

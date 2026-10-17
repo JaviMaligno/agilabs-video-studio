@@ -4,7 +4,7 @@ import { Audio } from '@remotion/media';
 import { TransitionSeries, linearTiming } from '@remotion/transitions';
 import { AUDIO } from './audio.generated.ts';
 import { VIDEOS } from './timeline.ts';
-import { FPS, SCENE_TRANSITION, linesInVideo, sceneFrames } from './timing.ts';
+import { FPS, SCENE_TRANSITION, handOverAt, linesInVideo, sceneFrames } from './timing.ts';
 import { SETTINGS } from './settings.ts';
 import { musicVolume } from './music.ts';
 import { C } from './brand.ts';
@@ -14,7 +14,7 @@ import { Background } from './components/Background.tsx';
 import { Intro, Outro } from './components/Cards.tsx';
 import { Captions } from './components/Captions.tsx';
 import { Badge } from './components/Brand.tsx';
-import { dip } from './components/Dip.tsx';
+import { blend, dip } from './components/Dip.tsx';
 import type { Lang, Scene } from './types.ts';
 
 /** noSubs: no captions (poster frames and thumbnails). */
@@ -51,6 +51,18 @@ const AnimView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p }
   );
 };
 
+/**
+ * Same animation, and the next scene picks up the play where this one stops: no dip between them.
+ * Not after a scene that ends on a headline figure, which would ghost over the live pitch.
+ */
+const continuous = (a: Scene, b: Scene | undefined): boolean => {
+  if (!b || a.kind !== 'anim' || b.kind !== 'anim' || a.anim?.name !== b.anim?.name) return false;
+  if ((a.anim?.props as { counter?: unknown } | undefined)?.counter) return false;
+  const pa = (a.anim?.props as { play?: [number, number] } | undefined)?.play;
+  const pb = (b.anim?.props as { play?: [number, number] } | undefined)?.play;
+  return !!pa && !!pb && Math.abs(pa[1] - pb[0]) < 0.05;
+};
+
 const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p }) => {
   // The intro shows its first line as the big hook, so the captions start from the second line.
   const captioned = scene.kind === 'intro' ? scene.lines.slice(1) : scene.lines;
@@ -66,7 +78,7 @@ const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p 
           </div>
         </>
       )}
-      {!p.noSubs && <Captions lines={captioned} lang={p.subs} vertical={p.vertical} />}
+      {!p.noSubs && <Captions lines={captioned} lang={p.subs} vertical={p.vertical} until={handOverAt(scene)} />}
       {/* Before the TTS script has run there is no audio: the scene plays silent on estimated timing. */}
       {scene.lines
         .filter((l) => AUDIO[l.voice]?.[l.key] !== undefined)
@@ -108,7 +120,7 @@ export const ArticleVideo: React.FC<ArticleVideoProps> = (p) => {
               <SceneView scene={scene} p={p} />
             </TransitionSeries.Sequence>
             {i < scenes.length - 1 && (
-              <TransitionSeries.Transition presentation={dip()} timing={linearTiming({ durationInFrames: SCENE_TRANSITION })} />
+              <TransitionSeries.Transition presentation={continuous(scene, scenes[i + 1]) ? blend() : dip()} timing={linearTiming({ durationInFrames: SCENE_TRANSITION })} />
             )}
           </React.Fragment>
         ))}

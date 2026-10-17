@@ -17,7 +17,8 @@ const build = (): Cuts => ({
           'Borré el balón del campo y dejé solo a los jugadores. ¿Sabes dónde está?',
         ),
       ],
-      { min: 5 },
+      // A beat on the question: the "?" holds and the caption stays readable before the hand-over.
+      { min: 6.6 },
     ),
     anim(
       'guess',
@@ -34,7 +35,10 @@ const build = (): Cuts => ({
       {
         mode: 'reveal',
         play: [4.4, 4.7],
-        counter: { value: 53, suffix: '%', label: L('Frontier AI on off-centre balls', 'IA puntera con balones descentrados'), coin: true, delay: 1.0 },
+        chip: L('The real ball', 'El balón real'),
+        // The real ball and the AI misses hold the screen while the hard case is described;
+        // the figure lands on "they did no better than a coin flip".
+        counter: { value: 53, suffix: '%', label: L('Frontier AI on off-centre balls', 'IA puntera con balones descentrados'), coin: true, delay: 3.7 },
       },
       [
         say(
@@ -43,6 +47,8 @@ const build = (): Cuts => ({
           'En los casos difíciles, balones lejos del centro de la imagen, no lo hicieron mejor que una moneda al aire.',
         ),
       ],
+      // Lets the 53% land and its closing cue stay readable.
+      { min: 7.2 },
     ),
     anim(
       'net',
@@ -68,6 +74,8 @@ const build = (): Cuts => ({
           'Su truco es casi vergonzosamente simple: mirar hacia dónde corren los jugadores.',
         ),
       ],
+      // Room for the arrows to be read, and for the fast closing cue to stay up.
+      { min: 6.6 },
     ),
     anim(
       'centroid',

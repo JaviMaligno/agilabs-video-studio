@@ -14,8 +14,11 @@ export type { PitchProps };
 
 const DATA = play as unknown as PlayData;
 
-/** Visible part of the pitch, in metres: the attacking two thirds, where this play happens. */
-const VIEW = { x0: 25, x1: 107, y0: 0, y1: 68 };
+/** Visible part of the pitch, in metres: the attacking half and a bit, where this play happens. */
+const VIEW = { x0: 30, x1: 107, y0: 0, y1: 68 };
+/** Vertical cut: the pitch runs wider than the stage (to 40 px from the edges) and starts higher. */
+const VERTICAL_SIDE = 40;
+const VERTICAL_TOP = 250;
 
 /** Pitch markings (metres, 105 x 68). */
 const Markings: React.FC<{ sw: number }> = ({ sw }) => {
@@ -106,14 +109,16 @@ export const PitchPlayback: React.FC<AnimProps & PitchProps> = (p) => {
   const stage = stageOf(p.vertical);
   const vw = VIEW.x1 - VIEW.x0;
   const vh = VIEW.y1 - VIEW.y0;
-  const scale = Math.min(stage.w / vw, (stage.h - (p.vertical ? 150 : 90)) / vh);
+  // Vertical: as wide as the frame allows, so dots stay legible on a phone; the chip under the
+  // pitch still clears the two caption rows.
+  const maxW = p.vertical ? 1080 - 2 * VERTICAL_SIDE : stage.w;
+  const scale = Math.min(maxW / vw, (stage.h - (p.vertical ? 50 : 90)) / vh);
   const W = vw * scale;
   const H = vh * scale;
-  const left = stage.side + (stage.w - W) / 2;
-  const top = stage.top + (p.vertical ? 10 : 0);
+  const left = p.vertical ? (1080 - W) / 2 : stage.side + (stage.w - W) / 2;
+  const top = p.vertical ? VERTICAL_TOP : stage.top;
   const px = (x: number) => (x - VIEW.x0) * scale;
   const py = (y: number) => (y - VIEW.y0) * scale;
-  const inView = (x: number) => x > VIEW.x0 - 3 && x < VIEW.x1 + 3;
 
   const arrow = (x0: number, y0: number, x1: number, y1: number, op: number, key: number) => {
     const dx = x1 - x0;
@@ -183,8 +188,8 @@ export const PitchPlayback: React.FC<AnimProps & PitchProps> = (p) => {
 
           {arrowsOn && s.players.map((q, i) => arrow(q.x, q.y, q.ax, q.ay, 0.3 + 0.7 * q.bright, i))}
 
-          {s.players.map((q, i) =>
-            inView(q.x) ? (
+          {/* Players off the left edge are clipped by the viewBox, so they slide in instead of popping. */}
+          {s.players.map((q, i) => (
               <circle
                 key={`p${i}`}
                 cx={q.x}
@@ -194,6 +199,23 @@ export const PitchPlayback: React.FC<AnimProps & PitchProps> = (p) => {
                 stroke={C.bg0}
                 strokeWidth={0.3}
                 opacity={arrowsOn ? 0.55 + 0.45 * q.bright : 0.95}
+              />
+          ))}
+
+          {/* How far each AI guess missed: a dashed line drawn from the guess to the real ball. */}
+          {s.misses.map((m, i) =>
+            m.draw > 0 ? (
+              <line
+                key={`m${i}`}
+                x1={m.x}
+                y1={m.y}
+                x2={m.x + (s.ball.x - m.x) * m.draw}
+                y2={m.y + (s.ball.y - m.y) * m.draw}
+                stroke={C.text}
+                strokeWidth={0.4}
+                strokeDasharray="1.2 0.9"
+                strokeLinecap="round"
+                opacity={0.75 * m.opacity}
               />
             ) : null,
           )}
