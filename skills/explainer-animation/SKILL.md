@@ -93,6 +93,11 @@ When the script flags a scene "bespoke":
 5. Optionally add a sample to `src/Gallery.tsx`. If it is reusable, it belongs back in the
    plugin's template.
 
+**Generated images.** Most scenes should be drawn in code (SVG and CSS from the brand tokens).
+If a scene truly needs a generated image (a background, a base image, a textured moment), an
+image model can make it, for example the Codex CLI's image generation. Save it under
+`public/`, load it with `staticFile()`, keep it inside the brand palette, and check the still.
+
 ## Vertical safe area (1080x1920)
 
 - Platform UI covers the top ~220 px and the bottom ~380 px; keep 72 px at the sides.

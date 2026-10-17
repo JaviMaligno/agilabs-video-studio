@@ -21,6 +21,10 @@ when installed as a plugin; next to `skills/` in the plugin repo).
   the article. Keep the table in `factcheck.md` (claim, where it appears, the article sentence
   quoted). Figures are shown exactly as the article writes them: same rounding, same units,
   same "14/20" rather than "70%". A mismatch is fixed in the timeline, never in the article.
+  The fact-check covers the narration and the numbers and claims shown on screen, nothing else.
+  Visuals are chosen for impact, not as a literal replay of the experiment: an illustrative
+  scene (real data replayed freely, markers placed for clarity, a stylised mechanism) is fine,
+  because the rigour lives in the article and its repo.
 - **Voice.** The narration speaks as the article is written: first person ("I ran...", "I
   found..."), with claims no stronger than the article's. If the article hedges ("in this
   setup", "on these 20 runs"), the script hedges too. No punchier-than-source wording.
