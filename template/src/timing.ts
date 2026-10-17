@@ -21,3 +21,9 @@ export const sceneStarts = (scenes: Scene[]): { starts: number[]; total: number 
   });
   return { starts, total: at };
 };
+
+/** Every narration line with its start in video seconds (scene start + line start). */
+export const linesInVideo = (scenes: Scene[]): { scene: Scene; line: Scene['lines'][number]; at: number }[] => {
+  const { starts } = sceneStarts(scenes);
+  return scenes.flatMap((scene, i) => scene.lines.map((line) => ({ scene, line, at: starts[i] / FPS + line.start })));
+};

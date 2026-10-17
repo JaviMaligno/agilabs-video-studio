@@ -35,9 +35,12 @@ export const say = (at: number, en: string, es: string): Spec => ({ at, en, es }
 
 const CHARS_PER_SECOND: Record<Lang, number> = { en: 14.5, es: 15.5 };
 
+/** Expected spoken length of a text, from its length: used before TTS and by audio QA. */
+export const estimateSeconds = (text: string, lang: Lang): number => text.length / CHARS_PER_SECOND[lang];
+
 /** Spoken length of a line: the real audio once TTS has run, an estimate before that. */
 export const lineSeconds = (key: string, text: string, lang: Lang = current): number =>
-  AUDIO[lang]?.[key] ?? text.length / CHARS_PER_SECOND[lang];
+  AUDIO[lang]?.[key] ?? estimateSeconds(text, lang);
 
 const round = (n: number) => +n.toFixed(3);
 

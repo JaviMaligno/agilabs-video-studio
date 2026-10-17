@@ -4,7 +4,9 @@ import { Audio } from '@remotion/media';
 import { TransitionSeries, linearTiming } from '@remotion/transitions';
 import { AUDIO } from './audio.generated.ts';
 import { VIDEOS } from './timeline.ts';
-import { FPS, SCENE_TRANSITION, sceneFrames } from './timing.ts';
+import { FPS, SCENE_TRANSITION, linesInVideo, sceneFrames } from './timing.ts';
+import { SETTINGS } from './settings.ts';
+import { musicVolume } from './music.ts';
 import { C } from './brand.ts';
 import { fontFamily, SAFE } from './theme.ts';
 import { ANIMS } from './anim/index.ts';
@@ -77,11 +79,28 @@ const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p 
   );
 };
 
+const Music: React.FC<{ scenes: Scene[] }> = ({ scenes }) => {
+  const { durationInFrames } = useVideoConfig();
+  const music = SETTINGS.music;
+  const spans = React.useMemo(() => linesInVideo(scenes).map(({ line, at }) => ({ from: at, to: at + line.dur })), [scenes]);
+  if (!music) return null;
+  const total = durationInFrames / FPS;
+  return (
+    <Audio
+      src={staticFile(music.src)}
+      loop
+      loopVolumeCurveBehavior="extend"
+      volume={(f) => musicVolume(f / FPS, spans, total, music)}
+    />
+  );
+};
+
 export const ArticleVideo: React.FC<ArticleVideoProps> = (p) => {
   const scenes = scenesFor(p.voice);
   return (
     <AbsoluteFill style={{ background: C.bg0 }}>
       <Background />
+      <Music scenes={scenes} />
       <TransitionSeries>
         {scenes.map((scene, i) => (
           <React.Fragment key={scene.id}>

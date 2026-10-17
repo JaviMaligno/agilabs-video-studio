@@ -7,7 +7,15 @@
   },
   "scripts": {
     "test": "node --test \"test/**/*.test.ts\"",
-    "typecheck": "tsc -p ."
+    "typecheck": "tsc -p .",
+    "studio": "remotion studio src/index.ts",
+    "lint": "node scripts/lint.ts",
+    "tts": "node scripts/tts.ts",
+    "audio-qa": "node scripts/audio-qa.ts",
+    "music": "node scripts/music.mjs",
+    "srt": "node scripts/srt.ts",
+    "render": "node scripts/render.mjs",
+    "deliver": "node scripts/deliver.mjs"
   },
   "devDependencies": {
     "@remotion/bundler": "4.0.534",

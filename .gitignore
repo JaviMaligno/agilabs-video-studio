@@ -7,8 +7,8 @@ template/public/audio/
 examples/*/public/audio/
 *.mp4
 *.wav
-# Music beds may be committed later
-!template/public/music/*.wav
+# The music bed is generated (npm run music; render makes it when missing)
+template/public/music/
 
 # Secrets
 .env
