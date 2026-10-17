@@ -69,6 +69,7 @@ test('settings defaults and placeholder timeline', () => {
   assert.equal(SETTINGS.targetSeconds, 45);
   assert.deepEqual(SETTINGS.music, { src: 'music/bed.wav', volume: 0.2, duck: 0.3 });
   assert.equal(SETTINGS.poster, null);
-  assert.deepEqual(TIMELINE.map((s) => s.kind), ['intro', 'outro']);
+  assert.deepEqual(TIMELINE.map((s) => s.kind), ['intro', 'anim', 'outro']);
+  assert.equal(TIMELINE[1].anim?.name, 'KeyQuote');
   assert.equal(VIDEOS.en.main, TIMELINE);
 });

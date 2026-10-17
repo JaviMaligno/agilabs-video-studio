@@ -1,6 +1,7 @@
 import React from 'react';
 import { Composition } from 'remotion';
 import { ArticleVideo, scenesFor, type ArticleVideoProps } from './Video.tsx';
+import { GALLERY, GALLERY_SECONDS, Gallery } from './Gallery.tsx';
 import { SETTINGS } from './settings.ts';
 import { FPS, sceneStarts } from './timing.ts';
 import { LANDSCAPE, VERTICAL } from './theme.ts';
@@ -28,6 +29,22 @@ export const Root: React.FC = () => (
           />
         );
       });
+    })}
+    {/* Every animation component in turn, to check the library by eye. */}
+    {(['vertical', 'landscape'] as const).map((format) => {
+      const size = format === 'vertical' ? VERTICAL : LANDSCAPE;
+      return (
+        <Composition
+          key={`gallery-${format}`}
+          id={`Gallery-${format}`}
+          component={Gallery}
+          durationInFrames={GALLERY.length * GALLERY_SECONDS * FPS}
+          fps={FPS}
+          width={size.w}
+          height={size.h}
+          defaultProps={{ vertical: format === 'vertical' }}
+        />
+      );
     })}
   </>
 );
