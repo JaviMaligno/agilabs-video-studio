@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Renders and generated media
+out/
+template/public/audio/
+examples/*/public/audio/
+*.mp4
+*.wav
+# Music beds may be committed later
+!template/public/music/*.wav
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store

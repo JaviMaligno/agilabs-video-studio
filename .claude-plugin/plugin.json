@@ -1,0 +1,12 @@
+{
+  "name": "agilabs-video-studio",
+  "description": "Turn a blog article into a short narrated, animated vertical explainer video with Remotion: script, animated scenes, TTS narration, burned-in captions and render.",
+  "version": "0.1.0",
+  "author": {
+    "name": "AGILabs"
+  },
+  "homepage": "https://javieraguilar.ai",
+  "repository": "https://github.com/JaviMaligno/agilabs-video-studio",
+  "license": "MIT",
+  "keywords": ["video", "remotion", "explainer", "narration", "tts", "captions", "blog"]
+}
