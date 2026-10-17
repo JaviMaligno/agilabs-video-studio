@@ -135,3 +135,11 @@ test('a spoken form keeps the written caption, timed proportionally', () => {
     WORDS.en = {};
   }
 });
+
+test('the last cue of a line is held into the silence, never past the next line', async () => {
+  const { heldCuesOf, CUE_HOLD } = await import('../src/captions.ts');
+  const mk = (key: string, start: number, dur: number, text: string) => ({ key, start, dur, text: { en: text, es: text }, voice: 'en' as const });
+  const lines = [mk('x-01', 0, 1, 'Short one.'), mk('x-02', 1.3, 1, 'Next.'), mk('x-03', 3, 1, 'Last.')];
+  assert.equal(heldCuesOf(lines, 0, 'en').at(-1)!.end, 1.3);
+  assert.equal(heldCuesOf(lines, 2, 'en').at(-1)!.end, 4 + CUE_HOLD);
+});

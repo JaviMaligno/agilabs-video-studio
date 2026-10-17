@@ -143,9 +143,28 @@ export const cuesOf = (line: Line, subs: Lang, maxChars = 32): Cue[] => {
   }));
 };
 
-/** All cues of a list of lines, in scene seconds. */
-export const cuesOfLines = (lines: Line[], subs: Lang, maxChars = 32): Cue[] =>
-  lines.flatMap((l) => cuesOf(l, subs, maxChars));
+/**
+ * How long the last cue of a line stays up after the voice stops, in seconds: a short closing
+ * phrase ("Can you tell where it is?") would otherwise flash by faster than it can be read.
+ * Never past the start of the next line, nor past `until` (where the scene starts handing over
+ * to the next one, so two scenes' captions never show at once).
+ */
+export const CUE_HOLD = 0.8;
+
+/** The cues of line `i` of a scene, its last cue held up to CUE_HOLD into the silence after it. */
+export const heldCuesOf = (lines: Line[], i: number, subs: Lang, maxChars = 32, until = Infinity): Cue[] => {
+  const cues = cuesOf(lines[i], subs, maxChars);
+  const last = cues.at(-1);
+  if (last) {
+    const next = lines[i + 1]?.start ?? until;
+    last.end = Math.max(last.end, Math.min(last.end + CUE_HOLD, next));
+  }
+  return cues;
+};
+
+/** All cues of a scene's lines, in scene seconds, with the hold after each line. */
+export const cuesOfLines = (lines: Line[], subs: Lang, maxChars = 32, until = Infinity): Cue[] =>
+  lines.flatMap((_, i) => heldCuesOf(lines, i, subs, maxChars, until));
 
 /**
  * Splits a cue into one or two rows for display: the most balanced break that keeps both rows

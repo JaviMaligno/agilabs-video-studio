@@ -15,12 +15,13 @@ const LANDSCAPE_STYLE = { fontSize: 46, width: 1500, bottomGap: 70 };
  * Karaoke captions: the current cue in one or two rows, the word being spoken in the accent text
  * colour. Times are scene seconds, so this must sit inside the scene's Sequence.
  */
-export const Captions: React.FC<{ lines: Line[]; lang: Lang; vertical: boolean }> = ({ lines, lang, vertical }) => {
+/** `until`: scene second where the hand-over to the next scene starts; held cues stop there. */
+export const Captions: React.FC<{ lines: Line[]; lang: Lang; vertical: boolean; until?: number }> = ({ lines, lang, vertical, until }) => {
   const frame = useCurrentFrame();
   const { fps, height } = useVideoConfig();
   const t = frame / fps;
   const maxChars = vertical ? ROW_CHARS.vertical : ROW_CHARS.landscape;
-  const cues = useMemo(() => cuesOfLines(lines, lang, maxChars), [lines, lang, maxChars]);
+  const cues = useMemo(() => cuesOfLines(lines, lang, maxChars, until), [lines, lang, maxChars, until]);
   const cue = cues.find((c) => t >= c.start && t < c.end);
   if (!cue) return null;
   const st = vertical ? VERTICAL_STYLE : LANDSCAPE_STYLE;

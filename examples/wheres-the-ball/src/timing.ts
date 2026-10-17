@@ -11,6 +11,9 @@ export const sceneFrames = (scene: Scene): number => {
   return Math.max(1, Math.round(seconds * FPS));
 };
 
+/** Scene second where its hand-over to the next scene begins (held captions end there). */
+export const handOverAt = (scene: Scene): number => (sceneFrames(scene) - SCENE_TRANSITION) / FPS;
+
 /** Start frame of each scene in the video and the total length, with transitions overlapping. */
 export const sceneStarts = (scenes: Scene[]): { starts: number[]; total: number } => {
   const starts: number[] = [];
