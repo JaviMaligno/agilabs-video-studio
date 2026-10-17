@@ -1,0 +1,27 @@
+// Per-video settings, read by both the Remotion composition and the Node scripts.
+// No browser-only imports here.
+import type { Label, Lang } from './types.ts';
+
+export type Settings = {
+  /** Narration languages. Each one gets its own timing, since lines differ in length. */
+  voices: Lang[];
+  /** Burned-in caption languages over the main voice. */
+  subtitles: Lang[];
+  /** Optional music bed (file under public/), ducked to `volume * duck` while a line plays. */
+  music: null | { src: string; volume: number; duck: number };
+  /** Intended length of the main cut, in seconds (30–60 for the vertical format). */
+  targetSeconds: number;
+  /** Thumbnail frame: scene id + seconds into it. null = a frame from the intro. */
+  poster: null | { scene: string; second: number };
+  /** Title of the source article, shown on the intro card. */
+  articleTitle: Label;
+};
+
+export const SETTINGS: Settings = {
+  voices: ['en'],
+  subtitles: ['en'],
+  music: null,
+  targetSeconds: 45,
+  poster: null,
+  articleTitle: { en: 'Article title', es: 'Título del artículo' },
+};
