@@ -245,3 +245,33 @@ test('PitchPlayback: centroid lands on the ball; arrows shrink to nothing when s
   const slow = a.players.reduce((m, q) => (q.speed < m.speed ? q : m));
   assert.ok(fast.bright > slow.bright);
 });
+
+test('PitchPlayback: the "?" never covers a player dot while it is on screen', () => {
+  const need = (pitch.Q_SIZE / 2) * 1.1 + 1.55;
+  const roomOver = (q: { x: number; y: number }, span: [number, number]) => {
+    let room = Infinity;
+    for (let t = span[0]; t <= span[1] + 1e-9; t += 0.05) {
+      const s = pitch.sample(PLAY, t);
+      for (const o of [...s.home, ...s.away]) room = Math.min(room, Math.hypot(o.x - q.x, o.y - q.y));
+    }
+    return room;
+  };
+  for (const [mode, play, qSpan] of [
+    ['hidden', [0, 3.6], [0, 4.4]],
+    ['guess', [3.6, 4.4], [0, 4.4]],
+    ['still', [10, 13.9], [12.2, 13.9]],
+  ] as const) {
+    const s = pitch.frameState({ mode, play: [...play], qSpan: [...qSpan] }, 6, [0.2, 4], 6.8, PLAY);
+    assert.ok(roomOver(s.question, [...qSpan]) >= need, `${mode}: "?" at ${s.question.x},${s.question.y} touches a player`);
+    // Inside the visible pitch.
+    const r = (pitch.Q_SIZE / 2) * 1.1;
+    assert.ok(s.question.x - r >= pitch.VIEW.x0 && s.question.x + r <= pitch.VIEW.x1, mode);
+    assert.ok(s.question.y - r >= pitch.VIEW.y0 && s.question.y + r <= pitch.VIEW.y1, mode);
+  }
+  // Hidden and guess hand the "?" over at the same spot.
+  const a = pitch.frameState({ mode: 'hidden', play: [0, 3.6], qSpan: [0, 4.4] }, 1, [0.3], 6.6, PLAY);
+  const b = pitch.frameState({ mode: 'guess', play: [3.6, 4.4], qSpan: [0, 4.4] }, 1, [0.2, 3], 7.2, PLAY);
+  assert.deepEqual([a.question.x, a.question.y], [b.question.x, b.question.y]);
+  // Clear of the AI guess markers too.
+  for (const g of pitch.GUESSES) assert.ok(Math.hypot(g.x - a.question.x, g.y - a.question.y) > (pitch.Q_SIZE / 2) * 1.1 + 3);
+});

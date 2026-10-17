@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { say, intro, anim, outro, lineSeconds, videos, voice, GAP, TAIL } from '../src/narrate.ts';
+import { say, intro, anim, outro, lineSeconds, videos, voice, GAP, TAIL, OUTRO_SECONDS, OUTRO_TAIL } from '../src/narrate.ts';
 import { FPS, SCENE_TRANSITION, sceneFrames, sceneStarts } from '../src/timing.ts';
 import { SETTINGS } from '../src/settings.ts';
 import { VIDEOS, TIMELINE } from '../src/timeline.ts';
@@ -28,14 +28,24 @@ test('beats equal line starts', () => {
 });
 
 test('scene lasts at least min and covers last line + TAIL', () => {
-  const short = outro('end', [say(0, 'Hi.', 'Hola.')]);
-  assert.equal(short.minSeconds, 4);
+  const short = intro('hi', [say(0, 'Hi.', 'Hola.')]);
+  assert.equal(short.minSeconds, 3);
   assert.equal(TAIL, 0.8);
   const long = intro('long', [say(0, 'x'.repeat(145), 'y'), say(0, 'z'.repeat(29), 'w')]);
   const last = long.lines.at(-1)!;
   near(long.minSeconds!, last.start + last.dur + 0.8);
   assert.ok(long.minSeconds! > 3);
   assert.equal(sceneFrames(long), Math.round(long.minSeconds! * FPS));
+});
+
+test('outro: 3 s when silent or short, else only OUTRO_TAIL past its last line', () => {
+  assert.equal(OUTRO_SECONDS, 3);
+  assert.equal(outro('silent', []).minSeconds, 3);
+  assert.equal(outro('short', [say(0, 'Hi.', 'Hola.')]).minSeconds, 3);
+  // 58 chars / 14.5 = 4 s of voice: the card ends OUTRO_TAIL after it, not TAIL.
+  const long = outro('long', [say(0.2, 'a'.repeat(58), 'b')]);
+  near(long.minSeconds!, 0.2 + 4 + OUTRO_TAIL);
+  assert.ok(OUTRO_TAIL < TAIL);
 });
 
 test('at pushes a line later', () => {

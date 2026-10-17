@@ -3,7 +3,7 @@
 import React from 'react';
 import { AbsoluteFill, Sequence, useCurrentFrame, useVideoConfig } from 'remotion';
 import { C } from './brand.ts';
-import { SAFE } from './theme.ts';
+import { V } from './theme.ts';
 import { ANIMS } from './anim/index.ts';
 import { Background } from './components/Background.tsx';
 import { Badge } from './components/Brand.tsx';
@@ -85,7 +85,7 @@ const Segment: React.FC<{ sample: Sample; index: number; vertical: boolean }> = 
   return (
     <AbsoluteFill>
       <Comp {...sample.props} t={frame / fps} beats={sample.beats} dur={GALLERY_SECONDS} lang="en" vertical={vertical} />
-      <div style={{ position: 'absolute', top: vertical ? SAFE.top - 90 : 48, left: 0, right: 0, display: 'flex', justifyContent: 'center' }}>
+      <div style={{ position: 'absolute', top: vertical ? V.badgeTop : 48, left: 0, right: 0, display: 'flex', justifyContent: 'center' }}>
         <Badge size={vertical ? 1.1 : 0.9} />
       </div>
       <Captions lines={[sampleLine(sample, index)]} lang="en" vertical={vertical} />

@@ -8,6 +8,12 @@ import { spokenText, type Cuts, type Label, type Lang, type Line, type Scene, ty
 export const GAP = 0.35;
 /** Silence after the last line of a scene, in seconds. */
 export const TAIL = 0.8;
+/**
+ * The outro card: shown OUTRO_SECONDS when silent; when it speaks, held only OUTRO_TAIL after its
+ * last line (the card carries the address, so a long silent hold just loses viewers at the end).
+ */
+export const OUTRO_SECONDS = 3;
+export const OUTRO_TAIL = 0.5;
 
 // The timeline is built once per narration language; helpers read the current one.
 let current: Lang = 'en';
@@ -63,10 +69,10 @@ const place = (id: string, specs: Spec[]): Line[] => {
   return lines;
 };
 
-const scene = (id: string, kind: Scene['kind'], specs: Spec[], min: number, extra: Partial<Scene> = {}): Scene => {
+const scene = (id: string, kind: Scene['kind'], specs: Spec[], min: number, extra: Partial<Scene> = {}, tail = TAIL): Scene => {
   const lines = place(id, specs);
   const last = lines.at(-1);
-  const minSeconds = round(Math.max(min, last ? last.start + last.dur + TAIL : 0));
+  const minSeconds = round(Math.max(min, last ? last.start + last.dur + tail : 0));
   return { id, kind, ...extra, lines, beats: lines.map((l) => l.start), minSeconds };
 };
 
@@ -84,4 +90,4 @@ export const anim = (
     ...(opts.chapter !== undefined ? { chapter: opts.chapter } : {}),
   });
 
-export const outro = (id: string, specs: Spec[], min = 4): Scene => scene(id, 'outro', specs, min);
+export const outro = (id: string, specs: Spec[], min = OUTRO_SECONDS): Scene => scene(id, 'outro', specs, min, {}, OUTRO_TAIL);

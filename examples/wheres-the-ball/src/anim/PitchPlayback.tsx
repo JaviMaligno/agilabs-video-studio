@@ -4,7 +4,7 @@ import { C, GRADIENT, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import { tx } from '../types.ts';
 import type { AnimProps } from './types.ts';
-import { frameState, type PitchProps, type PlayData } from './PitchPlayback.state.ts';
+import { frameState, Q_SIZE, VIEW, type PitchProps, type PlayData } from './PitchPlayback.state.ts';
 import { frameState as quoteState } from './KeyQuote.state.ts';
 import { gradientText, stageOf } from './Stage.tsx';
 import play from '../data/play.json';
@@ -14,11 +14,10 @@ export type { PitchProps };
 
 const DATA = play as unknown as PlayData;
 
-/** Visible part of the pitch, in metres: the attacking half and a bit, where this play happens. */
-const VIEW = { x0: 30, x1: 107, y0: 0, y1: 68 };
-/** Vertical cut: the pitch runs wider than the stage (to 40 px from the edges) and starts higher. */
+/** Vertical cut: the pitch runs wider than the stage (to 40 px from the edges). */
 const VERTICAL_SIDE = 40;
-const VERTICAL_TOP = 250;
+/** Room under the pitch for the scene chip: gap + chip height. */
+const CHIP_ROOM = 24 + 86;
 
 /** Pitch markings (metres, 105 x 68). */
 const Markings: React.FC<{ sw: number }> = ({ sw }) => {
@@ -109,14 +108,15 @@ export const PitchPlayback: React.FC<AnimProps & PitchProps> = (p) => {
   const stage = stageOf(p.vertical);
   const vw = VIEW.x1 - VIEW.x0;
   const vh = VIEW.y1 - VIEW.y0;
-  // Vertical: as wide as the frame allows, so dots stay legible on a phone; the chip under the
-  // pitch still clears the two caption rows.
+  // Vertical: as wide as the frame allows, so dots stay legible on a phone; pitch + chip are
+  // centred in the stage, which ends above the caption box.
   const maxW = p.vertical ? 1080 - 2 * VERTICAL_SIDE : stage.w;
-  const scale = Math.min(maxW / vw, (stage.h - (p.vertical ? 50 : 90)) / vh);
+  const scale = Math.min(maxW / vw, (stage.h - (p.vertical ? CHIP_ROOM : 90)) / vh);
   const W = vw * scale;
   const H = vh * scale;
   const left = p.vertical ? (1080 - W) / 2 : stage.side + (stage.w - W) / 2;
-  const top = p.vertical ? VERTICAL_TOP : stage.top;
+  const top = p.vertical ? stage.top + Math.max(0, (stage.h - H - CHIP_ROOM) / 2) : stage.top;
+  const qSize = Q_SIZE * scale;
   const px = (x: number) => (x - VIEW.x0) * scale;
   const py = (y: number) => (y - VIEW.y0) * scale;
 
@@ -349,9 +349,9 @@ export const PitchPlayback: React.FC<AnimProps & PitchProps> = (p) => {
               top: py(s.question.y),
               transform: `translate(-50%, -50%) scale(${1 + 0.1 * s.question.pulse})`,
               opacity: s.question.opacity,
-              width: 170,
-              height: 170,
-              borderRadius: 85,
+              width: qSize,
+              height: qSize,
+              borderRadius: qSize / 2,
               background: alpha(C.bg0, 0.72),
               border: `5px solid ${C.accentText}`,
               boxShadow: `0 0 ${30 + 40 * s.question.pulse}px ${alpha(C.accent, 0.4 + 0.4 * s.question.pulse)}`,
@@ -360,7 +360,7 @@ export const PitchPlayback: React.FC<AnimProps & PitchProps> = (p) => {
               justifyContent: 'center',
             }}
           >
-            <span style={{ fontSize: 130, fontWeight: 800, lineHeight: 1, ...gradientText }}>?</span>
+            <span style={{ fontSize: qSize * 0.76, fontWeight: 800, lineHeight: 1, ...gradientText }}>?</span>
           </div>
         )}
 
@@ -440,7 +440,7 @@ export const PitchPlayback: React.FC<AnimProps & PitchProps> = (p) => {
             position: 'absolute',
             left: 0,
             right: 0,
-            top: top + H + 30,
+            top: top + H + 24,
             display: 'flex',
             justifyContent: 'center',
             opacity: s.chip.opacity,

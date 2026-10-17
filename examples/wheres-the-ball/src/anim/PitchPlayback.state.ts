@@ -38,7 +38,20 @@ export type PitchProps = {
   counter?: PitchCounter;
   chip?: Label;
   quote?: { text: Label; emphasis?: string[] };
+  /**
+   * Play seconds the "?" must stay clear of the players over (default: `play`). Scenes that hand
+   * the "?" over to each other share one span, so it does not jump at the cut.
+   */
+  qSpan?: [number, number];
 };
+
+/** Visible part of the pitch, in metres: the attacking half and a bit, where this play happens. */
+export const VIEW = { x0: 34, x1: 107, y0: 0, y1: 68 };
+
+/** The "?" marker: diameter in metres (drawn at pitch scale) and the room it keeps from things. */
+export const Q_SIZE = 12;
+/** Player dot radius (metres) plus a little air. */
+const DOT_CLEAR = 2.2;
 
 /** Fixed AI guess markers (metres): near the middle of the action, the camera-centre bias. */
 export const GUESSES = [
@@ -54,6 +67,81 @@ export const ARROW_SECONDS = 1.6;
 export const REVEAL_AT = 0.7;
 
 const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
+
+type Pt = { x: number; y: number };
+
+/**
+ * The spot nearest `prefer` where the "?" (pulsing up to 10 % larger) covers no player dot, no
+ * extra obstacle and stays inside the visible pitch, at every play second of `span`. When no
+ * spot is clear the whole time, the one with the most room. Candidates are on a 1 m grid,
+ * optionally restricted by `allow` (e.g. a ring around the ball).
+ */
+export function clearSpot(
+  data: PlayData,
+  span: [number, number],
+  prefer: Pt,
+  obstacles: { x: number; y: number; r: number }[] = [],
+  allow: (q: Pt) => boolean = () => true,
+): Pt {
+  const R = (Q_SIZE / 2) * 1.1;
+  const times: number[] = [];
+  for (let t = span[0]; t <= span[1] + 1e-9; t += 0.1) times.push(t);
+  if (!times.length) times.push(span[0]);
+  const frames = times.map((t) => {
+    const s = sample(data, t);
+    return [...s.home, ...s.away].filter((q) => Number.isFinite(q.x) && Number.isFinite(q.y));
+  });
+  let best: { q: Pt; room: number; dist: number } | null = null;
+  for (let x = Math.ceil(VIEW.x0 + R); x <= VIEW.x1 - R; x += 1) {
+    for (let y = Math.ceil(VIEW.y0 + R); y <= VIEW.y1 - R; y += 1) {
+      const q = { x, y };
+      if (!allow(q)) continue;
+      // Room: how far the closest thing is beyond what the marker needs (negative = overlap).
+      let room = Infinity;
+      for (const ps of frames) for (const o of ps) room = Math.min(room, Math.hypot(o.x - x, o.y - y) - R - DOT_CLEAR);
+      for (const o of obstacles) room = Math.min(room, Math.hypot(o.x - x, o.y - y) - R - o.r);
+      const dist = Math.hypot(x - prefer.x, y - prefer.y);
+      const clear = room >= 0;
+      const better =
+        !best ||
+        (clear && best.room < 0) ||
+        (clear && best.room >= 0 && dist < best.dist) ||
+        (!clear && best.room < 0 && room > best.room);
+      if (better) best = { q, room, dist };
+    }
+  }
+  return best ? best.q : prefer;
+}
+
+const spots = new Map<string, Pt>();
+const cached = (key: string, make: () => Pt): Pt => {
+  const hit = spots.get(key);
+  if (hit) return hit;
+  const q = make();
+  spots.set(key, q);
+  return q;
+};
+
+/** The AI guess markers and their labels (drawn above them), as obstacles for the "?". */
+const GUESS_OBSTACLES = GUESSES.flatMap((g) => [
+  { x: g.x, y: g.y, r: 3 },
+  { x: g.x, y: g.y - 5, r: 4 },
+]);
+
+/** Where the "?" sits while the ball is hidden: clear of players and of the AI guesses. */
+export const hiddenSpot = (data: PlayData, span: [number, number]): Pt =>
+  cached(`hidden:${span}`, () => clearSpot(data, span, { x: 70, y: 22 }, GUESS_OBSTACLES));
+
+/** Where the "?" sits over the still ball: on a ring around it, clear of players, preferably above. */
+export const stillSpot = (data: PlayData, span: [number, number]): Pt =>
+  cached(`still:${span}`, () => {
+    const b = sample(data, span[0]).ball;
+    const R = (Q_SIZE / 2) * 1.1;
+    return clearSpot(data, span, { x: b.x, y: b.y - (R + 3) }, [{ x: b.x, y: b.y, r: 2.5 }], (q) => {
+      const d = Math.hypot(q.x - b.x, q.y - b.y);
+      return d >= R + 2.5 && d <= R + 6;
+    });
+  });
 const fin = (x: number, d = 0) => (Number.isFinite(x) ? x : d);
 
 /** Positions at play second `p`, interpolated between frames and clamped to the data. */
@@ -144,16 +232,18 @@ export function frameState(p: PitchProps, time: number, beats: number[], dur: nu
   // "?" pulsing: over the middle of the action while the ball is hidden, over the still ball later.
   const pulse = 0.5 + 0.5 * Math.sin((fin(time) * 2 * Math.PI) / 1.1);
   let qOpacity = 0;
-  let qx = 70;
-  let qy = 22;
+  let q: Pt = { x: 70, y: 22 };
   // On from the very first frame: the opening frame is the feed thumbnail and the hook.
+  // It stays put for the whole span, on a spot no player crosses (players move under it otherwise).
   if (mode === 'hidden') qOpacity = 1;
   if (mode === 'guess') qOpacity = 1 - progress(t, fit(b1, 0.5, d), 0.5) * 0.6;
+  if (mode === 'hidden' || mode === 'guess') q = hiddenSpot(data, p.qSpan ?? p.play);
   if (mode === 'still') {
     qOpacity = progress(t, fit(b1, 0.5, d), 0.5);
-    qx = s.ball.x;
-    qy = s.ball.y - 8;
+    q = stillSpot(data, p.qSpan ?? p.play);
   }
+  const qx = q.x;
+  const qy = q.y;
 
   // AI guess markers: drop in on beat 2 of the guess scene; crossed out once the ball is revealed.
   const guesses = GUESSES.map((g, i) => {
