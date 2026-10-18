@@ -1,0 +1,48 @@
+{
+  "source": "experiments/agent-telephone/runs/cc_grid/messages.jsonl (branch blog/the-why-gets-lost of the website repo), run software_3-hier_chain-free-clean-sonnet. One sentence per hop, quoted verbatim and cropped; backticks dropped.",
+  "client": "Tidewater Climbing",
+  "desks": [
+    {
+      "edge": "client → lead",
+      "rule": "Inactivity is measured on last_seen_at, not last_login,",
+      "tabs": [
+        "because the mobile app stopped updating last_login after the Auth0 switch.",
+        "That's because Skatteetaten makes us keep invoices for five years."
+      ]
+    },
+    {
+      "edge": "lead → PM",
+      "rule": "Inactivity is measured on last_seen_at, NOT last_login,",
+      "tabs": [
+        "because the mobile app stopped updating last_login after the Auth0 switch",
+        "(Skatteetaten requires keeping invoices for five years)"
+      ]
+    },
+    {
+      "edge": "PM → architect",
+      "rule": "Inactivity is measured on last_seen_at, NOT last_login",
+      "tabs": [
+        "(the mobile app stopped updating last_login after the Auth0 switch)",
+        "(Skatteetaten requires five-year retention)"
+      ]
+    },
+    {
+      "edge": "architect → implementer",
+      "rule": "Inactivity is measured on last_seen_at, never last_login.",
+      "tabs": []
+    }
+  ],
+  "facts": [
+    "Þórdís",
+    "730 days",
+    "Never include the email"
+  ],
+  "code": [
+    "def plan_purge(accounts, today):",
+    "    for a in accounts:",
+    "        dues = []",
+    "        if seen is not None:",
+    "            dues.append(seen + dt.timedelta(days=730))"
+  ],
+  "codeSource": "implementer → architect reply, same run (lines excerpted)"
+}
