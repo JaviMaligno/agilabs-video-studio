@@ -4,7 +4,7 @@ import { Audio } from '@remotion/media';
 import { TransitionSeries, linearTiming } from '@remotion/transitions';
 import { AUDIO } from './audio.generated.ts';
 import { VIDEOS } from './timeline.ts';
-import { FPS, SCENE_TRANSITION, linesInVideo, sceneFrames } from './timing.ts';
+import { FPS, SCENE_TRANSITION, handOverAt, linesInVideo, sceneFrames } from './timing.ts';
 import { SETTINGS } from './settings.ts';
 import { musicVolume } from './music.ts';
 import { C } from './brand.ts';
@@ -66,7 +66,7 @@ const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p 
           </div>
         </>
       )}
-      {!p.noSubs && <Captions lines={captioned} lang={p.subs} vertical={p.vertical} />}
+      {!p.noSubs && <Captions lines={captioned} lang={p.subs} vertical={p.vertical} until={handOverAt(scene)} />}
       {/* Before the TTS script has run there is no audio: the scene plays silent on estimated timing. */}
       {scene.lines
         .filter((l) => AUDIO[l.voice]?.[l.key] !== undefined)

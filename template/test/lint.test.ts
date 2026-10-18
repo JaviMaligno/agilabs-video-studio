@@ -30,9 +30,10 @@ test('a timeline on target with known anims and readable cues is clean', () => {
 });
 
 test('flags caption cues that are too fast or too short', () => {
-  // One long line squeezed into a very short scene: the estimate is replaced by a 1 s duration.
+  // One long line squeezed into a very short scene: the estimate is replaced by a 0.5 s duration
+  // (short enough that even with the closing hold the first cue stays under 0.8 s).
   const s = anim('fast', 'Known', {}, [say(0, words(12), words(12))]);
-  s.lines[0].dur = 1;
+  s.lines[0].dur = 0.5;
   const issues = lintTimeline([s], 1, { known: ['Known'] });
   assert.ok(issues.some((m) => /chars\/s/.test(m)), issues.join('\n'));
   assert.ok(issues.some((m) => /0\.8 s/.test(m)), issues.join('\n'));

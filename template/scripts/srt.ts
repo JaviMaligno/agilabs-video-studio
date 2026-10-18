@@ -4,8 +4,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { cueRows, cuesOf } from '../src/captions.ts';
-import { linesInVideo } from '../src/timing.ts';
+import { cueRows, heldCuesOf } from '../src/captions.ts';
+import { handOverAt, linesInVideo } from '../src/timing.ts';
 import type { Lang, Scene } from '../src/types.ts';
 
 const ROW_CHARS = 32;
@@ -18,9 +18,9 @@ const stamp = (seconds: number): string => {
 
 /** SRT text for a cut. Every line is included, the intro hook too (on screen it is the title card). */
 export function srtOf(scenes: Scene[], subs: Lang, maxChars = ROW_CHARS): string {
-  const cues = linesInVideo(scenes).flatMap(({ line, at }) => {
+  const cues = linesInVideo(scenes).flatMap(({ scene, line, at }) => {
     const offset = at - line.start; // scene start in video seconds
-    return cuesOf(line, subs, maxChars).map((c) => ({ from: offset + c.start, to: offset + c.end, text: cueRows(c, maxChars).join('\n') }));
+    return heldCuesOf(scene.lines, scene.lines.indexOf(line), subs, maxChars, handOverAt(scene)).map((c) => ({ from: offset + c.start, to: offset + c.end, text: cueRows(c, maxChars).join('\n') }));
   });
   // Lines never overlap, but keep a hair of space between cues for players that merge them.
   cues.forEach((c, i) => {

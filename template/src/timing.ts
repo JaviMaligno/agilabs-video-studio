@@ -4,6 +4,9 @@ export const FPS = 30;
 /** Frames two consecutive scenes overlap while one fades into the next. */
 export const SCENE_TRANSITION = 18;
 
+/** Scene second where its hand-over to the next scene begins (held captions end there). */
+export const handOverAt = (scene: Scene): number => (sceneFrames(scene) - SCENE_TRANSITION) / FPS;
+
 /** Length of a scene in frames: its minimum length, or long enough for its last line. */
 export const sceneFrames = (scene: Scene): number => {
   const last = scene.lines.at(-1);

@@ -14,7 +14,7 @@ export type Cue = { start: number; end: number; text: string; tokens: Token[] };
 /** Short function words a cue should not end on: they read as part of what follows. */
 export const GLUE = new Set(
   (
-    'a an the of to in on at by for from with as and or but nor so if than that this these those ' +
+    'a an the of to into in on at by for from with as and or but nor so if than that this these those ' +
     'is are was were be its our your their my his her we i you it not no ' +
     'el la los las lo un una unos unas de del al a y e o u ni en con por para sin sobre que su sus ' +
     'se le les es son era fue como mi tu nos no'
@@ -78,6 +78,21 @@ export const tokensOf = (line: Line, subs: Lang): Token[] => {
       return { text, start, end: stop };
     });
   }
+  // Spoken form differs (a number or address read out as several words): align the written words
+  // to the spoken ones, so only the rewritten words take the span of what was said for them.
+  const said = subs === line.voice ? WORDS[line.voice]?.[line.key] : undefined;
+  if (said && said.length) {
+    const aligned = alignWords(words, said);
+    if (aligned) {
+      let prev = line.start;
+      return words.map((text, i) => {
+        const start = Math.min(end, Math.max(prev, line.start + aligned[i][0]));
+        const stop = Math.min(end, Math.max(start, line.start + aligned[i][1]));
+        prev = start;
+        return { text, start, end: stop };
+      });
+    }
+  }
   // Weight = characters plus one for the space, so short words still get some time.
   const weights = words.map((w) => w.length + 1);
   const total = weights.reduce((a, b) => a + b, 0) || 1;
@@ -87,6 +102,55 @@ export const tokensOf = (line: Line, subs: Lang): Token[] => {
     acc += weights[i];
     return { text, start, end: line.start + (acc / total) * line.dur };
   });
+};
+
+const norm = (w: string) => w.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+
+/**
+ * Times for written words from spoken word timestamps, matching identical words in order and
+ * giving each run of unmatched written words the span of the unmatched spoken words between the
+ * same anchors ("8–31%" ← "eight to thirty-one percent"). Null when too few words match.
+ */
+export const alignWords = (written: string[], spoken: [string, number, number][]): [number, number][] | null => {
+  const w = written.map(norm);
+  const s = spoken.map(([x]) => norm(x));
+  const out: [number, number][] = [];
+  let i = 0;
+  let j = 0;
+  let matched = 0;
+  while (i < w.length) {
+    if (j < s.length && w[i] && w[i] === s[j]) {
+      out.push([spoken[j][1], spoken[j][2]]);
+      matched++;
+      i++;
+      j++;
+      continue;
+    }
+    // Next anchor: the nearest pair (i2, j2) of equal words ahead.
+    let best: [number, number] | null = null;
+    for (let i2 = i; i2 < Math.min(w.length, i + 6) && !best; i2++) {
+      if (!w[i2]) continue;
+      for (let j2 = j; j2 < Math.min(s.length, j + 10); j2++) {
+        if (w[i2] === s[j2] && !(i2 === i && j2 === j)) {
+          best = [i2, j2];
+          break;
+        }
+      }
+    }
+    const [i2, j2] = best ?? [w.length, s.length];
+    if (i2 === i) {
+      // Extra spoken words before this written word: skip them.
+      j = j2;
+      continue;
+    }
+    const a = j < s.length ? spoken[j][1] : (spoken.at(-1)?.[2] ?? 0);
+    const b = j2 > j ? spoken[Math.min(j2, s.length) - 1][2] : a;
+    const n = i2 - i;
+    for (let k = 0; k < n; k++) out.push([a + ((b - a) * k) / n, a + ((b - a) * (k + 1)) / n]);
+    i = i2;
+    j = j2;
+  }
+  return matched >= Math.ceil(written.length / 2) ? out : null;
 };
 
 /** Greedy row filling (words longer than `maxChars` have already been split). */
@@ -123,7 +187,7 @@ export const cuesOf = (line: Line, subs: Lang, maxChars = 32): Cue[] => {
     if (cur.length && fillRows([...cur, t], maxChars).length > 2) close();
     cur.push(t);
     const rest = toks.length - 1 - i;
-    if (rest > 0 && SENTENCE_END.test(t.text) && textLen(cur) >= maxChars) close();
+    if (rest > 0 && SENTENCE_END.test(t.text) && textLen(cur) >= maxChars / 2) close();
   });
   if (cur.length) groups.push(cur);
   // Carrying glue words forward can, rarely, make the next cue three rows; split it again.
@@ -143,9 +207,28 @@ export const cuesOf = (line: Line, subs: Lang, maxChars = 32): Cue[] => {
   }));
 };
 
-/** All cues of a list of lines, in scene seconds. */
-export const cuesOfLines = (lines: Line[], subs: Lang, maxChars = 32): Cue[] =>
-  lines.flatMap((l) => cuesOf(l, subs, maxChars));
+/**
+ * How long the last cue of a line stays up after the voice stops, in seconds: a short closing
+ * phrase ("Can you tell where it is?") would otherwise flash by faster than it can be read.
+ * Never past the start of the next line, nor past `until` (where the scene starts handing over
+ * to the next one, so two scenes' captions never show at once).
+ */
+export const CUE_HOLD = 0.8;
+
+/** The cues of line `i` of a scene, its last cue held up to CUE_HOLD into the silence after it. */
+export const heldCuesOf = (lines: Line[], i: number, subs: Lang, maxChars = 32, until = Infinity): Cue[] => {
+  const cues = cuesOf(lines[i], subs, maxChars);
+  const last = cues.at(-1);
+  if (last) {
+    const next = lines[i + 1]?.start ?? until;
+    last.end = Math.max(last.end, Math.min(last.end + CUE_HOLD, next));
+  }
+  return cues;
+};
+
+/** All cues of a scene's lines, in scene seconds, with the hold after each line. */
+export const cuesOfLines = (lines: Line[], subs: Lang, maxChars = 32, until = Infinity): Cue[] =>
+  lines.flatMap((_, i) => heldCuesOf(lines, i, subs, maxChars, until));
 
 /**
  * Splits a cue into one or two rows for display: the most balanced break that keeps both rows

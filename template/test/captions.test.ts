@@ -135,3 +135,32 @@ test('a spoken form keeps the written caption, timed proportionally', () => {
     WORDS.en = {};
   }
 });
+
+test('the last cue of a line is held into the silence, never past the next line', async () => {
+  const { heldCuesOf, CUE_HOLD } = await import('../src/captions.ts');
+  const mk = (key: string, start: number, dur: number, text: string) => ({ key, start, dur, text: { en: text, es: text }, voice: 'en' as const });
+  const lines = [mk('x-01', 0, 1, 'Short one.'), mk('x-02', 1.3, 1, 'Next.'), mk('x-03', 3, 1, 'Last.')];
+  assert.equal(heldCuesOf(lines, 0, 'en').at(-1)!.end, 1.3);
+  assert.equal(heldCuesOf(lines, 2, 'en').at(-1)!.end, 4 + CUE_HOLD);
+});
+
+test('alignWords gives a number read out as several words the span of those words', async () => {
+  const { alignWords } = await import('../src/captions.ts');
+  const written = 'only 8–31% of those'.split(' ');
+  const spoken: [string, number, number][] = [['only', 0, 0.3], ['eight', 0.4, 0.6], ['to', 0.6, 0.7], ['thirty-one', 0.7, 1.2], ['percent', 1.2, 1.6], ['of', 1.6, 1.7], ['those', 1.8, 2]];
+  const a = alignWords(written, spoken)!;
+  assert.deepEqual(a[1], [0.4, 1.6]);
+  assert.deepEqual(a[2], [1.6, 1.7]);
+});
+
+test('a cue closes at a sentence end once half full, and never ends on "into"', () => {
+  // 26 characters: past half of a 32-character row, so the sentence gets its own cue.
+  const l = line('half-01', 'The agent went home early. It then looked into the old repo for the missing file.', 0, 6);
+  assert.equal(cuesOf(l, 'en', 32)[0].text, 'The agent went home early.');
+  assert.ok(GLUE.has('into'));
+  const long = line('into-01', 'Every message it wrote went straight into the queue and then into a log nobody read into the night.', 0, 8);
+  for (let max = 8; max <= 40; max++) {
+    const cues = cuesOf(long, 'en', max);
+    for (const c of cues.slice(0, -1)) assert.notEqual(bare(c.tokens.at(-1)!.text), 'into', `maxChars ${max}: "${c.text}"`);
+  }
+});
