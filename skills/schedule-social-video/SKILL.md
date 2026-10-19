@@ -30,6 +30,9 @@ narration says them, 4-5 hashtags, no claims stronger than the article.
 - One reel every two days at a fixed evening hour (18:00 local) works; check the blog
   publish schedule and the LinkedIn schedule first so a video never lands before its
   article is live, and avoid same-day clashes with article posts.
+- **Business Suite only schedules up to 29 days ahead, on Facebook and on Instagram.** Anything
+  later cannot be scheduled yet: leave it out, note the date from which it can be scheduled
+  (post date minus 29 days) and add a reminder to the project calendar.
 - Write the agreed dates into `textos-reels.md` and show the table before scheduling.
 
 ## 3. Instagram + Facebook: Meta Business Suite, one reel at a time
@@ -45,7 +48,10 @@ Per video:
    native; browser automation cannot drive it, and file-upload tools are size-capped).
 3. Turn on **Customise for Facebook and Instagram** and paste each platform's block.
 4. Thumbnail: pick the most striking suggested frame (the hook frame usually wins).
-5. Leave auto-captions off: the videos have burned-in captions.
+5. Auto-captions: with both platforms selected the Share step has **Subtitles ticked by default**;
+   untick it (the videos have burned-in captions) and confirm it reads "Aplica subtítulos a tu vídeo".
+   With both platforms there is also an Edit step (music library): skip it without adding audio.
+   If an upload stalls at 95 %, reload the composer and add the file again (texts are lost).
 6. Schedule: date `dd/mm/yyyy`, hour, minutes; confirm the zoomed date reads correctly
    before pressing **Schedule**; check the confirmation dialog shows the same date.
 7. Reopen the composer for the next video and ask for the next file.
