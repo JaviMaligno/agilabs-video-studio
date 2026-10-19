@@ -220,7 +220,7 @@ test('EchoChat: the wall counter climbs to ×1000; the flat reply only shrinks',
   for (let i = 1; i < lens.length; i++) assert.ok(lens[i] <= lens[i - 1], `reply grew back: ${lens}`);
   const fin = echo.frameState({ mode: 'final' }, 5, [0.1], 5);
   assert.equal(fin.reply.text, 'No time access.');
-  assert.equal(fin.tag, '×1000');
+  assert.equal(fin.tag, '×300');
   assert.equal(echo.frameState({ mode: 'meter' }, 3, [0.1], 3).gauge.tick, 1);
   // Before Opus bursts there is only a typing indicator, never an invented reply.
   assert.equal(echo.frameState({ mode: 'burst' }, 0.3, [0.15], 4.4).reply.text, '');

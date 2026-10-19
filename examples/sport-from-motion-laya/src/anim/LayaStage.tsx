@@ -346,7 +346,10 @@ export const LayaStage: React.FC<AnimProps & LayaProps> = (p) => {
           {m.result > 0 && (
             <div style={{ position: 'absolute', left: 300, top: 150, opacity: m.result, transform: `scale(${interpolate(m.result, [0, 1], [1.4, 1])})`, display: 'flex', alignItems: 'baseline', gap: 20 }}>
               <span style={{ fontSize: 150, fontWeight: 800, letterSpacing: '-0.03em' }}>23%</span>
-              <span style={{ fontSize: 44, fontWeight: 800, color: C.muted }}>· chance</span>
+              <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
+                <span style={{ fontSize: 44, fontWeight: 800, color: C.text }}>correct</span>
+                <span style={{ fontSize: 36, fontWeight: 800, color: C.muted }}>chance ≈ 25%</span>
+              </span>
             </div>
           )}
           {m.words.learning > 0 && (

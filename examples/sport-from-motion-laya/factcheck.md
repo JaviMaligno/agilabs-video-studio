@@ -128,3 +128,5 @@ Removed from v1's screen: "0.48", "0.36", "0.83" chips, "classifier −12", "tag
 - Pronunciation of "Laya" ("Lah-yah") by the cloned voice: word timestamps show the form was
   read, nobody has listened to it yet.
 - Final duration: ~80-84 s estimated; the TTS render and `npm run lint` decide (ceiling 85 s).
+
+**v3.1 (2026-10-19):** the "23%" label now reads "23% correct · chance ≈ 25%" so it is read as accuracy on the 400 clips, not as the per-sport score ("The result was 23% on the 400 clips"; chance with four options = 25%; "Untouched, Laya gets 24%… which is chance").

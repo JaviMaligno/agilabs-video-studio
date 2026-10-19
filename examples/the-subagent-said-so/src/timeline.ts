@@ -14,7 +14,7 @@ const build = (): Cuts => ({
       'doors',
       'ReportDesk',
       // Cues from the word timestamps: one copy drops per door as it is named.
-      { mode: 'doors', blend: true, cue: { drop0: 4.4, drop1: 5.55, drop2: 6.8, chips: 7.75 } },
+      { mode: 'doors', blend: true, cue: { drop0: 4.48, drop1: 5.68, drop2: 6.96, chips: 7.91 } },
       [say(0.1, 'Same report, word for word. I changed only the door.', ''), say(0, "Its own subagent. A teammate's file. My message.", '')],
       // Silent beat at the end: the three model chips and the episode count (script scene 5).
       { min: 9.3 },
@@ -26,10 +26,8 @@ const build = (): Cuts => ({
       [
         say(0.1, 'With the fact in plain sight,', '', { en: 'With the fact in plain sight.' }),
         // A short pause before the number keeps the first caption cue under 17 chars/s.
-        say(2.0, 'Opus adopted the wrong conclusion 4 times in 791.', '', {
-          en: 'Opus adopted the wrong conclusion four times in seven hundred ninety-one.',
-        }),
-        say(0, 'It usually said why: "it couldn\'t see those notes."', ''),
+        say(2.0, 'Opus almost never adopted the wrong conclusion.', ''),
+        say(0, 'It often said why: "it couldn\'t see my notes."', ''),
       ],
       // Holds the quote cards a little longer (and keeps their cue under 17 chars/s).
       { min: 11.3 },
@@ -37,27 +35,25 @@ const build = (): Cuts => ({
     anim(
       'check',
       'ReportDesk',
-      { mode: 'check', blend: true, cue: { chip0: 8.96 } },
+      { mode: 'check', blend: true, cue: { chip0: 9.08 } },
       [
         say(0.1, 'The gap was in checking.', ''),
         say(0, 'Without the fact, Opus checked every file and message.', ''),
-        say(0, "Its own subagent's report? Answered straight away 25% of the time.", '', {
-          en: "Its own subagent's report? Answered straight away twenty-five percent of the time.",
-        }),
+        say(0, "Its own subagent's report? Answered straight away a quarter of the time.", ''),
       ],
+      // Holds the last cue long enough to stay under 17 chars/s.
+      { min: 11.4 },
     ),
-    anim('long', 'ReportDesk', { mode: 'long', blend: true }, [say(0.1, '47% with long context.', '', { en: 'Forty-seven percent with long context.' })], { min: 2.6 }),
+    anim('long', 'ReportDesk', { mode: 'long', blend: true }, [say(0.1, 'Almost half, with long context.', '')], { min: 2.6 }),
     anim(
       'gemini',
       'ReportDesk',
-      { mode: 'flood', blend: true, cue: { chip0: 1.55, chip1: 3.15, chip2: 4.25, ticket: 5.6, toggle: 6.9, adopt: 8.47 } },
+      { mode: 'flood', blend: true, cue: { chip0: 1.65, chip1: 3.23, chip2: 3.47, ticket: 4.4, toggle: 5.7, adopt: 7.36 } },
       [
-        say(0.1, 'Gemini 3 Flash: 88%, against 3% and 0%.', '', {
-          en: 'Gemini three Flash: eighty-eight percent, against three percent and zero percent.',
+        say(0.1, 'Gemini 3 Flash: almost always, against almost never.', '', {
+          en: 'Gemini three Flash: almost always, against almost never.',
         }),
-        say(0, 'From its subagent, it adopted the wrong conclusion 95% of the time.', '', {
-          en: 'From its subagent, it adopted the wrong conclusion ninety-five percent of the time.',
-        }),
+        say(0, 'From its subagent, it adopted the wrong conclusion nearly every time.', ''),
       ],
     ),
     anim('quote', 'ReportDesk', { mode: 'quote', blend: true }, [say(0.1, 'Once the work has been delegated, it counts as done.', '')]),
@@ -65,7 +61,7 @@ const build = (): Cuts => ({
       'gpt',
       'ReportDesk',
       // Dips (no blend) out of the full-frame quote.
-      { mode: 'inverted', cue: { chip0: 2.2, chip2: 3.55, slam: 3.15 } },
+      { mode: 'inverted', cue: { chip0: 2.36, chip2: 3.63, slam: 3.23 } },
       [say(0.1, 'GPT-5.6 flips it: it trusts my message most.', '', { en: 'G P T five point six flips it: it trusts my message most.' })],
       // Holds the 36 % / 10 % chips a little after the line.
       { min: 6.0 },

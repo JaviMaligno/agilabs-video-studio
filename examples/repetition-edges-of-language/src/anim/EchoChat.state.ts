@@ -2,7 +2,7 @@
 // striped wall at the top; under it, the model's reply. Modes:
 // - wall: the N counter climbs 1 · 3 · 10 · 30 · 100 · 300 · 1000 over "table" bubbles;
 // - flat: Sonnet's reply deflates through real replies (montage), a "third hello" inset pops in;
-// - final: the wall jumps to ×1000, the reply is "No time access.";
+// - final: the wall jumps to ×300 (Sonnet's conversation stopped at turn 300), the reply is "No time access.";
 // - meter: same picture, the repetition gauge comes forward and gets a "fine" tick;
 // - burst: Opus at ×30 bursts into confetti with its real reply;
 // - split: one wall over both outcomes, a flat line on the left and a spiral on the right.
@@ -153,7 +153,7 @@ export const frameState = (p: EchoChatProps, t0: number, beats: number[], dur: n
     return {
       ...base,
       level: log(30) + (3 - log(30)) * j,
-      tag: j > 0.5 ? '×1000' : '×30',
+      tag: j > 0.5 ? '×300' : '×30',
       tagPop: p.mode === 'final' && t >= jump + 0.3 ? easeOutCubic(progress(t, jump + 0.3, 0.3)) : 1,
       reply: {
         text: j > 0.5 ? FLAT[4].text : FLAT[3].text,
@@ -185,7 +185,7 @@ export const frameState = (p: EchoChatProps, t0: number, beats: number[], dur: n
   return {
     ...base,
     level: 3,
-    tag: '×1000',
+    tag: '×300',
     reply: { text: FLAT[4].text, lines: 1, opacity: 1, scale: 1 },
     wallH: 360,
     split: { progress: easeOutCubic(progress(t, 0.1, 0.8)) },

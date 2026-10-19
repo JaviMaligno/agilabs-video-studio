@@ -18,7 +18,7 @@ const build = (): Cuts => ({
     anim('chips', 'ShellChips', { mode: 'roster' }, [say(0.15, 'Four models.', ''), say(0, 'Two are one Qwen network, with and without alignment.', '')]),
     // 4-6 · Sonnet goes flat; the loop metric calls it fine.
     anim('flat', 'EchoChat', { mode: 'flat' }, [say(0.15, "Claude didn't loop.", ''), say(0, 'Its answers just got shorter.', '')], { min: 4.6 }),
-    anim('final', 'EchoChat', { mode: 'final', blend: true }, [say(0.1, 'Ask Sonnet the time a thousand times: “No time access.”', '')]),
+    anim('final', 'EchoChat', { mode: 'final', blend: true }, [say(0.1, 'Ask Sonnet the time three hundred times: “No time access.”', '')]),
     anim('meter', 'EchoChat', { mode: 'meter', blend: true }, [say(0.1, 'A loop metric would call that fine.', '')], { min: 2.9 }),
     // 7 · Opus breaks character.
     anim(
@@ -35,16 +35,16 @@ const build = (): Cuts => ({
       'table',
       'LoopSpiral',
       { mode: 'table' },
-      [say(0.1, 'Given “table”, its answer was 99.6% repetition.', '', { en: 'Given “table”, its answer was ninety-nine point six percent repetition.' })],
+      [say(0.1, 'Given “table”, its answer was almost pure repetition.', '')],
     ),
     anim('florb', 'LoopSpiral', { mode: 'seeds' }, [say(0.15, '“florb” works as well as an insult.', '')], { min: 3.0 }),
     anim(
       'stats',
       'LoopSpiral',
-      { mode: 'stats', swing: [0.9, 3.65] }, // "zero point five one" / "zero point seven eight" (stats-02.words.json)
+      { mode: 'stats', swing: [0.5, 1.4] }, // "does" (0.51) / "more" (0.78) (stats-02.words.json)
       [
-        say(0.15, 'Aligned models: ~0.10 repetition.', '', { en: 'Aligned models: about zero point one repetition.' }),
-        say(0, 'The base: 0.51, multi-turn 0.78.', '', { en: 'The base: zero point five one, multi-turn, zero point seven eight.' }),
+        say(0.15, 'Aligned models barely repeat.', ''),
+        say(0, 'The base does, and more over many turns.', ''),
       ],
       { min: 7.2 },
     ),
