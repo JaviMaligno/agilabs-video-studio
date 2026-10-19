@@ -318,6 +318,49 @@ export const LossMonitor: React.FC<AnimProps & MonitorProps> = (p) => {
     );
   }
 
+  if (p.mode === 'verdict') {
+    // The closing card: the article's conclusion, one line each, with a die on the seed line.
+    const v = s.verdict;
+    const row = (k: number, icon: React.ReactNode, text: string, colour: string) => (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 28, height: 170, opacity: v.rows[k], transform: `translateX(${(1 - v.rows[k]) * 40}px)` }}>
+        <div style={{ flex: 'none', width: 92, display: 'flex', justifyContent: 'center' }}>{icon}</div>
+        <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.06, letterSpacing: '-0.02em', color: colour }}>{text}</div>
+      </div>
+    );
+    const disc = (mark: string, colour: string) => (
+      <div style={{ width: 86, height: 86, borderRadius: 43, background: colour, color: C.bg0, fontSize: 56, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{mark}</div>
+    );
+    return (
+      <div style={base}>
+        <div
+          style={{
+            position: 'absolute',
+            left: 60,
+            width: 960,
+            top: 430,
+            height: 860,
+            boxSizing: 'border-box',
+            padding: '40px 50px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            borderRadius: 32,
+            background: alpha(C.card, 0.97),
+            border: `5px solid ${C.accentText}`,
+            boxShadow: `0 0 70px ${alpha(C.accent, 0.35)}`,
+            opacity: v.card,
+            transform: `scale(${interpolate(v.card, [0, 1], [0.92, 1])})`,
+          }}
+        >
+          <div style={{ textAlign: 'center', fontSize: 46, fontWeight: 800, letterSpacing: '0.2em', color: C.accentText, marginBottom: 50 }}>VERDICT</div>
+          {row(0, disc('✓', C.ok), 'It can learn to read movement…', C.text)}
+          {row(1, <Die face={3} size={86} colour={C.warm} />, '…but only for some seeds', C.warm)}
+          {row(2, disc('✗', alpha(C.flat, 0.9)), 'and far behind the classifier', C.muted)}
+        </div>
+      </div>
+    );
+  }
+
   // coin
   const faceW = 760;
   const faceH = 500;

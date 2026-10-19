@@ -3,12 +3,13 @@
 // epoch by epoch and a dashed "guessing" line. A run that learns nothing stays flat; a run that
 // learns breaks below the line and its dots light up in teal.
 // - wall: fifteen runs that differ only in the random seed (rows marked by die faces);
-// - coin: one run pulled out and flipped between its two possible outcomes.
+// - coin: one run pulled out and flipped between its two possible outcomes;
+// - verdict: the closing card, the article's conclusion in three lines (feedback v3).
 // Illustrative visuals, chosen for impact; the numbers on screen come from the article.
 // No Remotion or React here.
 import { beatAt, clamp01, easeOutCubic, fit, progress, sceneTime } from './steps.ts';
 
-export type MonitorMode = 'wall' | 'coin';
+export type MonitorMode = 'wall' | 'coin' | 'verdict';
 
 export type MonitorProps = {
   mode: MonitorMode;
@@ -16,7 +17,7 @@ export type MonitorProps = {
   clock?: number;
   /**
    * Scene seconds of spoken words the picture lands on (timeline.ts resolves them from the TTS
-   * word timestamps). wall: "random", "learned", "never".
+   * word timestamps). wall: "random", "learned", "never"; verdict: "learn", "some".
    */
   marks?: number[];
 };
@@ -97,6 +98,8 @@ export function frameState(p: MonitorProps, time: number, beats: number[], dur: 
   let coin = { angle: 0, opacity: 0, settle: 0 };
   let quote = { words: 0, opacity: 0, foot: 0 };
   let tally = { learned: 0, total: 0, opacity: 0 };
+  /** The verdict card and its three lines (can learn / only some seeds / far behind). */
+  let verdict = { card: 0, rows: [0, 0, 0] };
 
   if (mode === 'wall') {
     // "Same data, same recipe; only the random seed changed.": a die rolls in ("random seed") and
@@ -153,5 +156,21 @@ export function frameState(p: MonitorProps, time: number, beats: number[], dur: 
     };
   }
 
-  return { mode, playT, cells, die, rows, tally, coin, quote };
+  if (mode === 'verdict') {
+    // The card comes in with the question ("So, is Laya good?" on the question card). "The
+    // verdict: it can learn to read movement," lands line one, "but only for some seeds." line
+    // two; the gap to the classifier follows, unvoiced.
+    const learnAt = mark(0, 0.4);
+    const someAt = Math.max(learnAt + 0.4, mark(1, 0.75));
+    verdict = {
+      card: easeOutCubic(progress(t, 0.05, 0.4)),
+      rows: [
+        easeOutCubic(progress(t, fit(learnAt - 0.15, 0.35, d), 0.35)),
+        easeOutCubic(progress(t, fit(someAt - 0.15, 0.35, d), 0.35)),
+        easeOutCubic(progress(t, fit(someAt + 0.5, 0.35, d), 0.35)),
+      ],
+    };
+  }
+
+  return { mode, playT, cells, die, rows, tally, coin, quote, verdict };
 }

@@ -56,6 +56,7 @@ const Q1 = 'Which sport is it?';
 const Q2 = 'Does training work?';
 const Q3 = 'Does it use the order?';
 const Q4 = 'Is it repeatable?';
+const Q5 = 'So, is Laya good?';
 
 const build = (): Cuts => ({
   main: finish([
@@ -84,6 +85,14 @@ const build = (): Cuts => ({
         say(0.1, 'So I trained Laya, a small open model, on the same dots.', '', { en: `So I trained ${LAYA}, a small open model, on the same dots.` }),
         say(0, "It doesn't write answers. It gives each sport a score.", ''),
       ],
+      { tail: BLEND_TAIL },
+    ),
+    // 5b (feedback v3). What sets Laya apart from the frontier models, said and shown on its own.
+    anim(
+      'apart',
+      'LayaStage',
+      { mode: 'apart', marks: [[0, 'frontier'], [0, 'trained'], [0, 'dots']], card: { q: Q1 } },
+      [say(0.1, 'Unlike the frontier models, Laya is trained on the dots.', '', { en: `Unlike the frontier models, ${LAYA} is trained on the dots.` })],
       { tail: BLEND_TAIL },
     ),
     // 6. How to read the monitor, before any result (demo trace, no data).
@@ -161,6 +170,20 @@ const build = (): Cuts => ({
     ),
     // 18. The closing sentence.
     anim('coin', 'LossMonitor', { mode: 'coin', card: { q: Q4 } }, [say(0.2, 'One fine-tuning run is a sample, not a measurement.', '')], { min: 4.6 }),
+    // 19 (feedback v3). The verdict, plainly: it can learn, but only for some seeds.
+    anim(
+      'verdict',
+      'LossMonitor',
+      { mode: 'verdict', marks: [[0, 'learn'], [0, 'some']], card: { q: Q5, stamp: { text: 'partly', at: [0, 'seeds'], after: 0.15, tone: 'warm' } } },
+      [
+        // Caption breaks after "movement." (the spoken text keeps its comma and its cached audio).
+        say(0.3, 'The verdict: it can learn to read movement. But only for some seeds.', '', {
+          en: 'The verdict: it can learn to read movement, but only for some seeds.',
+        }),
+      ],
+      // A longer hold: the verdict card is the last thing read before the outro.
+      { min: 6.2 },
+    ),
     outro('outro', [say(0.15, 'More at javieraguilar.ai', '', { en: 'More at javier aguilar dot A I.' })]),
   ]),
 });

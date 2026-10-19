@@ -9,7 +9,7 @@
 // No Remotion or React here.
 import { beatAt, clamp01, easeOutCubic, fit, progress, sceneTime } from './steps.ts';
 
-export type LayaMode = 'task' | 'lasttime' | 'laya' | 'legend' | 'official' | 'tag' | 'control' | 'curves';
+export type LayaMode = 'task' | 'lasttime' | 'laya' | 'apart' | 'legend' | 'official' | 'tag' | 'control' | 'curves';
 
 export type LayaProps = {
   mode: LayaMode;
@@ -18,7 +18,7 @@ export type LayaProps = {
   /**
    * Scene seconds of spoken words the picture lands on (timeline.ts resolves them from the TTS
    * word timestamps). task: "four"; lasttime: "under", "most"; laya: "Laya", "same", "answers",
-   * "gives"; legend: "guessing", "falls", "learning"; tag: "tagged", "meaningless", "gives";
+   * "gives"; apart: "frontier", "trained", "dots"; legend: "guessing", "falls", "learning"; tag: "tagged", "meaningless", "gives";
    * control: "more", "did"; curves: "many", "sometimes", "end".
    */
   marks?: number[];
@@ -125,6 +125,8 @@ export function frameState(p: LayaProps, time: number, beats: number[], dur: num
   const question = { opacity: 0, pulse };
   const last = { title: 0, chips: MODELS.map(() => 0), frontier: { opacity: 0, grow: 0 }, classifier: { opacity: 0, grow: 0 }, half: 0 };
   const laya = { stream: 0, scroll: 0, chip: 0, tag: 0, bubble: 0, cross: 0, arrow: 0 };
+  /** What sets Laya apart (feedback v3): frontier column, Laya column, the two contrast rows. */
+  const apart = { title: 0, left: 0, right: 0, trained: 0, scores: 0 };
   const monitor = {
     opacity: 0,
     xMax: 12,
@@ -197,6 +199,24 @@ export function frameState(p: LayaProps, time: number, beats: number[], dur: num
     const grow = easeOutCubic(progress(t, fit(givesAt + 0.1, 0.9, d), 0.9));
     scores = DEMO_SCORES.map((v) => 0.02 + (v - 0.02) * grow);
     options[HOOK_SPORT].pick = progress(t, fit(givesAt + 0.9, 0.3, d), 0.3);
+  }
+
+  if (mode === 'apart') {
+    // "Unlike the frontier models, Laya is trained on the dots.": a contrast card in the lower
+    // panel. Frontier column on "frontier", Laya's just after; the trained / only shown row lands
+    // on "trained"; the scores row (said in the previous scene) after "dots".
+    const frontAt = mark(0, b0, 0.2);
+    const trainedAt = mark(1, b0, 0.6);
+    const shownAt = mark(2, b0, 0.85);
+    apart.title = progress(t, 0.05, 0.35);
+    apart.left = easeOutCubic(progress(t, fit(frontAt - 0.15, 0.35, d), 0.35));
+    apart.right = easeOutCubic(progress(t, fit(frontAt + 0.35, 0.35, d), 0.35));
+    apart.trained = easeOutCubic(progress(t, fit(trainedAt - 0.1, 0.35, d), 0.35));
+    apart.scores = easeOutCubic(progress(t, fit(Math.max(trainedAt + 0.4, shownAt + 0.1), 0.35, d), 0.35));
+    // The options keep Laya's answer from the previous scene: a score per sport.
+    bars = 1;
+    scores = [...DEMO_SCORES];
+    options[HOOK_SPORT].pick = 1;
   }
 
   if (mode === 'legend') {
@@ -339,5 +359,5 @@ export function frameState(p: LayaProps, time: number, beats: number[], dur: num
     options[HOOK_SPORT].pick = back;
   }
 
-  return { mode, playT, stage, options, scores, bars, together, question, last, laya, monitor };
+  return { mode, playT, stage, options, scores, bars, together, question, last, laya, apart, monitor };
 }

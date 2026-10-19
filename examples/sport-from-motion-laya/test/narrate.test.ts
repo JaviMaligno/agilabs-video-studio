@@ -88,15 +88,15 @@ test('this video: settings and timeline shape', () => {
   // Every line that names Laya is voiced Spanish-style.
   for (const l of TIMELINE.flatMap((s) => s.lines).filter((l) => /Laya/.test(l.text.en))) assert.match(l.spoken?.en ?? '', /Lah-yah/);
   assert.equal(VIDEOS.en.main, TIMELINE);
-  // Script v2.0: at most 85 s; one question card per part, in order, none on the outro.
-  assert.ok(sceneStarts(TIMELINE).total / FPS <= 85, `length ${sceneStarts(TIMELINE).total / FPS}`);
+  // Script v2.0 + feedback v3: at most 95 s; one question card per part, in order, none on the outro.
+  assert.ok(sceneStarts(TIMELINE).total / FPS <= 95, `length ${sceneStarts(TIMELINE).total / FPS}`);
   const qs = TIMELINE.map((s) => (s.anim?.props.card as { q: string } | undefined)?.q ?? null);
-  assert.deepEqual([...new Set(qs)], ['Which sport is it?', 'Does training work?', 'Does it use the order?', 'Is it repeatable?', null]);
+  assert.deepEqual([...new Set(qs)], ['Which sport is it?', 'Does training work?', 'Does it use the order?', 'Is it repeatable?', 'So, is Laya good?', null]);
   const stamps = TIMELINE.flatMap((s) => {
     const st = (s.anim?.props.card as { stamp?: { text: string; at: number } } | undefined)?.stamp;
     return st ? [st.text] : [];
   });
-  assert.deepEqual(stamps, ['?', 'yes', 'yes', 'sometimes']);
+  assert.deepEqual(stamps, ['?', 'yes', 'yes', 'sometimes', 'partly']);
   // Only two numbers are spoken: "four" (sports) and "eight" (points).
   const spoken = TIMELINE.flatMap((s) => s.lines.map((l) => (l.spoken?.en ?? l.text.en).toLowerCase()));
   const numbers = spoken.join(' ').match(/\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|percent)\b/g) ?? [];

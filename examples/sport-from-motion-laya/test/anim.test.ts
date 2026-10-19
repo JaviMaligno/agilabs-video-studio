@@ -15,8 +15,8 @@ import { readFileSync } from 'node:fs';
 
 const CLIPS = JSON.parse(readFileSync(new URL('../src/data/clips.json', import.meta.url), 'utf8')) as dots.ClipSet;
 const CURVES = JSON.parse(readFileSync(new URL('../src/data/laya-curves.json', import.meta.url), 'utf8')) as mon.Curves;
-const MON_MODES = ['wall', 'coin'] as const;
-const LAYA_MODES = ['task', 'lasttime', 'laya', 'legend', 'official', 'tag', 'control', 'curves'] as const;
+const MON_MODES = ['wall', 'coin', 'verdict'] as const;
+const LAYA_MODES = ['task', 'lasttime', 'laya', 'apart', 'legend', 'official', 'tag', 'control', 'curves'] as const;
 
 // Fields that are animation progress and must stay within [0, 1].
 const PROGRESS = new Set(['progress', 'appear', 'grow', 'fill', 'draw', 'pop', 'opacity', 'emphasis', 'flash', 'pick', 'bars', 'together', 'lit', 'rose', 'ring', 'textIn']);

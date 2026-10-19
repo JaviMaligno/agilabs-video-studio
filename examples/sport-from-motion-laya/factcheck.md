@@ -1,10 +1,23 @@
-# Fact-check: Teaching a Small Model to Recognise a Sport From Moving Dots (EN vertical) · v2.0
+# Fact-check: Teaching a Small Model to Recognise a Sport From Moving Dots (EN vertical) · v3.0
 
 Source: `src/content/blog/en/sport-from-motion-laya.md` on `origin/blog/sport-from-motion-laya`
 (personal-website), cross-checked against `docs/results-laya.md` in `JaviMaligno/sport-from-motion`
 (`origin/main`, 5be89c9) and the local run files under `sport-from-motion/runs/laya/`. Every
 spoken claim and every number or claim on screen, with the article sentence it rests on.
 Illustrative visuals are listed at the end.
+
+## Changes from feedback v3 (v2.0 → v3.0)
+
+Two added scenes; no existing line changed. Each claim below rests on the article.
+
+| Line / screen text | Article sentence | Note |
+|---|---|---|
+| Spoken 5b: "Unlike the frontier models, Laya is trained on the dots." | "The specialists that worked had been trained on the data; the language models that struggled had not. What happens if you take a language model, a small one, and train it on exactly what the specialists saw?"; "Five frontier models, shown the same clips" | The frontier models were shown the clips without training; Laya was fine-tuned on them. |
+| Screen 5b: "Frontier models · last time": "only shown the clips", "write an answer" | "Five frontier models, shown the same clips, landed between chance and 47%"; "Like Jev, it does not write an answer" | "write an answer" is the contrast the article draws for Laya (it does not write one); the frontier models answered in text in the first article. |
+| Screen 5b: "LAYA · small · open weights · 322M": "trained on the dots", "scores each sport" | "I fine-tuned Laya, a 322M open-weights decision model, on the same moving dots"; "it returns a probability for each option" | "scores" = probability per option, as in scene 5. No size claimed for the frontier models. |
+| Spoken 18b: "The verdict: it can learn to read movement, but only for some seeds." | Description: "with enough training it learned to read the order of the snapshots, but only for some seeds."; "A small open model can learn to read the order of the snapshots"; "the same configuration learns or does not depending on the seed" | "read movement" = reading the order of the snapshots, as scene 11 frames it and as the article's own quote "Laya learns to read movement". |
+| Screen 18b: question "So, is Laya good?", stamp "PARTLY" | Same as above | The stamp is the article's "can learn … but only for some seeds" in one word; not stronger than "learns or does not depending on the seed". |
+| Screen 18b: "It can learn to read movement…", "…but only for some seeds", "and far behind the classifier" | As above; "it stays far from a specialist that works on the numbers directly"; "Laya is 48 points below MiniRocket" | The third line is on screen only (not voiced); "the classifier" = MiniRocket, as in scenes 3 and 15. Die face = illustrative, as the wall's. |
 
 ## Changes from feedback (v1.1 → v2.0)
 

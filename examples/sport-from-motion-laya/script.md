@@ -1,4 +1,4 @@
-# Teaching a Small Model to Recognise a Sport From Moving Dots — article video (EN) · script draft v2.0
+# Teaching a Small Model to Recognise a Sport From Moving Dots — article video (EN) · script draft v3.0
 
 Article: sport-from-motion-laya (javieraguilar.ai, EN, `pubDate` 2026-10-30; read from
 `origin/blog/sport-from-motion-laya` of personal-website). Vertical 9:16, target ~80 s (ceiling
@@ -8,6 +8,32 @@ Javier's cloned voice with the `JAVIER_POST` chain.
 Sequel to the *Which Sport Is It?* video (`examples/sport-from-motion`): same dark point-light
 stage (`DotStage`), same deck of 8 snapshot cards (`SnapshotDeck`), same model-chip style, so the
 two read as a series.
+
+## Changes from feedback v3 (v2.0 → v3.0)
+
+Javier, on the v2.0 render (liked overall): "it is not understood what Laya is, in what
+distinguishes it from the others" and "it is not clear whether it is good or not". Only these two
+points change; every other line, scene, visual and timing is as in v2.0. Two scenes are added,
+no existing line is edited or re-voiced.
+
+- **Added scene 5b `apart`** (after scene 5, before the monitor legend).
+  - Narration: (none) → "Unlike the frontier models, Laya is trained on the dots." (spoken
+    "Lah-yah"; 10 words, no numbers).
+  - Visual: (none) → a contrast card in the lower panel, under the same stage and options:
+    title **WHAT SETS LAYA APART**; left column "Frontier models · last time" with ✗ "only shown
+    the clips" and ✗ "write an answer"; right column (accent border, glows on "trained") **LAYA**
+    · "small · open weights · 322M" with ✓ "trained on the dots" and ✓ "scores each sport".
+    Columns land on "frontier", the trained row on "trained", the scores row after "dots".
+    Question card unchanged ("Which sport is it?").
+- **Added scene 18b `verdict`** (after the coin, before the outro).
+  - Narration: (none) → "The verdict: it can learn to read movement, but only for some seeds."
+    (13 words, no numbers).
+  - Visual: (none) → the question card changes to **So, is Laya good?** and gets the stamp
+    **PARTLY** (warm) on "seeds"; a full verdict card fills the frame: title **VERDICT**,
+    ✓ "It can learn to read movement…" (on "learn"), die face + "…but only for some seeds"
+    (warm, on "some"), ✗ "and far behind the classifier" (muted, unvoiced, last).
+- Length: 84.7 s → 94.1 s (ceiling for this pass 95 s). Spoken numbers unchanged: "four" and
+  "eight" only.
 
 ## Changes from feedback (v1.1 → v2.0)
 
@@ -58,6 +84,7 @@ Two recurring pictures, nothing else on screen competes with them.
 | 3 | A classifier trained on the dots got most right. | A plain "classifier" chip slides in; the pills light green one clip after another; its bar fills well past half. On screen: "83%". | `DotStage` (mode `specialist`, reused) + `Counter` (83%) | "A small classifier trained on the dots got it right 83% of the time." |
 | 4 | So I trained Laya, a small open model, on the same dots. | The two groups slide aside, leaving a gap in the middle; a new chip drops into it: **LAYA** with a sub-line "small · open weights" (on screen also "322M"). The dots of the stage turn into lines of coordinates that scroll into the chip. Tag under the chip: "same 400 clips". | bespoke: `DotStage` (mode `totext`) | "That left an obvious gap in the middle."; "I fine-tuned Laya, a 322M open-weights decision model, on the same moving dots"; "the coordinates of the 10 dots over 8 snapshots, written as text"; "The same 400 clips" |
 | 5 | It doesn't write answers. It gives each sport a score. | The chip "answers": a score bar grows on each of the four pills (Laya's output). A small crossed-out speech bubble beside the chip ("no text answer"). Highest bar = its pick. | bespoke: `ScoreBars` on the sport pills | "it does not write an answer: you give it a state, a question and a list of options, and it returns a probability for each option." |
+| 5b | Unlike the frontier models, Laya is trained on the dots. | Contrast card in the lower panel: WHAT SETS LAYA APART; Frontier models (last time): ✗ only shown the clips, ✗ write an answer; LAYA (small · open weights · 322M): ✓ trained on the dots, ✓ scores each sport. | `LayaStage` (mode `apart`, new) | "The specialists that worked had been trained on the data; the language models that struggled had not."; "Five frontier models, shown the same clips"; "I fine-tuned Laya, a 322M open-weights decision model"; "it does not write an answer … it returns a probability for each option" |
 | 6 | This line tracks training. If it stays flat, it's guessing; if it falls, it's learning. | The monitor strip slides in under the pills, x axis "epochs", dashed line "guessing". Demo, no data: the trace runs flat on the line (four bars equal), then dips (dots turn teal, one bar grows). Words "guessing" and "learning" light under the trace as they are said. | bespoke: `LossMonitor` (mode `legend`) | Alt text: "stays at the chance value, 1.39"; "it stayed at the value of guessing among four options"; seeds caption "Teal: it learned. Rose: it stayed at chance." |
 | 7 | The official recipe stayed flat. Every sport got the same score. | Question card changes to **Does training work?** Monitor resets; caption on the strip "official recipe". The trace runs flat, the four bars sit exactly level and pulse together; at the "4 epochs" mark the strip goes dark. On screen: "23% · chance". Card stamps a provisional "?". | `LossMonitor` (mode `official`) | Heading "The official recipe learned nothing"; "I used it as is: 4 epochs, its learning rates, its loss. The result was 23% on the 400 clips."; "the model had settled on giving all four options the same score for every clip" |
 | 8 | Was the code broken? I tagged each clip with a meaningless label that gives away the answer. | A label `Q7` is stuck on the top of the clip; a small key appears beside it, "Q7 = soccer". On "meaningless", the label briefly shuffles to other random codes (`M2`, `K4`) to show it is arbitrary. | `LossMonitor` (mode `control`, setup) | "an arbitrary tag at the top of each one that encodes the answer (`tag: Q7` for soccer, `tag: M2` for basketball, and so on). The tag means nothing" |
@@ -71,6 +98,7 @@ Two recurring pictures, nothing else on screen competes with them.
 | 16 | Same data, same recipe; only the random seed changed. | Card changes to **Is it repeatable?** A die rolls onto the frame, labelled "random seed"; the single monitor multiplies into a 3 × 5 wall of mini monitors, rows marked by three die faces. All flat. | bespoke: `LossMonitor` (mode `wall`, setup) | "The fifteen runs with the snapshots in order share the data split, the recipe and the number of epochs; only the random seed changes." |
 | 17 | Some runs learned. Others never left the flat line. | The wall pulses with the real per-run data: 9 traces fall and turn teal, 6 stay flat and turn rose. Tally on screen "9 / 15 learned". Card stamps **sometimes**. | `LossMonitor` (mode `wall`) | "In 9 of them the training loss clearly drops below the chance value at some point; in the other 6 it never leaves it in 32 epochs."; caption "Seed 2 learns in only one of five splits, and late." |
 | 18 | One fine-tuning run is a sample, not a measurement. | One cell is pulled out of the wall and flips like a coin between a teal face "Laya learns to read movement" and a rose face "Laya does not learn this"; the sentence writes itself over it, "sample" and "measurement" in the accent. Footnote: "with 3 seeds, the effect holds, same sign in each". | bespoke: `LossMonitor` (mode `coin`) + `KeyQuote` overlay | "One fine-tuning run is a sample, not a measurement."; "anything from "Laya learns to read movement" to "Laya does not learn this"."; "The contrasts hold with the three seeds, and the sign is the same in each one." |
+| 18b | The verdict: it can learn to read movement, but only for some seeds. | Question card **So, is Laya good?**, stamp **PARTLY**. Verdict card: ✓ It can learn to read movement… · die + …but only for some seeds · ✗ and far behind the classifier (unvoiced). | `LossMonitor` (mode `verdict`, new) | Description: "with enough training it learned to read the order of the snapshots, but only for some seeds."; "A small open model can learn to read the order of the snapshots … it stays far from a specialist" |
 | 19 | More at javieraguilar.ai | Outro card: AGILabs badge, javieraguilar.ai, the article title set over two lines. Credit lines. | outro | — |
 
 **Word count (EN):** 11 + 8 + 9 + 12 + 10 + 15 + 11 + 17 + 10 + 12 + 13 + 11 + 13 + 8 + 10 + 9 +

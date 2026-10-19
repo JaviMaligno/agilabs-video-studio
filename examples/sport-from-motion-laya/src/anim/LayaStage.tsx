@@ -257,6 +257,62 @@ const Laya: React.FC<{ s: S }> = ({ s }) => {
   );
 };
 
+/**
+ * What sets Laya apart from the frontier models of the first video (feedback v3): two columns,
+ * two contrast rows. Every line is the article's: frontier models were shown the clips, Laya is
+ * trained on them; it scores each option instead of writing an answer; small, open weights, 322M.
+ */
+const Apart: React.FC<{ s: S }> = ({ s }) => {
+  const a = s.apart;
+  const top = LS.lowTop;
+  const colW = (LS.w - 30) / 2;
+  const cell = (text: string, good: boolean, appear: number) => (
+    <div style={{ height: 96, display: 'flex', alignItems: 'center', gap: 14, opacity: appear, transform: `translateY(${(1 - appear) * 16}px)` }}>
+      <div style={{ flex: 'none', width: 46, height: 46, borderRadius: 23, background: good ? C.ok : alpha(C.flat, 0.85), color: C.bg0, fontSize: 32, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {good ? '✓' : '✗'}
+      </div>
+      <div style={{ fontSize: 35, fontWeight: 800, lineHeight: 1.08, color: good ? C.text : C.muted }}>{text}</div>
+    </div>
+  );
+  const box = (appear: number, accent: boolean): React.CSSProperties => ({
+    position: 'absolute',
+    top: top + 54,
+    width: colW,
+    height: LS.lowH - 58,
+    boxSizing: 'border-box',
+    padding: '16px 20px',
+    borderRadius: 24,
+    background: alpha(C.card, 0.97),
+    border: `4px solid ${accent ? C.accentText : alpha(C.muted, 0.45)}`,
+    boxShadow: accent ? `0 0 ${50 * a.trained}px ${alpha(C.accent, 0.45)}` : undefined,
+    opacity: appear,
+    transform: `translateY(${(1 - appear) * 24}px)`,
+  });
+  return (
+    <>
+      <div style={{ position: 'absolute', left: 0, right: 0, top: top - 4, textAlign: 'center', fontSize: 38, fontWeight: 800, letterSpacing: '0.12em', color: C.accentText, opacity: a.title }}>
+        WHAT SETS LAYA APART
+      </div>
+      <div style={{ ...box(a.left, false), left: LS.left }}>
+        <div style={{ height: 124 }}>
+          <div style={{ fontSize: 50, fontWeight: 800, color: C.muted, lineHeight: 1.1 }}>Frontier models</div>
+          <div style={{ fontSize: 30, fontWeight: 700, color: C.muted, marginTop: 6 }}>last time</div>
+        </div>
+        {cell('only shown the clips', false, a.trained)}
+        {cell('write an answer', false, a.scores)}
+      </div>
+      <div style={{ ...box(a.right, true), left: LS.left + colW + 30 }}>
+        <div style={{ height: 124 }}>
+          <div style={{ fontSize: 60, fontWeight: 800, lineHeight: 1, letterSpacing: '0.02em', ...gradientText }}>LAYA</div>
+          <div style={{ fontSize: 30, fontWeight: 700, color: C.text, marginTop: 10, whiteSpace: 'nowrap' }}>small · open weights · 322M</div>
+        </div>
+        {cell('trained on the dots', true, a.trained)}
+        {cell('scores each sport', true, a.scores)}
+      </div>
+    </>
+  );
+};
+
 export const LayaStage: React.FC<AnimProps & LayaProps> = (p) => {
   const s = frameState(p, p.t, p.beats, p.dur, DATA);
   const m = s.monitor;
@@ -273,6 +329,7 @@ export const LayaStage: React.FC<AnimProps & LayaProps> = (p) => {
       )}
       {p.mode === 'lasttime' && <LastTime s={s} />}
       {p.mode === 'laya' && <Laya s={s} />}
+      {p.mode === 'apart' && <Apart s={s} />}
 
       {m.opacity > 0 && (
         <div style={{ position: 'absolute', left: LS.left, top: LS.lowTop, opacity: m.opacity }}>
