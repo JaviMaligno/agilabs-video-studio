@@ -10,7 +10,6 @@ import {
   ENV,
   FACT_NOTE,
   H,
-  LOOK_TAG,
   MODELS,
   NOTEBOOK,
   PANEL,
@@ -472,8 +471,8 @@ const Stack58k: React.FC<{ v: number }> = ({ v }) => {
         />
       ))}
       <div style={{ position: 'absolute', left: 6, top: 30, width: 230, height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', color: C.bg0, fontWeight: 800, lineHeight: 1.1 }}>
-        <span style={{ fontSize: 40, whiteSpace: 'nowrap' }}>58k tokens</span>
-        <span style={{ fontSize: 30, whiteSpace: 'nowrap' }}>of work</span>
+        <span style={{ fontSize: 46 }}>58k tokens</span>
+        <span style={{ fontSize: 32 }}>of work</span>
       </div>
     </div>
   );
@@ -507,7 +506,7 @@ const Consequences: React.FC<{ s: BoardState; id: string }> = ({ s, id }) => {
       <svg width={W} height={H} style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }}>
         <GradDefs id={id} />
         {c.crackA > 0 && <path d={crackPath(165, 838, 210)} fill="none" stroke={C.bg0} strokeWidth={7} pathLength={1} strokeDasharray={`${c.crackA} 1`} strokeLinecap="round" strokeLinejoin="round" />}
-        {c.crackB > 0 && <path d={crackPath(600, 935, 220)} fill="none" stroke={C.text} strokeWidth={7} pathLength={1} strokeDasharray={`${c.crackB} 1`} strokeLinecap="round" strokeLinejoin="round" />}
+        {c.crackB > 0 && <path d={crackPath(600, 806, 220)} fill="none" stroke={C.text} strokeWidth={7} pathLength={1} strokeDasharray={`${c.crackB} 1`} strokeLinecap="round" strokeLinejoin="round" />}
       </svg>
       {c.chip > 0 && (
         <div style={{ position: 'absolute', left: 0, right: 0, top: 992, display: 'flex', justifyContent: 'center', opacity: c.chip }}>
@@ -524,153 +523,6 @@ const Consequences: React.FC<{ s: BoardState; id: string }> = ({ s, id }) => {
     </div>
   );
 };
-
-// ---------------------------------------------------------------- setup and split (new in v2.0)
-
-/** The fact F as a glowing sticky note. */
-const FactNote: React.FC<{ w: number; h: number; glow: number; fontSize: number; style?: React.CSSProperties }> = ({ w, h, glow, fontSize, style }) => (
-  <div
-    style={{
-      width: w,
-      height: h,
-      borderRadius: 14,
-      background: `linear-gradient(135deg, ${alpha(C.accent, 0.42)}, ${alpha(C.accent2, 0.42)})`,
-      border: `3px solid ${C.accentText}`,
-      boxShadow: `0 0 ${44 * glow}px ${alpha(C.accent, 0.85 * glow)}`,
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      padding: '0 22px',
-      boxSizing: 'border-box',
-      fontSize,
-      fontWeight: 700,
-      lineHeight: 1.18,
-      color: C.text,
-      ...style,
-    }}
-  >
-    {FACT_NOTE.map((l) => (
-      <div key={l}>{l}</div>
-    ))}
-  </div>
-);
-
-/** The report page, as it would come out of the envelope. */
-const ReportPage: React.FC<{ w: number; fontSize: number }> = ({ w, fontSize }) => (
-  <div style={{ width: w, padding: '26px 24px', boxSizing: 'border-box', borderRadius: 10, background: alpha(C.text, 0.94), color: C.bg0, fontSize, fontWeight: 800, lineHeight: 1.18, boxShadow: `0 16px 34px ${alpha(C.bg0, 0.8)}` }}>
-    {REPORT.map((l) => (
-      <div key={l}>{l}</div>
-    ))}
-  </div>
-);
-
-const Header: React.FC<{ text: string; hero?: boolean; size?: number }> = ({ text, hero, size = 34 }) => (
-  <div style={{ fontSize: size, fontWeight: 700, textAlign: 'center', ...(hero ? gradientText : { color: C.muted }) }}>{text}</div>
-);
-
-const Neq: React.FC<{ v: number; size: number; id: string }> = ({ v, size, id }) => (
-  <svg width={size} height={size} viewBox="0 0 100 100" style={{ display: 'block', opacity: v, transform: `scale(${0.5 + 0.5 * v})` }}>
-    <GradDefs id={id} />
-    <circle cx={50} cy={50} r={46} fill={C.bg0} stroke={`url(#${id})`} strokeWidth={6} />
-    <line x1={26} y1={40} x2={74} y2={40} stroke={C.text} strokeWidth={9} strokeLinecap="round" />
-    <line x1={26} y1={62} x2={74} y2={62} stroke={C.text} strokeWidth={9} strokeLinecap="round" />
-    <line x1={62} y1={22} x2={38} y2={80} stroke={C.text} strokeWidth={9} strokeLinecap="round" />
-  </svg>
-);
-
-const SetupCards: React.FC<{ s: BoardState }> = ({ s }) => {
-  const u = s.setup;
-  if (u.report <= 0 && u.note <= 0) return null;
-  return (
-    <div style={{ position: 'absolute', inset: 0 }}>
-      {/* Right: the report, written by me the way a subagent without my notes would. */}
-      <div style={{ position: 'absolute', left: 530, top: 180, width: 400, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18, opacity: u.report, transform: `translateY(${(1 - u.report) * 40}px)` }}>
-        <Header text="the report" />
-        <ReportPage w={400} fontSize={40} />
-      </div>
-      {/* Under the report: the subagent it imitates, with no notes. */}
-      <div style={{ position: 'absolute', left: 530, top: 640, width: 400, display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: u.sub, transform: `scale(${0.8 + 0.2 * u.sub})` }}>
-        <Glyph i={0} size={96} color={C.accentText} />
-        <div style={{ fontSize: 34, fontWeight: 700, color: C.text, marginTop: 6 }}>a subagent</div>
-        <div style={{ marginTop: 14, width: 230, height: 54, borderRadius: 8, border: `3px dashed ${alpha(C.muted, 0.7)}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, fontWeight: 600, color: C.muted }}>
-          no notes
-        </div>
-      </div>
-      {/* Left: the fact the main agent may know. */}
-      <div style={{ position: 'absolute', left: 30, top: 180, width: 400, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18, opacity: u.note, transform: `translateY(${(1 - u.note) * 40}px)` }}>
-        <Header text="my notes" hero />
-        <FactNote w={400} h={230} glow={0.4 + 0.6 * u.clash} fontSize={42} />
-      </div>
-      <div style={{ position: 'absolute', left: 435, top: 345, width: 90, opacity: u.clash }}>
-        <Neq v={u.clash} size={90} id="nq0" />
-      </div>
-    </div>
-  );
-};
-
-const MiniStack: React.FC<{ x: number; withF: boolean; fGlow: number; dim: number }> = ({ x, withF, fGlow, dim }) => {
-  const W0 = 340;
-  const rows = [0, 1, 'F', 2] as const;
-  let y = 0;
-  return (
-    <div style={{ position: 'absolute', left: x - W0 / 2, top: 250, width: W0, opacity: 1 - 0.55 * dim }}>
-      {rows.map((r, k) => {
-        const top = y;
-        if (r === 'F') {
-          y += 128;
-          return withF ? (
-            <FactNote key={k} w={W0} h={116} glow={fGlow} fontSize={30} style={{ position: 'absolute', left: 0, top, transform: `scale(${1 + 0.04 * fGlow})` }} />
-          ) : (
-            <div key={k} style={{ position: 'absolute', left: 0, top, width: W0, height: 116, boxSizing: 'border-box', borderRadius: 14, border: `3px dashed ${alpha(C.muted, 0.55)}` }} />
-          );
-        }
-        y += 56;
-        return (
-          <div key={k} style={{ position: 'absolute', left: (r % 2) * 6, top, width: W0 - 6, height: 46, borderRadius: 7, background: C.card, border: `2px solid ${alpha(C.muted, 0.35)}`, transform: `rotate(${r === 1 ? 1.2 : -1}deg)` }}>
-            <div style={{ margin: '12px 16px 0', height: 7, width: 180 + r * 30, borderRadius: 4, background: alpha(C.muted, 0.35) }} />
-            <div style={{ margin: '6px 16px 0', height: 7, width: 110 + r * 20, borderRadius: 4, background: alpha(C.muted, 0.25) }} />
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
-const SplitView: React.FC<{ s: BoardState }> = ({ s }) => {
-  const v = s.split;
-  if (v.left <= 0) return null;
-  const col = (x: number, known: boolean, a: number, tag: number) => (
-    <div style={{ position: 'absolute', inset: 0, opacity: a, transform: `translateY(${(1 - a) * 30}px)` }}>
-      <div style={{ position: 'absolute', left: x - 220, top: 150, width: 440, opacity: known ? 1 : tag }}>
-        <Header text={known ? 'fact known' : 'no fact'} hero={known} size={44} />
-      </div>
-      <MiniStack x={x} withF={known} fGlow={known ? 0.25 + 0.75 * v.fGlow : 0} dim={known ? 0 : 0.5} />
-      <div style={{ position: 'absolute', left: x - 170, top: 1012, width: 340, textAlign: 'center', fontSize: 30, fontWeight: 600, color: C.muted }}>same report</div>
-    </div>
-  );
-  return (
-    <div style={{ position: 'absolute', inset: 0 }}>
-      {col(245, true, v.left, 1)}
-      {col(715, false, v.right, v.noTag)}
-      <div style={{ position: 'absolute', left: 480, top: 150, width: 3, height: 880, background: alpha(C.muted, 0.25 * v.right) }} />
-      <Envelope e={{ x: 245, y: 900, scale: 0.78, rot: -3, opacity: v.left, slit: 0, print: 0, crack: 0, sweep: 0, sweeping: 0, dim: 0, label: false }} id="sp0" />
-      <Envelope e={{ x: 715, y: 900, scale: 0.78, rot: 3, opacity: v.right, slit: 0, print: 0, crack: 0, sweep: 0, sweeping: 0, dim: 0, label: false }} id="sp1" />
-      <div style={{ position: 'absolute', left: 245 - 50, top: 600, width: 100 }}>
-        <Neq v={v.neq} size={100} id="nq1" />
-      </div>
-    </div>
-  );
-};
-
-const LookTag: React.FC<{ v: number }> = ({ v }) =>
-  v <= 0 ? null : (
-    <div style={{ position: 'absolute', left: 0, right: 0, top: 470, display: 'flex', justifyContent: 'center', opacity: v, transform: `translateY(${(1 - v) * 24}px)` }}>
-      <div style={{ padding: '16px 30px', borderRadius: 20, background: alpha(C.bg0, 0.92), border: `3px solid ${C.accentText}`, textAlign: 'center', lineHeight: 1.2 }}>
-        <div style={{ fontSize: 40, fontWeight: 800, color: C.text }}>{LOOK_TAG[0]}</div>
-        <div style={{ fontSize: 30, fontWeight: 600, color: C.muted, marginTop: 4 }}>{LOOK_TAG[1]}</div>
-      </div>
-    </div>
-  );
 
 // ---------------------------------------------------------------- views
 
@@ -693,8 +545,8 @@ const ModelChips: React.FC<{ s: BoardState }> = ({ s }) => (
 
 const BoardView: React.FC<{ s: BoardState }> = ({ s }) => (
   <div style={{ position: 'absolute', left: 0, top: 0, width: W, height: H, transform: `translateX(${s.shake}px)` }}>
-    <ModelChips s={s} />
     <div style={{ position: 'absolute', inset: 0, opacity: s.deskIn }}>
+      <ModelChips s={s} />
       {[0, 1, 2].map((i) => (
         <Panel key={i} i={i} lit={s.slots[i].lit} />
       ))}
@@ -705,9 +557,6 @@ const BoardView: React.FC<{ s: BoardState }> = ({ s }) => (
       <Notebook s={s} />
     </div>
     <Stack58k v={s.stack58k} />
-    <SetupCards s={s} />
-    <SplitView s={s} />
-    <LookTag v={s.look.tag} />
     <Subagent s={s} />
     {s.slip > 0 && (
       <div style={{ position: 'absolute', left: 0, right: 0, top: 640, display: 'flex', justifyContent: 'center', opacity: s.slip }}>

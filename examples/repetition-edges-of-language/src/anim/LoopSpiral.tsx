@@ -59,9 +59,6 @@ export const LoopSpiral: React.FC<AnimProps & LoopSpiralProps> = ({ t, beats, du
           </div>
           <div style={{ position: 'absolute', right: 0, top: 0, opacity: s.gauge.opacity }}>
             <Gauge value={s.gauge.value} w={300} label={s.gauge.label} id="table" valueSize={64} />
-            {s.gauge.tag ? (
-              <div style={{ textAlign: 'center', fontSize: 30, fontWeight: 700, color: C.accentText, marginTop: 6, opacity: s.gauge.label ? 1 : 0 }}>{s.gauge.tag}</div>
-            ) : null}
           </div>
         </>
       )}

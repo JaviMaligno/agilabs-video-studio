@@ -25,7 +25,7 @@ export const GiveUpRow: React.FC<AnimProps & GiveUpRowProps> = ({ t, beats, dur,
         <CoreChip size={80} seed={SEED.sonnet} shell={1} />
         <div style={{ fontSize: 34, fontWeight: 700, color: C.text, lineHeight: 1.15 }}>
           Claude Sonnet
-          <div style={{ fontSize: 26, fontWeight: 600, color: C.muted }}>lights out = gave up · % of replies</div>
+          <div style={{ fontSize: 26, fontWeight: 600, color: C.muted }}>lights out = gave up</div>
         </div>
       </div>
       {s.human > 0 && (

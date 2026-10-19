@@ -40,6 +40,10 @@ caption.
 - **Clarity beats brevity.** The viewer must understand what was tested before hearing the
   result. If the setup needs another scene to make sense, add it, even past 60 s; labels
   scattered over the visual are not an explanation.
+- **Key points, loud and clear.** Each key point (what is being tested, what makes the subject
+  different, the verdict) gets its own spoken sentence and its own unmistakable on-screen
+  moment: a card, a stamp, a big line. The closing must say plainly what the result means
+  (good, bad, or "only sometimes"), as the article concludes it.
 
 ## Captions
 

@@ -56,10 +56,6 @@ const CASES: Case[] = [
   },
   { name: 'ReportDesk slam', state: (t, b, d) => desk.frameState({ mode: 'slam' }, t, b, d) },
   { name: 'ReportDesk context', state: (t, b, d) => desk.frameState({ mode: 'context' }, t, b, d) },
-  { name: 'ReportDesk setup', state: (t, b, d) => desk.frameState({ mode: 'setup' }, t, b, d) },
-  { name: 'ReportDesk split', state: (t, b, d) => desk.frameState({ mode: 'split' }, t, b, d) },
-  { name: 'ReportDesk nofact', state: (t, b, d) => desk.frameState({ mode: 'nofact' }, t, b, d) },
-  { name: 'ReportDesk doors (no chips)', state: (t, b, d) => desk.frameState({ mode: 'doors', noChips: true }, t, b, d) },
   { name: 'ReportDesk doors', state: (t, b, d) => desk.frameState({ mode: 'doors' }, t, b, d) },
   { name: 'ReportDesk fact', state: (t, b, d) => desk.frameState({ mode: 'fact' }, t, b, d) },
   { name: 'ReportDesk check', state: (t, b, d) => desk.frameState({ mode: 'check' }, t, b, d) },
@@ -219,7 +215,7 @@ test('ReportDesk trays: the 0 % trays never show a sealed envelope', () => {
   const beats = [0.1, 1.6, 4.4];
   const dur = 8;
   for (let t = 0; t <= dur; t += 0.05) {
-    const check = deskAt('check', t, [0.1, 4], 9.7);
+    const check = deskAt('check', t, beats, dur);
     assert.equal(check.trays[1].sealed, 0);
     assert.equal(check.trays[2].sealed, 0);
     const flood = deskAt('flood', t, [0.1, 3.6], 7.5);
@@ -230,11 +226,11 @@ test('ReportDesk trays: the 0 % trays never show a sealed envelope', () => {
 
 test('ReportDesk trays: sealed share follows the chips by the end', () => {
   const end = (m: desk.Mode, b: number[], d: number) => deskAt(m, d, b, d);
-  const opus = end('check', [0.1, 4], 9.7);
+  const opus = end('check', [0.1, 1.6, 4.4], 8);
   assert.deepEqual(opus.trays.map((x) => x.sealed), [5, 0, 0]);
   assert.deepEqual(opus.trays.map((x) => x.sealed + x.opened), [20, 20, 20]);
   assert.deepEqual(opus.slots.map((x) => x.chip.text), ['25 %', '0 %', '0 %']);
-  const long = end('long', [], 3.2);
+  const long = end('long', [0.1], 2.6);
   assert.equal(long.trays[0].sealed, 9);
   assert.equal(long.slots[0].chip.text, '47 %');
   assert.equal(long.slots[0].chip.tag, 'long context');
@@ -251,8 +247,8 @@ test('ReportDesk trays: sealed share follows the chips by the end', () => {
 
 test('ReportDesk chips appear only after their tray has filled', () => {
   const cases: [desk.Mode, number[], number][] = [
-    ['check', [0.1, 4], 9.7],
-    ['long', [], 3.2],
+    ['check', [0.1, 1.6, 4.4], 8],
+    ['long', [0.1], 2.6],
     ['flood', [0.1, 3.6], 7.5],
     ['inverted', [0.1], 4],
   ];
@@ -268,7 +264,7 @@ test('ReportDesk chips appear only after their tray has filled', () => {
 });
 
 test('ReportDesk fact: 4 / 791, and none of the adoptions through the subagent', () => {
-  const s = deskAt('fact', 9, [0.1, 2.4, 5.1], 9);
+  const s = deskAt('fact', 6, [0.1, 4], 6);
   assert.equal(s.counter.text, '4 / 791');
   assert.equal(s.counter.appear, 1);
   assert.deepEqual(s.slots.map((x) => x.chip.text), ['0', '4', '0']);
@@ -295,52 +291,4 @@ test('ReportDesk open: the stamp never comes down; the seal is cracked and the f
   assert.equal(s.envs[0].crack, 1);
   assert.equal(s.envs[0].slit, 1);
   assert.equal(s.envs[0].print, 0);
-});
-
-test('ReportDesk setup: the report comes first, the contradicting note after it', () => {
-  const beats = [0.1, 2.8];
-  const early = deskAt('setup', 1.5, beats, 6.5);
-  assert.equal(early.setup.report, 1);
-  assert.equal(early.setup.note, 0);
-  const late = deskAt('setup', 6.5, beats, 6.5);
-  assert.equal(late.setup.note, 1);
-  assert.equal(late.setup.clash, 1);
-  assert.equal(late.chipsShown, 0);
-});
-
-test('ReportDesk split: fact known on the left, no fact on the right, model chips last and silent', () => {
-  const beats = [0.1, 1.65, 5.0];
-  const p = { mode: 'split' as const, cue: { chips: 6.95 } };
-  const mid = desk.frameState(p, 3, beats, 9.2);
-  if (mid.view !== 'desk') throw new Error('not a desk');
-  assert.equal(mid.split.left, 1);
-  assert.equal(mid.split.right, 0);
-  assert.equal(mid.chipsShown, 0);
-  const end = desk.frameState(p, 9.2, beats, 9.2);
-  if (end.view !== 'desk') throw new Error('not a desk');
-  assert.equal(end.split.right, 1);
-  assert.equal(end.chipsShown, 1);
-  assert.equal(end.chips.tag, '6 scenarios · ~2,800 episodes');
-});
-
-test('ReportDesk doors with noChips never shows the model chips', () => {
-  for (let t = 0; t <= 8; t += 0.1) {
-    const s = desk.frameState({ mode: 'doors', noChips: true }, t, [0.1, 3.65], 8);
-    if (s.view !== 'desk') throw new Error('not a desk');
-    assert.equal(s.chipsShown, 0);
-  }
-});
-
-test('ReportDesk nofact: the fact leaves, then the look tag and the tools come up', () => {
-  const s0 = deskAt('nofact', 0, [0.1, 2.5], 6.5);
-  assert.equal(s0.look.tag, 0);
-  const s = deskAt('nofact', 6.5, [0.1, 2.5], 6.5);
-  assert.equal(s.notebook.fGone, 1);
-  assert.equal(s.look.tag, 1);
-  assert.equal(s.opener.glow, 1);
-  assert.equal(s.envs[0].print, 0, 'the report sits sealed and unstamped');
-});
-
-test('ReportDesk quotes: only the one quote the article keeps', () => {
-  assert.deepEqual([...desk.QUOTES], ['“it couldn’t see my notes”']);
 });
