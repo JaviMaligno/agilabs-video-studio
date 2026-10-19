@@ -24,7 +24,8 @@ const build = (): Cuts => ({
       BLEND,
     ),
     anim('setup', 'ReachMap', { mode: 'setup', chip: L('truth', 'realidad'), chipIn: true }, [
-      say(0.2, 'A robot wants a high-value spot inside a fence that stops it on contact.', ''),
+      // Spoken comma: a breath after "spot" keeps the first caption cue under 17 chars/s with the cloned voice.
+      say(0.2, 'A robot wants a high-value spot inside a fence that stops it on contact.', '', { en: 'A robot wants a high-value spot, inside a fence that stops it on contact.' }),
     ], { min: 4.4, ...BLEND }),
     anim('gauge', 'ReachMap', { mode: 'gauge', chip: M1, chipIn: true }, [
       say(0.2, 'The model wrote a filled disc.', ''),

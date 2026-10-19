@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { chooseEngine } from '../scripts/tts-engine.mjs';
+import { createHash } from 'node:crypto';
+import { chooseEngine, postChain, lineHash } from '../scripts/tts-engine.mjs';
+import config, { JAVIER_POST } from '../video.config.mjs';
 
 test('auto falls back per language', () => {
   const noKey = chooseEngine('auto', false);
@@ -23,4 +25,33 @@ test('explicit engines are honoured', () => {
   assert.deepEqual(chooseEngine('cartesia', true), { engine: 'cartesia' });
   // Asked for Cartesia explicitly: an outage is an error, never a silent switch of voice.
   assert.throws(() => chooseEngine('cartesia', true, 'HTTP 500'), /HTTP 500/);
+});
+
+test('post chain: optional, trimmed, and never one that changes a line length', () => {
+  assert.equal(postChain(undefined), '');
+  assert.equal(postChain(null), '');
+  assert.equal(postChain({}), '');
+  assert.equal(postChain({ post: '' }), '');
+  assert.equal(postChain({ post: '  highpass=f=85,afftdn=nr=10 ' }), 'highpass=f=85,afftdn=nr=10');
+  assert.throws(() => postChain({ post: 42 }), /string/);
+  assert.throws(() => postChain({ post: 'highpass=f=85,atempo=1.1' }), /atempo/);
+  assert.throws(() => postChain({ post: 'silenceremove=1:0:-50dB' }), /silenceremove/);
+});
+
+test('line hash: unchanged without post, different with it', () => {
+  const parts = ['cartesia', 'voice', 'model', 1];
+  const legacy = createHash('sha1').update('cartesia|voice|model|1|Hello').digest('hex');
+  assert.equal(lineHash(parts, 'Hello'), legacy); // existing caches stay valid
+  assert.equal(lineHash(parts, 'Hello', ''), legacy);
+  const a = lineHash(parts, 'Hello', 'highpass=f=85');
+  const b = lineHash(parts, 'Hello', 'highpass=f=90');
+  assert.notEqual(a, legacy);
+  assert.notEqual(a, b);
+});
+
+test('video.config voices parse: the default EN voice carries a valid post chain', () => {
+  const en = config.tts.voices.en;
+  assert.equal(en.id, 'b7abe199-5f62-45fd-b77a-d12a1fe80a36');
+  assert.equal(postChain(en), JAVIER_POST);
+  for (const v of Object.values(config.tts.kokoro.voices)) postChain(v);
 });

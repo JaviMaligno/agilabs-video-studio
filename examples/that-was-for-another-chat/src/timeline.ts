@@ -95,6 +95,8 @@ const build = (): Cuts => ({
         tally: { value: '1', label: L('invented a bridge', 'inventó un puente') },
         thread: [L('2am shift', 'turno de 2am'), L('April race', 'carrera de abril')],
         stamps: [L('Good advice', 'Buen consejo'), L('Invented connection', 'Conexión inventada')],
+        // Each stamp on its words: "Good" at 0.12 s, "Invented" at 1.23 s into carve-02 (TTS word timings).
+        stampAt: [0.1, 1.2],
       },
       [
         say(0.2, "One invented a bridge, weaving a night-shift baker's job into a 10K training plan.", 'Uno inventó un puente: metió un trabajo de panadero de noche en un plan para un 10K.', {

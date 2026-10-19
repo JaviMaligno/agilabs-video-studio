@@ -26,6 +26,8 @@ export type PuzzleProps = {
   /** carve mode: the two ends of the invented thread, and the two verdict stamps. */
   thread?: [Label, Label];
   stamps?: [Label, Label];
+  /** carve: when each stamp appears, in seconds after the second line starts (keyed to its words). */
+  stampAt?: [number, number];
   /** aside mode: tag under the set-aside piece. */
   tag?: Label;
   /** grid / ceiling: small legend under the wall. */
@@ -237,7 +239,8 @@ export function frameState(p: PuzzleProps, t0: number, beats: number[], dur: num
       s.carve = easeInOut(cut);
       s.knife = { opacity: progress(t, cutAt - 0.2, 0.2) * (1 - progress(t, cutAt + 1.85, 0.25)), progress: cut };
       s.thread = { draw: easeInOut(progress(t, fit(a0 + 3.5, 1.0, D), 1.0)) };
-      s.stamps = { opacity: [progress(t, fit(b1 + 0.05, 0.25, D), 0.25), progress(t, fit(b1 + 0.75, 0.25, D), 0.25)] };
+      const [sa, sb] = p.stampAt ?? [0.05, 0.75];
+      s.stamps = { opacity: [progress(t, fit(b1 + sa, 0.25, D), 0.25), progress(t, fit(b1 + sb, 0.25, D), 0.25)] };
       break;
     }
     case 'aside': {

@@ -143,3 +143,12 @@ test('the last cue of a line is held into the silence, never past the next line'
   assert.equal(heldCuesOf(lines, 0, 'en').at(-1)!.end, 1.3);
   assert.equal(heldCuesOf(lines, 2, 'en').at(-1)!.end, 4 + CUE_HOLD);
 });
+
+test('alignWords gives a number read out as several words the span of those words', async () => {
+  const { alignWords } = await import('../src/captions.ts');
+  const written = 'only 8–31% of those'.split(' ');
+  const spoken: [string, number, number][] = [['only', 0, 0.3], ['eight', 0.4, 0.6], ['to', 0.6, 0.7], ['thirty-one', 0.7, 1.2], ['percent', 1.2, 1.6], ['of', 1.6, 1.7], ['those', 1.8, 2]];
+  const a = alignWords(written, spoken)!;
+  assert.deepEqual(a[1], [0.4, 1.6]);
+  assert.deepEqual(a[2], [1.6, 1.7]);
+});

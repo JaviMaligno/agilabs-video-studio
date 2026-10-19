@@ -31,9 +31,19 @@ test('a timeline on target with known anims and readable cues is clean', () => {
 
 test('flags caption cues that are too fast or too short', () => {
   // One long line squeezed into a very short scene: the estimate is replaced by a 1 s duration.
-  const s = anim('fast', 'Known', {}, [say(0, words(12), words(12))]);
+  // A second line starts right where it ends, so no hold extends its cues.
+  const s = anim('fast', 'Known', {}, [say(0, words(12), words(12)), say(0, 'Next.', 'Sigue.')]);
   s.lines[0].dur = 1;
+  s.lines[1].start = s.lines[0].start + 1;
   const issues = lintTimeline([s], 1, { known: ['Known'] });
   assert.ok(issues.some((m) => /chars\/s/.test(m)), issues.join('\n'));
   assert.ok(issues.some((m) => /0\.8 s/.test(m)), issues.join('\n'));
+});
+
+test('counts the hold after a line, as the captions show it', () => {
+  // 38 characters spoken in 1.9 s (20 chars/s), then silence: held 0.8 s it reads at ~14 chars/s.
+  const s = anim('held', 'Known', {}, [say(0, 'this is not from your electricity bill.', 'x.')], { min: 4 });
+  s.lines[0].dur = 1.9;
+  const issues = lintTimeline([s], 4, { known: ['Known'] });
+  assert.ok(!issues.some((m) => /chars\/s/.test(m)), issues.join('\n'));
 });

@@ -3,8 +3,8 @@
 // to read, and anim scenes whose component is not registered. Exit code 1 when anything is found.
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { cuesOf } from '../src/captions.ts';
-import { FPS, sceneStarts } from '../src/timing.ts';
+import { heldCuesOf } from '../src/captions.ts';
+import { FPS, handOverAt, sceneStarts } from '../src/timing.ts';
 import type { Lang, Scene } from '../src/types.ts';
 
 /** Shortest time a cue may stay on screen, in seconds. */
@@ -43,14 +43,17 @@ export function lintTimeline(scenes: Scene[], target: number, opts: LintOptions 
       const name = scene.anim?.name;
       if (!name || !known.has(name)) issues.push(`scene "${scene.id}": animation "${name ?? '(none)'}" is not registered in src/anim/index.ts`);
     }
-    for (const line of scene.lines) {
-      for (const cue of cuesOf(line, subs, ROW_CHARS)) {
+    // The cues as the Captions component shows them: a line's last cue is held up to CUE_HOLD into
+    // the silence after it (never past the next line or the scene's hand-over).
+    const until = handOverAt(scene);
+    scene.lines.forEach((line, i) => {
+      for (const cue of heldCuesOf(scene.lines, i, subs, ROW_CHARS, until)) {
         const shown = cue.end - cue.start;
         const cps = cue.text.length / Math.max(shown, 0.01);
         if (shown < MIN_CUE_SECONDS) issues.push(`${line.key}: cue on screen ${shown.toFixed(2)} s (< ${MIN_CUE_SECONDS} s): "${cue.text}"`);
         if (cps > MAX_CPS) issues.push(`${line.key}: cue reads at ${cps.toFixed(1)} chars/s (> ${MAX_CPS}): "${cue.text}"`);
       }
-    }
+    });
   }
   return issues;
 }

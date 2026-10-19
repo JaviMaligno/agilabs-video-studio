@@ -125,8 +125,12 @@ export function frameState(p: ShelfProps, time: number, beats: number[], dur: nu
     const inbox = W1(b0 + 0.6, 0.3);
     const walks = [W1(k + 0.15, 0.4), W1(k + 0.35, 0.4)];
     const ticks = [W1(k + 0.55, 0.25), W1(k + 0.75, 0.25)];
-    const chip = W1(k + 0.35 * span1, 0.3);
-    const stamp = W1(k + 0.62 * span1, 0.25);
+    // Chip on "called it", stamp on "published": fixed offsets into the line, not fractions of
+    // the scene, so a longer hold (needed for the caption's reading speed) cannot push the stamp
+    // past its word. Capped by the span for very short scenes.
+    const chip = W1(k + Math.min(0.85, 0.35 * span1), 0.3);
+    const stampAt = k + Math.min(1.45, 0.62 * span1);
+    const stamp = W1(stampAt, 0.25);
     return {
       view: 'loaded' as const,
       panes,
@@ -136,7 +140,7 @@ export function frameState(p: ShelfProps, time: number, beats: number[], dur: nu
       ticks,
       chip,
       stamp,
-      stampFlash: loaded ? pulse(t, fit(k + 0.62 * span1, 0.4, dur), 0.4) : 0,
+      stampFlash: loaded ? pulse(t, fit(stampAt, 0.4, dur), 0.4) : 0,
       boxes: [box(480, '0.4.0', '0.3.1', { lid: Math.max(walks[0], walks[1]) > 0.9 ? 0.3 : 0 })],
       zoom: loaded ? 0 : E(0, 0.55),
       crack: loaded ? 0 : P(b0 + 0.25, 0.55),

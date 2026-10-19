@@ -57,9 +57,10 @@ export function frameState(_p: GhostWriterProps, time: number, beats: number[], 
     meaning: { read: meaningRead, ghost, ghostText: VISIBLE.slice(0, ghostChars) },
     nonsense: { read: nonsenseRead, ghost: nGhost, ghostText: flicker(NONSENSE, t, nKeep) },
     ocr: { appear: easeOutCubic(P(b0 + 1.2, 0.5)), on: size >= OCR_STOP ? 1 : 0 },
-    // The marks pop on the words that name them (line 2), then the gap between them.
-    mark55: easeOutCubic(P(b1 + 1.2, 0.45)),
-    mark8: easeOutCubic(P(b1 + 2.3, 0.45)),
-    bracket: easeOutCubic(P(b1 + 2.8, 0.5)),
+    // The marks pop on the words that name them (line 2: "five" ~b1+1.5, "Nonsense" ~b1+3.0,
+    // "eight" ~b1+4.1 in the current voice), the gap bracket lands as "eight" is said.
+    mark55: easeOutCubic(P(b1 + 1.4, 0.45)),
+    mark8: easeOutCubic(P(b1 + 2.95, 0.45)),
+    bracket: easeOutCubic(P(b1 + 3.65, 0.5)),
   };
 }

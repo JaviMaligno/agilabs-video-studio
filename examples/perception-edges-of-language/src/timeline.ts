@@ -24,7 +24,7 @@ const build = (): Cuts => ({
       { mode: 'ladder', play: [2, 3] },
       [say(0.1, 'My eyes gave up when the ink was about 3% as dark as black.', '', { en: 'My eyes gave up when the ink was about three percent as dark as black.' })],
     ),
-    anim('machines', 'FadeCard', { mode: 'machines', play: [3, 4] }, [say(0.1, 'Most models kept reading six to seven times fainter.', '')]),
+    anim('machines', 'FadeCard', { mode: 'machines', play: [3, 4] }, [say(0.1, 'Most models kept reading six to seven times fainter.', '')], { min: 3.85 }),
     anim(
       'floor',
       'FadeCard',

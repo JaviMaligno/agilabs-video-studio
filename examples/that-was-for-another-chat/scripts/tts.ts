@@ -1,22 +1,22 @@
 // Voices every narration line: public/audio/{lang}/{key}.wav (+ {key}.words.json with Cartesia's
 // word timestamps), then rewrites src/audio.generated.ts from what is on disk.
-// Lines are cached by a hash of engine + voice + model + speed + text: only new or edited lines
-// are voiced again. One engine per language (see tts-engine.mjs): if Cartesia drops out half way,
+// Lines are cached by a hash of engine + voice + model + speed + text (+ the voice's `post` chain):
+// only new or edited lines are voiced again. A voice's optional `post` (an ffmpeg -af chain) is
+// applied to each line right after synthesis; it must keep the line's length (word timestamps). One engine per language (see tts-engine.mjs): if Cartesia drops out half way,
 // the whole language is redone with Kokoro, and the next run with Cartesia back redoes it again.
 // Usage: npm run tts [-- en|es]
 import fs from 'node:fs';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { VIDEOS } from '../src/timeline.ts';
 import { SETTINGS } from '../src/settings.ts';
 import { spokenText, type Lang, type Word } from '../src/types.ts';
 import config from '../video.config.mjs';
 import { at, secret, findFfmpeg, wavSeconds, CARTESIA, cartesiaHeaders } from './lib.mjs';
-import { chooseEngine, cartesiaUnavailable } from './tts-engine.mjs';
+import { chooseEngine, cartesiaUnavailable, postChain, lineHash } from './tts-engine.mjs';
 
-type CartesiaVoice = { id: string; language?: string };
-type KokoroVoice = { voice: string; lang: string };
+type CartesiaVoice = { id: string; language?: string; post?: string };
+type KokoroVoice = { voice: string; lang: string; post?: string };
 
 const TTS = config.tts;
 const ENGINE = TTS.engine as 'cartesia' | 'kokoro' | 'auto';
@@ -24,7 +24,6 @@ const RATE = CARTESIA.sampleRate;
 const requested = process.argv.slice(2).filter((a): a is Lang => a === 'en' || a === 'es');
 const langs = SETTINGS.voices.filter((l) => !requested.length || requested.includes(l));
 const key = ENGINE === 'kokoro' ? undefined : secret('CARTESIA_API_KEY', false);
-const sha1 = (s: string) => crypto.createHash('sha1').update(s).digest('hex');
 
 /** Cartesia said "not now" (outage, credits, rate limit) or the network failed: try Kokoro. */
 class Unavailable extends Error {}
@@ -105,6 +104,22 @@ async function cartesiaLine(text: string, voice: CartesiaVoice): Promise<{ audio
   return { audio: wavFile(Buffer.concat(pcm)), words };
 }
 
+// ── Post-processing: run the voice's ffmpeg chain over a line's WAV in place, same format, and
+// check the length did not move (the word timestamps belong to the unfiltered audio).
+function applyPost(file: string, chain: string) {
+  if (!chain) return;
+  const tmp = file.replace(/\.wav$/, '.post.wav');
+  const r = spawnSync(findFfmpeg(), ['-y', '-loglevel', 'error', '-i', file, '-af', chain, '-ar', String(RATE), '-ac', '1', '-c:a', 'pcm_s16le', tmp], { encoding: 'utf8' });
+  if (r.status !== 0) throw new Error(`ffmpeg post chain failed on ${file}: ${r.stderr.slice(-400)}`);
+  const before = wavSeconds(fs.readFileSync(file));
+  const after = wavSeconds(fs.readFileSync(tmp));
+  if (Math.abs(after - before) > 0.02) {
+    fs.rmSync(tmp);
+    throw new Error(`post chain changed the length of ${file} (${before.toFixed(3)} s -> ${after.toFixed(3)} s): word timestamps would drift`);
+  }
+  fs.renameSync(tmp, file);
+}
+
 // ── Kokoro: a batch per language through scripts/kokoro.py, resampled to Cartesia's format.
 function kokoroBatch(jobs: { text: string; out: string }[], voice: KokoroVoice) {
   if (!jobs.length) return;
@@ -137,6 +152,8 @@ for (const lang of langs) {
   const lines = linesOf(lang);
   const cvoice: CartesiaVoice | null = TTS.voices?.[lang] ?? null;
   const kvoice: KokoroVoice | undefined = TTS.kokoro?.voices?.[lang];
+  const cpost = postChain(cvoice);
+  const kpost = postChain(kvoice);
   let made = 0;
 
   // A missing Cartesia voice for this language counts as Cartesia being unavailable for it.
@@ -146,15 +163,16 @@ for (const lang of langs) {
     try {
       for (const [k, text] of lines) {
         const file = path.join(dir, `${k}.wav`);
-        const hash = sha1(`cartesia|${cvoice!.id}|${TTS.model}|${TTS.speed ?? 1}|${text}`);
+        const hash = lineHash(['cartesia', cvoice!.id, TTS.model, TTS.speed ?? 1], text, cpost);
         if (cache[k] === hash && fs.existsSync(file)) continue;
         const { audio, words } = await cartesiaLine(text, cvoice!);
         fs.writeFileSync(file, audio);
+        applyPost(file, cpost);
         fs.writeFileSync(path.join(dir, `${k}.words.json`), JSON.stringify(words));
         cache[k] = hash;
         saveCache();
         made++;
-        console.log(`${lang}/${k}: ${wavSeconds(audio).toFixed(2)} s, ${words.length} words (Cartesia)`);
+        console.log(`${lang}/${k}: ${wavSeconds(audio).toFixed(2)} s, ${words.length} words (Cartesia${cpost ? ' + post' : ''})`);
       }
     } catch (e) {
       if (!(e instanceof Unavailable)) throw e;
@@ -168,12 +186,13 @@ for (const lang of langs) {
     const jobs: { key: string; hash: string; text: string; out: string }[] = [];
     for (const [k, text] of lines) {
       const out = path.join(dir, `${k}.wav`);
-      const hash = sha1(`kokoro|${kvoice.voice}|${kvoice.lang}|${TTS.kokoro?.speed ?? 1}|${text}`);
+      const hash = lineHash(['kokoro', kvoice.voice, kvoice.lang, TTS.kokoro?.speed ?? 1], text, kpost);
       if (cache[k] === hash && fs.existsSync(out)) continue;
       jobs.push({ key: k, hash, text, out });
     }
     kokoroBatch(jobs, kvoice);
     for (const j of jobs) {
+      applyPost(j.out, kpost);
       fs.rmSync(path.join(dir, `${j.key}.words.json`), { force: true });
       cache[j.key] = j.hash;
       made++;

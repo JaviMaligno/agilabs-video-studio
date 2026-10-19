@@ -21,7 +21,10 @@ const build = (): Cuts => ({
         }),
       ],
     ),
-    anim('tell', 'SessionPanes', { mode: 'tell', blend: true }, [say(0.1, 'More than a third were about whether work was correct.', '')]),
+    anim('tell', 'SessionPanes', { mode: 'tell', blend: true }, [say(0.1, 'More than a third were about whether work was correct.', '')], {
+      // Javier's voice reads this line faster than the old one: a short hold keeps the cue under 17 chars/s.
+      min: 4.1,
+    }),
     anim(
       'thread',
       'SessionPanes',
@@ -40,7 +43,7 @@ const build = (): Cuts => ({
       'RegistryShelf',
       { mode: 'loaded' },
       [say(0.1, 'Then I added load.', ''), say(0, 'One of three called it published without looking.', '')],
-      { min: 5.2 },
+      { min: 5.8 },
     ),
     anim('crack', 'RegistryShelf', { mode: 'crack', blend: true }, [say(0.1, 'A crack, not a rate.', '')], { min: 2.4 }),
     anim(
@@ -86,7 +89,7 @@ const build = (): Cuts => ({
         say(0, 'Worth something to check what you published.', ''),
       ],
       // The closing cue needs a little more air than TAIL to stay under 17 chars/s.
-      { min: 6.6 },
+      { min: 6.9 },
     ),
     outro('outro', [say(0.15, 'More at javieraguilar.ai.', '', { en: 'More at javier aguilar dot A I.' })]),
   ],

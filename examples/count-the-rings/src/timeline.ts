@@ -154,7 +154,8 @@ const build = (): Cuts => ({
         mode: 'pans',
         R: OB.R,
         counter: { radii: [...OB.radii], w: OB.w },
-        morph: { beat: 0, delay: 4.75, tag: L('any pan shape', '') },
+        // Morph just after "random" starts (word timings of the cloned voice).
+        morph: { beat: 0, delay: 5.05, tag: L('any pan shape', '') },
         pans: (['tightest', 'roomiest', 'random'] as const).map((rule, pi) => ({
           label: rule.toUpperCase(),
           dials: ['seared'],

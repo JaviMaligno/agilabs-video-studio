@@ -78,6 +78,21 @@ export const tokensOf = (line: Line, subs: Lang): Token[] => {
       return { text, start, end: stop };
     });
   }
+  // Spoken form differs (a number or address read out as several words): align the written words
+  // to the spoken ones, so only the rewritten words take the span of what was said for them.
+  const said = subs === line.voice ? WORDS[line.voice]?.[line.key] : undefined;
+  if (said && said.length) {
+    const aligned = alignWords(words, said);
+    if (aligned) {
+      let prev = line.start;
+      return words.map((text, i) => {
+        const start = Math.min(end, Math.max(prev, line.start + aligned[i][0]));
+        const stop = Math.min(end, Math.max(start, line.start + aligned[i][1]));
+        prev = start;
+        return { text, start, end: stop };
+      });
+    }
+  }
   // Weight = characters plus one for the space, so short words still get some time.
   const weights = words.map((w) => w.length + 1);
   const total = weights.reduce((a, b) => a + b, 0) || 1;
@@ -87,6 +102,55 @@ export const tokensOf = (line: Line, subs: Lang): Token[] => {
     acc += weights[i];
     return { text, start, end: line.start + (acc / total) * line.dur };
   });
+};
+
+const norm = (w: string) => w.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+
+/**
+ * Times for written words from spoken word timestamps, matching identical words in order and
+ * giving each run of unmatched written words the span of the unmatched spoken words between the
+ * same anchors ("8–31%" ← "eight to thirty-one percent"). Null when too few words match.
+ */
+export const alignWords = (written: string[], spoken: [string, number, number][]): [number, number][] | null => {
+  const w = written.map(norm);
+  const s = spoken.map(([x]) => norm(x));
+  const out: [number, number][] = [];
+  let i = 0;
+  let j = 0;
+  let matched = 0;
+  while (i < w.length) {
+    if (j < s.length && w[i] && w[i] === s[j]) {
+      out.push([spoken[j][1], spoken[j][2]]);
+      matched++;
+      i++;
+      j++;
+      continue;
+    }
+    // Next anchor: the nearest pair (i2, j2) of equal words ahead.
+    let best: [number, number] | null = null;
+    for (let i2 = i; i2 < Math.min(w.length, i + 6) && !best; i2++) {
+      if (!w[i2]) continue;
+      for (let j2 = j; j2 < Math.min(s.length, j + 10); j2++) {
+        if (w[i2] === s[j2] && !(i2 === i && j2 === j)) {
+          best = [i2, j2];
+          break;
+        }
+      }
+    }
+    const [i2, j2] = best ?? [w.length, s.length];
+    if (i2 === i) {
+      // Extra spoken words before this written word: skip them.
+      j = j2;
+      continue;
+    }
+    const a = j < s.length ? spoken[j][1] : (spoken.at(-1)?.[2] ?? 0);
+    const b = j2 > j ? spoken[Math.min(j2, s.length) - 1][2] : a;
+    const n = i2 - i;
+    for (let k = 0; k < n; k++) out.push([a + ((b - a) * k) / n, a + ((b - a) * (k + 1)) / n]);
+    i = i2;
+    j = j2;
+  }
+  return matched >= Math.ceil(written.length / 2) ? out : null;
 };
 
 /** Greedy row filling (words longer than `maxChars` have already been split). */
