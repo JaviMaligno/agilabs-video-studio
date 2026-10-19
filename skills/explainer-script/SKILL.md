@@ -33,10 +33,11 @@ caption.
 - First person, as the article is written: "I gave the planner...", "What I found...".
 - Claims as nuanced as the article. Keep its hedges ("on these runs", "in this setup").
 - Short spoken sentences. One idea per line. No jargon the article does not explain.
-- **Spoken numbers sparingly.** Never chain several figures in a row, and avoid repetitive or
-  unround values in the voice: say the one number that carries the point (rounded when the
-  article's own wording allows) and leave the rest on screen or out. A viewer can read a table;
-  nobody can listen to one.
+- **Spoken numbers: the problem is the pile-up, not the number.** Saying a figure is fine, and
+  the headline number usually should be said. What tires the ear is several figures in a row,
+  repetitive ones, or long unround values ("0.51, multi-turn 0.78"). When that happens, keep the
+  figure that carries the point and move the rest to the screen. Do not turn every number into
+  words by reflex: "almost never" is weaker than "4 times in 791" when that count is the finding.
 - **Clarity beats brevity.** The viewer must understand what was tested before hearing the
   result. If the setup needs another scene to make sense, add it, even past 60 s; labels
   scattered over the visual are not an explanation.
