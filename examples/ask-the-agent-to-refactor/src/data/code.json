@@ -1,0 +1,26 @@
+{
+  "_source": "Actual (open source, MIT), packages/loot-core, repeated-code variant R of the agent-abstractions experiment; lines trimmed from Codex's T0 diff experiments/agent-abstractions/data/diffs/study3/codex/RC/Z2/0/T0.patch. Variable names simplified to num1/num2 as the article does.",
+  "files": {
+    "shared": "shared/schedules.ts",
+    "forecast": "forecast/forecast-schedules.ts",
+    "app": "schedules/app.ts",
+    "template": "budget/schedule-template.ts"
+  },
+  "copy": "Math.round((num1 + num2) / 2)",
+  "template": "Math.round(num1 + num2) / 2",
+  "shared": "getScheduledAmount()",
+  "call": "getScheduledAmount(…)",
+  "diff": [
+    "- ? Math.round(amountCondition.value.num1 + amountCondition.value.num2) /",
+    "+ ? getScheduledAmount(",
+    "-   : Math.round((amountValue.num1 + amountValue.num2) / 2);",
+    "+ const amount = getScheduledAmount(amountValue);",
+    "-   : Math.round((amountValue.num1 + amountValue.num2) / 2);",
+    "+ const amount = getScheduledAmount(amountCond.value);",
+    "-   : Math.round((schedule._amount.num1 + schedule._amount.num2) / 2);",
+    "+ const amount = getScheduledAmount(schedule._amount);",
+    "-   const avg = (amount.num1 + amount.num2) / 2;",
+    "-   return inverse ? -Math.round(avg) : Math.round(avg);",
+    "+   : Math.round((amount.num1 + amount.num2) / 2);"
+  ]
+}

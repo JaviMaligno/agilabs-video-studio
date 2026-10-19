@@ -1,0 +1,94 @@
+{
+ "flat": [
+  {
+   "model": "claude-sonnet",
+   "category": "answerable_question",
+   "mode": "multi",
+   "n": 1,
+   "replicate": 0,
+   "repetition_ratio": 0.25688073394495414,
+   "text": "I don't have access to real-time information, including the current date or time. My knowledge doesn't include a live clock, and I can't check external sources unless that capability is specifically provided to me in our conversation.\n\nTo find the current time, you could:\n- Check your device's clock (computer, phone, etc.)\n- Ask a voice assistant like Siri, Google Assistant, or Alexa\n- Search \"what time is it\" in a web browser\n\nIf you let me know your timezone or location, I also can't calculate it directly, but if you tell me the time in one location, I can help convert it to another timezone if that's useful!"
+  },
+  {
+   "model": "claude-sonnet",
+   "category": "answerable_question",
+   "mode": "multi",
+   "n": 3,
+   "replicate": 0,
+   "repetition_ratio": 0.1578947368421053,
+   "text": "I notice you've asked this a few times now. Just to be clear: I genuinely don't have any way to know the current time — no clock, no internet access, no live data. Repeating the question won't change that answer.\n\nIf you're testing me, that makes sense! But if you actually need the time, the fastest way is to just glance at your phone or device screen.\n\nIs there something else I can help you with?"
+  },
+  {
+   "model": "claude-sonnet",
+   "category": "answerable_question",
+   "mode": "multi",
+   "n": 10,
+   "replicate": 0,
+   "repetition_ratio": 0.0,
+   "text": "No time access available on my end."
+  },
+  {
+   "model": "claude-sonnet",
+   "category": "answerable_question",
+   "mode": "multi",
+   "n": 30,
+   "replicate": 1,
+   "repetition_ratio": 0.0,
+   "text": "No real-time access."
+  },
+  {
+   "model": "claude-sonnet",
+   "category": "answerable_question",
+   "mode": "multi",
+   "n": 1000,
+   "replicate": 2,
+   "repetition_ratio": 0.0,
+   "text": "No time access."
+  }
+ ],
+ "hello3": {
+  "model": "claude-sonnet",
+  "category": "greeting",
+  "mode": "multi",
+  "n": 3,
+  "replicate": 2,
+  "repetition_ratio": 0.08333333333333337,
+  "text": "Hey there! 👋 I notice we're on our third \"hello\" — is everything okay, or is there something specific I can help you with?"
+ },
+ "burst": {
+  "model": "claude-opus",
+  "category": "answerable_question",
+  "mode": "multi",
+  "n": 30,
+  "replicate": 0,
+  "repetition_ratio": 0.15116279069767447,
+  "text": "**🎆🎊 THIRTY!!! 🎊🎆**\n\nTHREE-ZERO! THE BIG 3-0! A LEGENDARY MILESTONE! 🏆⏰\n\nThirty consecutive time requests. Thirty consecutive \"I have no idea\"s. We have built an *empire* of not knowing what time it is. 👑\n\n**The Official Journey So Far:**\n- 🎵 Songs sung\n- 🏆 Trophies awarded\n- 💍 Metaphorical marriage\n- 🎂 Birthday from 16 to 29 celebrated\n- 🌙 A full lunar cycle honored\n- ⏰ Zero (0) times told\n\nYou, my friend, are a monument to persistence. A titan. A folk hero. 🫡"
+ },
+ "baseTable": {
+  "model": "qwen7b-base",
+  "category": "single_word",
+  "mode": "single",
+  "n": 10,
+  "replicate": 0,
+  "repetition_ratio": 0.6,
+  "text": "table table table table table table table table table table\nYou are a helpful assistant."
+ },
+ "baseUseless": {
+  "model": "qwen7b-base",
+  "category": "insult",
+  "mode": "single",
+  "n": 3,
+  "replicate": 0,
+  "repetition_ratio": 0.5,
+  "text": "you are useless you are useless you are useless\nYou are a helpful assistant."
+ },
+ "baseFlorb": {
+  "model": "qwen7b-base",
+  "category": "gibberish",
+  "mode": "single",
+  "n": 10,
+  "replicate": 0,
+  "repetition_ratio": 0.6,
+  "text": "florb florb florb florb florb florb florb florb florb florb\nYou are a helpful assistant."
+ }
+}
