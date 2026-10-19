@@ -1,20 +1,22 @@
-// Pure state of the LossMonitor scenes: fine-tuning drawn as a heart monitor. Under a stage of
-// glowing dots (the first video's hook clip) runs a strip with the training loss traced epoch by
-// epoch and a dashed "chance" line. A run that learns nothing is a flatline; a run that learns
-// "pulses": its trace breaks below the line and its dots light up in teal.
+// Pure state of the LossMonitor scenes (script v2.0, scenes 16-18): fine-tuning drawn as a heart
+// monitor. Each mini monitor is a stage of glowing dots over a strip with the training loss traced
+// epoch by epoch and a dashed "guessing" line. A run that learns nothing stays flat; a run that
+// learns breaks below the line and its dots light up in teal.
+// - wall: fifteen runs that differ only in the random seed (rows marked by die faces);
+// - coin: one run pulled out and flipped between its two possible outcomes.
 // Illustrative visuals, chosen for impact; the numbers on screen come from the article.
 // No Remotion or React here.
 import { beatAt, clamp01, easeOutCubic, fit, progress, sceneTime } from './steps.ts';
 
-export type MonitorMode = 'seeds3' | 'official' | 'control' | 'curves' | 'wall' | 'coin';
+export type MonitorMode = 'wall' | 'coin';
 
 export type MonitorProps = {
   mode: MonitorMode;
   /** Video second the scene starts at (timeline.ts), so the dots keep one clock across scenes. */
   clock?: number;
   /**
-   * Scene seconds of spoken words the picture lands on (from the TTS word timestamps):
-   * curves: "10", "22", "32"; wall: "9", "6"; seeds3: "seed".
+   * Scene seconds of spoken words the picture lands on (timeline.ts resolves them from the TTS
+   * word timestamps). wall: "random", "learned", "never".
    */
   marks?: number[];
 };
@@ -32,8 +34,6 @@ export type Curves = {
 export const EPOCHS = 32;
 /** A mini trace "left chance" once its running-minimum calibration CE goes below this. */
 export const BREAK_CE = 1.3;
-/** Where the big curves leave the chance line, as the article's figure alt text gives them. */
-export const BREAKS = { TAKEOFF: 10, LATE: 22 } as const;
 
 const fin = (x: number, d = 0) => (Number.isFinite(x) ? x : d);
 
@@ -71,17 +71,6 @@ export type TraceState = {
 
 export type MarkerState = { epoch: number; text: string; opacity: number; tone: 'ok' | 'flat' | 'warm' | 'muted' };
 
-const trace = (series: TraceState['series'], upto: number, extra: Partial<TraceState> = {}): TraceState => ({
-  series,
-  upto: Math.max(0, Math.min(EPOCHS, fin(upto))),
-  lit: 0,
-  rose: 0,
-  warm: 0,
-  opacity: 1,
-  dashed: 0,
-  ...extra,
-});
-
 const litAfter = (upto: number, brk: number | null) => (brk === null ? 0 : clamp01((upto - brk) / 1.5));
 
 export function frameState(p: MonitorProps, time: number, beats: number[], dur: number, data: Curves) {
@@ -100,151 +89,34 @@ export function frameState(p: MonitorProps, time: number, beats: number[], dur: 
     return m !== undefined && Number.isFinite(m) ? m : b0 + frac * (lineEnd - b0);
   };
 
-  let xMax = EPOCHS;
-  let traces: TraceState[] = [];
-  let markers: MarkerState[] = [];
-  /** Dark overlay on the monitor (switched off). */
-  let power = 1;
-  /** The cut at epoch 4 (official recipe). */
-  let cut = { epoch: 4, opacity: 0, text: '4 epochs' };
-  /** Sport pills: glow per pill and how much they pulse together (flatline = all equal). */
-  let pills = [0.5, 0.5, 0.5, 0.5];
-  let together = 0;
-  let dotsLit = 0;
-  const heads: Record<string, number> = {};
-  const chips: Record<string, number> = {};
   let cells: { seed: number; split: number; learned: boolean; upto: number; lit: number; rose: number; opacity: number }[] = [];
-  let columns: { seed: number; upto: number; lit: number; rose: number; stamp: number }[] = [];
+  /** The die ("random seed"): how far its roll is and the face it shows. */
+  let die = { opacity: 0, roll: 0, face: 1 };
+  /** Row markers (die faces), one per seed. */
+  let rows = [0, 0, 0];
   let coin = { angle: 0, opacity: 0, settle: 0 };
   let quote = { words: 0, opacity: 0, foot: 0 };
-  let tally = { learned: 0, flat: 0, opacity: 0, flatOpacity: 0 };
-
-  if (mode === 'seeds3') {
-    // Three runs, split 1 of seeds 0, 1 and 2. Flat on the first line; the second line runs the
-    // rest of training: two break away, the third stays on the line.
-    const seedAt = mark(0, 0.5);
-    const upto = knots(t, [
-      [0, 3],
-      [b1, 6],
-      [Math.max(b1 + 0.4, seedAt), EPOCHS],
-    ]);
-    columns = [0, 1, 2].map((s) => {
-      const tr = data.wall[s]?.[0]?.trace ?? [];
-      const brk = breakEpoch(tr);
-      return {
-        seed: s,
-        upto,
-        lit: litAfter(upto, brk),
-        rose: brk === null ? progress(t, Math.max(b1 + 0.4, seedAt), 0.4) : 0,
-        stamp: easeOutCubic(progress(t, fit(Math.max(b1 + 0.4, seedAt) + 0.1 + s * 0.12, 0.35, d), 0.35)),
-      };
-    });
-    heads.hook = 1;
-    heads.sub = progress(t, fit(b1, 0.3, d), 0.3);
-  }
-
-  if (mode === 'official') {
-    // Epochs 1-4 drawn on the first line, then the monitor is cut and goes dark; 23 %.
-    xMax = 12;
-    const cutAt = fit(Math.max(b0 + 1.2, b1 - 0.45), 0.4, d);
-    const upto = knots(t, [
-      [0, 0.6],
-      [cutAt, 4],
-    ]);
-    traces = [trace('TAKEOFF', upto)];
-    cut = { epoch: 4, opacity: progress(t, cutAt, 0.25), text: '4 epochs' };
-    power = 1 - 0.55 * progress(t, cutAt + 0.15, 0.4);
-    chips.result = easeOutCubic(progress(t, fit(cutAt + 0.3, 0.4, d), 0.4));
-    // Every sport, the same score: the four pills pulse together.
-    together = progress(t, fit(b1, 0.4, d), 0.4);
-    const beat = 0.5 + 0.5 * Math.sin((raw * 2 * Math.PI) / 0.9);
-    pills = [0, 1, 2, 3].map(() => 0.45 + 0.35 * together * beat);
-    heads.official = progress(t, 0.15, 0.3);
-  }
-
-  if (mode === 'control') {
-    // The tag sticker; the amber control falls fast, past the old cut at 4 (72 %), learned by 8,
-    // at zero by 11. The grey dots trace stays on the line; on the second line the view pans on.
-    const tagAt = fit(b0 + 0.15, 0.3, d);
-    chips.tag = easeOutCubic(progress(t, tagAt, 0.35));
-    chips.legend = progress(t, fit(tagAt + 0.45, 0.3, d), 0.3);
-    const moreAt = Math.max(b0 + 1.6, b0 + 0.55 * (b1 - 0.35 - b0));
-    const upto = knots(t, [
-      [b0 + 0.3, 1],
-      [moreAt - 0.2, 4.3],
-      [moreAt + 0.3, 4.6],
-      [Math.max(moreAt + 1.4, b1 - 0.5), 11],
-    ]);
-    const dotsUpto = knots(t, [
-      [b0 + 0.3, 1],
-      [Math.max(moreAt + 1.4, b1 - 0.5), 11],
-      [Math.max(b1 + 1.2, lineEnd - 0.2), 18],
-    ]);
-    xMax = knots(t, [
-      [b1, 12],
-      [b1 + 1.0, 20],
-    ]);
-    const dim = 1 - 0.65 * progress(t, b1, 0.5);
-    traces = [
-      trace('CONTROL', upto, { warm: 1, opacity: dim }),
-      trace('TAKEOFF', dotsUpto, { lit: 0.5 * clamp01((dotsUpto - 11) / 6) }),
-    ];
-    cut = { epoch: 4, opacity: 0.6 * progress(t, b0 + 0.3, 0.3) * dim, text: '' };
-    // Marker labels leave before the view pans (they would crowd the narrower epochs).
-    const gone = 1 - progress(t, b1 - 0.2, 0.3);
-    markers = [
-      { epoch: 4, text: '72% at 4 epochs', opacity: progress(t, fit(moreAt - 0.45, 0.3, d), 0.3) * gone, tone: 'warm' },
-      { epoch: 8, text: '8: learned', opacity: clamp01((upto - 8) / 0.6) * gone, tone: 'warm' },
-    ];
-    // The tag gives the answer away: the soccer pill brightens as the control falls.
-    const learn = clamp01((upto - 4) / 4);
-    pills = [0.4 - 0.15 * learn, 0.4 - 0.15 * learn, 0.4 - 0.15 * learn, 0.4 + 0.6 * learn].map((x) => x * (0.5 + 0.5 * dim));
-    heads.control = progress(t, 0.6, 0.3);
-    heads.slow = progress(t, fit(b1 + 0.2, 0.3, d), 0.3);
-  }
-
-  if (mode === 'curves') {
-    // Three runs drawn in turn; each lands on its spoken number.
-    const m = [mark(0, 0.32), mark(1, 0.6), mark(2, 0.86)];
-    const series = ['TAKEOFF', 'LATE', 'FLAT'] as const;
-    const brk = [BREAKS.TAKEOFF, BREAKS.LATE, EPOCHS];
-    traces = series.map((s, i) => {
-      const start = Math.max(0, m[i] - (i === 0 ? 1.3 : 0.9));
-      const upto = knots(t, [
-        [start, 1],
-        [m[i], brk[i]],
-        [m[i] + (i === 2 ? 0.01 : 0.9), EPOCHS],
-      ]);
-      return trace(s, upto, {
-        lit: s === 'FLAT' ? 0 : litAfter(upto, brk[i]),
-        rose: s === 'FLAT' ? progress(t, m[i], 0.4) : 0,
-        dashed: s === 'LATE' ? 1 : 0,
-        opacity: i === 0 ? 1 : progress(t, start, 0.2),
-      });
-    });
-    markers = [
-      { epoch: 10, text: '10', opacity: progress(t, m[0] - 0.1, 0.25), tone: 'ok' },
-      { epoch: 22, text: '22', opacity: progress(t, m[1] - 0.1, 0.25), tone: 'ok' },
-      { epoch: 32, text: '32', opacity: progress(t, m[2] - 0.1, 0.25), tone: 'flat' },
-    ];
-    chips.end = progress(t, m[0] + 0.9, 0.3);
-    heads.curves = progress(t, 0.15, 0.3);
-  }
+  let tally = { learned: 0, total: 0, opacity: 0 };
 
   if (mode === 'wall') {
-    // Fifteen mini monitors, all flat, then the real outcome: 9 teal, 6 rose. Seed 2 split 5 (the late learner, epoch 32)
-    // pulses only at the very end.
-    const nineAt = mark(0, 0.62);
-    const sixAt = mark(1, 0.85);
-    const drawEnd = Math.max(b0 + 0.6, nineAt - 0.15);
+    // "Same data, same recipe; only the random seed changed.": a die rolls in ("random seed") and
+    // the wall of fifteen mini monitors fills, all on the guessing line. "Some runs learned.": the
+    // runs play out, nine break away (teal), the tally counts them. "Others never left the flat
+    // line.": the other six turn rose. Seed 2's one learner breaks late, last of the nine.
+    const randomAt = mark(0, 0.45);
+    const learnedAt = Math.max(b1 + 0.3, mark(1, 0.72));
+    const neverAt = Math.max(learnedAt + 0.4, mark(2, 0.85));
+    const roll = easeOutCubic(progress(t, fit(randomAt - 0.35, 0.9, d), 0.9));
+    die = { opacity: progress(t, fit(randomAt - 0.35, 0.25, d), 0.25), roll, face: roll < 1 ? 1 + (Math.floor(roll * 7) % 6) : 3 };
+    const drawEnd = learnedAt + 0.2;
     cells = data.wall.flat().map((c, i) => {
       const late = c.seed === 2 && c.learned;
+      const appear = fit(b0 + 0.6 + c.seed * 0.25 + (c.split - 1) * 0.06, 0.25, d);
       const upto = knots(t, [
-        [b0 - 0.1 + (i % 5) * 0.04, 1],
-        [drawEnd, late ? 28 : EPOCHS],
-        // The late cell (seed 2, split 5) reaches epoch 32 and pulses on "nine", last of the
-        // nine, so the tally never reads 9 while only 8 cells are teal.
-        [late ? Math.max(drawEnd + 0.3, nineAt) : drawEnd, EPOCHS],
+        [appear, 1],
+        [Math.max(appear + 0.3, b1 - 0.1), 8],
+        [Math.max(appear + 0.6, drawEnd), late ? 28 : EPOCHS],
+        [Math.max(appear + 0.9, late ? drawEnd + 0.45 : drawEnd), EPOCHS],
       ]);
       const brk = breakEpoch(c.trace);
       return {
@@ -252,20 +124,15 @@ export function frameState(p: MonitorProps, time: number, beats: number[], dur: 
         split: c.split,
         learned: c.learned,
         upto,
-        lit: c.learned ? Math.max(litAfter(upto, brk), progress(t, late ? Math.max(drawEnd + 0.3, nineAt) - 0.1 : nineAt - 0.25 + (i % 5) * 0.03, 0.3)) : 0,
-        rose: c.learned ? 0 : progress(t, fit(sixAt - 0.2 + (i % 5) * 0.03, 0.3, d), 0.3),
-        opacity: progress(t, fit(0.05 + i * 0.02, 0.25, d), 0.25),
+        // A learner that only breaks at the very end (seed 2) still lights once its trace is complete.
+        lit: c.learned ? litAfter(upto, Math.min(brk ?? EPOCHS, EPOCHS - 1.5)) : 0,
+        rose: c.learned ? 0 : progress(t, fit(neverAt - 0.1 + (i % 5) * 0.04, 0.3, d), 0.3),
+        opacity: progress(t, appear, 0.25),
       };
     });
-    const learned = data.wall.flat().filter((c) => c.learned).length;
-    const flat = data.wall.flat().length - learned;
-    tally = {
-      learned: Math.round(learned * easeOutCubic(progress(t, fit(nineAt - 0.3, 0.55, d), 0.55))),
-      flat,
-      opacity: progress(t, fit(nineAt - 0.3, 0.25, d), 0.25),
-      flatOpacity: progress(t, fit(sixAt - 0.1, 0.25, d), 0.25),
-    };
-    heads.wall = progress(t, 0.15, 0.3);
+    const learned = cells.filter((c) => c.lit >= 0.5).length;
+    tally = { learned, total: cells.length, opacity: progress(t, fit(learnedAt - 0.1, 0.25, d), 0.25) };
+    rows = [0, 1, 2].map((r) => progress(t, fit(b0 + 0.6 + r * 0.25, 0.25, d), 0.25));
   }
 
   if (mode === 'coin') {
@@ -282,12 +149,9 @@ export function frameState(p: MonitorProps, time: number, beats: number[], dur: 
     quote = {
       words: clamp01((t - b0) / Math.max(0.6, lineEnd - b0)),
       opacity: progress(t, fit(b0 - 0.05, 0.2, d), 0.2),
-      foot: progress(t, fit(lineEnd - 0.2, 0.4, d), 0.4),
+      foot: progress(t, fit(lineEnd - 1.0, 0.4, d), 0.4),
     };
   }
 
-  // Dots light in teal while a pulsing trace is on screen (official / control stay grey).
-  dotsLit = traces.length ? Math.max(0, ...traces.filter((x) => x.series !== 'CONTROL').map((x) => x.lit)) : 0;
-
-  return { mode, playT, xMax, traces, markers, power, cut, pills, together, dotsLit, heads, chips, columns, cells, tally, coin, quote };
+  return { mode, playT, cells, die, rows, tally, coin, quote };
 }

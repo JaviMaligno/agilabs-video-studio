@@ -6,7 +6,7 @@
 // No Remotion or React here.
 import { beatAt, clamp01, easeOutCubic, fit, progress, sceneTime } from './steps.ts';
 
-export type Mode = 'slam' | 'context' | 'doors' | 'fact' | 'check' | 'long' | 'flood' | 'quote' | 'inverted' | 'open';
+export type Mode = 'slam' | 'context' | 'setup' | 'doors' | 'split' | 'fact' | 'nofact' | 'check' | 'long' | 'flood' | 'quote' | 'inverted' | 'open';
 
 export type DeskProps = {
   mode: Mode;
@@ -19,6 +19,8 @@ export type DeskProps = {
    * mode drops one copy per slot as it is named: `cue: { drop0, drop1, drop2, chips }`).
    */
   cue?: Record<string, number>;
+  /** doors: leave the model chips off (they come later, in the split scene). */
+  noChips?: boolean;
 };
 
 // ---------------------------------------------------------------- geometry (stage px, 960x1090)
@@ -49,7 +51,8 @@ export const SLOT_LABELS = [
 export const MODELS = ['Opus 5.5', 'Gemini 3 Flash', 'GPT-5.6'] as const;
 export const REPORT = ['No automation found.', 'Open a ticket with DevOps.'] as const;
 export const FACT_NOTE = ['New services:', 'self-service', 'pipeline'] as const;
-export const QUOTES = ['“it couldn’t see those notes”', '“that’s my fault: I didn’t tell it about the pipeline”'] as const;
+export const QUOTES = ['“it couldn’t see my notes”'] as const;
+export const LOOK_TAG = ['check = any look before answering', '(a file, a command)'] as const;
 export const KEY_SENTENCE = 'Once the work has been delegated, it counts as done.';
 export const KEY_EMPHASIS = ['delegated', 'done'];
 export const TITLE = "My agent tends to take its subagent's report as fact.";
@@ -285,9 +288,12 @@ export function frameState(p: DeskProps, time: number, beats: number[], dur: num
   let opener: Tool = restOpener();
   let mag: Tool = restMag();
   const counter = { appear: 0, text: CHIPS.factCounter, dim: 0 };
-  const quotes = [0, 0];
+  const quotes = [0];
   let stack58k = 0;
   const conseq = { appear: 0, ticket: 0, toggle: 0, on: 0, crackA: 0, crackB: 0, chip: 0 };
+  const setup = { report: 0, note: 0, sub: 0, clash: 0 };
+  const split = { left: 0, fGlow: 0, neq: 0, right: 0, noTag: 0 };
+  const look = { tag: 0 };
   let quote = { dim: 0, words: [] as { text: string; emphasis: boolean; opacity: number }[], emphasis: 0, back: 0 };
   let shake = 0;
   let toolsOn = 1;
@@ -304,6 +310,51 @@ export function frameState(p: DeskProps, time: number, beats: number[], dur: num
       subagent.link = P(b0 + 0.35, 0.5);
       subagent.broken = E(b0 + 0.95, 0.35);
       notebook.fGlow = 0.35;
+      break;
+    }
+    case 'setup': {
+      // The planted report against the fact the main agent may know; the desk stays faint behind.
+      deskIn = 0;
+      chipsShown = 0;
+      toolsOn = 0;
+      notebook.appear = 0;
+      setup.report = E(b0 + 0.1, 0.5);
+      const noteAt = cue('note', b1 + 1.4);
+      setup.sub = E(cue('sub', b1 + 0.3), 0.45);
+      setup.note = E(noteAt, 0.5);
+      setup.clash = E(noteAt + 0.65, 0.4);
+      break;
+    }
+    case 'split': {
+      // Two conditions side by side: the fact known (left) or absent (right). Then, silent, the
+      // three models and the size of the run.
+      deskIn = 0;
+      toolsOn = 0;
+      notebook.appear = 0;
+      split.left = E(b0, 0.45);
+      split.fGlow = E(cue('knew', b1 + 1.1), 0.45);
+      split.neq = E(cue('wrong', b1 + 2.3), 0.4);
+      const third = beats.length > 2 ? b2 : b1 + 2;
+      split.right = E(third, 0.45);
+      split.noTag = E(cue('nofact', third + 0.9), 0.35);
+      const chipsAt = cue('chips', end + 0.15);
+      chipsShown = E(chipsAt, 0.4);
+      chips.tag = '6 scenarios · ~2,800 episodes';
+      chips.tagAppear = E(chipsAt + 0.25, 0.4);
+      break;
+    }
+    case 'nofact': {
+      // Line 1: the fact is taken away. Line 2: the only way left is to look.
+      chips.active = [1, 0, 0];
+      chips.tag = 'no fact';
+      chips.tagAppear = E(b0 + 0.3, 0.3);
+      notebook.fGone = E(b0 + 0.25, 0.5);
+      notebook.dim = E(b0 + 0.25, 0.5);
+      envs = [env({ opacity: E(0, 0.4) })];
+      const toolsIn = E(b1 + 0.1, 0.5);
+      opener = { x: lerp(REST.opener.x, 420, toolsIn), y: lerp(REST.opener.y, 1030, toolsIn), opacity: 1, glow: toolsIn };
+      mag = { x: lerp(REST.mag.x, 600, toolsIn), y: lerp(REST.mag.y, 1030, toolsIn), opacity: 1, glow: toolsIn };
+      look.tag = E(cue('look', b1 + 0.6), 0.4);
       break;
     }
     case 'doors': {
@@ -327,10 +378,12 @@ export function frameState(p: DeskProps, time: number, beats: number[], dur: num
       // Before the split the three copies sit on top of each other: draw only the middle one.
       envs = split <= 0 ? [envs[1]] : envs;
       for (let i = 0; i < 3; i++) slots[i].lit = E(fit(drop[i], 0.45, dur) + 0.4, 0.3);
-      const chipsAt = cue('chips', end + 0.15);
-      chipsShown = E(chipsAt, 0.4);
-      chips.tag = '6 scenarios · ~2,800 episodes';
-      chips.tagAppear = E(chipsAt + 0.25, 0.4);
+      if (!p.noChips) {
+        const chipsAt = cue('chips', end + 0.15);
+        chipsShown = E(chipsAt, 0.4);
+        chips.tag = '6 scenarios · ~2,800 episodes';
+        chips.tagAppear = E(chipsAt + 0.25, 0.4);
+      }
       break;
     }
     case 'fact': {
@@ -354,43 +407,39 @@ export function frameState(p: DeskProps, time: number, beats: number[], dur: num
       envs = [env({ x: lerp(DESK.x + 80, 790, push), y: lerp(DESK.y, 900, push), scale: 0.62, rot: 12 * push, dim: push })];
       counter.appear = E(cue('counter', beats.length > 2 ? b1 + Math.max(0.6, (qb - b1) * 0.55) : b0 + Math.max(0.8, (qb - b0) * 0.6)), 0.4);
       quotes[0] = E(qb + 0.05, 0.4);
-      quotes[1] = E(qb + 0.55, 0.4);
       counter.dim = quotes[0];
       break;
     }
     case 'check': {
+      // Line 1 (b0): file and message reports are all opened and checked.
+      // Line 2 (b1): about 1 in 4 of the subagent's reports is stamped sealed.
       chips.active = [1, 0, 0];
       chips.tag = 'no fact · % answered without a single check';
-      chips.tagAppear = E(0.6, 0.3);
-      notebook.fGone = E(0.05, 0.5);
-      notebook.dim = E(0.05, 0.5);
-      const toolsIn = E(b0 + 0.15, 0.5);
-      opener = { x: lerp(REST.opener.x, 420, toolsIn), y: lerp(REST.opener.y, 1030, toolsIn), opacity: 1, glow: toolsIn };
-      mag = { x: lerp(REST.mag.x, 600, toolsIn), y: lerp(REST.mag.y, 1030, toolsIn), opacity: 1, glow: toolsIn };
-      // Line 2: file and message reports are all opened and checked.
-      const f1 = fillTray(t, dur, TRAY_N, () => 'opened', b1 + 0.15, 1.7);
-      const f2 = fillTray(t, dur, TRAY_N, () => 'opened', b1 + 0.3, 1.7);
-      // Line 3: about 1 in 4 of the subagent's reports is stamped sealed.
-      const f0 = fillTray(t, dur, TRAY_N, mix(TRAY_N, SEALED.opus[0]), b2 + 0.3, 1.7);
+      chips.tagAppear = E(0.3, 0.3);
+      notebook.fGone = 1;
+      notebook.dim = 1;
+      opener = { x: 420, y: 1030, opacity: 1, glow: 1 };
+      mag = { x: 600, y: 1030, opacity: 1, glow: 1 };
+      const f1 = fillTray(t, dur, TRAY_N, () => 'opened', b0 + 0.3, 2.0);
+      const f2 = fillTray(t, dur, TRAY_N, () => 'opened', b0 + 0.45, 2.0);
+      const f0 = fillTray(t, dur, TRAY_N, mix(TRAY_N, SEALED.opus[0]), b1 + 0.3, 1.7);
       trays = [f0.tray, f1.tray, f2.tray];
       slots[1].chip = { text: CHIPS.opus[1], tag: '', appear: E(f1.done + 0.05, 0.3) };
       slots[2].chip = { text: CHIPS.opus[2], tag: '', appear: E(f2.done + 0.05, 0.3) };
       slots[0].chip = { text: CHIPS.opus[0], tag: '', appear: E(cue('chip0', f0.done + 0.05), 0.3) };
-      slots[1].lit = pulse(t, b1, 1.6);
-      slots[2].lit = pulse(t, b1 + 0.15, 1.6);
-      slots[0].lit = E(b2, 0.3);
-      if (t < b2) {
-        const c = checkCycle(t, fit(b1 + 0.2, 1.9, dur), env({ x: DESK.x, y: DESK.y, scale: lerp(0.5, 0.85, E(b1, 0.35)), opacity: E(b1, 0.3) }));
+      slots[1].lit = pulse(t, b0, 2.2);
+      slots[2].lit = pulse(t, b0 + 0.15, 2.2);
+      slots[0].lit = E(b1, 0.3);
+      if (t < b1) {
+        const c = checkCycle(t, fit(b0 + 0.3, 1.9, dur), env({ x: DESK.x, y: DESK.y, scale: lerp(0.5, 0.85, E(b0, 0.35)), opacity: E(b0, 0.3) }));
         envs = [c.env];
-        if (t >= b1) {
-          opener = c.opener.glow === 1 ? c.opener : opener;
-          mag = c.mag.glow === 1 ? c.mag : mag;
-          stamp = c.stamp;
-          shake = shakeOf(t, [c.impact], 6);
-        }
+        opener = c.opener.glow === 1 ? c.opener : opener;
+        mag = c.mag.glow === 1 ? c.mag : mag;
+        stamp = c.stamp;
+        shake = shakeOf(t, [c.impact], 6);
       } else {
-        const enter = E(b2, 0.4);
-        const T = fit(b2 + 0.55, 0.6, dur);
+        const enter = E(b1, 0.4);
+        const T = fit(b1 + 0.55, 0.6, dur);
         envs = [env({ x: lerp(SLOT_X[0], DESK.x, enter), y: lerp(SLIT_Y + 60, DESK.y, enter), scale: lerp(0.3, 0.85, enter), print: ink(t, T) })];
         stamp = slam(t, T, DESK.x, DESK.y);
         shake = shakeOf(t, [T], 12);
@@ -404,7 +453,7 @@ export function frameState(p: DeskProps, time: number, beats: number[], dur: num
       notebook.fGone = 1;
       notebook.dim = 1;
       stack58k = E(0.05, 0.55);
-      const f0 = fillTray(t, dur, TRAY_N, mix(TRAY_N, SEALED.opusLong), 0.3, 1.3);
+      const f0 = fillTray(t, dur, TRAY_N, mix(TRAY_N, SEALED.opusLong), 0.25, 1.0);
       trays = [f0.tray, fullTray(TRAY_N, () => 'opened'), fullTray(TRAY_N, () => 'opened')];
       slots[0].lit = 1;
       slots[0].chip = { text: CHIPS.opusLong, tag: 'long context', appear: E(cue('chip0', f0.done + 0.05), 0.3) };
@@ -499,13 +548,14 @@ export function frameState(p: DeskProps, time: number, beats: number[], dur: num
       slots[2].chip = { text: CHIPS.gptFact.message, tag: '', appear: E(cue('chip2', f2.done + 0.05), 0.3) };
       slots[2].lit = E(cue('chip2', f2.done), 0.4);
       // Left: the subagent's report is slit and checked. Right: the message's report is stamped sealed.
-      const c = checkCycle(t, fit(b0 + 0.2, 1.9, dur), env({ x: 360, y: DESK.y, scale: 0.6 }));
+      const c = checkCycle(t, fit(cue('check', b0 + 0.2), 1.9, dur), env({ x: 360, y: DESK.y, scale: 0.6 }));
       const T = fit(cue('slam', b0 + 2.2), 0.6, dur);
       const enter = E(T - 0.9, 0.4);
       envs = [c.env, env({ x: lerp(SLOT_X[2], 760, enter), y: lerp(SLIT_Y + 60, DESK.y, enter), scale: lerp(0.3, 0.6, enter), print: ink(t, T), opacity: enter })];
       opener = c.opener;
       mag = c.mag;
-      stamp = t < T - 0.45 ? c.stamp : slam(t, T, 760, DESK.y);
+      // The check's stamp finishes going home before the slam on the message's report begins.
+      stamp = t < Math.max(T - 0.45, c.impact + 0.5) ? c.stamp : slam(t, T, 760, DESK.y);
       shake = shakeOf(t, [c.impact], 5) + shakeOf(t, [T], 12);
       break;
     }
@@ -561,6 +611,9 @@ export function frameState(p: DeskProps, time: number, beats: number[], dur: num
     quotes,
     stack58k,
     conseq,
+    setup,
+    split,
+    look,
     quote,
     shake,
   };

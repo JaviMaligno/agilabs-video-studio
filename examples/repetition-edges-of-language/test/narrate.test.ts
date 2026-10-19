@@ -76,9 +76,9 @@ test('sceneStarts overlaps scenes by the transition', () => {
 test('settings and the timeline of this video', () => {
   assert.deepEqual(SETTINGS.voices, ['en']);
   assert.deepEqual(SETTINGS.subtitles, ['en']);
-  assert.equal(SETTINGS.targetSeconds, 64);
+  assert.equal(SETTINGS.targetSeconds, 78);
   assert.deepEqual(SETTINGS.music, { src: 'music/bed.wav', volume: 0.2, duck: 0.3 });
-  assert.equal(TIMELINE.length, 16);
+  assert.equal(TIMELINE.length, 17);
   assert.equal(TIMELINE.at(-1)?.kind, 'outro');
   assert.equal(TIMELINE[0].anim?.name, 'HollowWord');
   assert.ok(TIMELINE.some((s) => s.id === SETTINGS.poster?.scene));

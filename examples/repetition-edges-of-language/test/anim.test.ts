@@ -31,7 +31,7 @@ type Case = { name: string; state: (t: number, beats: number[], dur: number) => 
 
 const CASES: Case[] = [
   { name: 'HollowWord', state: (t, b, d) => hollow.frameState({ word: 'table', count: 30, span: 3.8 }, t, b, d) },
-  ...(['wall', 'flat', 'final', 'meter', 'burst', 'split'] as const).map((mode) => ({ name: `EchoChat ${mode}`, state: (t: number, b: number[], d: number) => echo.frameState({ mode }, t, b, d) })),
+  ...(['wall', 'modes', 'flat', 'final', 'meter', 'burst', 'split'] as const).map((mode) => ({ name: `EchoChat ${mode}`, state: (t: number, b: number[], d: number) => echo.frameState({ mode }, t, b, d) })),
   ...(['roster', 'peel', 'cutaway'] as const).map((mode) => ({ name: `ShellChips ${mode}`, state: (t: number, b: number[], d: number) => shell.frameState({ mode }, t, b, d) })),
   ...(['table', 'seeds', 'stats'] as const).map((mode) => ({ name: `LoopSpiral ${mode}`, state: (t: number, b: number[], d: number) => loop.frameState({ mode }, t, b, d) })),
   ...(['row', 'human'] as const).map((mode) => ({ name: `GiveUpRow ${mode}`, state: (t: number, b: number[], d: number) => giveup.frameState({ mode }, t, b, d) })),
@@ -220,11 +220,29 @@ test('EchoChat: the wall counter climbs to ×1000; the flat reply only shrinks',
   for (let i = 1; i < lens.length; i++) assert.ok(lens[i] <= lens[i - 1], `reply grew back: ${lens}`);
   const fin = echo.frameState({ mode: 'final' }, 5, [0.1], 5);
   assert.equal(fin.reply.text, 'No time access.');
-  assert.equal(fin.tag, '×1000');
+  // The long conversation stopped at turn 300 (article corrected in 31a49777), never ×1000.
+  assert.equal(fin.tag, 'turn 300');
+  assert.equal(echo.frameState({ mode: 'final', jumpAt: 2.2 }, 1.5, [0.1], 5).tag, 'turn 30');
+  assert.equal(echo.frameState({ mode: 'split' }, 3, [0.15], 5).tag, 'repeated');
   assert.equal(echo.frameState({ mode: 'meter' }, 3, [0.1], 3).gauge.tick, 1);
   // Before Opus bursts there is only a typing indicator, never an invented reply.
   assert.equal(echo.frameState({ mode: 'burst' }, 0.3, [0.15], 4.4).reply.text, '');
   assert.equal(echo.frameState({ mode: 'burst' }, 4.4, [0.15], 4.4).burst.empire, 1);
+  // The empire line is typed with the voice: not before it starts, done by the scene end.
+  const ob = { mode: 'burst' as const, empireAt: 2.1, empireDur: 3.3 };
+  assert.equal(echo.frameState(ob, 2.0, [0.15], 6.5).burst.empire, 0);
+  assert.equal(echo.frameState(ob, 6.5, [0.15], 6.5).burst.empire, 1);
+});
+
+test('EchoChat modes: both sides count up in sync, the emphasis moves left → right → both', () => {
+  const c = [0.3, 1.0, 1.8, 2.6, 3.6].map((t) => echo.frameState({ mode: 'modes' }, t, [0.15], 3.6).modes);
+  for (let i = 1; i < c.length; i++) assert.ok(c[i].count >= c[i - 1].count);
+  assert.equal(c[0].count, 1);
+  assert.equal(c.at(-1)!.count, echo.MODES_MAX);
+  assert.ok(c[0].left > c[0].right);
+  assert.ok(c[2].right > c[2].left);
+  assert.equal(c.at(-1)!.left, 1);
+  assert.equal(c.at(-1)!.right, 1);
 });
 
 test('EchoChat wall rows never exceed their height', () => {
@@ -250,6 +268,7 @@ test('ShellChips: the two Qwen chips share a core; the peel ends on the Base chi
 test('LoopSpiral: 99.6% on table, 0.51 then 0.78 for the base, ~0.10 for the aligned', () => {
   const tb = loop.frameState({ mode: 'table' }, 4, [0.1], 4);
   assert.equal(tb.gauge.label, '99.6%');
+  assert.equal(tb.gauge.tag, '“table” ×100');
   assert.ok(tb.spirals[0].words.every((w) => w.text === 'table'));
   const mid = loop.frameState({ mode: 'stats', swing: [0.9, 3.6] }, 5.0, [0.15, 3.8], 9.4);
   assert.equal(mid.gauge.label, '0.51');

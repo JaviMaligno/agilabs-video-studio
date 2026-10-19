@@ -8,14 +8,18 @@ import * as grid from '../src/anim/StatGrid.state.ts';
 import * as dots from '../src/anim/DotStage.state.ts';
 import * as deck from '../src/anim/SnapshotDeck.state.ts';
 import * as mon from '../src/anim/LossMonitor.state.ts';
+import * as laya from '../src/anim/LayaStage.state.ts';
+import * as card from '../src/anim/QuestionCard.state.ts';
+import { resolveMark } from '../src/marks.ts';
 import { readFileSync } from 'node:fs';
 
 const CLIPS = JSON.parse(readFileSync(new URL('../src/data/clips.json', import.meta.url), 'utf8')) as dots.ClipSet;
 const CURVES = JSON.parse(readFileSync(new URL('../src/data/laya-curves.json', import.meta.url), 'utf8')) as mon.Curves;
-const MON_MODES = ['seeds3', 'official', 'control', 'curves', 'wall', 'coin'] as const;
+const MON_MODES = ['wall', 'coin'] as const;
+const LAYA_MODES = ['task', 'lasttime', 'laya', 'legend', 'official', 'tag', 'control', 'curves'] as const;
 
 // Fields that are animation progress and must stay within [0, 1].
-const PROGRESS = new Set(['progress', 'appear', 'grow', 'fill', 'draw', 'pop', 'opacity', 'emphasis']);
+const PROGRESS = new Set(['progress', 'appear', 'grow', 'fill', 'draw', 'pop', 'opacity', 'emphasis', 'flash', 'pick', 'bars', 'together', 'lit', 'rose', 'ring', 'textIn']);
 
 /** Walks a frame state: every number finite, every progress field within [0, 1]. */
 const check = (value: unknown, path: string) => {
@@ -36,6 +40,9 @@ const CASES: Case[] = [
   ...(['specialist', 'guesses', 'totext'] as const).map((mode) => ({ name: `DotStage ${mode}`, state: (t: number, b: number[], d: number) => dots.frameState({ mode, clock: 7.3 }, t, b, d, CLIPS) })),
   ...(['laya', 'company'] as const).map((mode) => ({ name: `SnapshotDeck ${mode}`, state: (t: number, b: number[], d: number) => deck.frameState({ mode }, t, b, d) })),
   ...MON_MODES.map((mode) => ({ name: `LossMonitor ${mode}`, state: (t: number, b: number[], d: number) => mon.frameState({ mode, clock: 3.1 }, t, b, d, CURVES) })),
+  ...LAYA_MODES.map((mode) => ({ name: `LayaStage ${mode}`, state: (t: number, b: number[], d: number) => laya.frameState({ mode, clock: 3.1 }, t, b, d, CURVES) })),
+  ...LAYA_MODES.map((mode) => ({ name: `LayaStage ${mode} (marks)`, state: (t: number, b: number[], d: number) => laya.frameState({ mode, marks: [0.5, 9, Number.NaN, 2] }, t, b, d, CURVES) })),
+  ...(['laya'] as const).map((mode) => ({ name: `SnapshotDeck ${mode} (marks)`, state: (t: number, b: number[], d: number) => deck.frameState({ mode, marks: [0.5, 9, Number.NaN, 2] }, t, b, d) })),
   ...MON_MODES.map((mode) => ({ name: `LossMonitor ${mode} (marks)`, state: (t: number, b: number[], d: number) => mon.frameState({ mode, marks: [0.5, 9, Number.NaN] }, t, b, d, CURVES) })),
   { name: 'Counter', state: (t, b, d) => counter.frameState({ value: 70, suffix: '%', label: 'pass rate', decimals: 1, beat: 1 }, t, b, d) },
   { name: 'Counter (beat out of range)', state: (t, b, d) => counter.frameState({ value: 3, label: 'x', beat: 9 }, t, b, d) },
@@ -216,48 +223,123 @@ test('curves data: the article figure arrays, and the 9 / 15 wall', () => {
   for (const c of cells) assert.equal(mon.breakEpoch(c.trace) !== null, c.learned, `seed ${c.seed} split ${c.split}`);
 });
 
-test('LossMonitor: the hook starts flat and ends with two pulses and one flatline', () => {
-  const beats = [0.1, 2.4];
-  const first = mon.frameState({ mode: 'seeds3' }, 0, beats, 5.5, CURVES);
-  assert.ok(first.columns.every((c) => c.upto >= 1 && c.lit === 0 && c.rose === 0), 'flat and visible at frame 0');
-  const end = mon.frameState({ mode: 'seeds3' }, 5.5, beats, 5.5, CURVES);
-  assert.deepEqual(end.columns.map((c) => c.lit > 0.99), [true, true, false]);
-  assert.deepEqual(end.columns.map((c) => c.rose), [0, 0, 1]);
+test('LayaStage: the options are level while flat; the right one grows once learning', () => {
+  const beats = [0.1, 1.6];
+  const flat = laya.frameState({ mode: 'legend', marks: [2.5, 3.2, 3.8] }, 2.6, beats, 6, CURVES);
+  assert.deepEqual(flat.scores, [0.25, 0.25, 0.25, 0.25]);
+  assert.equal(flat.stage.lit, 0);
+  const end = laya.frameState({ mode: 'legend', marks: [2.5, 3.2, 3.8] }, 6, beats, 6, CURVES);
+  assert.equal(end.monitor.traces[0].upto, 32);
+  assert.equal(end.stage.lit, 1);
+  assert.ok(end.scores[laya.HOOK_SPORT] > 0.7 && end.scores.every((v, k) => k === laya.HOOK_SPORT || v < 0.15));
+  assert.ok(Math.abs(end.scores.reduce((a, b) => a + b, 0) - 1) < 1e-9);
 });
 
-test('LossMonitor: official recipe stops at epoch 4; control is learned by 8 and the dots stay grey', () => {
-  const off = mon.frameState({ mode: 'official' }, 6, [0.1, 2.5], 6, CURVES);
-  assert.equal(off.traces[0].upto, 4);
-  assert.equal(off.cut.opacity, 1);
-  const ctl = mon.frameState({ mode: 'control' }, 3.6, [0.1, 3.9], 6.5, CURVES);
-  assert.ok(ctl.traces[0].upto >= 8 && ctl.traces[0].upto <= 11, `control upto ${ctl.traces[0].upto}`);
-  assert.ok(ctl.traces[1].lit < 0.1, `dots lit ${ctl.traces[1].lit}`);
+test('LayaStage: the official recipe stops at epoch 4 with every score equal', () => {
+  const off = laya.frameState({ mode: 'official' }, 5, [0.25, 2.6], 5, CURVES);
+  assert.equal(off.monitor.traces[0].upto, 4);
+  assert.equal(off.monitor.cut.opacity, 1);
+  assert.deepEqual(off.scores, [0.25, 0.25, 0.25, 0.25]);
+  assert.equal(off.together, 1);
 });
 
-test('LossMonitor: curves land on 10, 22 and 32 at their marks', () => {
-  const marks = [1.2, 2.4, 3.6];
-  const s = (t: number) => mon.frameState({ mode: 'curves', marks }, t, [0.1], 5, CURVES);
-  assert.equal(s(1.2).traces[0].upto, 10);
-  assert.equal(s(2.4).traces[1].upto, 22);
-  assert.equal(s(3.6).traces[2].upto, 32);
-  assert.equal(s(5).traces[2].rose, 1);
-  assert.deepEqual(s(5).markers.map((m) => m.text), ['10', '22', '32']);
+test('LayaStage: the tag cycles arbitrary codes and settles on M2 (= basketball, the hook clip)', () => {
+  const marks = [2.3, 3.6, 4.9];
+  const at = (t: number) => laya.frameState({ mode: 'tag', marks }, t, [0.1, 2.0], 6.7, CURVES).stage.tag;
+  assert.equal(at(2.0).pop, 0);
+  assert.equal(at(3.0).code, 'M2');
+  assert.notEqual(at(3.95).code, 'M2');
+  assert.equal(at(6.7).code, 'M2');
+  assert.equal(at(6.7).key, 1);
+  assert.equal(laya.SPORTS[laya.HOOK_SPORT], 'Basketball');
 });
 
-test('LossMonitor: the wall ends 9 teal, 6 rose', () => {
-  const s = mon.frameState({ mode: 'wall' }, 6, [0.1], 6, CURVES);
+test('LayaStage: the control waits at 4 epochs (72%), then reaches the floor by "did"', () => {
+  const marks = [2.9, 4.0];
+  const s = (t: number) => laya.frameState({ mode: 'control', marks }, t, [0.1, 2.45], 5.9, CURVES);
+  assert.equal(s(2.6).monitor.traces[0].upto, 4);
+  assert.equal(s(2.6).monitor.markers[0].text, '72% at 4');
+  assert.equal(s(4.0).monitor.traces[0].upto, 11);
+  assert.equal(CURVES.CONTROL[10], 0);
+  assert.equal(s(5.9).options[laya.HOOK_SPORT].pick, 1);
+});
+
+test('LayaStage: the dots curves leave the line at 10 and 22; the third stays flat to 32', () => {
+  const s = laya.frameState({ mode: 'curves', marks: [2.6, 3.5, 4.3] }, 5.7, [0.3], 5.7, CURVES);
+  const [, a, b, c] = s.monitor.traces;
+  assert.deepEqual([a.series, b.series, c.series], ['TAKEOFF', 'LATE', 'FLAT']);
+  assert.ok([a, b, c].every((x) => x.upto === 32));
+  assert.equal(c.rose, 1);
+  assert.deepEqual(s.monitor.markers.map((m) => [m.text, m.opacity]), [['10', 1], ['22', 1], ['32', 1]]);
+  // Mid-way, the first trace is drawn to its break first.
+  const mid = laya.frameState({ mode: 'curves', marks: [2.6, 3.5, 4.3] }, 2.8, [0.3], 5.7, CURVES);
+  assert.ok(Math.abs(mid.monitor.traces[1].upto - laya.BREAKS.TAKEOFF) < 0.01, `upto ${mid.monitor.traces[1].upto}`);
+});
+
+test('QuestionCard: questions swap at their scene, stamps persist with their question', () => {
+  const scenes = [
+    { anim: { props: { card: { q: 'A?' } } } },
+    { anim: { props: { card: { q: 'B?', stamp: { text: '?', at: 1, tone: 'muted' } } } } },
+    { anim: { props: { card: { q: 'B?', stamp: { text: 'yes', at: 2 } } } } },
+    { anim: { props: { card: { q: 'C?' } } } },
+    {},
+  ];
+  const track = card.cardTrack(scenes, [0, 5, 10, 15, 20]);
+  assert.equal(card.cardState(track, 0).opacity, 0);
+  assert.equal(card.cardState(track, 1).text, 'A?');
+  assert.equal(card.cardState(track, 5.1).text, 'A?');
+  assert.equal(card.cardState(track, 5.6).text, 'B?');
+  assert.equal(card.cardState(track, 5.6).stamp, null);
+  assert.equal(card.cardState(track, 7).stamp?.text, '?');
+  assert.equal(card.cardState(track, 11).stamp?.text, '?');
+  assert.equal(card.cardState(track, 12.5).stamp?.text, 'yes');
+  assert.equal(card.cardState(track, 12.5).stamp?.pop, 1);
+  assert.equal(card.cardState(track, 16).text, 'C?');
+  assert.equal(card.cardState(track, 16).stamp, null);
+  assert.equal(card.cardState(track, 25).opacity, 0);
+});
+
+test('marks resolve to the spoken word, or to an estimate before TTS', () => {
+  const lines = [
+    { key: 'x-01', start: 0.2, dur: 2, text: { en: 'Which of four sports is this?', es: '' }, voice: 'en' as const },
+    { key: 'x-02', start: 2.6, dur: 2, text: { en: 'So I trained Laya.', es: '' }, voice: 'en' as const, spoken: { en: 'So I trained Lah-yah.' } },
+  ];
+  const words = { 'x-01': [['Which', 0.1, 0.3], ['of', 0.3, 0.4], ['four', 0.45, 0.7]] as [string, number, number][], 'x-02': [['Lah-yah.', 0.9, 1.3]] as [string, number, number][] };
+  assert.equal(resolveMark(lines, [0, 'four'], words, 'en'), 0.65);
+  assert.equal(resolveMark(lines, [1, 'Lah'], words, 'en'), 3.5);
+  const est = resolveMark(lines, [0, 'sports'], {}, 'en');
+  assert.ok(est > 0.2 && est < 2.2);
+  assert.ok(Number.isNaN(resolveMark(lines, [5, 'x'], words, 'en')));
+});
+
+test('LossMonitor: the wall ends 9 teal, 6 rose; the tally never runs ahead of the teal cells', () => {
+  const marks = [2.9, 5.5, 6.9];
+  for (const t of [5.4, 5.6, 5.8, 6.0, 6.2, 9]) {
+    const s = mon.frameState({ mode: 'wall', marks }, t, [0.2, 4.6], 9, CURVES);
+    assert.equal(s.tally.learned, s.cells.filter((c) => c.lit >= 0.5).length);
+  }
+  const s = mon.frameState({ mode: 'wall', marks }, 9, [0.2, 4.6], 9, CURVES);
   assert.equal(s.cells.filter((c) => c.lit === 1).length, 9);
   assert.equal(s.cells.filter((c) => c.rose === 1).length, 6);
   assert.equal(s.tally.learned, 9);
-  assert.equal(s.tally.flat, 6);
+  assert.equal(s.tally.total, 15);
+  assert.equal(s.die.face, 3);
 });
 
-test('SnapshotDeck: Laya reads 1 -> 8, then the shuffle is 5, 2, 8, 1 and the rows grow', () => {
-  const end = deck.frameState({ mode: 'laya' }, 7, [0.1, 2.6], 7);
+test('SnapshotDeck: in order 1 -> 8, shuffled 5, 2, 8, 1; the "?" before the result, then -8 and -10', () => {
+  const marks = [1.9, 5.8, 10.6, 15.4];
+  const beats = [0.3, 3.4, 6.5, 11.5];
+  const st = (t: number) => deck.frameState({ mode: 'laya', marks }, t, beats, 17);
   assert.deepEqual(deck.PERM.slice(0, 4).map((k) => k + 1), [5, 2, 8, 1]);
+  assert.ok(st(1.8).cards.every((c) => c.move === 0));
+  assert.equal(st(6.2).rows[0].ask, 1);
+  assert.equal(st(6.2).rows[0].grow, 0);
+  assert.equal(st(6.2).rows[1].opacity, 0);
+  const end = st(17);
   assert.ok(end.cards.every((c) => c.move === 1));
-  assert.deepEqual(end.rows.map((r) => r.grow), [1, 1, 1]);
-  assert.deepEqual(deck.ROWS.map((r) => r.drop), [8, 10, 12]);
+  assert.deepEqual(end.rows.map((r) => r.grow), [1, 1]);
+  assert.equal(end.rows[0].ask, 0);
+  assert.deepEqual(deck.ROWS.map((r) => r.drop), [8, 10]);
   const c = deck.frameState({ mode: 'company' }, 7, [0.1, 3.2], 7);
   assert.equal(c.company.laya.hop, 1);
   assert.equal(c.frontier.filter((f) => f.zero === 1).length, 4);

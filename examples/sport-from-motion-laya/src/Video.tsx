@@ -13,6 +13,7 @@ import { ANIMS } from './anim/index.ts';
 import { Background } from './components/Background.tsx';
 import { Intro, Outro } from './components/Cards.tsx';
 import { Captions } from './components/Captions.tsx';
+import { QuestionCard } from './components/QuestionCard.tsx';
 import { Badge } from './components/Brand.tsx';
 import { blend, dip } from './components/Dip.tsx';
 import type { Lang, Scene } from './types.ts';
@@ -124,6 +125,8 @@ export const ArticleVideo: React.FC<ArticleVideoProps> = (p) => {
           </React.Fragment>
         ))}
       </TransitionSeries>
+      {/* The question card stays fixed above the scene transitions. */}
+      <QuestionCard scenes={scenes} vertical={p.vertical} />
     </AbsoluteFill>
   );
 };

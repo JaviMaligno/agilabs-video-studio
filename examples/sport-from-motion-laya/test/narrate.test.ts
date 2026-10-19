@@ -76,9 +76,9 @@ test('sceneStarts overlaps scenes by the transition', () => {
 test('this video: settings and timeline shape', () => {
   assert.deepEqual(SETTINGS.voices, ['en']);
   assert.deepEqual(SETTINGS.subtitles, ['en']);
-  assert.equal(SETTINGS.targetSeconds, 66);
+  assert.equal(SETTINGS.targetSeconds, 80);
   assert.deepEqual(SETTINGS.music, { src: 'music/bed.wav', volume: 0.2, duck: 0.3 });
-  assert.deepEqual(SETTINGS.poster, { scene: 'hook', second: 6.1 });
+  assert.deepEqual(SETTINGS.poster, { scene: 'wall', second: 8.2 });
   // The hook is an animation from the first frame (no title card), the outro closes.
   assert.equal(TIMELINE[0].kind, 'anim');
   assert.equal(TIMELINE.at(-1)?.kind, 'outro');
@@ -88,6 +88,19 @@ test('this video: settings and timeline shape', () => {
   // Every line that names Laya is voiced Spanish-style.
   for (const l of TIMELINE.flatMap((s) => s.lines).filter((l) => /Laya/.test(l.text.en))) assert.match(l.spoken?.en ?? '', /Lah-yah/);
   assert.equal(VIDEOS.en.main, TIMELINE);
+  // Script v2.0: at most 85 s; one question card per part, in order, none on the outro.
+  assert.ok(sceneStarts(TIMELINE).total / FPS <= 85, `length ${sceneStarts(TIMELINE).total / FPS}`);
+  const qs = TIMELINE.map((s) => (s.anim?.props.card as { q: string } | undefined)?.q ?? null);
+  assert.deepEqual([...new Set(qs)], ['Which sport is it?', 'Does training work?', 'Does it use the order?', 'Is it repeatable?', null]);
+  const stamps = TIMELINE.flatMap((s) => {
+    const st = (s.anim?.props.card as { stamp?: { text: string; at: number } } | undefined)?.stamp;
+    return st ? [st.text] : [];
+  });
+  assert.deepEqual(stamps, ['?', 'yes', 'yes', 'sometimes']);
+  // Only two numbers are spoken: "four" (sports) and "eight" (points).
+  const spoken = TIMELINE.flatMap((s) => s.lines.map((l) => (l.spoken?.en ?? l.text.en).toLowerCase()));
+  const numbers = spoken.join(' ').match(/\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|percent)\b/g) ?? [];
+  assert.deepEqual(numbers.filter((n) => n !== 'one'), ['four', 'eight']);
 });
 
 test('a spoken form drives the TTS length estimate and is kept on the line', () => {

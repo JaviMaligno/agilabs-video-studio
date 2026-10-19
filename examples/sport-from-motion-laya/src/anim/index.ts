@@ -10,6 +10,7 @@ import { StatGrid } from './StatGrid.tsx';
 import { DotStage } from './DotStage.tsx';
 import { SnapshotDeck } from './SnapshotDeck.tsx';
 import { LossMonitor } from './LossMonitor.tsx';
+import { LayaStage } from './LayaStage.tsx';
 
 export type { AnimProps };
 
@@ -23,4 +24,5 @@ export const ANIMS: Record<string, React.FC<AnimProps & any>> = {
   DotStage,
   SnapshotDeck,
   LossMonitor,
+  LayaStage,
 };

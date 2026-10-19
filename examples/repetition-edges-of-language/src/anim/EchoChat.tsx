@@ -2,7 +2,7 @@ import React from 'react';
 import { C, GRADIENT, alpha } from '../brand.ts';
 import { Stage, gradientText } from './Stage.tsx';
 import type { AnimProps } from './types.ts';
-import { LAYOUT, frameState, wallRows, type EchoChatProps } from './EchoChat.state.ts';
+import { LAYOUT, MODES_MAX, frameState, wallRows, type EchoChatProps } from './EchoChat.state.ts';
 import { BURST, HELLO3 } from './rep.ts';
 import { SEED } from './ShellChips.state.ts';
 import { CoreChip, EmojiText, Gauge, ModelTag, ReplyBubble, SpiralText, UserBubble } from './pieces.tsx';
@@ -79,14 +79,56 @@ export const EchoChat: React.FC<AnimProps & EchoChatProps> = ({ t, beats, dur, v
   const s = frameState(p, t, beats, dur);
   const opus = s.model === 'Claude Opus';
 
+  if (p.mode === 'modes') {
+    const { count, left, right, labels } = s.modes;
+    const hello = Array.from({ length: count }, () => 'hello').join(' ');
+    const Label: React.FC<{ title: string; sub: string; on: number }> = ({ title, sub, on }) => (
+      <div style={{ opacity: labels * (0.35 + 0.65 * on), textAlign: 'center' }}>
+        <div style={{ fontSize: 56, fontWeight: 800, lineHeight: 1.1, ...gradientText }}>{title}</div>
+        <div style={{ fontSize: 30, fontWeight: 600, color: C.muted, marginTop: 8 }}>{sub}</div>
+      </div>
+    );
+    return (
+      <Stage vertical={vertical} fill style={{ opacity: s.appear }}>
+        <div style={{ position: 'absolute', left: 478, top: 20, width: 4, height: 1040, borderRadius: 2, background: alpha(C.muted, 0.3) }} />
+        {/* Left: one prompt, the message repeated inside it, one reply. */}
+        <div style={{ position: 'absolute', left: 0, top: 0, width: 450, opacity: left }}>
+          <Label title="one prompt" sub="repeated inside one message" on={left} />
+          <div style={{ marginTop: 70, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 30 }}>
+            <UserBubble text={hello} size={56} style={{ whiteSpace: 'normal', width: 400, boxSizing: 'border-box', lineHeight: 1.35 }} />
+            <div style={{ alignSelf: 'flex-start' }}>
+              <ReplyBubble text="" size={52} t={t} />
+            </div>
+          </div>
+        </div>
+        {/* Right: the same message, once per turn, each turn answered. */}
+        <div style={{ position: 'absolute', left: 510, top: 0, width: 450, opacity: right }}>
+          <Label title="turn after turn" sub="sent again every turn" on={right} />
+          <div style={{ marginTop: 40, display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {Array.from({ length: MODES_MAX }, (_, i) => (
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 6, opacity: i < count ? 1 : 0 }}>
+                <div style={{ alignSelf: 'flex-end' }}>
+                  <UserBubble text="hello" size={38} />
+                </div>
+                <div style={{ alignSelf: 'flex-start', marginTop: -20 }}>
+                  <ReplyBubble text="" size={30} t={t + i * 0.4} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Stage>
+    );
+  }
+
   if (p.mode === 'split') {
     const words = spiralWords({ words: ['what time is it?'], cx: 715, cy: 790, R: 235, t, turns: 2.8, perTurn: 4.6, grow: s.split.progress, maxSize: 34 });
     return (
       <Stage vertical={vertical} fill style={{ opacity: s.appear }}>
-        <div style={{ position: 'absolute', left: 0, top: 30 }}>
-          <Tag text={s.tag} pop={1} size={84} />
+        <div style={{ position: 'absolute', left: 0, top: 40 }}>
+          <Tag text={s.tag} pop={1} size={72} />
         </div>
-        <Wall stimulus={s.stimulus} level={3} maxH={330} top={LAYOUT.wallTop} />
+        <Wall stimulus={s.stimulus} level={s.level} maxH={330} top={LAYOUT.wallTop} />
         <div style={{ position: 'absolute', left: 480, top: 430, width: 2, height: 620, background: alpha(C.muted, 0.35) }} />
         {/* Left: the flat polite line. */}
         <div style={{ position: 'absolute', left: 0, top: 470, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 120 }}>
@@ -124,7 +166,7 @@ export const EchoChat: React.FC<AnimProps & EchoChatProps> = ({ t, beats, dur, v
       ) : (
         <>
           <div style={{ position: 'absolute', left: 0, top: 30 }}>
-            <Tag text={s.tag} pop={s.tagPop} />
+            <Tag text={s.tag} pop={s.tagPop} size={88} />
           </div>
           <Wall stimulus={s.stimulus} level={s.level} maxH={s.wallH} top={wallTop} />
         </>

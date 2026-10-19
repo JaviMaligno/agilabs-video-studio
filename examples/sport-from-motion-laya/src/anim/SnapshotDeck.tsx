@@ -19,7 +19,7 @@ const GAP = 14;
 const COLS = 4;
 const DECK_W = COLS * CARD + (COLS - 1) * GAP;
 const DECK_H = 2 * CARD + GAP;
-const DECK_TOP = 262;
+const DECK_TOP = 392;
 const slotXY = (slot: number) => ({ x: (slot % COLS) * (CARD + GAP), y: Math.floor(slot / COLS) * (CARD + GAP) });
 
 /** One snapshot of the hook clip: dots on a dark card, its number in the corner. */
@@ -59,8 +59,8 @@ const SLOT_W = 292;
 const SLOT_H = 104;
 const SLOT_GAP = 14;
 const BOX_LEFT = (1080 - (3 * SLOT_W + 2 * SLOT_GAP)) / 2;
-const ACC_TOP = 420;
-const ORDER_TOP = 1030;
+const ACC_TOP = 470;
+const ORDER_TOP = 1080;
 const accXY = (slot: number) => ({ x: BOX_LEFT + (slot % 3) * (SLOT_W + SLOT_GAP), y: ACC_TOP + Math.floor(slot / 3) * (SLOT_H + SLOT_GAP) });
 const seatXY = (seat: number) => ({ x: BOX_LEFT + seat * (SLOT_W + SLOT_GAP), y: ORDER_TOP });
 const CLASSIFIER_XY = { x: BOX_LEFT + 2 * (SLOT_W + SLOT_GAP), y: ACC_TOP + 2 * (SLOT_H + SLOT_GAP) + 60 };
@@ -122,7 +122,7 @@ export const SnapshotDeck: React.FC<AnimProps & DeckProps> = (p) => {
     const cs = seatXY(1);
     return (
       <div style={base}>
-        <div style={{ position: 'absolute', left: 0, right: 0, top: 300, textAlign: 'center', fontSize: 48, fontWeight: 800, letterSpacing: '0.12em', color: C.muted, opacity: c.accTitle }}>
+        <div style={{ position: 'absolute', left: 0, right: 0, top: 384, textAlign: 'center', fontSize: 48, fontWeight: 800, letterSpacing: '0.12em', color: C.muted, opacity: c.accTitle }}>
           ACCURACY
         </div>
         {/* Frontier table. */}
@@ -155,8 +155,6 @@ export const SnapshotDeck: React.FC<AnimProps & DeckProps> = (p) => {
           x={CLASSIFIER_XY.x + (cs.x - CLASSIFIER_XY.x) * c.classifierDown}
           y={CLASSIFIER_XY.y + (cs.y - CLASSIFIER_XY.y) * c.classifierDown}
           name="Classifier"
-          value="0.83"
-          valueOpacity={1 - c.classifierDown}
           opacity={c.classifier}
           tone="ghost"
         />
@@ -181,7 +179,7 @@ export const SnapshotDeck: React.FC<AnimProps & DeckProps> = (p) => {
         <div style={{ position: 'absolute', left: 0, right: 0, top: ORDER_TOP + SLOT_H + 40, textAlign: 'center', fontSize: 32, fontWeight: 700, color: C.muted, opacity: c.glow }}>
           lose accuracy when shuffled
         </div>
-        <Chip x={lx} y={ly} name="LAYA" value="0.36" valueOpacity={c.laya.number} opacity={c.laya.opacity} tone="laya" glow={c.glow} />
+        <Chip x={lx} y={ly} name="LAYA" opacity={c.laya.opacity} tone="laya" glow={c.glow} />
       </div>
     );
   }
@@ -202,8 +200,8 @@ export const SnapshotDeck: React.FC<AnimProps & DeckProps> = (p) => {
   const centres = pos.map((q) => ({ x: q.x + CARD / 2, y: q.y + CARD / 2 }));
   const path = centres.map((q, i) => `${i ? 'L' : 'M'} ${q.x} ${q.y}`).join(' ');
   const pathLen = centres.slice(1).reduce((acc, q, i) => acc + Math.hypot(q.x - centres[i].x, q.y - centres[i].y), 0) || 1;
-  const chipTop = DECK_TOP + DECK_H + 34;
-  const rowsTop = chipTop + 150;
+  const chipTop = DECK_TOP + DECK_H + 26;
+  const rowsTop = chipTop + 118;
   const rowH = 84;
   const barMax = 300;
   const unit = barMax / 12;
@@ -262,15 +260,17 @@ export const SnapshotDeck: React.FC<AnimProps & DeckProps> = (p) => {
         </div>
         <div style={{ position: 'relative', width: 560, height: 60 }}>
           <div style={{ position: 'absolute', left: 0, top: 6, fontSize: 40, fontWeight: 700, color: C.text, opacity: s.chip.epochs * Math.max(0, 1 - 2 * s.chip.dim), whiteSpace: 'nowrap' }}>
-            up to 32 epochs: <span style={{ color: C.ok }}>reads 1 → 8</span>
+            in order: <span style={{ color: C.ok }}>1 → 8</span>
           </div>
-          <div style={{ position: 'absolute', left: 0, top: 6, fontSize: 40, fontWeight: 700, color: C.muted, opacity: Math.max(0, 2 * s.chip.dim - 1), whiteSpace: 'nowrap' }}>shuffled: 5, 2, 8, 1…</div>
+          <div style={{ position: 'absolute', left: 0, top: 6, fontSize: 40, fontWeight: 700, color: C.text, opacity: Math.max(0, 2 * s.chip.dim - 1), whiteSpace: 'nowrap' }}>
+            shuffled: <span style={{ color: C.flat }}>5, 2, 8, 1…</span>
+          </div>
         </div>
       </div>
 
       {/* Points lost when shuffled. */}
       <div style={{ position: 'absolute', left: 60, right: 60, top: rowsTop }}>
-        <div style={{ fontSize: 36, fontWeight: 700, color: C.muted, textAlign: 'center', marginBottom: 14, opacity: s.rowsTitle }}>Accuracy lost when shuffled</div>
+        <div style={{ fontSize: 36, fontWeight: 700, color: C.muted, textAlign: 'center', marginBottom: 14, opacity: s.rowsTitle }}>Accuracy lost once shuffled</div>
         {s.rows.map((r, i) => {
           const R = ROWS[i];
           const main = r.kind === 'laya';
@@ -300,12 +300,15 @@ export const SnapshotDeck: React.FC<AnimProps & DeckProps> = (p) => {
                 <div style={{ position: 'absolute', left: R.drop * unit + 16, fontSize: main ? 42 : 36, fontWeight: 800, color: main ? C.text : C.muted, opacity: r.grow, whiteSpace: 'nowrap' }}>
                   {R.text}
                 </div>
+                {/* The prediction, before the result: will shuffling cost it anything? */}
+                {r.ask > 0 && <div style={{ position: 'absolute', left: 26, fontSize: 54, fontWeight: 800, color: C.accentText, opacity: r.ask }}>?</div>}
               </div>
             </div>
           );
         })}
         <div style={{ marginTop: 18, textAlign: 'center', fontSize: 30, fontWeight: 600, color: C.muted, opacity: s.foot }}>
-          3 seeds · corrected p = 0.007 · <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+          3 seeds · corrected p = 0.007<span style={{ display: 'inline-flex', alignItems: 'center', opacity: s.footImage }}>
+            &nbsp;·&nbsp;
             <svg width={20} height={18} viewBox="0 0 26 24" style={{ marginRight: 6 }}>
               <polygon points="13,2 24,22 2,22" fill={C.muted} />
             </svg>

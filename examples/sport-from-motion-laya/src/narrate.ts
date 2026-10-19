@@ -6,7 +6,10 @@ import { spokenText, type Cuts, type Label, type Lang, type Line, type Scene, ty
 
 /** Silence between two lines, in seconds. */
 export const GAP = 0.35;
-/** Silence after the last line of a scene, in seconds. */
+/**
+ * Silence after the last line of a scene, in seconds. An anim scene may ask for a shorter `tail`
+ * when the next scene blends into the same picture (nothing new has to settle in between).
+ */
 export const TAIL = 0.8;
 /**
  * The outro card: shown OUTRO_SECONDS when silent; when it speaks, held only OUTRO_TAIL after its
@@ -83,11 +86,18 @@ export const anim = (
   name: string,
   props: Record<string, unknown>,
   specs: Spec[],
-  opts: { chapter?: Label; min?: number } = {},
+  opts: { chapter?: Label; min?: number; tail?: number } = {},
 ): Scene =>
-  scene(id, 'anim', specs, opts.min ?? 0, {
-    anim: { name, props },
-    ...(opts.chapter !== undefined ? { chapter: opts.chapter } : {}),
-  });
+  scene(
+    id,
+    'anim',
+    specs,
+    opts.min ?? 0,
+    {
+      anim: { name, props },
+      ...(opts.chapter !== undefined ? { chapter: opts.chapter } : {}),
+    },
+    opts.tail ?? TAIL,
+  );
 
 export const outro = (id: string, specs: Spec[], min = OUTRO_SECONDS): Scene => scene(id, 'outro', specs, min, {}, OUTRO_TAIL);

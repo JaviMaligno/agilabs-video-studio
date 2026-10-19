@@ -1,6 +1,6 @@
 // LoopSpiral: the base model's reply never closes; its words wind into an inward-turning spiral.
 // Modes:
-// - table: "table" pours out of the reply bubble, the gauge slams to 99.6%;
+// - table: "table" pours out of the reply bubble, the gauge slams to 99.6% (tagged ×100);
 // - seeds: "florb" and "you are useless" wind into two spirals, same shape, same speed;
 // - stats: one spiral wound from all nine stimuli; three calm aligned replies above it at ~0.10;
 //   the spiral's own badge swings to 0.51, then (tighter, faster) to 0.78; p-value tag.
@@ -18,7 +18,7 @@ export type LoopSpiralProps = {
 };
 
 export type Placed = SpiralWord;
-export type Gauge = { value: number; label: string; opacity: number };
+export type Gauge = { value: number; label: string; opacity: number; tag?: string };
 
 export type SpiralState = {
   spirals: { words: Placed[]; label: string; labelOpacity: number; cx: number; cy: number }[];
@@ -48,7 +48,8 @@ export const frameState = (p: LoopSpiralProps, t0: number, beats: number[], dur:
     const v = slam(progress(t, at, 0.7));
     return {
       spirals: [{ words: place([SEEDS.table], { cx: 480, cy: 650, R: 410, t: tt, grow, perTurn: 8, turns: 3.4 }), label: '', labelOpacity: 0, cx: 480, cy: 650 }],
-      gauge: { value: Math.min(1, 0.996 * v), label: v > 0.2 ? '99.6%' : '', opacity: easeOutCubic(progress(t, 0, 0.4)) },
+      // 99.6% is the "table" ×100 cell (the article, corrected in 31a49777).
+      gauge: { value: Math.min(1, 0.996 * v), label: v > 0.2 ? '99.6%' : '', opacity: easeOutCubic(progress(t, 0, 0.4)), tag: '“table” ×100' },
       aligned: [],
       pTag: 0,
       bubble: 1,
