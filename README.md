@@ -37,6 +37,7 @@ Then ask for it: "make a video of this article: <path or URL>".
 | `explainer-script` | The script: hook within 3 s, structure, 75-140 words, caption reading speed, EN/ES pair, a visual per scene |
 | `explainer-animation` | The timeline, the component catalogue, bespoke components with tested frame states, safe areas, stills |
 | `narration` | Cartesia TTS, Kokoro fallback, pronunciation, Spanish voice, audio QA thresholds |
+| `schedule-social-video` | Scheduling finished videos as Instagram/Facebook reels (Meta Business Suite) and LinkedIn video posts, with per-platform captions |
 
 ## Quickstart without Claude
 
