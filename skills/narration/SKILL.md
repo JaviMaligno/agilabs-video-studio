@@ -7,19 +7,35 @@ description: Voice the narration of an article explainer video - Cartesia TTS wi
 
 `npm run tts` voices every line of `src/timeline.ts` into `public/audio/<lang>/<key>.wav`, with
 Cartesia's word timestamps in `<key>.words.json`, and rewrites `src/audio.generated.ts` with the
-real line lengths. Lines are cached by engine, voice, model, speed and text: only new or edited
+real line lengths. Lines are cached by engine, voice, model, speed, text and the voice's `post` chain: only new or edited
 lines are voiced again. `npm run tts -- en` or `-- es` limits it to one language.
 
 ## Cartesia setup
 
 - Settings live in `video.config.mjs` (`tts`): model `sonic-3.6-2026-08-27`, speed `1`.
-- EN voice: `5568a7df-e5ab-4442-9fae-2e9ba1b15ad8` (en-GB).
+- EN voice: Javier's own cloned voice, `b7abe199-5f62-45fd-b77a-d12a1fe80a36`, with a `post`
+  clean-up chain (below). Alternative stock voice: Quentin, `5568a7df-e5ab-4442-9fae-2e9ba1b15ad8`
+  (en-GB), without `post`.
 - `CARTESIA_API_KEY` is looked up in this order:
   1. the environment;
   2. `.env` in the video folder (gitignored; copy `.env.example`);
   3. `~/Documents/repos/.env`.
 - Never print the key, echo it, or commit it. Check that it exists without showing it, for
   example `test -n "$CARTESIA_API_KEY" && echo set`.
+
+## Post-processing (`post`)
+
+Any voice in `video.config.mjs` (Cartesia `voices.<lang>` or `kokoro.voices.<lang>`) may carry
+`post`: an ffmpeg `-af` chain that `npm run tts` applies to each line's WAV right after synthesis.
+Javier's mic is weak, so his clone uses the approved "version B" chain (`JAVIER_POST` in
+`video.config.mjs`): highpass 85 Hz, light `afftdn` denoise, -3.5 dB at 220 Hz, +5 dB at 3.2 kHz,
++4 dB high shelf at 8.5 kHz, gentle `acompressor`.
+
+- The chain is part of the line cache: editing it re-voices (and re-processes) every line.
+- It must keep each line's length, or the word timestamps drift: `atempo`, `silenceremove`,
+  `atrim`, `apad`, `asetrate`... are refused, and the script fails if a line's length moves.
+- No `loudnorm` needed: audio-qa normalises every line and the mix lands at -16 LUFS.
+- To change voice: set `id` (and `post`, or drop it for a stock voice) and run `npm run tts`.
 
 ## Engines and the Kokoro fallback
 
