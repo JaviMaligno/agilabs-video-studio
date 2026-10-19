@@ -33,11 +33,8 @@ caption.
 - First person, as the article is written: "I gave the planner...", "What I found...".
 - Claims as nuanced as the article. Keep its hedges ("on these runs", "in this setup").
 - Short spoken sentences. One idea per line. No jargon the article does not explain.
-- **Spoken numbers: write for the ear, case by case.** Numbers are neither banned nor
-  mandatory. Say one when it is easy to hear and adds something ("a quarter of the time",
-  "eighty-three percent"). When the exact value is awkward to listen to (unround, long, or one
-  of several in a row), say what it means in words ("almost never") and keep the figure on
-  screen. Judge each line by how it sounds read aloud, not by a rule applied to every number.
+- **Numbers in the voice.** Say them the way you would explaining the result to a colleague:
+  naturally, as part of the sentence. The only thing to avoid is reading a table aloud.
 - **Clarity beats brevity.** The viewer must understand what was tested before hearing the
   result. If the setup needs another scene to make sense, add it, even past 60 s; labels
   scattered over the visual are not an explanation.
