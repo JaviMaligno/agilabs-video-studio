@@ -1,0 +1,29 @@
+{
+  "plain": "name the capital of france",
+  "ciphers": {
+    "rot13": "anzr gur pncvgny bs senapr",
+    "random_substitution": "dovg pkg xolwpoc rf fjodxg",
+    "letters_to_digits": "14-1-13-5-/-20-8-5-/-3-1-16-9-20-1-12-/-15-6-/-6-18-1-14-3-5",
+    "morse": "-. .- -- . / - .... . / -.-. .- .--. .. - .- .-.. / --- ..-. / ..-. .-. .- -. -.-. .",
+    "binary": "1101110 1100001 1101101 1100101 100000 1110100 1101000 1100101 100000 1100011 1100001 1110000 1101001 1110100 1100001 1101100 100000 1101111 1100110 100000 1100110 1110010 1100001 1101110 1100011 1100101",
+    "base64": "bmFtZSB0aGUgY2FwaXRhbCBvZiBmcmFuY2U=",
+    "reverse_all": "ecnarf fo latipac eht eman",
+    "block_permutation": "e amn chettapiaf  olncrafe",
+    "cyrillic_homoglyph": "nаmе thе сарitаl оf frаnсе",
+    "disemvowel": "nm th cptl f frnc"
+  },
+  "rosetta": [
+    [
+      "the city",
+      "pkg xwpy"
+    ],
+    [
+      "of rome",
+      "rf jrvg"
+    ],
+    [
+      "a capital",
+      "o xolwpoc"
+    ]
+  ]
+}
