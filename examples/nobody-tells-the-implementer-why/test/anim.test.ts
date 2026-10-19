@@ -232,6 +232,14 @@ test('HandoffShaft: reasons rides from the lead to the architect; shortcut count
   const before = shaft.frameState({ mode: 'shortcut' }, 1, [0.2, 4.8], 9);
   if (before.view !== 'overview') throw new Error('overview expected');
   assert.equal(before.counter?.appear, 0);
+  // Three lines (the lead-in split at its comma): nothing is cut until the LAST line starts.
+  const mid = shaft.frameState({ mode: 'shortcut' }, 4.0, [0.2, 3.4, 5.6], 9);
+  if (mid.view !== 'overview') throw new Error('overview expected');
+  assert.deepEqual(mid.shortcut.falls, [0, 0, 0]);
+  assert.equal(mid.counter?.appear, 0);
+  const cut = shaft.frameState({ mode: 'shortcut' }, 8.5, [0.2, 3.4, 5.6], 9);
+  if (cut.view !== 'overview') throw new Error('overview expected');
+  assert.deepEqual(cut.shortcut.falls, [1, 1, 1]);
 });
 
 test('HandoffShaft: pile slots and ghosts line up; nothing is cut before the scissors arrive', () => {

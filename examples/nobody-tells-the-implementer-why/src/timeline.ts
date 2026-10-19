@@ -13,7 +13,8 @@ const build = (): Cuts => ({
       'unroll',
       'HandoffShaft',
       { mode: 'unroll', play: [10, 10] },
-      [say(0.3, "I passed a client's request down a team of agents, from the lead to whoever writes the code.", '')],
+      // Split at the comma: the cloned voice reads ~18 chars/s, so the first cue needs the pause to stay under 17.
+      [say(0.3, "I passed a client's request down a team of agents,", ''), say(0.25, 'from the lead to whoever writes the code.', '')],
       // The closing cue needs a little more air than TAIL to stay under 17 chars/s.
       { min: 6.4 },
     ),
@@ -42,7 +43,9 @@ const build = (): Cuts => ({
       'HandoffShaft',
       { mode: 'shortcut', play: [20, 20], counter: { value: 24, suffix: '%', label: L('reason kept · lead → implementer', ''), delay: 1.1 } },
       [
-        say(0.2, "Even the lead, writing that message itself with the client's request in hand,", ''),
+        // Split at the comma (cloned voice ~18 chars/s): the pause keeps the first cue under 17 chars/s.
+        say(0.2, 'Even the lead, writing that message itself,', ''),
+        say(0.2, "with the client's request in hand,", ''),
         say(0, 'kept the reason only 24% of the time.', '', { en: 'kept the reason only twenty-four percent of the time.' }),
       ],
     ),

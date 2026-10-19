@@ -117,6 +117,8 @@ export function frameState(p: ShaftProps, time: number, beats: number[], dur: nu
     }
 
     if (p.mode === 'shortcut') {
+      // The cut lands on the LAST line ("kept the reason only 24%…"), however many lines lead into it.
+      const b1 = beats.length > 1 ? beatAt(beats, beats.length - 1) : end;
       const fade = E(b0, 0.6);
       dim = [0, 0.78 * fade, 0.78 * fade, 0];
       shortcut = {
