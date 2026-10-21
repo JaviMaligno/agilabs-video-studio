@@ -61,6 +61,19 @@ can be added from the Instagram app after publication if wanted.
 
 After each reel goes live the person shares it to their own story with the link sticker.
 
+### Moving or removing scheduled reels
+
+Content → Programadas lists each reel twice (Facebook and Instagram are separate entries); search
+by the caption's first words to find both. Row menu «…» → Administrar publicación:
+
+- **Reprogramar publicación** changes date and time without re-uploading. Still limited to 29 days
+  ahead; do it per platform and check the dialog's date before confirming.
+- **Eliminar** is the way to take a reel off the calendar beyond the window (it goes to the
+  trash). **Never "Mover a borradores"**: it leaves the scheduled entry in "Error al publicar", and
+  deleting that entry deletes the draft with it. The reel must be uploaded again when its window
+  opens.
+- Free a date before moving another reel onto it (one reel per day).
+
 ## 4. LinkedIn
 
 Video posts go through the site repo's LinkedIn tooling (`scripts/linkedin/post-standalone.js`
