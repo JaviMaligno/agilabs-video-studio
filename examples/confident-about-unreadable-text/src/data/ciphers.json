@@ -1,0 +1,29 @@
+{
+  "plain": "reply with the single word banana",
+  "ciphers": {
+    "rot13": "ercyl jvgu gur fvatyr jbeq onanan",
+    "random_substitution": "jglcy bwpk pkg zwdhcg brjs aododo",
+    "letters_to_digits": "18-5-16-12-25-/-23-9-20-8-/-20-8-5-/-19-9-14-7-12-5-/-23-15-18-4-/-2-1-14-1-14-1",
+    "morse": ".-. . .--. .-.. -.-- / .-- .. - .... / - .... . / ... .. -. --. .-.. . / .-- --- .-. -.. / -... .- -. .- -. .-",
+    "binary": "1110010 1100101 1110000 1101100 1111001 100000 1110111 1101001 1110100 1101000 100000 1110100 1101000 1100101 100000 1110011 1101001 1101110 1100111 1101100 1100101 100000 1110111 1101111 1110010 1100100 100000 1100010 1100001 1101110 1100001 1101110 1100001",
+    "base64": "cmVwbHkgd2l0aCB0aGUgc2luZ2xlIHdvcmQgYmFuYW5h",
+    "reverse_all": "ananab drow elgnis eht htiw ylper",
+    "block_permutation": "lyeprthwi e th glinsor wean bdana",
+    "cyrillic_homoglyph": "rерlу with thе singlе wоrd bаnаnа",
+    "disemvowel": "rply wth th sngl wrd bnn"
+  },
+  "rosetta": [],
+  "task": {
+    "plain": "what is seven plus five",
+    "ciphers": {
+      "binary": "1110111 1101000 1100001 1110100 100000 1101001 1110011 100000 1110011 1100101 1110110 1100101 1101110 100000 1110000 1101100 1110101 1110011 100000 1100110 1101001 1110110 1100101",
+      "cyrillic_homoglyph": "whаt is sеvеn рlus fivе",
+      "block_permutation": "t hawses i penv fuslive"
+    }
+  },
+  "mimic": {
+    "binary": "1110100 1101000 1100101 100000 1100001 1101110 1110011 1110111 1100101 1110010 100000 1110100 1101111 100000 1110100 1101000 1100001 1110100 100000 1101001 1110011 100000 1101001 1101110 100000 1110100 1101000 1100101 100000 1101110 1100101 1111000 1110100 100000 1101100 1101001 1101110 1100101",
+    "cyrillic_homoglyph": "thе аnswеr tо thаt is in thе nехt linе",
+    "block_permutation": " aheterswn tto  iathn  is nhet lxteine"
+  }
+}
