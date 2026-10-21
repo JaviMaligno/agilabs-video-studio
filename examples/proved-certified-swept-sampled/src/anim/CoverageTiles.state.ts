@@ -78,8 +78,10 @@ export type Tile = {
   cover: number;
   /** The card slides up and away (region modes). */
   away: number;
-  card: { serif: number; software: number; text: string; swText: string };
-  tick: { appear: number; lift: number; ci: number };
+  /** lit: the card has been read out (hook); pulse: its sentence's soft sway as it is read. */
+  card: { serif: number; software: number; text: string; swText: string; lit: number; pulse: number };
+  /** pulse: a soft beat of the tick (hook, on "holds"). */
+  tick: { appear: number; lift: number; ci: number; pulse: number };
   sub: { text: string; appear: number };
   stamp: { text: string; pop: number; tone: number };
   pattern: { kind: 0 | 1 | 2 | 3; reveal: number; stroke: number; pulse: number; count: string; cells: Cell[] };
@@ -92,8 +94,8 @@ const baseTile = (i: number, rect: Rect): Tile => ({
   opacity: 1,
   cover: 1,
   away: 0,
-  card: { serif: 1, software: 0, text: SENTENCE, swText: SOFTWARE[i] },
-  tick: { appear: 1, lift: 0, ci: 0 },
+  card: { serif: 1, software: 0, text: SENTENCE, swText: SOFTWARE[i], lit: 0, pulse: 0 },
+  tick: { appear: 1, lift: 0, ci: 0, pulse: 0 },
   sub: { text: SUBS[i], appear: 0 },
   stamp: { text: STAMPS[i], pop: 0, tone: i },
   pattern: { kind: i as 0 | 1 | 2 | 3, reveal: 1, stroke: 1, pulse: 0, count: fmtCount(1), cells: emptyCells().map(() => ({ fill: 1, green: 0, rose: 0, corner: 0, pulse: 0 })) },
@@ -152,13 +154,27 @@ export function frameState(p: TilesProps, time: number, beats: number[], dur: nu
 
   if (p.mode === 'same') {
     const words = HOOK_TITLE.split(' ');
-    const end = Math.max(b0 + 0.6, d - 0.9);
+    // The title lights over its own line; with a second line (the card read out) it is done
+    // just before that line starts.
+    const end = beats.length > 1 ? Math.max(b0 + 0.6, beat(beats, 1, d) - 0.35) : Math.max(b0 + 0.6, d - 0.9);
     s.title = { appear: E(t, 0, 0.4), words: words.map((text, i) => ({ text, lit: progress(t, b0 + (i / words.length) * (end - b0), 0.2) })) };
+    // The card read out: each sentence lights and sways once, one card after another from "four"
+    // to "whole domain"; the four ticks beat together on "holds".
+    const read = cueOf(p, 'four', Number.MAX_SAFE_INTEGER / 2);
+    const last = Math.max(read, cueOf(p, 'whole', read + 2.2));
+    const holds = cueOf(p, 'holds', Number.MAX_SAFE_INTEGER / 2);
+    // A half-sine bump that is exactly 0 outside its window (sin(π) is not quite 0).
+    const bump = (q: number) => (q <= 0 || q >= 1 ? 0 : Math.sin(Math.PI * q));
+    const tickBeat = bump(progress(t, holds, 0.6));
     tiles.forEach((tl, i) => {
       const at = 0.25 + 0.32 * i;
       tl.opacity = E(t, at, 0.4);
       tl.tick.appear = E(t, at + 0.25, 0.3);
       tl.rect = { ...tl.rect, y: tl.rect.y + 40 * (1 - tl.opacity) };
+      const mine = read + (i / 3) * (last - read);
+      tl.card.lit = E(t, mine, 0.35);
+      tl.card.pulse = bump(progress(t, mine, 0.7));
+      tl.tick.pulse = tickBeat;
     });
     return s;
   }

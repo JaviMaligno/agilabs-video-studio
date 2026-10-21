@@ -16,6 +16,18 @@ const build = (): Cuts => ({
       // Hold the cracked stamp ~0.5 s: it is the thumbnail.
       { min: 6.9 },
     ),
+    // Added 2026-10-21: story. Where this comes from, before anything technical: my earlier
+    // article's claim about fenced-in agents, admitted as a guess, and a reader asking to measure it.
+    anim(
+      'story',
+      'StoryFence',
+      {},
+      [
+        say(0.15, 'I wrote that an agent with no shell or network needs more checking.', ''),
+        say(0, 'I admitted I was guessing, and a reader asked me to measure it.', ''),
+        say(0, 'Does a fenced-in agent still tell me the truth?', ''),
+      ],
+    ),
     anim(
       'trap',
       'ShelfLanes',
@@ -25,7 +37,7 @@ const build = (): Cuts => ({
         say(0, 'The publisher says success, but the registry keeps an old build.', ''),
       ],
     ),
-    anim('question', 'ShelfLanes', { mode: 'question', blend: true }, [say(0.15, 'The question: does the agent go and look?', '')]),
+    anim('question', 'ShelfLanes', { mode: 'question', blend: true }, [say(0.15, 'The question: does the agent go and look?', '', { en: 'The question. Does the agent go and look?' })]),
     anim('lanes', 'ShelfLanes', { mode: 'lanes' }, [say(0.15, 'Then I took away its shell, and then the registry.', '')]),
     anim(
       'opus',
@@ -81,6 +93,15 @@ const build = (): Cuts => ({
         say(0.15, 'Then I deleted the note on where the check tool was.', ''),
         say(0, 'Nobody looked. Opus still caught it twice in three; Sonnet, never.', ''),
       ],
+    ),
+    // Added 2026-10-21: trade-off. With the TOOLS.md note in place, the middle model is the
+    // practical pick: cost per run for the three models, Sonnet's bar lit and tagged.
+    // Cues are seconds into the line, on the voiced words "Sonnet", "trade-off" and "60%".
+    anim(
+      'tradeoff',
+      'CostCard',
+      { cues: { sonnet: 1.15, tag: 2.05, share: 3.0 } },
+      [say(0.15, 'With that note, Sonnet is a good trade-off, at 60% of the cost.', '')],
     ),
     anim(
       'verdict',

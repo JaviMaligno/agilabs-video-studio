@@ -4,8 +4,9 @@ import * as tiles from '../src/anim/CoverageTiles.state.ts';
 import * as band from '../src/anim/ToleranceBand.state.ts';
 import * as range from '../src/anim/LabelRange.state.ts';
 import * as ladder from '../src/anim/VersionLadder.state.ts';
+import * as story from '../src/anim/StoryPaper.state.ts';
 
-const PROGRESS = new Set(['progress', 'appear', 'grow', 'fill', 'draw', 'pop', 'opacity', 'emphasis', 'cover', 'away', 'lift', 'reveal', 'stroke', 'green', 'rose', 'corner', 'red', 'glint', 'spread', 'pull', 'stamp', 'card', 'cardAppear', 'arrow', 'dim', 'eps', 'lit', 'gap', 'drop', 'detail', 'footnote', 'glow', 'tag', 'sub', 'chipStamp', 'hot', 'ci', 'zeroTag', 'harmless', 'greenRun', 'note', 'sampled', 'reviewer', 'axis']);
+const PROGRESS = new Set(['progress', 'appear', 'grow', 'fill', 'draw', 'pop', 'opacity', 'emphasis', 'cover', 'away', 'lift', 'reveal', 'stroke', 'green', 'rose', 'corner', 'red', 'glint', 'spread', 'pull', 'stamp', 'card', 'cardAppear', 'arrow', 'dim', 'eps', 'lit', 'gap', 'drop', 'detail', 'footnote', 'glow', 'tag', 'sub', 'chipStamp', 'hot', 'ci', 'zeroTag', 'harmless', 'greenRun', 'note', 'sampled', 'reviewer', 'axis', 'slide', 'bar', 'pulse', 'spread', 'tick']);
 
 const check = (value: unknown, path: string) => {
   if (typeof value === 'number') {
@@ -25,6 +26,8 @@ const CASES: { name: string; state: (t: number, b: number[], d: number) => unkno
   { name: 'LabelRange range', state: (t, b, d) => range.frameState({ mode: 'range' }, t, b, d) },
   { name: 'LabelRange quote', state: (t, b, d) => range.frameState({ mode: 'quote' }, t, b, d) },
   { name: 'VersionLadder', state: (t, b, d) => ladder.frameState({}, t, b, d) },
+  { name: 'StoryPaper', state: (t, b, d) => story.frameState({}, t, b, d) },
+  { name: 'StoryPaper cues', state: (t, b, d) => story.frameState({ cue: { sixty: 1, pan: 2, proved: 3, computer: 3.5, samples: 4, print: 4.5, same: 5, worth: 6 } }, t, b, d) },
 ];
 const SCENARIOS = [
   { beats: [0.3, 1.4, 2.6, 3.5], dur: 5 },
@@ -51,6 +54,19 @@ test('CoverageTiles: identical covered cards with ticks in the cold open, all li
   assert.equal(mid.tiles[3].pattern.count, '10,000,000');
   const fin = tiles.frameState({ mode: 'stamp' }, 3, [0.1], 5);
   assert.ok(fin.tiles.every((x) => x.cover === 1));
+});
+
+test('CoverageTiles: the hook reads the card out, one card after another, ticks beat together', () => {
+  const p = { mode: 'same' as const, cue: { four: 3, holds: 4.5, whole: 5.25 } };
+  const beats = [0.15, 2.6];
+  const at = (t: number) => tiles.frameState(p, t, beats, 8);
+  assert.ok(at(2.9).tiles.every((x) => x.card.lit === 0 && x.card.pulse === 0), 'nothing lit before "four"');
+  assert.ok(at(2.5).title!.words.every((w) => w.lit === 1), 'title lit before the second line');
+  const mid = at(3.75 + 0.35);
+  assert.ok(mid.tiles[1].card.pulse > 0.5 && mid.tiles[3].card.pulse === 0, 'card 2 sways on "inequality", card 4 not yet');
+  assert.ok(at(4.8).tiles.every((x) => x.tick.pulse === 1));
+  const held = at(6.5);
+  assert.ok(held.tiles.every((x) => x.card.lit === 1 && x.card.pulse === 0 && x.tick.pulse === 0 && x.opacity === 1), 'all readable and still at the hold');
 });
 
 test('CoverageTiles: stamps strongest to weakest, tally counts refutations', () => {
@@ -87,4 +103,21 @@ test('LabelRange: PROVED ends at α ≥ 1 with the gap shown; ladder ends at ref
   assert.equal(l.tally.value, 3);
   assert.ok(l.rows.every((r) => r.pop === 1));
   assert.equal(l.footnote, 1);
+});
+
+test('StoryPaper: nothing before the scene, identical ticks on every claim, backing hidden in print and back with falling weight', () => {
+  const beats = [0.15, 4.2, 8.5];
+  const dur = 12.5;
+  const before = story.frameState({}, -1, beats, dur);
+  assert.equal(before.page.appear, 0);
+  assert.ok(before.badges.every((b) => b.appear === 0));
+  const shown = story.frameState({}, beats[2] - 0.1, beats, dur);
+  assert.ok(shown.badges.every((b) => b.appear > 0.99 && b.slide === 0));
+  const hidden = story.frameState({ cue: { print: 8.7, worth: 10.6 } }, 10.4, beats, dur);
+  assert.ok(hidden.badges.every((b) => b.slide > 0.99));
+  assert.ok(hidden.rows.every((r) => r.tick === 1));
+  const end = story.frameState({}, dur, beats, dur);
+  assert.ok(end.badges.every((b) => b.slide === 0 && b.bar === 1 && b.appear === 1));
+  const w = story.BACKING.map((b) => b.weight);
+  assert.ok(w[0] > w[1] && w[1] > w[2]);
 });

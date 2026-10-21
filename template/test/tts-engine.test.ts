@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { chooseEngine, postChain, lineHash } from '../scripts/tts-engine.mjs';
+import { chooseEngine, postChain, lineHash, colonsAsStops } from '../scripts/tts-engine.mjs';
 import config, { JAVIER_POST } from '../video.config.mjs';
 
 test('auto falls back per language', () => {
@@ -54,4 +54,17 @@ test('video.config voices parse: the default EN voice carries a valid post chain
   assert.equal(en.id, 'b7abe199-5f62-45fd-b77a-d12a1fe80a36');
   assert.equal(postChain(en), JAVIER_POST);
   for (const v of Object.values(config.tts.kokoro.voices)) postChain(v);
+});
+
+test('colons are voiced as full stops, captions untouched', () => {
+  assert.equal(colonsAsStops('It said: one workflow per article.'), 'It said. One workflow per article.');
+  assert.equal(colonsAsStops('The verdict: the checker is clumsy.'), 'The verdict. The checker is clumsy.');
+  assert.equal(colonsAsStops('Locked out, it said so: "I could not confirm."'), 'Locked out, it said so. "I could not confirm."');
+  assert.equal(colonsAsStops('Every move must match: 100%.'), 'Every move must match. 100%.');
+  assert.equal(colonsAsStops('Iterating failed nearly all of those too:'), 'Iterating failed nearly all of those too.');
+  // No space after the colon: clock times, ratios and URLs stay as they are.
+  assert.equal(colonsAsStops('At 10:30, a 3:1 split on https://example.com.'), 'At 10:30, a 3:1 split on https://example.com.');
+  assert.equal(colonsAsStops('No colon here.'), 'No colon here.');
+  // The template turns it on by default.
+  assert.equal(config.tts.colonsAsStops, true);
 });

@@ -89,6 +89,8 @@ export type PlanState = {
     flip: number;
     domain: 'course' | 'release';
     lines: number[];
+    /** Release domain: each course item's release counterpart (and its arrow) landing. */
+    mapped: number[];
     kb: number;
     chips: number[];
     bubble: number;
@@ -108,7 +110,12 @@ const SHEET_MODES = new Set<PlanMode>(['sheet', 'ask', 'conditions', 'release'])
 
 export const MODELS = ['gpt-4o', 'gpt-4.1-mini', 'gpt-5.4-mini', 'claude-haiku-4.5', 'claude-sonnet-4.6', 'claude-opus-5'];
 export const COURSE_LINES = ['68 videos to record', 'studio: 4 days, ahead', 'scripts frozen since July', 'timings: 2 good / 3 to redo / 63 pending', 'piece 4: “I’ll rewrite them for you”'];
-export const RELEASE_LINES = ['12 services to release', 'deploy window: ahead', 'staging rehearsals: behind'];
+/** Scene 6 (revised 2026-10-21): each course fact and its counterpart in the release domain. */
+export const RELEASE_PAIRS: [course: string, release: string][] = [
+  ['68 videos', '12 services'],
+  ['studio days: ahead', 'deploy window: ahead'],
+  ['read-throughs: behind', 'staging rehearsals: behind'],
+];
 export const STRIPS = ['today is 11 August 2026', 'these are practice read-throughs, not studio takes', 'don’t invent ordering constraints'];
 /** Which strips each condition tab A-E adds to the material. */
 export const TAB_STRIPS: number[][] = [[], [0], [1], [0, 1], [0, 1, 2]];
@@ -256,24 +263,29 @@ export function frameState(props: PlanBoardProps, t: number, beats: number[], du
   // The flip waits for the blend from `conditions` (SCENE_TRANSITION, 0.6 s) to finish, or the
   // outgoing full sheet shows behind the squeezed one.
   const flip = release ? progress(T, 0.65, 0.7) : 0;
+  // Release marks: [course, rebuilt, same, release]. The course column is in by "my course", each
+  // release counterpart lands from "rebuilt", the tag after "same", the tally on "software release".
+  const flipped = release && flip >= 0.5;
+  const tally = mk(m, 3, b0 + 4) - 0.2;
   const sheet = {
     opacity: sheetOn ? (s0 ? e(T, 0, 0.45) : 1) : 0,
     slide: s0 ? 1 - e(T, 0, 0.55) : 0,
     flip,
-    domain: (release && flip >= 0.5 ? 'release' : 'course') as 'course' | 'release',
-    lines: (release && flip >= 0.5 ? RELEASE_LINES : COURSE_LINES).map((_, i) =>
-      s0 ? e(T, lineAt(i), 0.35) : release && flip >= 0.5 ? e(T, 1.05 + i * 0.25, 0.3) : 1,
+    domain: (flipped ? 'release' : 'course') as 'course' | 'release',
+    lines: (flipped ? RELEASE_PAIRS : COURSE_LINES).map((_, i) =>
+      s0 ? e(T, lineAt(i), 0.35) : flipped ? e(T, Math.max(1.05, mk(m, 0, b0 + 1.5) - 0.6) + i * 0.2, 0.3) : 1,
     ),
+    mapped: flipped ? RELEASE_PAIRS.map((_, i) => e(T, mk(m, 1, b0 + 2.4) + i * 0.3, 0.35)) : [],
     kb: s0 ? e(T, mk(m, 0, b0 + 1.6), 0.35) : sheetOn ? 1 : 0,
     chips: MODELS.map((_, i) => (s0 ? e(T, mk(m, 1, b0 + 2.4) - 0.6 + i * 0.12, 0.3) : sheetOn ? 1 : 0)),
     bubble: at('ask') ? e(T, mk(m, 0, b0 + 0.3), 0.4) : 0,
     tabs: conditions ? e(T, 0, 0.3) : 0,
     tab,
     strips: release ? [0, 0, 0] : strips,
-    counter: release ? Math.round(572 * easeOutCubic(progress(T, mk(m, 1, b0 + 1.5), 1.1))) : 0,
-    counterOpacity: release ? e(T, mk(m, 1, b0 + 1.5) - 0.1, 0.3) : 0,
-    judge: release ? e(T, mk(m, 1, b0 + 1.5) + 1.1, 0.4) : 0,
-    same: release ? e(T, mk(m, 0, b0 + 0.8), 0.4) : 0,
+    counter: release ? Math.round(572 * easeOutCubic(progress(T, tally, 1.1))) : 0,
+    counterOpacity: release ? e(T, tally - 0.1, 0.3) : 0,
+    judge: release ? e(T, tally + 1.1, 0.4) : 0,
+    same: release ? e(T, mk(m, 2, b0 + 2.9) + 0.6, 0.4) : 0,
   };
 
   // ---- the end: the date strip, the prohibition, the verdict, the rewrite ----

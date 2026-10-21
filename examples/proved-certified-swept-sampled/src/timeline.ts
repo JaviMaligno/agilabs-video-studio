@@ -13,22 +13,50 @@ const wordStarts = (key: string, at: number): number[] | undefined => WORDS.en?.
 const build = (): Cuts => ({
   main: [
     // Cold open: the hook is drawn by the scene itself over the four identical cards.
-    anim('hook', 'CoverageTiles', { mode: 'same', titleLine: true }, [say(0.15, 'These four claims print the same way.', '')], { min: 3.3 }),
+    anim(
+      'hook',
+      'CoverageTiles',
+      // Word cues of the second line (starts at 0.15 + 2.08 + 0.35 = 2.58): the cards light one
+      // after another from "four" to "whole domain", the ticks beat on "holds".
+      { mode: 'same', titleLine: true, cue: { four: 2.58 + 0.44, holds: 2.58 + 1.96, whole: 2.58 + 2.68 } },
+      [
+        say(0.15, 'These four claims print the same way.', ''),
+        // Added 2026-10-21: the voice reads the card, so nobody needs a silent pause to read it.
+        say(0, 'All four say the inequality holds on the whole domain.', ''),
+      ],
+      // Speech ends at 2.58 + 3.48 = 6.06; the dip out starts 0.6 s before the end: 1.24 s held.
+      { min: 7.9 },
+    ),
+    // The story (added 2026-10-21): where the four claims come from, before the four kinds.
+    anim(
+      'story',
+      'StoryPaper',
+      // Word cues: the tag on "sixty", the rings on "rings", one backing per kind, hidden on
+      // "print", ticks pulse on "same", backing back with its weight on "worth".
+      { cue: { sixty: 0.15 + 0.6, pan: 0.15 + 2.28, proved: 3.94 + 0.92, computer: 3.94 + 2.6, samples: 3.94 + 4.04, print: 8.93 + 0.36, same: 8.93 + 1.72, worth: 8.93 + 2.92 } },
+      [
+        say(0.15, 'I wrote a sixty-page paper on packing rings in a frying pan.', ''),
+        say(0, 'Some claims are proved. Others: a computer check, or just samples.', '', { en: 'Some claims are proved. Others. A computer check, or just samples.' }),
+        say(0, "In print, they all look the same. They're not worth the same.", ''),
+      ],
+      // Held so the weight bars land and the last caption reads under 17 chars/s.
+      { min: 14 },
+    ),
     anim(
       'lift',
       'CoverageTiles',
-      { mode: 'lift', blend: true, cue: { silent: 5.81 + 1.47 } },
+      { mode: 'lift', blend: true, cue: { silent: 5.81 + 1.6 } },
       [
         say(0.15, 'One: a written proof.', ''),
         say(0, 'One: exact arithmetic, box by box.', ''),
-        say(0, 'One: a grid, silent in between.', ''),
-        say(0, 'And one: ten million samples, none broke it.', ''),
+        say(0, 'One: a grid, silent in between.', '', { en: 'One. A grid, silent in between.' }),
+        say(0, 'And one: ten million samples, none broke it.', '', { en: 'And one. Ten million samples, none broke it.' }),
       ],
       // The cards drop back on at the start of the next scene.
     ),
     // Stamps land one per beat from "label" (word timestamps); the line under them is read after.
     anim('stamp', 'CoverageTiles', { mode: 'stamp', blend: true, cue: { stamp: 0.05 + 3.08 } }, [say(0.05, 'So in my last preprint, every claim carries a label.', '')], { min: 5.3 }),
-    anim('focus', 'CoverageTiles', { mode: 'focus', blend: true, cue: { tally: 0.2 + 3.16 } }, [say(0.2, 'What convinced me: a certificate that lied to me three times.', '')]),
+    anim('focus', 'CoverageTiles', { mode: 'focus', blend: true, cue: { tally: 0.2 + 2.92 } }, [say(0.2, 'What convinced me: a certificate that lied to me three times.', '', { en: 'What convinced me. A certificate that lied to me three times.' })]),
     anim('boxes', 'CoverageTiles', { mode: 'boxes', blend: true, cue: { wave: 0.05 + 1.0 } }, [say(0.05, 'It had to check one lemma over a whole region.', '')]),
     anim('reviewer', 'CoverageTiles', { mode: 'reviewer', blend: true, cue: { send: 0.05 + 1.0, break: 0.05 + 2.46 } }, [say(0.05, 'A separate model got only the statement, told to break it.', '')]),
     anim('refute', 'CoverageTiles', { mode: 'refute', blend: true, cue: { refute: 0.05 + 0.84, chips: 0.05 + 1.97 } }, [say(0.05, 'Version one fell at once: part of it was only sampled.', '')]),

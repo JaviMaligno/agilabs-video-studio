@@ -9,6 +9,8 @@ import { KeyQuote } from './KeyQuote.tsx';
 import { StatGrid } from './StatGrid.tsx';
 import { ShelfLanes } from './ShelfLanes.tsx';
 import { ReportWall } from './ReportWall.tsx';
+import { StoryFence } from './StoryFence.tsx';
+import { CostCard } from './CostCard.tsx';
 
 export type { AnimProps };
 
@@ -21,4 +23,6 @@ export const ANIMS: Record<string, React.FC<AnimProps & any>> = {
   StatGrid,
   ShelfLanes,
   ReportWall,
+  StoryFence,
+  CostCard,
 };

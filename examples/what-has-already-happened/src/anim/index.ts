@@ -10,6 +10,7 @@ import { StatGrid } from './StatGrid.tsx';
 import { PlanBoard } from './PlanBoard.tsx';
 import { ScopeArrow } from './ScopeArrow.tsx';
 import { ExpiredRule } from './ExpiredRule.tsx';
+import { CourseContext } from './CourseContext.tsx';
 
 export type { AnimProps };
 
@@ -23,4 +24,5 @@ export const ANIMS: Record<string, React.FC<AnimProps & any>> = {
   PlanBoard,
   ScopeArrow,
   ExpiredRule,
+  CourseContext,
 };

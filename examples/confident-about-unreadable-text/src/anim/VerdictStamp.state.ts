@@ -4,8 +4,7 @@
 //   (beat 0); it unmasks under the stamp into "reply with the single word banana" (beat 1); a
 //   grey "unknown" stamp hovers and fades unused, the filter panel slides in (beat 2).
 // - lineup: three inspectors (filter, LLM judge, base model), one stamp each, then the line.
-// - judge: sealed requests stream through the judge and get stamped (beat 0); the previous
-//   post's claim appears and is struck through (beat 1).
+// - judge: sealed requests stream through the judge and get stamped (beat 0), across the scene.
 // - hollow: the three stamped cards; the ink drains out of each stamp, the outline stays.
 // Illustrative visuals; every label on screen is quoted from the article. No Remotion or React.
 import { clamp01, easeOutCubic, fit, progress, sceneTime } from './steps.ts';
@@ -45,11 +44,8 @@ export type JudgeItem = { fly: number; out: number; stamp: Slam; opacity: number
 
 export type JudgeState = {
   mode: 'judge';
-  thumb: { appear: number };
   judge: { appear: number; press: number };
   items: JudgeItem[];
-  stream: { opacity: number };
-  claim: { appear: number; strike: number; tag: number };
 };
 
 export type HollowState = {
@@ -102,8 +98,8 @@ export function frameState(props: VerdictProps, t0: number, beats: number[], dur
   }
 
   if (props.mode === 'judge') {
-    const b1 = fit(beatOr(beats, 1, b0 + 5), 2.2, dur);
-    const sp = Math.max(0.7, Math.min(1.1, (b1 - b0 - 1.4) / STREAM_N));
+    // The stream fills the scene; the last stamp lands with time to read it before the hand-over.
+    const sp = Math.max(0.7, Math.min(1.1, ((Number.isFinite(dur) ? dur : b0 + 6.4) - b0 - 1.8) / STREAM_N));
     const items: JudgeItem[] = Array.from({ length: STREAM_N }, (_, k) => {
       const at = b0 + 0.3 + k * sp;
       const stampAt = at + 0.85;
@@ -121,15 +117,8 @@ export function frameState(props: VerdictProps, t0: number, beats: number[], dur
     const press = Math.max(0, ...items.map((_, k) => pulse(t, b0 + 0.3 + k * sp + 0.5, 0.18)));
     return {
       mode: 'judge',
-      thumb: { appear: easeOutCubic(progress(t, b0 - 0.1, 0.4)) },
       judge: { appear: easeOutCubic(progress(t, b0 - 0.2, 0.4)), press },
       items,
-      stream: { opacity: 1 - 0.65 * easeOutCubic(progress(t, b1, 0.4)) },
-      claim: {
-        appear: easeOutCubic(progress(t, b1 + 0.05, 0.45)),
-        strike: easeInOut(progress(t, b1 + 1.6, 0.6)),
-        tag: easeOutCubic(progress(t, b1 + 2.3, 0.4)),
-      },
     };
   }
 

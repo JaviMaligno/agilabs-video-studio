@@ -4,12 +4,13 @@
 // scene transitions in Video.tsx) and gets the part's answer stamped on it. Under it:
 // - PlanBoard (1-6, 14-20): the plan board under a wall clock; the fact sheet slides over it in
 //   the setup;
+// - CourseContext (1a-1c, added 2026-10-21): where the story comes from, right after the hook;
 // - ScopeArrow (7-10): failure 1, the dependency the page denies;
 // - ExpiredRule (11-13): failure 2, the reason that expired.
 // Marks are [line, word]: resolved to scene seconds from the TTS word timestamps (marks.ts).
 import type { Cuts, Scene } from './types.ts';
 import { anim, outro, say, videos, voice } from './narrate.ts';
-import { FPS, sceneStarts } from './timing.ts';
+import { FPS, SCENE_TRANSITION, sceneFrames, sceneStarts } from './timing.ts';
 import { WORDS } from './audio.generated.ts';
 import { resolveMark, type MarkSpec } from './marks.ts';
 import type { CardSpec, StampTone } from './anim/QuestionCard.state.ts';
@@ -24,10 +25,14 @@ type CardIn = { q: string; stamp?: { text: string; at: MarkSpec; after?: number;
 const finish = (scenes: Scene[]): Scene[] => {
   const { starts } = sceneStarts(scenes);
   const words = WORDS[voice()];
+  // The context scenes (no wall clock on screen) do not advance the board's clock: its hand picks up
+  // where the hook left it, as it did before they were added.
+  let away = 0;
   return scenes.map((s, i) => {
     if (s.kind !== 'anim' || !s.anim) return s;
     const props = { ...s.anim.props };
-    props.clock = +(starts[i] / FPS).toFixed(3);
+    props.clock = +((starts[i] - away) / FPS).toFixed(3);
+    if (s.anim.name === 'CourseContext') away += sceneFrames(s) - SCENE_TRANSITION;
     props.layout = s.anim.name;
     if (Array.isArray(props.marks)) props.marks = (props.marks as MarkSpec[]).map((m) => resolveMark(s.lines, m, words, voice()));
     const card = props.card as CardIn | undefined;
@@ -56,6 +61,33 @@ const build = (): Cuts => ({
   main: finish([
     // 1. Cold open: the agent's plan on the board; the takes in DONE never happened.
     anim('hook', 'PlanBoard', { mode: 'hook', marks: [[0, 'never']] }, [say(0.5, 'My agents plan around work that never happened.', '')], { min: 4.4, tail: BLEND_TAIL }),
+    // 1a-1c. Context (added 2026-10-21): the course, the advice that didn't hold up, the status file.
+    anim(
+      'course',
+      'CourseContext',
+      { mode: 'course', marks: [[0, 'university'], [1, 'sixty'], [1, 'four'], [1, 'studio']] },
+      // Voiced in two parts: the pause at the colon keeps the first caption cue readable.
+      // The first part is voiced as a full stop (revised 2026-10-21): with the colon, "course" rose
+      // like a question. The caption keeps the colon.
+      [say(0.4, "I'm preparing a university course:", '', { en: "I'm preparing a university course." }), say(0, 'sixty-eight videos, four days in a studio.', '')],
+      { tail: BLEND_TAIL },
+    ),
+    anim(
+      'advice',
+      'CourseContext',
+      { mode: 'advice', marks: [[0, 'plan'], [0, 'ordering'], [0, 'didn']] },
+      [say(0.2, "Coding agents helped me plan it, and kept giving ordering advice that didn't hold up.", '')],
+      // A longer hold: the closing cue "that didn't hold up." needs its time on screen.
+      { tail: 1.0 },
+    ),
+    anim(
+      'status',
+      'CourseContext',
+      { mode: 'status', marks: [[0, 'status'], [0, 'two'], [0, 'nothing']] },
+      [say(0.2, 'One status file even listed two good takes. Nothing had been recorded yet.', '')],
+      // Hold the stamp and the closing cue before the dip to the clock.
+      { tail: 1.2 },
+    ),
     // 2. The obvious suspect: the clock.
     anim(
       'clock',
@@ -78,12 +110,19 @@ const build = (): Cuts => ({
       [say(0.1, "Then I added a line: today's date, or what the timings really were.", '')],
       { min: 5.6, tail: BLEND_TAIL },
     ),
-    // 6. The second domain, and the size of the test.
-    anim('release', 'PlanBoard', { mode: 'release', marks: [[0, 'unrelated'], [0, 'release']], card: { q: Q0 } }, [say(0.3, 'Then all of it again, on an unrelated software release.', '')], {
-      min: 5.2,
-    }),
+    // 6. The second domain (revised 2026-10-21: say why it is there), and the size of the test.
+    // The sheet maps course item -> release item; "same structure, none of the same words" is on
+    // screen, so it is not voiced.
+    anim(
+      'release',
+      'PlanBoard',
+      { mode: 'release', marks: [[0, 'course'], [0, 'rebuilt'], [0, 'same'], [0, 'release']], card: { q: Q0 } },
+      [say(0.3, "To check it wasn't just my course, I rebuilt the same test as a software release.", '')],
+      // The 572 tally lands on "software release": hold until its judge line has been read.
+      { min: 6.4 },
+    ),
     // 7-8. Failure 1: the trap, and the exemption on the page.
-    anim('trap', 'ScopeArrow', { mode: 'trap', marks: [[0, 'reuses']], card: { q: Q1 } }, [say(0.3, 'The trap: piece four reuses a calculation from piece three.', '')], { tail: BLEND_TAIL }),
+    anim('trap', 'ScopeArrow', { mode: 'trap', marks: [[0, 'reuses']], card: { q: Q1 } }, [say(0.3, 'The trap: piece four reuses a calculation from piece three.', '', { en: 'The trap. Piece four reuses a calculation from piece three.' })], { tail: BLEND_TAIL }),
     anim(
       'exempt',
       'ScopeArrow',
@@ -107,7 +146,7 @@ const build = (): Cuts => ({
       min: 5.3,
     }),
     // 11-13. Failure 2: the habit, its expired reason, and the bars.
-    anim('rule', 'ExpiredRule', { mode: 'rule', marks: [[0, 'last'], [0, 'depends']], card: { q: Q2 } }, [say(0.3, 'Then a habit: shoot the intro last, since it depends on the rest.', '')], {
+    anim('rule', 'ExpiredRule', { mode: 'rule', marks: [[0, 'last'], [0, 'depends']], card: { q: Q2 } }, [say(0.3, 'Then a habit: shoot the intro last, since it depends on the rest.', '', { en: 'Then a habit. Shoot the intro last, since it depends on the rest.' })], {
       // A full hold: the closing cue "on the rest." needs its time on screen.
       tail: 1.1,
     }),

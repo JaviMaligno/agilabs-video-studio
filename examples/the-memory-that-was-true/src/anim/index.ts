@@ -9,6 +9,7 @@ import { KeyQuote } from './KeyQuote.tsx';
 import { StatGrid } from './StatGrid.tsx';
 import { PinnedNote } from './PinnedNote.tsx';
 import { MemoryWall } from './MemoryWall.tsx';
+import { MemoryStory } from './MemoryStory.tsx';
 
 export type { AnimProps };
 
@@ -21,4 +22,5 @@ export const ANIMS: Record<string, React.FC<AnimProps & any>> = {
   StatGrid,
   PinnedNote,
   MemoryWall,
+  MemoryStory,
 };

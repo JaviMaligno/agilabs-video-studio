@@ -80,6 +80,9 @@ say(0.3, 'It solved 14/20 tasks.', 'Resolvió 14/20 tareas.', {
   listen shows the TTS gets it wrong.
 - Slashes, version strings ("gpt-5.6"), file names and acronyms are the usual trouble. Listen to
   each line that has one.
+- Colons: Javier's cloned voice makes the word before a colon rise like a question ("It said:"
+  sounds like "It said?"), so `npm run tts` voices ": " as ". " by default (captions keep the
+  colon; `tts.colonsAsStops: false` in `video.config.mjs` turns it off).
 
 ## Audio QA
 

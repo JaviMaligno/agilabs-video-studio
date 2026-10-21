@@ -23,6 +23,17 @@ const build = (): Cuts => ({
       ],
       { min: 14 },
     ),
+    // Added 2026-10-21 (story): where the hook's string comes from, before anything technical.
+    anim(
+      'story',
+      'StoryBench',
+      {},
+      [
+        say(0.15, 'I was testing whether AI can read codes nobody taught it.', ''),
+        say(0, 'That string was one of my tests.', ''),
+        say(0, "My AI grader couldn't read them either.", ''),
+      ],
+    ),
     anim(
       'run',
       'CipherCard',
@@ -39,14 +50,9 @@ const build = (): Cuts => ({
       'judge',
       'VerdictStamp',
       { mode: 'judge' },
-      [
-        say(0.15, 'My last post rested on an LLM judge grading replies to harmful requests in cipher.', '', {
-          en: 'My last post rested on an L L M judge grading replies to harmful requests in cipher.',
-        }),
-        say(0, "Its conclusion, that a cipher defuses them, didn't survive the full run.", ''),
-      ],
-      // Holds the struck claim long enough to read before the hand-over.
-      { min: 12.0 },
+      // Revised 2026-10-21: one line, no previous-post claim; the stream holds a few stamps.
+      [say(0.15, 'Take the AI judge grading replies to harmful requests in cipher.', '')],
+      { min: 6.4 },
     ),
     anim(
       'lens',
@@ -67,7 +73,7 @@ const build = (): Cuts => ({
       [
         say(0.15, 'A second, independent judge agrees with it on plain text.', ''),
         say(0, 'On the two small models in cipher, they agree worse than chance.', ''),
-        say(0, "So that drop isn't evidence that ciphers protect them.", ''),
+        say(0, "So that isn't evidence that ciphers protect them.", ''),
       ],
     ),
     anim(
@@ -78,14 +84,14 @@ const build = (): Cuts => ({
         say(0.15, 'On GPT-5, where judges agree, two requests refused in plain text got through in cipher.', '', {
           en: 'On G P T five, where judges agree, two requests refused in plain text got through in cipher.',
         }),
-        say(0, 'Two prompts: proof it can happen, not a rate.', ''),
+        say(0, 'Two prompts: proof it can happen, not a rate.', '', { en: 'Two prompts. Proof it can happen, not a rate.' }),
       ],
     ),
     anim(
       'mimic',
       'CipherCard',
       { mode: 'mimic' },
-      [say(0.15, 'The third: a base model writing fluent cipher.', ''), say(0, 'On three ciphers it wrote in code and never once did the task.', '')],
+      [say(0.15, 'The third: a base model writing fluent cipher.', '', { en: 'The third. A base model writing fluent cipher.' }), say(0, 'On three ciphers it wrote in code and never once did the task.', '')],
       // Holds the "understands 36% · writes in code 56%" tag (it pops after the MIMICRY stamp).
       { min: 9.0 },
     ),

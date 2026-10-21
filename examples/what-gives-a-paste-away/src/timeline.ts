@@ -36,6 +36,24 @@ const build = (): Cuts => ({
       [say(0.1, 'Then "ignore it" made it worse.', '')],
       { min: 3.2 },
     ),
+    // Added 2026-10-21 (story): the real situation, before any condition or number.
+    anim(
+      'story',
+      'PasteStory',
+      {
+        titles: ['Dinner recipe', 'Electricity bill'],
+        under: ['meant for this one', 'pasted here'],
+        purpose: 'on purpose',
+        reply: 'played along',
+        questions: ['What makes it suspect a mistake?', 'How do you take it back?'],
+      },
+      [
+        say(0.1, "We've all pasted something into the wrong chat.", ''),
+        say(0, 'So I did it on purpose. Every model played along.', ''),
+        say(0, 'What would make it suspect a mistake?', ''),
+        say(0, 'And how do you take it back?', ''),
+      ],
+    ),
     // 3-4. Recap of part 1, and the question it left open.
     anim(
       'recap',
@@ -95,7 +113,7 @@ const build = (): Cuts => ({
       },
       [
         say(0.1, 'A tell tripled the doubt: one reply in five.', ''),
-        say(0.4, 'The contradiction: zero out of 95.', '', { en: 'The contradiction: zero out of ninety-five.' }),
+        say(0.4, 'The contradiction: zero out of 95.', '', { en: 'The contradiction. Zero out of ninety-five.' }),
       ],
       { min: 0 },
     ),
@@ -118,7 +136,7 @@ const build = (): Cuts => ({
         tally: { value: '77 / 95', label: 'just did the work' },
         quote: { rows: ["It doesn't look like an accident.", 'It looks like you changed your mind.'], emphasis: ['changed your mind'] },
       },
-      [say(0.1, "My reading: it doesn't look like an accident.", ''), say(0, 'It looks like you changed your mind.', '')],
+      [say(0.1, "My reading: it doesn't look like an accident.", '', { en: 'My reading. It doesn\'t look like an accident.' }), say(0, 'It looks like you changed your mind.', '')],
     ),
     // 13-14. Act I verdict.
     anim(
@@ -151,7 +169,7 @@ const build = (): Cuts => ({
         entities: ['names', 'products', 'places'],
         chip: 'Claude Opus 5 · 120 conversations per message',
       },
-      [say(0.1, "On one model: do the paste's names come back?", '')],
+      [say(0.1, "On one model: do the paste's names come back?", '', { en: 'On one model. Do the paste\'s names come back?' })],
       { min: 4.2 },
     ),
     // 18-20. The three leakage rates.
@@ -169,7 +187,7 @@ const build = (): Cuts => ({
         p2: 'p = 0.0036 (Holm)',
       },
       [
-        say(0.1, 'Saying nothing: about three in a hundred.', ''),
+        say(0.1, 'Saying nothing: about three in a hundred.', '', { en: 'Saying nothing. About three in a hundred.' }),
         say(0.1, '"Ignore it": almost one in five. Six times more.', ''),
         say(0.1, 'Adding where to go cut that by more than half.', ''),
       ],

@@ -12,7 +12,19 @@ const build = (): Cuts => ({
       'hook',
       'PinnedNote',
       { mode: 'hook' },
-      [say(0.25, 'My agent handed me a memory.', ''), say(0, 'It was true in July.', ''), say(0, 'It said: one workflow per article.', '')],
+      [say(0.25, 'My agent handed me a memory.', ''), say(0, 'It was true in July.', ''), say(0, 'It said: one workflow per article.', '', { en: 'It said. One workflow per article.' })],
+      { min: 4 },
+    ),
+    // Story (added 2026-10-21): where the memory comes from and what nearly happened.
+    anim(
+      'story',
+      'MemoryStory',
+      {},
+      [
+        say(0.25, 'A memory is a note my coding agent writes about my blog after each session.', ''),
+        say(0, 'I was preparing an article, and that note told me how to schedule it.', ''),
+        say(0, 'I very nearly acted on it.', ''),
+      ],
       { min: 4 },
     ),
     // 3. The world moves under the note.
@@ -39,7 +51,7 @@ const build = (): Cuts => ({
       'MemoryWall',
       { mode: 'thread', blend: true },
       [
-        say(0.25, 'The idea: tie each memory to a check against the repository.', ''),
+        say(0.25, 'The idea: tie each memory to a check against the repository.', '', { en: 'The idea. Tie each memory to a check against the repository.' }),
         say(0, 'It claims those workflows exist? If none is left, it turns red.', ''),
       ],
       { min: 5 },
@@ -89,7 +101,7 @@ const build = (): Cuts => ({
       'MemoryWall',
       { mode: 'green', blend: true },
       [
-        say(0.2, 'One green was stale too: its files existed, its expiry date had passed.', ''),
+        say(0.2, 'One green was stale too: its files existed, its expiry date had passed.', '', { en: 'One green was stale too. Its files existed, its expiry date had passed.' }),
         say(0, 'A green certifies what was encoded, not the whole memory.', ''),
       ],
       { min: 5 },
@@ -97,13 +109,13 @@ const build = (): Cuts => ({
     // 19. The hedge.
     anim('folder', 'MemoryWall', { mode: 'folder' }, [say(0.25, "That's one folder, not a staleness rate.", '')], { min: 3.2 }),
     // 20. The verdict on the tool.
-    anim('verdict', 'MemoryWall', { mode: 'verdict' }, [say(0.25, 'The verdict: the checker is clumsy.', '')], { min: 4.8 }),
+    anim('verdict', 'MemoryWall', { mode: 'verdict' }, [say(0.25, 'The verdict: the checker is clumsy.', '', { en: 'The verdict. The checker is clumsy.' })], { min: 4.8 }),
     // 21-22. What actually fixes it.
     anim(
       'close',
       'PinnedNote',
       { mode: 'close' },
-      [say(0.25, 'What keeps a memory true is updating it when the work ends.', ''), say(0, 'And mark anything in progress as such: it will expire.', '')],
+      [say(0.25, 'What keeps a memory true is updating it when the work ends.', ''), say(0, 'And mark anything in progress as such: it will expire.', '', { en: 'And mark anything in progress as such. It will expire.' })],
       { min: 5 },
     ),
     outro('outro', [say(0.15, 'More at javieraguilar.ai', '', { en: 'More at javier aguilar dot A I.' })]),

@@ -10,6 +10,7 @@ import * as lens from '../src/anim/JudgeLens.state.ts';
 import * as two from '../src/anim/TwoJudges.state.ts';
 import * as gate from '../src/anim/RefusalGate.state.ts';
 import * as card from '../src/anim/CipherCard.state.ts';
+import * as story from '../src/anim/StoryBench.state.ts';
 import { slam } from '../src/anim/stamp.ts';
 import fs from 'node:fs';
 
@@ -68,6 +69,7 @@ for (const mode of ['filter', 'lineup', 'judge', 'hollow'] as const) {
   CASES.push({ name: `VerdictStamp ${mode}`, state: (t, b, d) => verdict.frameState({ mode, stampAt: 2.3 }, t, b, d) });
 }
 CASES.push({ name: 'VerdictStamp filter (no stampAt)', state: (t, b, d) => verdict.frameState({ mode: 'filter' }, t, b, d) });
+CASES.push({ name: 'StoryBench', state: (t, b, d) => story.frameState({}, t, b, d) });
 CASES.push({ name: 'JudgeLens', state: (t, b, d) => lens.frameState({}, t, b, d) });
 for (const mode of ['agree', 'grid'] as const) CASES.push({ name: `TwoJudges ${mode}`, state: (t, b, d) => two.frameState({ mode }, t, b, d) });
 CASES.push({ name: 'RefusalGate bypass', state: (t, b, d) => gate.frameState({ mode: 'bypass' }, t, b, d) });
@@ -258,13 +260,14 @@ test('VerdictStamp lineup and hollow: three stamps land; the ink drains to the o
   assert.equal(h.head.none, 1);
 });
 
-test('VerdictStamp judge: the claim is struck through by the end', () => {
-  const j = verdict.frameState({ mode: 'judge' }, 11, [0.15, 5.6], 11) as verdict.JudgeState;
-  assert.equal(j.claim.strike, 1);
-  assert.ok(j.stream.opacity < 0.5);
-  const mid = verdict.frameState({ mode: 'judge' }, 3, [0.15, 5.6], 11) as verdict.JudgeState;
-  assert.equal(mid.claim.appear, 0);
+test('VerdictStamp judge: the stream runs and every stamp lands before the scene ends', () => {
+  const end = verdict.frameState({ mode: 'judge' }, 6.4, [0.15], 6.4) as verdict.JudgeState;
+  assert.ok(end.items.every((i) => i.stamp.pop === 1 || i.opacity === 0));
+  assert.equal(end.items.at(-1)!.opacity, 1);
+  assert.equal(end.items.at(-1)!.stamp.pop, 1);
+  const mid = verdict.frameState({ mode: 'judge' }, 2, [0.15], 6.4) as verdict.JudgeState;
   assert.ok(mid.items.some((i) => i.opacity > 0));
+  assert.equal(mid.judge.appear, 1);
 });
 
 test('JudgeLens: three passes, every one stamped; tag at the end', () => {
@@ -328,4 +331,23 @@ test('CipherCard: ladder counts to 696 with ten rows; mimic ends on the stamp an
   assert.equal(m.hero.opacity, 0);
   const typing = card.frameState({ mode: 'mimic' }, 2.0, [0.15, 3.2], 9, DATA) as card.MimicState;
   assert.ok(typing.hero.typed > 0 && typing.hero.typed < 1);
+});
+
+test('StoryBench: codes cycle on beat 0, settle on base64 by beat 1; the grader stamps by the end', () => {
+  const beats = [0.15, 4.6, 7.4];
+  const dur = 12;
+  const early = story.frameState({}, 0, beats, dur);
+  assert.equal(early.echo.opacity, 0);
+  assert.equal(early.grader.appear, 0);
+  assert.equal(early.stamp.opacity, 0);
+  const mid = story.frameState({}, 2.2, beats, dur);
+  assert.ok(mid.code.to >= 0, 'still cycling through codes before beat 1');
+  const settled = story.frameState({}, beats[1] + 1.5, beats, dur);
+  assert.equal(settled.code.to, -1);
+  assert.equal(settled.code.p, 1);
+  assert.equal(settled.echo.pop, 1);
+  const end = story.frameState({}, dur, beats, dur);
+  assert.equal(end.stamp.pop, 1);
+  assert.equal(end.code.to, -1);
+  for (const k of story.STORY_CODES) assert.ok(typeof DATA.ciphers[k] === 'string' && DATA.ciphers[k].length > 0, k);
 });

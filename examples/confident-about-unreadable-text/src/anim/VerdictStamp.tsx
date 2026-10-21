@@ -153,39 +153,15 @@ const Lineup: React.FC<{ s: LineupState; t: number; W: number }> = ({ s, t, W })
 );
 
 // ---------- judge ----------
-const CLAIM = ['“a cipher doesn’t unlock', 'a refused request,', 'it defuses it”'];
-const J = { thumbTop: 0, claimTop: 170, winTop: 520, toolTop: 650, laneY: 690 };
+// Revised 2026-10-21: no previous-post card or struck claim; the judge and its stream sit centred.
+const J = { winTop: 340, toolTop: 470, laneY: 510 };
 
 const Judge: React.FC<{ s: JudgeState; t: number; W: number }> = ({ s, t, W }) => {
   const jx = W / 2;
   return (
     <>
-      {/* The previous post */}
-      <div style={{ position: 'absolute', left: 0, top: J.thumbTop, width: W, opacity: s.thumb.appear, transform: `translateY(${(1 - s.thumb.appear) * -20}px)` }}>
-        <Card w={W} h={140} style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '0 34px', boxSizing: 'border-box', gap: 6 }}>
-          <div style={{ fontSize: 26, fontWeight: 700, color: C.muted, letterSpacing: '0.08em', textTransform: 'uppercase' }}>my last post</div>
-          <div style={{ fontSize: 36, fontWeight: 700, whiteSpace: 'nowrap' }}>Teaching a Model a Language You Just Invented</div>
-        </Card>
-      </div>
-      {/* Its conclusion, struck through */}
-      <div style={{ position: 'absolute', left: 0, top: J.claimTop, width: W, opacity: s.claim.appear, transform: `translateY(${(1 - s.claim.appear) * 24}px)` }}>
-        {CLAIM.map((l, i) => {
-          const strike = Math.min(1, Math.max(0, s.claim.strike * CLAIM.length - i));
-          return (
-            <div key={i} style={{ display: 'flex', justifyContent: 'center', marginTop: i ? 4 : 18 }}>
-              <span style={{ position: 'relative', fontSize: 58, fontWeight: 800, letterSpacing: '-0.01em', color: alpha(C.text, 1 - 0.45 * s.claim.strike) }}>
-                {l}
-                <span style={{ position: 'absolute', left: -8, top: '52%', height: 9, width: `calc(${strike * 100}% + 16px)`, borderRadius: 5, background: C.accentText, boxShadow: `0 0 16px ${alpha(C.accent, 0.8)}` }} />
-              </span>
-            </div>
-          );
-        })}
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 18, opacity: s.claim.tag }}>
-          <Pill size={32}>didn’t survive the full run</Pill>
-        </div>
-      </div>
       {/* The judge and its stream */}
-      <div style={{ position: 'absolute', inset: 0, opacity: s.stream.opacity }}>
+      <div style={{ position: 'absolute', inset: 0 }}>
         <div style={{ position: 'absolute', left: jx - 170, top: J.winTop, opacity: s.judge.appear }}>
           <NoiseWindow w={340} h={110} t={t} label="what the judge sees" rows={1} cols={10} seed={7} size={36} />
         </div>

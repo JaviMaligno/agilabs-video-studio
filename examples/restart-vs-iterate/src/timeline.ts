@@ -61,7 +61,7 @@ const build = (): Cuts => ({
       'quote',
       'CodeTower',
       { mode: 'quote', marks: [[0, 'let'], [0, 'restart']], card: { q: Q1 } },
-      [say(0.15, 'Andrej Karpathy put it as: let the loop restart.', '')],
+      [say(0.15, 'Andrej Karpathy put it as: let the loop restart.', '', { en: 'Andrej Karpathy put it as. Let the loop restart.' })],
       { tail: 1.4 },
     ),
     // 3. The harness: write → test → feedback.
@@ -93,7 +93,7 @@ const build = (): Cuts => ({
       'restart',
       'CodeTower',
       { mode: 'lanes', lane: 2, marks: [[0, 'wipe'], [0, 'clean'], [0, 'round']], card: { q: Q2 } },
-      [say(0.2, 'Restart: wipe it all and start clean every round.', '')],
+      [say(0.2, 'Restart: wipe it all and start clean every round.', '', { en: 'Restart. Wipe it all and start clean every round.' })],
       { tail: 1.3 },
     ),
     // 7. Key card: the third arm, a restart button with a scope dial.
@@ -101,7 +101,7 @@ const build = (): Cuts => ({
       'button',
       'CodeTower',
       { mode: 'lanes', lane: 3, marks: [[0, 'button'], [0, 'picks'], [0, 'how'], [0, 'much'], [0, 'away']], card: { q: Q2 } },
-      [say(0.2, 'Or a restart button: the agent picks when, and how much to throw away.', '')],
+      [say(0.2, 'Or a restart button: the agent picks when, and how much to throw away.', '', { en: 'Or a restart button. The agent picks when, and how much to throw away.' })],
       { tail: 0.8 },
     ),
     // 8. Who won? Strong model: iterate 86% vs restart 69%.
@@ -141,7 +141,7 @@ const build = (): Cuts => ({
       { tail: 0.9 },
     ),
     // 12. The turn: how each model used the button.
-    anim('style', 'ScalpelVsWreckingBall', { mode: 'setup', card: { q: Q4 } }, [say(0.3, 'The difference: how each model used it.', '')], { tail: BLEND_TAIL }),
+    anim('style', 'ScalpelVsWreckingBall', { mode: 'setup', card: { q: Q4 } }, [say(0.3, 'The difference: how each model used it.', '', { en: 'The difference. How each model used it.' })], { tail: BLEND_TAIL }),
     // 13. Strong: 7 restarts, 5 one file.
     anim(
       'strong',
@@ -183,7 +183,7 @@ const build = (): Cuts => ({
       'VerdictCard',
       { marks: [[0, 'keep'], [0, 'these']] },
       [
-        say(0.3, 'The verdict, on these tasks: keep the code and iterate.', ''),
+        say(0.3, 'The verdict, on these tasks: keep the code and iterate.', '', { en: 'The verdict, on these tasks. Keep the code and iterate.' }),
         say(0, 'Restart only if you know what to throw away.', ''),
         say(0, 'Here, only the stronger model knew.', ''),
       ],

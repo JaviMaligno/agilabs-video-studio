@@ -7,6 +7,8 @@ import * as quote from '../src/anim/KeyQuote.state.ts';
 import * as grid from '../src/anim/StatGrid.state.ts';
 import * as lanes from '../src/anim/ShelfLanes.state.ts';
 import * as wall from '../src/anim/ReportWall.state.ts';
+import * as story from '../src/anim/StoryFence.state.ts';
+import * as cost from '../src/anim/CostCard.state.ts';
 
 // Fields that are animation progress and must stay within [0, 1].
 const PROGRESS = new Set(['progress', 'appear', 'grow', 'fill', 'draw', 'pop', 'opacity', 'emphasis']);
@@ -30,6 +32,9 @@ const LANE_MODES: lanes.Mode[] = ['hook', 'trap', 'question', 'lanes', 'opus', '
 
 const CASES: Case[] = [
   ...LANE_MODES.map((mode) => ({ name: `ShelfLanes ${mode}`, state: (t: number, b: number[], d: number) => lanes.frameState({ mode }, t, b, d) })),
+  { name: 'StoryFence', state: (t, b, d) => story.frameState({}, t, b, d) },
+  { name: 'CostCard', state: (t, b, d) => cost.frameState({ cues: { sonnet: 1.15, tag: 2.05, share: 3 } }, t, b, d) },
+  { name: 'CostCard (default cues)', state: (t, b, d) => cost.frameState({}, t, b, d) },
   { name: 'ReportWall wall', state: (t, b, d) => wall.frameState({ mode: 'wall' }, t, b, d) },
   { name: 'ReportWall number', state: (t, b, d) => wall.frameState({ mode: 'number' }, t, b, d) },
   { name: 'Counter', state: (t, b, d) => counter.frameState({ value: 70, suffix: '%', label: 'pass rate', decimals: 1, beat: 1 }, t, b, d) },
@@ -239,4 +244,42 @@ test('ShelfLanes and ReportWall: the article\'s numbers', () => {
   // Haiku: nobody's walk reaches a lid.
   const hk = lanes.frameState({ mode: 'haiku' }, 99, [0.1, 3.2], 7.6);
   if (hk.view === 'lanes') assert.ok(hk.lanes.every((l) => l.walk === 0 && l.lid === 0));
+});
+
+test('StoryFence: one step per line, nothing before the first, the question by the end', () => {
+  const beats = [0.15, 5, 9];
+  const dur = 13;
+  const s0 = story.frameState({}, 0, beats, dur);
+  assert.equal(s0.card, 0);
+  assert.equal(s0.hand, 0);
+  assert.ok(s0.posts.every((p) => p === 0));
+  // Line 1 done: article, sentence, pen and both fences up; nothing of lines 2-3 yet.
+  const s1 = story.frameState({}, 4.9, beats, dur);
+  assert.equal(s1.card, 1);
+  assert.equal(s1.fence, 1);
+  assert.ok(s1.posts.every((p) => p === 1));
+  assert.deepEqual([s1.cord, s1.noShell, s1.noNet], [1, 1, 1]);
+  assert.deepEqual([s1.guess, s1.bubble, s1.report], [0, 0, 0]);
+  // Line 2: "a guess" stamped, the reader's comment in.
+  const s2 = story.frameState({}, 8.9, beats, dur);
+  assert.deepEqual([s2.guess, s2.bubble, s2.report], [1, 1, 0]);
+  // End: the comment gone, the article dimmed, the report and its question mark on screen.
+  const e = story.frameState({}, dur, beats, dur);
+  assert.deepEqual([e.bubble, e.report, e.query, e.settle], [0, 1, 1, 1]);
+  assert.ok(e.card > 0 && e.card < 1);
+});
+
+test('CostCard: article prices, Sonnet lit and tagged by the end', () => {
+  assert.deepEqual(cost.COSTS.map((m) => m.price), ['$1.62', '$0.97', '$0.21']);
+  const end = cost.frameState({}, 99, [0.15], 5.35);
+  assert.equal(end.rows[cost.PICK].name, 'Sonnet 5');
+  assert.equal(end.rows[cost.PICK].lit, 1);
+  assert.equal(end.tag, 1);
+  assert.equal(end.share, 1);
+  assert.ok(Math.abs(end.rows[1].fill - 0.97 / 1.62) < 1e-9);
+  // Sonnet is about 60% of Opus, as the article says.
+  assert.equal(Math.round(end.rows[1].fill * 100), 60);
+  const start = cost.frameState({}, 0.5, [0.15], 5.35);
+  assert.equal(start.tag, 0);
+  assert.equal(start.rows[1].lit, 0);
 });

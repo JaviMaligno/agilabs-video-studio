@@ -32,6 +32,9 @@ in its counts at the tally and stays.
 |---|---|---|---|---|---|
 | 1 | My agent handed me a memory. It was true in July. | | **Cold open.** Dark stage; a note slides in and pins itself, top centre, over a small file tree (`.github/workflows/` with three `scheduled-publish-<article>.yml` files). Note text, handwritten feel: "To schedule an article: one workflow per article." Corner tag "written · July". Edge teal; a thread runs from the note to the workflow files. | bespoke: `PinnedNote` (mode `hook`) | "my agent handed me a stale memory and I very nearly acted on it."; "The memory said that scheduling an article on this site means creating a single-use workflow named after the article. That was true in July." |
 | 2 | It said: one workflow per article. | | The note's line "one workflow per article" underlines itself; the three workflow files in the tree pulse in sync with it. | `PinnedNote` (mode `hook`) | "a single-use workflow named after the article" |
+| S1 | A memory is a note my coding agent writes about my blog after each session. | | *(added 2026-10-21: story)* A "coding agent · my blog" session window types a few chat lines; a "session ends → note" chip; a note flies into a small stack labelled "its memory · notes it keeps on my blog". | bespoke: `MemoryStory` | "the files Claude Code keeps per project. The agent writes them when a session ends" |
+| S2 | I was preparing an article, and that note told me how to schedule it. | | *(added 2026-10-21: story)* An article draft card ("new article · draft") asks "how do I schedule it?"; the hook note ("To schedule an article: one workflow per article.", "written · July") is pulled out of the stack to full size and pinned. | `MemoryStory` | "While I was preparing it, my agent handed me a stale memory"; "The memory said that scheduling an article on this site means creating a single-use workflow" |
+| S3 | I very nearly acted on it. | | *(added 2026-10-21: story)* A "+ create the workflow / scheduled-publish-new-article.yml" button appears; the cursor heads for it and stops just short; rose chip "very nearly". | `MemoryStory` | "I very nearly acted on it." |
 | 3 | Since then, a single queue file replaced them all. | | Time runs (a small calendar strip under the tree flips July → September). The workflow files fade out one by one; a single file `publish-schedule.json` slides in, "queue" tag. The note does not move and its text does not change; the thread goes slack, the edge drifts teal → rose. | `PinnedNote` (mode `drift`) | "The mechanism has since been replaced by a manifest: one JSON file holding the publication queue. There is **not one** of those workflows left on the main branch." |
 | 4 | The memory was not wrong. | | Stamp on the note, teal: **TRUE WHEN WRITTEN**. | `PinnedNote` (mode `stamp`) | "The memory wasn't wrong." |
 | 5 | It stopped being true while nobody was looking. | | Second stamp under it, rose: **STALE NOW**. The tree keeps moving slightly; the note stays still. | `PinnedNote` (mode `stamp`) | "**It was true, and it stopped being true while nobody was looking.**" |
@@ -57,7 +60,8 @@ in its counts at the tally and stays.
 **Word count (EN):** 11 + 6 + 9 + 5 + 8 + 10 + 11 + 12 + 9 + 9 + 6 + 4 + 10 + 12 + 11 + 10 + 13 +
 10 + 7 + 6 + 12 + 10 + 3 = **204 words** with "35" / "25" counted as two spoken words each
 (**202** as written). About 73 s of speech at ~2.8 words/s, **~83 s** with line gaps, stamps and
-the outro hold. If the TTS render runs over 85 s, trim scene holds first, then cut scene 2 (scene
+the outro hold. *(added 2026-10-21: story)* Rows S1-S3 add 15 + 14 + 6 = **35 words** (10.6 s
+of speech): **239 words** total (**237** as written), rendered length **96.4 s**. If the TTS render runs over 85 s, trim scene holds first, then cut scene 2 (scene
 1's note already shows the text). Do not cut scene 19 (the hedge) or scenes 9-11 (what makes the
 subject different).
 

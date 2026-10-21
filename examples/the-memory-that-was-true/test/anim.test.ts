@@ -7,6 +7,7 @@ import * as quote from '../src/anim/KeyQuote.state.ts';
 import * as grid from '../src/anim/StatGrid.state.ts';
 import * as pinned from '../src/anim/PinnedNote.state.ts';
 import * as wall from '../src/anim/MemoryWall.state.ts';
+import * as story from '../src/anim/MemoryStory.state.ts';
 import { CHECKED, COUNT, KINDS, OLD_ROWS, QUEUE_ROW, REDS, STALE_GREEN } from '../src/anim/memory.ts';
 
 // Fields that are animation progress and must stay within [0, 1].
@@ -64,6 +65,7 @@ const CASES: Case[] = [
     name: `MemoryWall ${mode}`,
     state: (t: number, b: number[], d: number) => wall.frameState({ mode }, t, b, d),
   })),
+  { name: 'MemoryStory', state: (t, b, d) => story.frameState({}, t, b, d) },
 ];
 
 const SCENARIOS = [
@@ -269,4 +271,20 @@ test('MemoryWall reds and green: the cards land and finish their steps', () => {
   assert.equal(g.green.open, 1);
   assert.deepEqual(g.green.lines, [1, 1, 1, 1, 1, 1, 1]);
   assert.equal(g.green.words, wall.QUOTE_WORDS.length);
+});
+
+test('MemoryStory: nothing before the first beat; session, note pulled, cursor stopped short by the end', () => {
+  const beats = [1, 4, 7];
+  const before = story.frameState({}, 0.5, beats, 9);
+  assert.equal(before.session.appear, 0);
+  assert.equal(before.stack.appear, 0);
+  assert.equal(before.pull.opacity, 0);
+  assert.equal(before.act.appear, 0);
+  // The scheduling note only comes out after the article asks, during the second line.
+  const mid = story.frameState({}, 4.2, beats, 9);
+  assert.equal(mid.article.appear > 0, true);
+  assert.equal(mid.pull.draw, 0);
+  const end = story.frameState({}, 9, beats, 9);
+  for (const v of [end.session.appear, end.session.typed, end.session.ends, end.stack.fly, end.article.ask, end.pull.draw, end.pull.underline, end.act.travel, end.act.almost])
+    assert.equal(v, 1);
 });

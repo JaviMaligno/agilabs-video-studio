@@ -9,6 +9,7 @@ import * as board from '../src/anim/PlanBoard.state.ts';
 import * as scope from '../src/anim/ScopeArrow.state.ts';
 import * as rule from '../src/anim/ExpiredRule.state.ts';
 import * as card from '../src/anim/QuestionCard.state.ts';
+import * as ctx from '../src/anim/CourseContext.state.ts';
 
 // Fields that are animation progress and must stay within [0, 1].
 const PROGRESS = new Set(['progress', 'appear', 'grow', 'fill', 'draw', 'pop', 'opacity', 'emphasis']);
@@ -68,6 +69,10 @@ const CASES: Case[] = [
   ...(['rule', 'expired', 'bars'] as const).flatMap((mode) => [
     { name: `ExpiredRule ${mode}`, state: (t: number, b: number[], d: number) => rule.frameState({ mode, marks: [0.9, 2.2] }, t, b, d) },
     { name: `ExpiredRule ${mode} (no marks)`, state: (t: number, b: number[], d: number) => rule.frameState({ mode }, t, b, d) },
+  ]),
+  ...(['course', 'advice', 'status'] as const).flatMap((mode) => [
+    { name: `CourseContext ${mode}`, state: (t: number, b: number[], d: number) => ctx.frameState({ mode, marks: [0.9, 2.2, 3.1, 4] }, t, b, d) },
+    { name: `CourseContext ${mode} (no marks)`, state: (t: number, b: number[], d: number) => ctx.frameState({ mode }, t, b, d) },
   ]),
 ];
 
@@ -248,6 +253,19 @@ test('PlanBoard: condition tabs add their strips (A none, B date, C rehearsals, 
   assert.equal(board.frameState({ mode: 'release', marks: [1, 1.5] }, 6, [0.3], 6).sheet.counter, 572);
 });
 
+test('PlanBoard: the release sheet maps each course fact to its release counterpart from "rebuilt"', () => {
+  const at = (t: number) => board.frameState({ mode: 'release', marks: [1.8, 2.7, 3.2, 4.5] }, t, [0.3], 6.4).sheet;
+  assert.equal(at(0.3).domain, 'course');
+  assert.equal(at(2.2).domain, 'release');
+  assert.deepEqual(at(2.2).lines, [1, 1, 1]);
+  assert.deepEqual(at(2.2).mapped, [0, 0, 0]);
+  assert.deepEqual(at(4).mapped, [1, 1, 1]);
+  assert.equal(at(3.5).same, 0);
+  assert.equal(at(4.5).same, 1);
+  assert.equal(at(4.2).counterOpacity, 0);
+  assert.equal(at(6.4).counter, 572);
+});
+
 test('ScopeArrow: the arrow snaps on "No dependency"; five rows solid, Opus faint', () => {
   const pre = scope.frameState({ mode: 'exempt', marks: [1, 2.5] }, 2.4, [0.1, 2.5], 4);
   assert.equal(pre.dotted.split, 0);
@@ -272,4 +290,31 @@ test('ExpiredRule: the intro ends last and stays; bars are the article figures',
 test('QuestionCard: "Kicker · main" splits; plain questions do not', () => {
   assert.deepEqual(card.splitQ('Failure 1 · a dependency the page denies'), { kicker: 'Failure 1', main: 'a dependency the page denies' });
   assert.deepEqual(card.splitQ('Does the date fix it?'), { kicker: '', main: 'Does the date fix it?' });
+});
+
+test('CourseContext: each mode starts where the previous one ended, so the blends do not jump', () => {
+  const end = (mode: ctx.ContextMode) => ctx.frameState({ mode, marks: [1, 2, 3, 4] }, 6, [0.3], 6);
+  const start = (mode: ctx.ContextMode) => ctx.frameState({ mode, marks: [1, 2, 3, 4] }, 0, [0.3], 6);
+  // course -> advice: the whole course picture is still there at the start of `advice`.
+  assert.deepEqual(start('advice').course, end('course').course);
+  assert.equal(start('advice').header.opacity, end('course').header.opacity);
+  assert.equal(start('advice').agents.bubbles[0], 0);
+  // advice -> status: header and both dimmed bubbles with their stamp, as `advice` ended.
+  assert.deepEqual(start('status').agents, end('advice').agents);
+  assert.equal(start('status').header.opacity, end('advice').header.opacity);
+  assert.equal(start('status').course.opacity, end('advice').course.opacity);
+  assert.equal(start('status').status.card, 0);
+});
+
+test('CourseContext: 68 tiles count up on "sixty"; studio days on "four"; the stamp lands on "nothing"', () => {
+  const at = (t: number) => ctx.frameState({ mode: 'course', marks: [1, 2, 3, 4] }, t, [0.3], 6).course;
+  assert.equal(at(1.85).count, 0);
+  assert.equal(at(6).count, 68);
+  assert.ok(at(2.95).studio.every((x) => x === 0));
+  assert.deepEqual(at(6).studio, [1, 1, 1, 1]);
+  const st = (t: number) => ctx.frameState({ mode: 'status', marks: [0.8, 2, 3] }, t, [0.2], 5).status;
+  assert.equal(st(2.95).stamp, 0);
+  assert.equal(st(5).stamp, 1);
+  assert.equal(st(5).highlight, 1);
+  assert.deepEqual(ctx.STATUS_ROWS.map((r) => r.value), ['2', '3', '63']);
 });

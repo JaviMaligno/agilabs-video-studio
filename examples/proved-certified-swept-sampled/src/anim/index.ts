@@ -11,6 +11,7 @@ import { CoverageTiles } from './CoverageTiles.tsx';
 import { ToleranceBand } from './ToleranceBand.tsx';
 import { LabelRange } from './LabelRange.tsx';
 import { VersionLadder } from './VersionLadder.tsx';
+import { StoryPaper } from './StoryPaper.tsx';
 
 export type { AnimProps };
 
@@ -25,4 +26,5 @@ export const ANIMS: Record<string, React.FC<AnimProps & any>> = {
   ToleranceBand,
   LabelRange,
   VersionLadder,
+  StoryPaper,
 };

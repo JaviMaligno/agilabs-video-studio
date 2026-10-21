@@ -4,7 +4,7 @@ import { C, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
 import { gradientText } from './Stage.tsx';
-import { COURSE_LINES, G, MODELS, RELEASE_LINES, STRIPS, frameState, type BandLine, type CardState, type PlanBoardProps, type PlanState } from './PlanBoard.state.ts';
+import { COURSE_LINES, G, MODELS, RELEASE_PAIRS, STRIPS, frameState, type BandLine, type CardState, type PlanBoardProps, type PlanState } from './PlanBoard.state.ts';
 import { Lock } from './pieces.tsx';
 
 export { frameState };
@@ -167,7 +167,6 @@ const Band: React.FC<{ s: PlanState }> = ({ s }) => {
 const Sheet: React.FC<{ s: PlanState['sheet'] }> = ({ s }) => {
   if (s.opacity <= 0) return null;
   const release = s.domain === 'release';
-  const lines = release ? RELEASE_LINES : COURSE_LINES;
   const top = 400;
   return (
     <>
@@ -188,13 +187,28 @@ const Sheet: React.FC<{ s: PlanState['sheet'] }> = ({ s }) => {
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontSize: 30, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted }}>{release ? 'the material · release' : 'the material · course'}</div>
+          <div style={{ fontSize: 30, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted }}>{release ? 'the same test · course → release' : 'the material · course'}</div>
           {!release && (
             <div style={{ fontSize: 32, fontWeight: 800, color: C.bg0, background: C.accentText, borderRadius: 12, padding: '4px 16px', opacity: s.kb, transform: `scale(${1.5 - 0.5 * s.kb})` }}>~1.7 KB</div>
           )}
         </div>
-        <div style={{ marginTop: 18 }}>
-          {lines.map((l, i) => (
+        {release && (
+          // Scene 6: each course fact and the release fact that plays its part, so the parallel is seen.
+          <div style={{ marginTop: 18, display: 'grid', gridTemplateColumns: 'auto 50px auto', justifyContent: 'start', alignItems: 'center', rowGap: 4, columnGap: 10 }}>
+            <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.muted }}>course</div>
+            <div />
+            <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.accentText, opacity: s.mapped[0] ?? 0 }}>release</div>
+            {RELEASE_PAIRS.map(([course, rel], i) => (
+              <React.Fragment key={rel}>
+                <div style={{ fontSize: 30, fontWeight: 700, lineHeight: '62px', color: C.muted, whiteSpace: 'nowrap', opacity: s.lines[i] ?? 1, transform: `translateX(${(1 - (s.lines[i] ?? 1)) * 40}px)` }}>{course}</div>
+                <div style={{ fontSize: 40, fontWeight: 800, color: C.accentText, textAlign: 'center', opacity: s.mapped[i] ?? 0 }}>→</div>
+                <div style={{ fontSize: 32, fontWeight: 800, lineHeight: '62px', color: C.text, whiteSpace: 'nowrap', opacity: s.mapped[i] ?? 0, transform: `translateX(${(1 - (s.mapped[i] ?? 0)) * -30}px)` }}>{rel}</div>
+              </React.Fragment>
+            ))}
+          </div>
+        )}
+        <div style={{ marginTop: release ? 0 : 18 }}>
+          {(release ? [] : COURSE_LINES).map((l, i) => (
             <div
               key={l}
               style={{

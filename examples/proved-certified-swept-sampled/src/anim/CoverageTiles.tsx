@@ -145,8 +145,8 @@ const TileView: React.FC<{ tile: Tile; i: number; big: boolean }> = ({ tile, i, 
             height: cardH,
             borderRadius: 18,
             background: `linear-gradient(180deg, ${C.card}, ${C.bg1})`,
-            border: `2px solid ${alpha('#ffffff', 0.14)}`,
-            boxShadow: `0 ${10 + 18 * (1 - tile.cover)}px 30px ${alpha('#000000', 0.55)}`,
+            border: `2px solid ${tile.card.lit > 0 ? alpha(C.accentText, 0.14 + 0.36 * tile.card.lit) : alpha('#ffffff', 0.14)}`,
+            boxShadow: `0 ${10 + 18 * (1 - tile.cover)}px 30px ${alpha('#000000', 0.55)}${tile.card.pulse > 0 ? `, 0 0 ${34 * tile.card.pulse}px ${alpha(C.accent, 0.45 * tile.card.pulse)}` : ''}`,
             transform: `translateY(${-140 * tile.away}px)`,
             opacity: 1 - tile.away,
             display: 'flex',
@@ -160,7 +160,9 @@ const TileView: React.FC<{ tile: Tile; i: number; big: boolean }> = ({ tile, i, 
           {tile.card.software > 0 ? (
             <div style={{ fontSize: 27, fontWeight: 700, lineHeight: 1.16, color: C.text }}>{tile.card.swText}</div>
           ) : (
-            <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: sentenceSize, lineHeight: 1.22, color: C.text }}>{tile.card.text}</div>
+            <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: sentenceSize, lineHeight: 1.22, color: C.text, transform: tile.card.pulse > 0 ? `scale(${1 + 0.03 * tile.card.pulse}) rotate(${-0.6 * tile.card.pulse}deg)` : undefined, transformOrigin: 'left center' }}>
+              {tile.card.text}
+            </div>
           )}
         </div>
       )}
@@ -171,7 +173,7 @@ const TileView: React.FC<{ tile: Tile; i: number; big: boolean }> = ({ tile, i, 
             right: 12,
             top: 12 - 70 * tile.tick.lift + (big ? -140 * tile.away : 0),
             opacity: tile.tick.appear,
-            transform: `scale(${0.6 + 0.4 * Math.min(1, tile.tick.appear * 1.3)})`,
+            transform: `scale(${(0.6 + 0.4 * Math.min(1, tile.tick.appear * 1.3)) * (1 + 0.18 * tile.tick.pulse)})`,
           }}
         >
           <Tick size={64} />

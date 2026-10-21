@@ -10,6 +10,7 @@ import { StatGrid } from './StatGrid.tsx';
 import { DepthWell } from './DepthWell.tsx';
 import { QuestionCard } from './QuestionCard.tsx';
 import { WinRateMeter } from './WinRateMeter.tsx';
+import { StoryGate } from './StoryGate.tsx';
 
 export type { AnimProps };
 
@@ -23,4 +24,5 @@ export const ANIMS: Record<string, React.FC<AnimProps & any>> = {
   DepthWell,
   QuestionCard,
   WinRateMeter,
+  StoryGate,
 };

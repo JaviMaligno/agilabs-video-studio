@@ -79,7 +79,7 @@ const build = (): Cuts => ({
       'setup',
       'BridgeCrew',
       { mode: 'setup', marks: [[0, 'test'], [0, 'feature'], [0, 'merged'], [1, 'message']], card },
-      [say(0.1, 'The test: each agent builds one feature; then their code is merged.', ''), say(0, 'They can message each other the whole time.', '')],
+      [say(0.1, 'The test: each agent builds one feature; then their code is merged.', '', { en: 'The test. Each agent builds one feature; then their code is merged.' }), say(0, 'They can message each other the whole time.', '')],
       { tail: 1.1 },
     ),
     // 5. The reproduced drop, strong model.
@@ -103,7 +103,7 @@ const build = (): Cuts => ({
       'clash',
       'BridgeCrew',
       { mode: 'clash', marks: [[0, 'Most'], [0, 'merge'], [0, 'clashed']], card },
-      [say(0.1, 'Most failures came at the merge: their code clashed.', '')],
+      [say(0.1, 'Most failures came at the merge: their code clashed.', '', { en: 'Most failures came at the merge. Their code clashed.' })],
     ),
     // 7. The ladder of five structures.
     anim('ladder', 'BridgeCrew', { mode: 'ladder', marks: [[0, 'tried'], [0, 'structure']], card }, [say(0.1, 'Then I tried five kinds of structure.', '')]),
@@ -156,7 +156,7 @@ const build = (): Cuts => ({
         ladder: { done: DONE_9, glow: ['seq'], accent: ['seq', 'int'], add: [{ id: 'seq', mark: 'tick' }] },
         card,
       },
-      [say(0.1, "In sequence: the second agent builds on the first one's code.", '')],
+      [say(0.1, "In sequence: the second agent builds on the first one's code.", '', { en: 'In sequence. The second agent builds on the first one\'s code.' })],
       { tail: BLEND_TAIL },
     ),
     // 11b. Or an integrator.
@@ -212,7 +212,7 @@ const build = (): Cuts => ({
       'slice',
       'SliceGrid',
       { total: 652, lit: 19, stats: ['5 repos', '3 runs', '2 models'], marks: [[0, 'nineteen'], [0, 'three'], [0, 'slice']], card },
-      [say(0.1, "That's 19 task pairs, three runs each: a slice, not the whole benchmark.", '', { en: "That's nineteen task pairs, three runs each: a slice, not the whole benchmark." })],
+      [say(0.1, "That's 19 task pairs, three runs each: a slice, not the whole benchmark.", '', { en: 'That\'s nineteen task pairs, three runs each. A slice, not the whole benchmark.' })],
     ),
     // 14a. The verdict, stamped on the question card.
     anim(

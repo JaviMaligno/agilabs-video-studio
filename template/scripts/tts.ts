@@ -13,7 +13,7 @@ import { SETTINGS } from '../src/settings.ts';
 import { spokenText, type Lang, type Word } from '../src/types.ts';
 import config from '../video.config.mjs';
 import { at, secret, findFfmpeg, wavSeconds, CARTESIA, cartesiaHeaders } from './lib.mjs';
-import { chooseEngine, cartesiaUnavailable, postChain, lineHash } from './tts-engine.mjs';
+import { chooseEngine, cartesiaUnavailable, postChain, lineHash, colonsAsStops } from './tts-engine.mjs';
 
 type CartesiaVoice = { id: string; language?: string; post?: string };
 type KokoroVoice = { voice: string; lang: string; post?: string };
@@ -137,9 +137,13 @@ function kokoroBatch(jobs: { text: string; out: string }[], voice: KokoroVoice) 
   }
 }
 
+// What the TTS reads for each line. Colons are voiced as full stops unless the config opts out
+// (see colonsAsStops in tts-engine.mjs): only the audio changes, never the caption.
+const voiced = (text: string): string => (TTS.colonsAsStops === false ? text : colonsAsStops(text));
+
 const linesOf = (lang: Lang): Map<string, string> => {
   const lines = new Map<string, string>();
-  for (const cut of Object.values(VIDEOS[lang] ?? {})) for (const scene of cut) for (const l of scene.lines) lines.set(l.key, spokenText(l, lang));
+  for (const cut of Object.values(VIDEOS[lang] ?? {})) for (const scene of cut) for (const l of scene.lines) lines.set(l.key, voiced(spokenText(l, lang)));
   return lines;
 };
 

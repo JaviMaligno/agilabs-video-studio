@@ -76,14 +76,14 @@ test('sceneStarts overlaps scenes by the transition', () => {
 test('this video: settings and timeline shape', () => {
   assert.deepEqual(SETTINGS.voices, ['en']);
   assert.deepEqual(SETTINGS.subtitles, ['en']);
-  assert.equal(SETTINGS.targetSeconds, 82);
+  assert.equal(SETTINGS.targetSeconds, 100);
   assert.deepEqual(SETTINGS.music, { src: 'music/bed.wav', volume: 0.2, duck: 0.3 });
   assert.deepEqual(SETTINGS.poster, { scene: 'date', second: 4 });
   assert.equal(TIMELINE[0].kind, 'anim');
   assert.equal(TIMELINE.at(-1)?.kind, 'outro');
   assert.equal(VIDEOS.en.main, TIMELINE);
-  // At most 90 s.
-  assert.ok(sceneStarts(TIMELINE).total / FPS <= 90, `length ${sceneStarts(TIMELINE).total / FPS}`);
+  // At most 110 s (90 s before the context scenes were added after the hook, 2026-10-21).
+  assert.ok(sceneStarts(TIMELINE).total / FPS <= 110, `length ${sceneStarts(TIMELINE).total / FPS}`);
   // One question card per part, in order; none on the hook or the outro.
   const qs = TIMELINE.map((s) => (s.anim?.props.card as { q: string } | undefined)?.q ?? null);
   assert.deepEqual([...new Set(qs)], [null, 'Does the date fix it?', 'Failure 1 · a dependency the page denies', 'Failure 2 · a reason that expired', 'Failure 3 · what has happened', 'So, is it the clock?']);
@@ -92,10 +92,11 @@ test('this video: settings and timeline shape', () => {
     return st ? [st.text] : [];
   });
   assert.deepEqual(stamps, ['5 / 6', 'no help', 'no']);
-  // Only the script's spoken numbers: six, four/three (pieces), five of six, ninety-six percent.
+  // Only the script's spoken numbers: sixty-eight (videos), four (days), two (takes) in the context
+  // added 2026-10-21; then six, four/three (pieces), five of six, ninety-six percent.
   const spoken = TIMELINE.flatMap((s) => s.lines.map((l) => (l.spoken?.en ?? l.text.en).toLowerCase()));
   const numbers = spoken.join(' ').match(/\b(\d+|two|three|four|five|six|seven|eight|nine|ten|twenty|ninety-six|percent)\b/g) ?? [];
-  assert.deepEqual(numbers, ['six', 'four', 'three', 'five', 'six', 'four', 'three', 'ninety-six', 'percent']);
+  assert.deepEqual(numbers, ['eight', 'four', 'two', 'six', 'four', 'three', 'five', 'six', 'four', 'three', 'ninety-six', 'percent']);
   // No personal name anywhere on screen or in the voice.
   assert.ok(!/javier aguilar(?! dot)/i.test(JSON.stringify(TIMELINE.map((s) => [s.anim, s.lines.map((l) => l.text)]))));
 });

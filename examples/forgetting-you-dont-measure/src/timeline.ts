@@ -20,7 +20,7 @@ const build = (): Cuts => ({
       [say(0.25, 'I taught a small model one new skill. It quietly forgot some of what it knew.', '')],
       { min: 6.0 },
     ),
-    anim('skill', 'TerminalProbe', {}, [say(0.1, 'The skill: predicting what a terminal prints.', ''), say(0, 'A tiny world model.', '')]),
+    anim('skill', 'TerminalProbe', {}, [say(0.1, 'The skill: predicting what a terminal prints.', '', { en: 'The skill. Predicting what a terminal prints.' }), say(0, 'A tiny world model.', '')]),
     // Script cut 1 (render past 88 s): "the same way" dropped; "general text mixed in ✓" carries it.
     anim('paper', 'WeightWall', { mode: 'paper', askAt: 2.9 }, [say(0.1, 'A recent paper trains big ones, but never measures the forgetting.', '')], {
       // Holds "the forgetting." long enough to read.
@@ -28,7 +28,7 @@ const build = (): Cuts => ({
     }),
     anim('test', 'WeightWall', { mode: 'test' }, [say(0.1, 'So I did, at toy scale, on reasoning benchmarks.', '')]),
     // Held past the line so the dial can rest on 10 %, 25 % and 50 % and the lane show each share.
-    anim('knob', 'WeightWall', { mode: 'knob' }, [say(0.1, 'One knob: how much of each batch is general text.', '')], { min: 4.6 }),
+    anim('knob', 'WeightWall', { mode: 'knob' }, [say(0.1, 'One knob: how much of each batch is general text.', '', { en: 'One knob. How much of each batch is general text.' })], { min: 4.6 }),
     anim('zero', 'WeightWall', { mode: 'zero', secondAt: 7.15 }, [
       // One sentence voiced as two lines, so each caption is one clause.
       say(0.1, 'With none, it learned the terminal,', ''),

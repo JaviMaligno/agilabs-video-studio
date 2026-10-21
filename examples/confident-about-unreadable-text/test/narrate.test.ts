@@ -80,11 +80,12 @@ test('settings and timeline of this video', () => {
   assert.equal(SETTINGS.targetSeconds, 82);
   assert.deepEqual(SETTINGS.music, { src: 'music/bed.wav', volume: 0.2, duck: 0.3 });
   assert.equal(TIMELINE.at(-1)?.kind, 'outro');
-  const names = ['VerdictStamp', 'CipherCard', 'JudgeLens', 'TwoJudges', 'RefusalGate'];
+  const names = ['VerdictStamp', 'StoryBench', 'CipherCard', 'JudgeLens', 'TwoJudges', 'RefusalGate'];
   assert.ok(TIMELINE.filter((s) => s.kind === 'anim').every((s) => names.includes(s.anim?.name ?? '')));
   assert.ok(TIMELINE.some((s) => s.id === SETTINGS.poster?.scene));
-  // One line per script row (17) plus the outro.
-  assert.equal(TIMELINE.flatMap((s) => s.lines).length, 18);
+  // One line per script row (17, plus the 3 story rows added 2026-10-21, minus the judge's
+  // previous-post line removed 2026-10-21) plus the outro.
+  assert.equal(TIMELINE.flatMap((s) => s.lines).length, 20);
   assert.equal(VIDEOS.en.main, TIMELINE);
 });
 

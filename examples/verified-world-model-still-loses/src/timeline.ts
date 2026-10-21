@@ -23,6 +23,18 @@ const build = (): Cuts => ({
       ],
       { tail: 1.6 },
     ),
+    // added 2026-10-21: story — where this comes from, before anything technical.
+    anim(
+      'story',
+      'StoryGate',
+      {},
+      [
+        say(0.2, "I was reproducing a DeepMind result: AI writes a game's rules as code, a world model.", ''),
+        say(0, 'A planner trusts that code once it passes a check.', ''),
+        say(0, "But does passing the check mean it's right?", ''),
+      ],
+      { tail: 1.0 },
+    ),
     anim(
       'setup',
       'FlowDiagram',

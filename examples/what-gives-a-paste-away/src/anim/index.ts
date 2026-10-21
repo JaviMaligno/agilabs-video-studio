@@ -9,6 +9,7 @@ import { KeyQuote } from './KeyQuote.tsx';
 import { StatGrid } from './StatGrid.tsx';
 import { PieceInspector } from './PieceInspector.tsx';
 import { RepairFork } from './RepairFork.tsx';
+import { PasteStory } from './PasteStory.tsx';
 
 export type { AnimProps };
 
@@ -21,4 +22,5 @@ export const ANIMS: Record<string, React.FC<AnimProps & any>> = {
   StatGrid,
   PieceInspector,
   RepairFork,
+  PasteStory,
 };

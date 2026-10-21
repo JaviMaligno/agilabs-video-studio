@@ -24,9 +24,9 @@ const build = (): Cuts => ({
     ),
     // Case 1 (script 5-8): the word detector.
     anim('case1', 'WordNet', {}, [
-      say(0.1, "One detector looked for agents saying: wait, I'm in that file.", ''),
+      say(0.1, "One detector looked for agents saying: wait, I'm in that file.", '', { en: 'One detector looked for agents saying — wait, I\'m in that file.' }),
       say(0, 'It found 19, and only 5 closed. That fit my story.', '', { en: 'It found nineteen, and only five closed. That fit my story.' }),
-      say(0, 'Counted by hand: 3 real requests, all 3 closed.', '', { en: 'Counted by hand: three real requests, all three closed.' }),
+      say(0, 'Counted by hand: 3 real requests, all 3 closed.', '', { en: 'Counted by hand. Three real requests, all three closed.' }),
       say(0, 'It had counted every "wait", even just mentions.', ''),
     ]),
     // Case 2 (script 9-11): the inherited benchmark. Line 11 split so CONCLUSION HELD gets its beat.
@@ -46,7 +46,7 @@ const build = (): Cuts => ({
       // The component skips the continuation's beat (cont: [3]).
       say(0, 'The comparator had three flaws,', ''),
       say(0, 'and all three could only subtract.', ''),
-      say(0, 'Checked case by case: 75%, up to 85%.', '', { en: 'Checked case by case: seventy-five percent, up to eighty-five.' }),
+      say(0, 'Checked case by case: 75%, up to 85%.', '', { en: 'Checked case by case. Seventy-five percent, up to eighty-five.' }),
     ]),
     // Mechanism (script 16-20): direction, the conveyor, the verdict (held), the audit.
     anim('mechanism', 'StoppingRule', {}, [
