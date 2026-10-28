@@ -12,7 +12,7 @@ const build = (): Cuts => ({
     anim(
       'unroll',
       'HandoffShaft',
-      { mode: 'unroll', play: [10, 10] },
+      { mode: 'unroll', play: [10, 10], cameos: [{ pose: 'laptop', at: [0, 'passed'] }] },
       // Split at the comma: the cloned voice reads ~18 chars/s, so the first cue needs the pause to stay under 17.
       [say(0.3, "I passed a client's request down a team of agents,", ''), say(0.25, 'from the lead to whoever writes the code.', '')],
       // The closing cue needs a little more air than TAIL to stay under 17 chars/s.
@@ -41,7 +41,13 @@ const build = (): Cuts => ({
     anim(
       'shortcut',
       'HandoffShaft',
-      { mode: 'shortcut', play: [20, 20], counter: { value: 24, suffix: '%', label: L('reason kept · lead → implementer', ''), delay: 1.1 } },
+      {
+        mode: 'shortcut',
+        play: [20, 20],
+        counter: { value: 24, suffix: '%', label: L('reason kept · lead → implementer', ''), delay: 1.1 },
+        // The spoken token is "twenty-four" (the line is voiced in words).
+        cameos: [{ pose: 'amazed', at: [2, 'twenty-four'], dur: 1.7 }],
+      },
       [
         // Split at the comma (cloned voice ~18 chars/s): the pause keeps the first cue under 17 chars/s.
         say(0.2, 'Even the lead, writing that message itself,', ''),
@@ -62,7 +68,7 @@ const build = (): Cuts => ({
       },
       [say(0.2, 'Whoever writes to the builder writes instructions.', ''), say(0, "And instructions don't carry reasons.", '')],
     ),
-    anim('code', 'HandoffShaft', { mode: 'code', play: [3, 3] }, [say(0.2, 'Whether losing it hurts the code is less tidy than I expected.', '')]),
+    anim('code', 'HandoffShaft', { mode: 'code', play: [3, 3], cameos: [{ pose: 'laughing', at: [0, 'less'], dur: 1.4 }] }, [say(0.2, 'Whether losing it hurts the code is less tidy than I expected.', '')]),
     anim(
       'reattach',
       'HandoffShaft',

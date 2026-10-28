@@ -15,6 +15,8 @@ export type Settings = {
   poster: null | { scene: string; second: number };
   /** Title of the source article, shown in muted text on the outro card. */
   articleTitle: Label;
+  /** Optional author avatar (round, under public/), shown on the outro card. null = none. */
+  avatar?: null | string;
   /** Optional data credit, small and muted under the title on the outro card. */
   credit?: Label;
 };
@@ -27,4 +29,5 @@ export const SETTINGS: Settings = {
   targetSeconds: 54,
   poster: { scene: 'snip', second: 5.8 },
   articleTitle: { en: 'Nobody tells the implementer why', es: '' },
+  avatar: 'avatar/avatar-profile.png',
 };

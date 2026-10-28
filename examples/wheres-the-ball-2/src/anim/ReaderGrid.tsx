@@ -3,7 +3,7 @@ import { C, GRADIENT, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
 import { CHANCE, frameState, type GridProps } from './ReaderGrid.state.ts';
-import { Tick } from './pitchParts.tsx';
+import { Bot, Tick } from './pitchParts.tsx';
 import { gradientText, stageOf } from './Stage.tsx';
 
 export { frameState };
@@ -196,9 +196,16 @@ export const ReaderGrid: React.FC<AnimProps & GridProps> = (p) => {
                         fontWeight: 700,
                         color: r === 0 ? C.text : C.muted,
                         whiteSpace: 'nowrap',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        paddingLeft: 6,
                       }}
                     >
-                      {c.chip}
+                      {c.bots.map((b) => (
+                        <Bot key={b} colour={b} size={44} style={{ margin: '-6px 0' }} />
+                      ))}
+                      <span style={{ marginLeft: 4 }}>{c.chip}</span>
                     </div>
                     {c.check > 0 && (
                       <div

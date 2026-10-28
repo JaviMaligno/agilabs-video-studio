@@ -15,6 +15,8 @@ export type Settings = {
   poster: null | { scene: string; second: number };
   /** Title of the source article, shown in muted text on the outro card. */
   articleTitle: Label;
+  /** Optional author avatar (round, under public/), shown on the outro card. null = none. */
+  avatar?: null | string;
   /** Optional data credit, small and muted under the title on the outro card. */
   credit?: Label;
 };
@@ -29,4 +31,5 @@ export const SETTINGS: Settings = {
   poster: { scene: 'verdict', second: 6.3 },
   articleTitle: { en: "Where's the Ball? · Part 2", es: '¿Dónde está el balón? · Parte 2' },
   credit: { en: 'Tracking: Metrica · SkillCorner · NBA SportVU', es: 'Tracking: Metrica · SkillCorner · NBA SportVU' },
+  avatar: 'avatar/avatar-profile.png',
 };

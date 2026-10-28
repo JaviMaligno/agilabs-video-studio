@@ -153,7 +153,7 @@ export const StoryPitch: React.FC<AnimProps & StoryProps> = (p) => {
         )}
 
         {s.guesses.map((g, i) => (
-          <GuessMarker key={g.label} x={px(g.x)} y={py(g.y)} label={g.label} opacity={g.opacity} labelSide={i === 0 ? 'left' : 'right'} size={64} />
+          <GuessMarker key={g.label} x={px(g.x)} y={py(g.y)} label={g.label} bot={g.bot} opacity={g.opacity} labelSide={i === 0 ? 'left' : 'right'} size={64} />
         ))}
 
         <QMark x={px(s.question.x)} y={py(s.question.y)} size={Q_SIZE * scale} pulse={s.question.pulse} opacity={s.question.opacity} />

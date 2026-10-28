@@ -16,14 +16,14 @@ export type GridProps = {
 };
 
 /** One cell: row 0 = trained, row 1 = frontier; col 0 = TV pixels, col 1 = player tracks. */
-export type CellDef = { row: 0 | 1; col: 0 | 1; chip: string; value: number; display: string; mode: GridMode; cue: string };
+export type CellDef = { row: 0 | 1; col: 0 | 1; chip: string; bots: ('teal' | 'sky' | 'amber' | 'violet')[]; value: number; display: string; mode: GridMode; cue: string };
 
 /** The article's figures: "82% from the tracks, 74% from the pixels", "53% on pixels", "35–38%". */
 export const CELLS: CellDef[] = [
-  { row: 0, col: 0, chip: 'small vision net', value: 74, display: '74%', mode: 'trained', cue: 'pixels' },
-  { row: 0, col: 1, chip: '60 kB net', value: 82, display: '82%', mode: 'trained', cue: 'tracks' },
-  { row: 1, col: 0, chip: 'GPT · Opus', value: 53, display: '53%', mode: 'frontier', cue: 'pixels' },
-  { row: 1, col: 1, chip: 'GPT · Opus · as text', value: 36.5, display: '35–38%', mode: 'astext', cue: 'tracks' },
+  { row: 0, col: 0, chip: 'small vision net', bots: ['sky'], value: 74, display: '74%', mode: 'trained', cue: 'pixels' },
+  { row: 0, col: 1, chip: '60 kB net', bots: ['teal'], value: 82, display: '82%', mode: 'trained', cue: 'tracks' },
+  { row: 1, col: 0, chip: 'GPT · Opus', bots: ['amber', 'violet'], value: 53, display: '53%', mode: 'frontier', cue: 'pixels' },
+  { row: 1, col: 1, chip: 'GPT · Opus · as text', bots: ['amber', 'violet'], value: 36.5, display: '35–38%', mode: 'astext', cue: 'tracks' },
 ];
 
 export const FILL_SECONDS = 0.9;
@@ -80,6 +80,7 @@ export function frameState(p: GridProps, time: number, beats: number[], dur: num
       row: c.row,
       col: c.col,
       chip: c.chip,
+      bots: c.bots,
       outline: rows[c.row],
       icon: headers[c.col],
       meter: meters[i],

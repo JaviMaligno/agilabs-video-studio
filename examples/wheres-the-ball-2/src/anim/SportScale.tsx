@@ -3,7 +3,7 @@ import { C, GRADIENT, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
 import { COURT_M, PITCH_M, frameState, type SportProps } from './SportScale.state.ts';
-import { Cross, Markings, Tick } from './pitchParts.tsx';
+import { Bot, Cross, Markings, Tick } from './pitchParts.tsx';
 import { gradientText, stageOf } from './Stage.tsx';
 
 export { frameState };
@@ -189,6 +189,7 @@ export const SportScale: React.FC<AnimProps & SportProps> = (p) => {
             whiteSpace: 'nowrap',
           }}
         >
+          <Bot colour="teal" size={64} style={{ margin: '-14px 0 -14px -12px' }} />
           same 60 kB net
         </div>
       )}

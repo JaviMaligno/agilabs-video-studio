@@ -1,5 +1,5 @@
 import React from 'react';
-import { interpolate } from 'remotion';
+import { Img, interpolate, staticFile } from 'remotion';
 import { C, GRADIENT, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import { tx } from '../types.ts';
@@ -24,6 +24,8 @@ export { frameState };
 export type { ShaftProps };
 
 const ROLES = ['Lead', 'PM', 'Architect', 'Implementer'];
+/** Each desk's agent, drawn (public/cast/role-*.png) inside its node; the role name stays as the label. */
+const ROLE_IMG = ['lead', 'pm', 'architect', 'implementer'].map((r) => staticFile(`cast/role-${r}.png`));
 const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
 
@@ -146,9 +148,10 @@ const Node: React.FC<{ x: number; y: number; r: number; i: number; opacity?: num
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        overflow: 'hidden',
       }}
     >
-      <div style={{ width: r * 0.42, height: r * 0.42, borderRadius: r, background: col }} />
+      <Img src={ROLE_IMG[i]} style={{ width: '112%', height: '112%', objectFit: 'contain', flexShrink: 0 }} />
     </div>
   );
 };

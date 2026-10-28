@@ -14,7 +14,7 @@ const build = (): Cuts => {
   const part1 = anim(
     'part1',
     'StoryPitch',
-    { mode: 'part1', play: [0, 4.0] },
+    { mode: 'part1', play: [0, 4.0], cameos: [{ pose: 'laptop', at: [0, 'erased'] }] },
     [say(0.3, 'In part one, I erased the ball from football footage and kept the players.', '')],
     // Holds the long closing cue long enough to read (17 chars/s).
     { min: 5.6 },
@@ -64,7 +64,7 @@ const build = (): Cuts => {
   );
   withCues(trained, { tracks: wordAt(trained, 1, '82'), pixels: wordAt(trained, 1, '74') });
 
-  const frontier = anim('frontier', 'ReaderGrid', { mode: 'frontier', blend: true }, [say(0.15, "Frontier AI didn't.", ''), say(0, '53% on pixels, a coin flip.', '', { en: 'Fifty-three percent on pixels, a coin flip.' })]);
+  const frontier = anim('frontier', 'ReaderGrid', { mode: 'frontier', blend: true, cameos: [{ pose: 'sceptical', at: [1, 'coin'], dur: 1.3 }] }, [say(0.15, "Frontier AI didn't.", ''), say(0, '53% on pixels, a coin flip.', '', { en: 'Fifty-three percent on pixels, a coin flip.' })]);
   withCues(frontier, { pixels: wordAt(frontier, 1, 'fifty'), coin: wordAt(frontier, 1, 'coin') });
 
   const astext = anim(
@@ -121,7 +121,7 @@ const build = (): Cuts => {
     ],
   );
   withCues(flip, { screen: wordAt(flip, 0, 'minus'), pitch: wordAt(flip, 1, 'plus') });
-  const sign = anim('sign', 'CameraFlip', { mode: 'sign', blend: true }, [say(0.15, 'The camera flips the sign.', '')], { min: 3.6 });
+  const sign = anim('sign', 'CameraFlip', { mode: 'sign', blend: true, cameos: [{ pose: 'amazed', at: [0, 'flips'], dur: 2.0 }] }, [say(0.15, 'The camera flips the sign.', '')], { min: 3.6 });
 
   // ── Two sports.
   const basketball = anim('basketball', 'SportScale', { mode: 'sports' }, [say(0.3, 'Then I trained the same net on basketball.', '')], { min: 3.9 });

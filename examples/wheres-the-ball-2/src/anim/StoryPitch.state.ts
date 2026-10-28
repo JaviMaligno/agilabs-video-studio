@@ -25,8 +25,8 @@ export const FRAME_CENTRE = { x: FRAME.x + FRAME.w / 2, y: FRAME.y + FRAME.h / 2
 
 /** Frontier AI guesses: where part 1 dropped them, and where they settle (either side of the centre). */
 export const GUESSES = [
-  { label: 'GPT', from: { x: 66, y: 41 }, to: { x: FRAME_CENTRE.x - 3.4, y: FRAME_CENTRE.y + 0.4 } },
-  { label: 'Opus', from: { x: 73, y: 27 }, to: { x: FRAME_CENTRE.x + 3.4, y: FRAME_CENTRE.y - 0.4 } },
+  { label: 'GPT', bot: 'amber', from: { x: 66, y: 41 }, to: { x: FRAME_CENTRE.x - 3.4, y: FRAME_CENTRE.y + 0.4 } },
+  { label: 'Opus', bot: 'violet', from: { x: 73, y: 27 }, to: { x: FRAME_CENTRE.x + 3.4, y: FRAME_CENTRE.y - 0.4 } },
 ] as const;
 
 /** Where the big "?" of the doubt scene sits: the middle of the visible pitch. */
@@ -100,7 +100,7 @@ export function frameState(p: StoryProps, time: number, beats: number[], dur: nu
       appear = fadeOut;
       drift = 1;
     }
-    return { label: g.label, x: lerp(g.from.x, g.to.x, drift), y: lerp(g.from.y, g.to.y, drift), opacity: appear };
+    return { label: g.label, bot: g.bot, x: lerp(g.from.x, g.to.x, drift), y: lerp(g.from.y, g.to.y, drift), opacity: appear };
   });
 
   // The real ball, flashed in at the frame's edge once the guesses have settled.

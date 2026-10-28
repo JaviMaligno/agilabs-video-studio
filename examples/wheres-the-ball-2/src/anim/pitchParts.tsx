@@ -1,6 +1,7 @@
 // Drawing pieces shared by the pitch scenes (from part 1): markings, the pulsing "?", the frontier
 // AI crosshair markers, a scene chip, a tick. Brand tokens only.
 import React from 'react';
+import { Img, staticFile } from 'remotion';
 import { C, GRADIENT, alpha } from '../brand.ts';
 import { gradientText } from './Stage.tsx';
 
@@ -57,11 +58,20 @@ export const QMark: React.FC<{ x: number; y: number; size: number; pulse: number
     </div>
   ) : null;
 
-/** A frontier AI guess: grey crosshair with its name above (part 1's marker). */
-export const GuessMarker: React.FC<{ x: number; y: number; label: string; opacity: number; size?: number; labelSide?: 'up' | 'left' | 'right' }> = ({
+/** Robot colours of the shared cast (public/cast/robots/robot-<colour>.png): one per model. */
+export type BotColour = 'teal' | 'sky' | 'amber' | 'violet';
+
+/** A model drawn as a small robot (the shared cast), sized in px; inline, for chips and labels. */
+export const Bot: React.FC<{ colour: BotColour; size: number; style?: React.CSSProperties }> = ({ colour, size, style }) => (
+  <Img src={staticFile(`cast/robots/robot-${colour}.png`)} style={{ width: size, height: size, objectFit: 'contain', flexShrink: 0, ...style }} />
+);
+
+/** A frontier AI guess: grey crosshair with its name above (part 1's marker), and its robot if given. */
+export const GuessMarker: React.FC<{ x: number; y: number; label: string; opacity: number; size?: number; labelSide?: 'up' | 'left' | 'right'; bot?: BotColour }> = ({
   x,
   y,
   label,
+  bot,
   opacity,
   size = 72,
   labelSide = 'up',
@@ -84,8 +94,10 @@ export const GuessMarker: React.FC<{ x: number; y: number; label: string; opacit
           fontWeight: 700,
           color: C.muted,
           whiteSpace: 'nowrap',
+          ...(bot ? { display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 6 } : {}),
         }}
       >
+        {bot && <Bot colour={bot} size={52} />}
         {label}
       </div>
       <svg width={size} height={size} viewBox="-36 -36 72 72">
