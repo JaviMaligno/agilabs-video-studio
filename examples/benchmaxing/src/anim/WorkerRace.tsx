@@ -43,10 +43,11 @@ export const WorkerRace: React.FC<AnimProps & WorkerRaceProps> = (p) => {
         <div style={{ fontSize: 42, fontWeight: 800, marginTop: 4 }}>{RACE_TXT.rule}</div>
       </div>
 
-      {/* what both models proposed */}
+      {/* what most models proposed */}
       <div style={{ position: 'absolute', left: 70, width: 940, top: 420, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, opacity: s.prop, transform: `translateY(${(1 - s.prop) * 20}px)` }}>
-        <Chip text={RACE_TXT.models[0]} size={30} />
-        <Chip text={RACE_TXT.models[1]} size={30} />
+        {RACE_TXT.models.map((m) => (
+          <Chip key={m} text={m} size={30} />
+        ))}
         <div style={{ fontSize: 44, fontWeight: 800, color: C.muted }}>→</div>
         <div style={{ opacity: clamp01(s.clock * 1.5), transform: `scale(${1.5 - 0.5 * s.clock})` }}>
           <Clock size={64} color={C.accentText} turn={0.2} />

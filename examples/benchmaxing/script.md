@@ -1,5 +1,7 @@
 # Benchmaxing: Winning the Exam Is Not Doing Better Work — article video (EN) · script v1.1
 
+**v1.2 (2026-10-28, Javier's request):** the pilot block (20-26) now shows all seven models together, after the article's October update: scene 20 "Seven models, five cases each" with `PilotGrid` as 7 models x 4 cases; scene 22 "Most relied on a time check" (chip "most models"); new scene 25b after the race fills the worker column (runs that kept the rule, of 8: Opus 0, Fable 0, Kimi 7, Gemini 6, DeepSeek 2, Qwen 2, GLM 1) and lights Kimi/Gemini, then Opus/Fable; scene 25 "almost all tied" fills D1/D3/D4 (D1 complete only for Gemini; D4 partial for DeepSeek and Qwen). The rows below 20-26 keep the v1.1 text for history.
+
 **v1.1 (2026-10-22, Javier's review):** the ending is open, centred on the concept and the doubt.
 Line 26 replaced (no verdict stamps), line 27 deleted, closing question 30a added. Rendered 139 s.
 

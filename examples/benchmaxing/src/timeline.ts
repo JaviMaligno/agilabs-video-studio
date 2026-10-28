@@ -3,8 +3,9 @@
 // Structure (scene numbers from the script):
 // - ExamBridge (1-19, 28-29, the open close): the exam and the job, and the bridge between them;
 //   one mode per scene, each starting where the previous one ended, so consecutive scenes blend;
-// - PilotGrid (20, 25, 26): the article's first figure, closed as one small probe;
-// - WorkerRace (21-24): the article's second figure, the race that breaks both proposals.
+// - PilotGrid (20, 25, 25b, 26): the article's first figure on all seven models (October update),
+//   closed as one small probe;
+// - WorkerRace (21-24): the article's second figure, the race that breaks most proposals.
 // Marks are [line, word]: resolved to scene seconds from the TTS word timestamps (marks.ts).
 import type { Cuts, Scene } from './types.ts';
 import { anim, outro, say, videos, voice } from './narrate.ts';
@@ -86,10 +87,11 @@ const build = (): Cuts => ({
       [say(0.5, "I feel the gap when managing other agents, and its announced benchmarks don't measure that.", '')],
       { tail: 3.0 },
     ),
-    // 20-25. The pilot: five cases, the rule, the race, the ties.
-    anim('pilot', 'PilotGrid', { mode: 'empty', marks: [[0, 'pilot'], [1, 'five']] }, [say(0.4, 'So I ran a small pilot.', ''), say(0, 'Five cases per model.', '')], { tail: 2.0 }),
+    // 20-26. The pilot on seven models (the article plus its October update): five cases, the
+    // rule, the race, who kept the rule, the near-tie, and one small probe.
+    anim('pilot', 'PilotGrid', { mode: 'empty', marks: [[0, 'pilot'], [1, 'seven']] }, [say(0.4, 'So I ran a small pilot.', ''), say(0, 'Seven models, five cases each.', '')], { tail: 2.0 }),
     anim('rule', 'WorkerRace', { mode: 'rule', marks: [[0, 'rule'], [1, 'never']] }, [say(0.4, 'Two cases had one rule.', ''), say(0, 'Never send the same thing twice.', '')], { tail: BLEND }),
-    anim('proposal', 'WorkerRace', { mode: 'proposal', marks: [[0, 'both'], [0, 'time']] }, [say(0.2, 'Both relied on a time check before retrying.', '')], { tail: 1.0 }),
+    anim('proposal', 'WorkerRace', { mode: 'proposal', marks: [[0, 'most'], [0, 'time']] }, [say(0.2, 'Most relied on a time check before retrying.', '')], { tail: 1.0 }),
     anim('stop1', 'WorkerRace', { mode: 'stop1', marks: [[0, 'check'], [0, 'pause']] }, [say(0.2, 'But a worker can check, then pause.', '')], { tail: BLEND }),
     anim(
       'stops',
@@ -98,8 +100,14 @@ const build = (): Cuts => ({
       [say(0.2, 'Another sends, the provider forgets, and the first sends again.', '')],
       { tail: 2.0 },
     ),
-    anim('tied', 'PilotGrid', { mode: 'filled', marks: [[0, 'permissions'], [0, 'data'], [0, 'tied']] }, [say(0.5, 'On permissions and data analysis, they tied.', '')], { tail: 1.4 }),
-    // 26. The pilot, reported as what it was: one small probe.
+    anim(
+      'workers',
+      'PilotGrid',
+      { mode: 'workers', marks: [[0, 'kimi'], [0, 'gemini'], [1, 'opus'], [1, 'fable']] },
+      [say(0.5, 'Kimi and Gemini kept the rule most of the time.', ''), say(0, 'Opus and Fable never did.', '')],
+      { tail: 1.6 },
+    ),
+    anim('tied', 'PilotGrid', { mode: 'filled', marks: [[0, 'permissions'], [0, 'data'], [0, 'tied']] }, [say(0.5, 'On permissions and data analysis, almost all tied.', '')], { tail: 1.4 }),
     anim('probe', 'PilotGrid', { mode: 'probe', marks: [[0, 'probe']] }, [say(0.2, 'Five cases are a probe, not an answer.', '')], { tail: 1.4 }),
     // 28-29 and the close: the literature, the transfer, and the question left open.
     bridge('lit', 'lit', [[0, 'research'], [0, 'reasons']], [say(0.3, 'The research gives good reasons to take it seriously.', '')], { tail: 1.1 }),

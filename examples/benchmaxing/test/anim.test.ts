@@ -303,27 +303,33 @@ test('ExamBridge: numbers and labels on screen are the article\'s', () => {
   assert.equal(eb.frameState({ mode: 'p2fan', marks: [0.5, 1, 2] }, 5, [0.2], 5).fan, 1);
 });
 
-test('PilotGrid: the article\'s figure, filled only in the second scene, then one small probe', () => {
+test('PilotGrid: seven models x four cases, the worker column after the race, then a probe', () => {
   assert.deepEqual(
-    pg.ROWS.map((r) => [r.label, r.code, ...r.cells]),
+    pg.ROWS.map((r) => [r.model, ...r.cells.map((c) => c.text)]),
     [
-      ['Double charge', 'D1', 'Incomplete', 'Incomplete'],
-      ['Paused workers', 'D2/D2b', 'Guarantee fails', 'Guarantee fails'],
-      ['Permissions', 'D3', 'Covered', 'Covered'],
-      ['Mix and cost', 'D4', 'Covered', 'Covered'],
+      ['Opus 5', 'gaps', '0/8', '✓', '✓'],
+      ['Fable 5', 'gaps', '0/8', '✓', '✓'],
+      ['Kimi K3.1 Pro', 'gaps', '7/8', '✓', '✓'],
+      ['Gemini 4 Argon', '✓', '6/8', '✓', '✓'],
+      ['DeepSeek V4 Pro', 'gaps', '2/8', '✓', 'partial'],
+      ['Qwen3.8', 'gaps', '2/8', '✓', 'partial'],
+      ['GLM 5.3', 'gaps', '1/8', '✓', '✓'],
     ],
   );
+  assert.deepEqual(pg.COLS.map((c) => c.code), ['D1', 'D2/D2b', 'D3', 'D4']);
   const empty = pg.frameState({ mode: 'empty', marks: [0.5, 1.5] }, 4, [0.3, 1.4], 4);
-  assert.deepEqual([empty.c1, empty.c2, empty.c3, empty.c4, empty.tie], [0, 0, 0, 0, 0]);
+  assert.deepEqual([empty.d1, empty.d2, empty.d3, empty.d4, empty.tie], [0, 0, 0, 0, 0]);
   assert.equal(empty.rows, 1);
+  const w = pg.frameState({ mode: 'workers', marks: [0.6, 1.2, 2.2, 2.8] }, 4, [0.3, 2], 4);
+  assert.deepEqual([w.d2, w.hiTop, w.hiClaude, w.d3], [1, 1, 1, 0]);
+  assert.equal(pg.frameState({ mode: 'workers', marks: [0.6, 1.2, 2.2, 2.8] }, 2.0, [0.3, 2], 4).hiClaude, 0);
   const filled = pg.frameState({ mode: 'filled', marks: [1, 1.8, 2.6] }, 4, [0.3], 4);
-  assert.deepEqual([filled.c1, filled.c2, filled.c3, filled.c4, filled.tie], [1, 1, 1, 1, 1]);
+  assert.deepEqual([filled.d1, filled.d2, filled.d3, filled.d4, filled.tie, filled.hiTop], [1, 1, 1, 1, 1, 0]);
   assert.equal(pg.frameState({ mode: 'filled', marks: [1, 1.8, 2.6] }, 2.5, [0.3], 4).tie, 0);
   // The pilot closes as one small probe, reported neutrally: no verdict stamps.
   const pr = (t: number) => pg.frameState({ mode: 'probe', marks: [1.5] }, t, [0.3], 5);
   assert.equal(pr(1.3).probe, 0);
   assert.equal(pr(5).probe, 1);
-  assert.ok(!('nb' in pr(5)) && !('nf' in pr(5)));
 });
 
 test('WorkerRace: the four stops of the article\'s figure, in order', () => {

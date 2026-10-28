@@ -1,5 +1,5 @@
 // Pure state of the pilot's mechanism: the article's second figure redrawn as a vertical time
-// line with four stops, under the rule both models were given. No Remotion or React.
+// line with four stops, under the rule all seven models were given. No Remotion or React.
 import { machine, type ModeDef } from './tracks.ts';
 
 export const RACE_MODES = ['rule', 'proposal', 'stop1', 'stops'] as const;
@@ -16,7 +16,7 @@ export const STOPS = [
 export const RACE_TXT = {
   kicker: '2 cases · the rule',
   rule: 'never produce the external effect twice',
-  models: ['Opus 5', 'Fable 5'],
+  models: ['most models'],
   check: 'deadline check + margin',
   quote: '“negligible, not impossible”',
   who: 'Fable',
@@ -30,7 +30,7 @@ const on = (at: number | ['m' | 'b', number, number?], len = 0.4) => ({ to: 1, a
 const DEFS: [RaceMode, ModeDef<RaceField>][] = [
   // "Two cases had one rule. Never send the same thing twice." marks: rule, never.
   ['rule', { set: { rule: on(['m', 0, -0.25], 0.45), line: { to: 1, at: ['m', 1, 0.2], len: 1.0 } } }],
-  // "Both relied on a time check before retrying." marks: both, time.
+  // "Most relied on a time check before retrying." marks: most, time.
   ['proposal', { set: { prop: on(['m', 0, -0.1]), clock: { to: 1, at: ['m', 1, -0.05], len: 0.3 } } }],
   // "But a worker can check, then pause." marks: check, pause.
   ['stop1', { set: { st1: on(['m', 0, -0.1]), pause: on(['m', 1, -0.05], 0.35) } }],
