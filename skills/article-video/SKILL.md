@@ -54,8 +54,10 @@ when installed as a plugin; next to `skills/` in the plugin repo).
 
    Save the approved script as `script.md` in that folder.
 5. **Build the timeline** with `explainer-animation`: set `src/settings.ts` (`articleTitle`,
-   `voices`, `subtitles`, `targetSeconds`, `poster`) and write `src/timeline.ts` from the script.
-   Add bespoke components if the script flagged any, each with its `frameState` test.
+   `voices`, `subtitles`, `targetSeconds`, `poster`, and `avatar` when the author has one) and
+   write `src/timeline.ts` from the script, with the cameos it marks. Add bespoke components if
+   the script flagged any, each with its `frameState` test, and generate the drawings it asks for
+   (people, objects) in the same style as the author's avatar, as transparent PNGs in `public/`.
 6. **Lint:** `npm run lint`. Fix every finding (length, caption speed, unknown component).
    Run `npm test` too when a component was added or changed.
 7. **Fact-check** against the article and write `factcheck.md` (see above).

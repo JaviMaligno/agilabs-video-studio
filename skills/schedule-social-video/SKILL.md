@@ -68,11 +68,19 @@ by the caption's first words to find both. Row menu «…» → Administrar publ
 
 - **Reprogramar publicación** changes date and time without re-uploading. Still limited to 29 days
   ahead; do it per platform and check the dialog's date before confirming.
-- **Eliminar** is the way to take a reel off the calendar beyond the window (it goes to the
-  trash). **Never "Mover a borradores"**: it leaves the scheduled entry in "Error al publicar", and
-  deleting that entry deletes the draft with it. The reel must be uploaded again when its window
-  opens.
+- **Eliminar** is the way to take a reel off the calendar. The dialog says the reel is deleted
+  *definitivamente*: it is a permanent deletion, so the person clicks it, not the agent. **Never
+  "Mover a borradores"**: it leaves the scheduled entry in "Error al publicar", and deleting that
+  entry deletes the draft with it. The reel must be uploaded again when its window opens.
 - Free a date before moving another reel onto it (one reel per day).
+
+### Replacing a scheduled reel with a new cut
+
+A scheduled reel's video cannot be swapped. Upload the new cut as a new reel with the same texts,
+date and time, then ask the person to delete the old Facebook and Instagram entries. In
+Programadas both versions show the same caption: tell them apart by the thumbnail (the old one
+keeps its old frame) or by the new one still reading «Procesando…», and name the exact rows to
+delete.
 
 ## 4. LinkedIn
 

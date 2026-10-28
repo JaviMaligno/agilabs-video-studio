@@ -13,6 +13,7 @@ import { ANIMS } from './anim/index.ts';
 import { Background } from './components/Background.tsx';
 import { Intro, Outro } from './components/Cards.tsx';
 import { Captions } from './components/Captions.tsx';
+import { Cameo, type CameoSpec } from './components/Cameo.tsx';
 import { QuestionCard } from './components/QuestionCard.tsx';
 import { Badge } from './components/Brand.tsx';
 import { blend, dip } from './components/Dip.tsx';
@@ -65,6 +66,7 @@ const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p 
           <div style={{ position: 'absolute', top: p.vertical ? V.badgeTop : 48, left: 0, right: 0, display: 'flex', justifyContent: 'center' }}>
             <Badge size={p.vertical ? 1.1 : 0.9} />
           </div>
+          {!p.noSubs && (scene.anim?.props as { cameos?: CameoSpec[] } | undefined)?.cameos?.map((c, i) => <Cameo key={i} cameo={c} vertical={p.vertical} />)}
         </>
       )}
       {!p.noSubs && <Captions lines={captioned} lang={p.subs} vertical={p.vertical} until={handOverAt(scene)} />}

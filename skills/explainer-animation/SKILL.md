@@ -52,6 +52,26 @@ export const TIMELINE = VIDEOS.en.main;
 - Run `npm run lint` after every change: length against `targetSeconds` (±20 %), caption cues
   under 0.8 s or over 17 characters/s, and component names missing from the registry.
 
+### Author avatar: cameos and outro
+
+Optional. Put the author's cut-outs in `public/avatar/` as transparent PNGs named
+`avatar-<pose>.png` (`amazed`, `sceptical`, `thinking`, `laughing`, `laptop`, `pointing`,
+`neutral`) plus a round picture for the outro, and set `avatar: 'avatar/avatar-profile.png'` in
+`src/settings.ts`. The outro then shows the avatar above the badge.
+
+A cameo is listed in an anim scene's props:
+
+```ts
+anim('result', 'BarCompare', { bars: [...], cameos: [{ pose: 'amazed', at: [1, 'eight'], dur: 2.2 }] }, [...lines]),
+```
+
+`at` is a mark, `[line index in the scene, word]`, resolved to the moment that word is spoken
+(from the TTS word timestamps; estimated before TTS), or plain scene seconds. The avatar pops up
+from the bottom-left corner for `dur` seconds (default 2.4), standing on the bottom safe line
+behind the caption box, so it never covers the stage; `side: 'right'` mirrors it, but the
+platform's action rail sits there. Check every cameo in a still: the captions must stay readable
+on top of it. Two or three per video, never on the intro or the outro.
+
 ## Component catalogue
 
 All components receive `t`, `beats`, `dur`, `lang` and `vertical` from the scene; the props

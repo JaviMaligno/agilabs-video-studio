@@ -82,6 +82,18 @@ If no component fits, flag the scene **"bespoke"** with a one-line description o
 animation. Avoid a video that is only text on a gradient: each article gets at least one
 visual that shows its mechanism.
 
+**Draw it, don't letter it.** When a scene shows people, models, agents, objects or places as
+initials, labels or plain text boxes, propose the drawing instead: a caricature for each person
+(not a circle with "A"), a small illustration for each object, a stylised terminal rather than a
+literal screenshot. Keep text for numbers, quotes and the question on screen. Flag each one in the
+script ("Ana, Bea, Carlos, Diego as caricatures") so the assets get made before the build.
+
+**Author cameos (optional).** When the video has an author avatar (see `explainer-animation`),
+mark 2-3 moments for it in the script: a *role* cameo where the narration says what the author
+did ("I trained…", "I labelled…"), or a *reaction* at a reveal (amazed), a failure or dubious
+claim (sceptical), a self-deprecating line (laughing). Vary the poses and the moments between
+videos; the same formula every time stops reading as personal.
+
 ## Script format
 
 Write `script.md` as a table, one row per narration line:

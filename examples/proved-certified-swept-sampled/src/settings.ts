@@ -15,6 +15,8 @@ export type Settings = {
   poster: null | { scene: string; second: number };
   /** Title of the source article, shown in muted text on the outro card. */
   articleTitle: Label;
+  /** Optional author avatar (round, under public/), shown on the outro card. null = none. */
+  avatar?: null | string;
   /** Optional small credit line under the title on the outro card. */
   credit?: Label;
 };
@@ -28,4 +30,5 @@ export const SETTINGS: Settings = {
   poster: { scene: 'lift', second: 11.8 },
   articleTitle: { en: 'Proved, Certified, Swept, Sampled', es: '' },
   credit: { en: 'Certificates and verification reports: open source (calamares)', es: '' },
+  avatar: 'avatar/avatar-profile.png',
 };

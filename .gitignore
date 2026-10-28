@@ -9,6 +9,8 @@ examples/*/public/audio/
 *.wav
 # The music bed is generated (npm run music; render makes it when missing)
 template/public/music/
+# Author avatar cut-outs: personal, copied in per video (see explainer-animation), not committed
+**/public/avatar/
 
 # Secrets
 .env

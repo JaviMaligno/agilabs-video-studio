@@ -33,7 +33,7 @@ const build = (): Cuts => ({
       'StoryPaper',
       // Word cues: the tag on "sixty", the rings on "rings", one backing per kind, hidden on
       // "print", ticks pulse on "same", backing back with its weight on "worth".
-      { cue: { sixty: 0.15 + 0.6, pan: 0.15 + 2.28, proved: 3.94 + 0.92, computer: 3.94 + 2.6, samples: 3.94 + 4.04, print: 8.93 + 0.36, same: 8.93 + 1.72, worth: 8.93 + 2.92 } },
+      { cameos: [{ pose: 'laptop', at: [0, 'sixty'], dur: 2.6 }], cue: { sixty: 0.15 + 0.6, pan: 0.15 + 2.28, proved: 3.94 + 0.92, computer: 3.94 + 2.6, samples: 3.94 + 4.04, print: 8.93 + 0.36, same: 8.93 + 1.72, worth: 8.93 + 2.92 } },
       [
         say(0.15, 'I wrote a sixty-page paper on packing rings in a frying pan.', ''),
         say(0, 'Some claims are proved. Others: a computer check, or just samples.', '', { en: 'Some claims are proved. Others. A computer check, or just samples.' }),
@@ -56,7 +56,7 @@ const build = (): Cuts => ({
     ),
     // Stamps land one per beat from "label" (word timestamps); the line under them is read after.
     anim('stamp', 'CoverageTiles', { mode: 'stamp', blend: true, cue: { stamp: 0.05 + 3.08 } }, [say(0.05, 'So in my last preprint, every claim carries a label.', '')], { min: 5.3 }),
-    anim('focus', 'CoverageTiles', { mode: 'focus', blend: true, cue: { tally: 0.2 + 2.92 } }, [say(0.2, 'What convinced me: a certificate that lied to me three times.', '', { en: 'What convinced me. A certificate that lied to me three times.' })]),
+    anim('focus', 'CoverageTiles', { mode: 'focus', blend: true, cameos: [{ pose: 'sceptical', at: [0, 'lied'], dur: 2.4 }], cue: { tally: 0.2 + 2.92 } }, [say(0.2, 'What convinced me: a certificate that lied to me three times.', '', { en: 'What convinced me. A certificate that lied to me three times.' })]),
     anim('boxes', 'CoverageTiles', { mode: 'boxes', blend: true, cue: { wave: 0.05 + 1.0 } }, [say(0.05, 'It had to check one lemma over a whole region.', '')]),
     anim('reviewer', 'CoverageTiles', { mode: 'reviewer', blend: true, cue: { send: 0.05 + 1.0, break: 0.05 + 2.46 } }, [say(0.05, 'A separate model got only the statement, told to break it.', '')]),
     anim('refute', 'CoverageTiles', { mode: 'refute', blend: true, cue: { refute: 0.05 + 0.84, chips: 0.05 + 1.97 } }, [say(0.05, 'Version one fell at once: part of it was only sampled.', '')]),
@@ -84,7 +84,7 @@ const build = (): Cuts => ({
     anim(
       'range',
       'LabelRange',
-      { mode: 'range', cue: { stamp: 0.1 + 0.25, drop: 0.1 + 2.0 } },
+      { mode: 'range', cue: { stamp: 0.1 + 0.25, drop: 0.1 + 2.0 }, cameos: [{ pose: 'laughing', at: [0, 'caught'], dur: 2.4 }] },
       [say(0.1, "The same reviewer caught a claim I'd marked proved.", ''), say(0, 'It was only proved for part of its range.', '')],
     ),
     // Quote and close write their sentence on screen in sync with the voice: no duplicate caption.

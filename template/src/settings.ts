@@ -15,6 +15,11 @@ export type Settings = {
   poster: null | { scene: string; second: number };
   /** Title of the source article, shown in muted text on the outro card. */
   articleTitle: Label;
+  /**
+   * Optional author avatar (round, under public/), shown on the outro card. Cameos read their
+   * cut-outs from public/avatar/avatar-<pose>.png. null = no avatar.
+   */
+  avatar?: null | string;
 };
 
 export const SETTINGS: Settings = {
@@ -25,4 +30,5 @@ export const SETTINGS: Settings = {
   targetSeconds: 45,
   poster: null,
   articleTitle: { en: 'Article title', es: 'Título del artículo' },
+  avatar: null,
 };

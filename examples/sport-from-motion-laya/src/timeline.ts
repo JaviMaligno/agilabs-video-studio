@@ -14,8 +14,11 @@ import { FPS, sceneStarts } from './timing.ts';
 import { WORDS } from './audio.generated.ts';
 import { resolveMark, type MarkSpec } from './marks.ts';
 import type { CardSpec, StampTone } from './anim/QuestionCard.state.ts';
+import type { CameoSpec } from './components/Cameo.tsx';
 
 type CardIn = { q: string; stamp?: { text: string; at: MarkSpec; after?: number; tone?: StampTone } };
+/** Avatar cameo as written here: `at` is a mark, resolved to scene seconds by finish(). */
+type CameoIn = Omit<CameoSpec, 'at'> & { at: MarkSpec };
 
 /**
  * One clock for every dot stage (`clock`: the video second the scene starts at), the layout that
@@ -33,6 +36,9 @@ const finish = (scenes: Scene[]): Scene[] => {
     props.clock = +(starts[i] / FPS).toFixed(3);
     props.layout = name === 'LayaStage' ? 'laya' : name === 'SnapshotDeck' ? 'deck' : mode;
     if (Array.isArray(props.marks)) props.marks = (props.marks as MarkSpec[]).map((m) => resolveMark(s.lines, m, words, voice()));
+    if (Array.isArray(props.cameos)) {
+      props.cameos = (props.cameos as CameoIn[]).map((c) => ({ ...c, at: +resolveMark(s.lines, c.at, words, voice()).toFixed(3) }));
+    }
     const card = props.card as CardIn | undefined;
     if (card) {
       const out: CardSpec = { q: card.q };
@@ -80,7 +86,7 @@ const build = (): Cuts => ({
     anim(
       'laya',
       'LayaStage',
-      { mode: 'laya', marks: [[0, 'Lah'], [0, 'same'], [1, 'answers'], [1, 'gives']], card: { q: Q1 } },
+      { mode: 'laya', marks: [[0, 'Lah'], [0, 'same'], [1, 'answers'], [1, 'gives']], card: { q: Q1 }, cameos: [{ pose: 'laptop', at: [0, 'trained'], dur: 2.6 }] },
       [
         say(0.1, 'So I trained Laya, a small open model, on the same dots.', '', { en: `So I trained ${LAYA}, a small open model, on the same dots.` }),
         say(0, "It doesn't write answers. It gives each sport a score.", ''),
@@ -142,7 +148,12 @@ const build = (): Cuts => ({
     anim(
       'order',
       'SnapshotDeck',
-      { mode: 'laya', marks: [[0, 'shuffle'], [1, 'hurt'], [2, 'eight'], [3, 'similar']], card: { q: Q3, stamp: { text: 'yes', at: [2, 'does'], after: 0.1 } } },
+      {
+        mode: 'laya',
+        marks: [[0, 'shuffle'], [1, 'hurt'], [2, 'eight'], [3, 'similar']],
+        card: { q: Q3, stamp: { text: 'yes', at: [2, 'does'], after: 0.1 } },
+        cameos: [{ pose: 'amazed', at: [2, 'eight'], dur: 2.2 }],
+      },
       [
         say(0.3, 'The real test: shuffle the snapshots.', ''),
         say(0, 'If it reads movement, that should hurt.', ''),
@@ -165,7 +176,12 @@ const build = (): Cuts => ({
     anim(
       'wall',
       'LossMonitor',
-      { mode: 'wall', marks: [[0, 'random'], [1, 'learned'], [1, 'never']], card: { q: Q4, stamp: { text: 'sometimes', at: [1, 'line'], after: 0.2, tone: 'warm' } } },
+      {
+        mode: 'wall',
+        marks: [[0, 'random'], [1, 'learned'], [1, 'never']],
+        card: { q: Q4, stamp: { text: 'sometimes', at: [1, 'line'], after: 0.2, tone: 'warm' } },
+        cameos: [{ pose: 'sceptical', at: [1, 'never'], dur: 2.4 }],
+      },
       [say(0.2, 'Same data, same recipe; only the random seed changed.', ''), say(0, 'Some runs learned. Others never left the flat line.', '')],
     ),
     // 18. The closing sentence.
