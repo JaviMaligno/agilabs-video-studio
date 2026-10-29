@@ -6,8 +6,9 @@ description: Schedule finished article videos as Instagram and Facebook reels (M
 # Schedule social video
 
 Takes rendered videos (`examples/<slug>/out/main-en-vertical.mp4`) and gets them scheduled.
-The person's only manual step is choosing each file in the browser's file dialog: plan
-everything else so that step happens once per video and never twice.
+When the browser tool can upload files, the agent does the whole thing; otherwise the person's
+only manual step is choosing each file in the browser's file dialog, once per video. Deleting
+scheduled entries is always the person's step (it is permanent).
 
 ## 1. Prepare the hand-off folder
 
@@ -44,8 +45,9 @@ person ends up choosing every file twice.
 Per video:
 
 1. Open the composer; **Publish to** = Facebook Page **and** Instagram account.
-2. Ask the person to click **Add video** and pick `videos/NN-<slug>.mp4` (the file dialog is
-   native; browser automation cannot drive it, and file-upload tools are size-capped).
+2. Add the video. If the browser tool can upload files (e.g. Claude in Chrome's `file_upload`),
+   the agent does it without the person; otherwise ask them to click **Add video** and pick
+   `videos/NN-<slug>.mp4`. Agent upload (see *Uploading without the file dialog* below).
 3. Turn on **Customise for Facebook and Instagram** and paste each platform's block.
 4. Thumbnail: pick the most striking suggested frame (the hook frame usually wins).
 5. Auto-captions: with both platforms selected the Share step has **Subtitles ticked by default**;
@@ -55,6 +57,39 @@ Per video:
 6. Schedule: date `dd/mm/yyyy`, hour, minutes; confirm the zoomed date reads correctly
    before pressing **Schedule**; check the confirmation dialog shows the same date.
 7. Reopen the composer for the next video and ask for the next file.
+
+### Uploading without the file dialog
+
+Clicking **Add video** opens the native picker, which automation cannot drive. Capture the file
+input instead, then hand it the file with the browser tool's upload action:
+
+```js
+// Run in the composer page, then click nothing else until the upload is done.
+window.__orig = window.__orig || HTMLInputElement.prototype.click;
+HTMLInputElement.prototype.click = function () {
+  if (this.type === 'file') { window.__cap = this; return; }   // swallow the picker
+  return window.__orig.call(this);
+};
+[...document.querySelectorAll('div[role=button],button')].find((b) => b.innerText.trim() === 'Añadir vídeo').click();
+const i = window.__cap; if (!i.isConnected) document.body.appendChild(i); i.style.display = 'block';
+```
+
+Then locate that `input[type=file]` (e.g. `find` "file input") and upload to its ref. Notes:
+
+- **Size and location:** upload tools are capped (Claude in Chrome: 10 MB, only files in the
+  session's scratch/shared folders). Re-encode a copy there first:
+  `ffmpeg -i in.mp4 -c:v libx264 -crf 26 -preset slow -c:a copy -movflags +faststart out.mp4`
+  (crf 28 if still over ~9.8 MB). Reels look the same at this size.
+- The composer loads blank for a few seconds; wait until **Add video** exists before running the
+  snippet. Reload the composer for each reel (the override lives in the page).
+- **Captions:** after the customise switch, the Facebook and Instagram text boxes are the same
+  element under two tabs. Type the Facebook text, click a neutral area to close the hashtag
+  suggestions, select the Instagram tab, click the box again and check it is empty before typing.
+- **Subtitles** sometimes come back ticked after the steps: untick by script (the checkbox whose
+  `closest('[role]')` text starts with "Subtítulos") and check it again right before scheduling.
+- **Time:** type the hour and the minutes into their own segments ("18", then "00"); typing
+  "1800" into the hour leaves it at 00. Zoom on the date and time fields before **Schedule**.
+- **Next** stays disabled while the video processes; wait, don't click through.
 
 Not available in this composer: Instagram collaborators and the AI-content label. Both
 can be added from the Instagram app after publication if wanted.
@@ -78,9 +113,15 @@ by the caption's first words to find both. Row menu «…» → Administrar publ
 
 A scheduled reel's video cannot be swapped. Upload the new cut as a new reel with the same texts,
 date and time, then ask the person to delete the old Facebook and Instagram entries. In
-Programadas both versions show the same caption: tell them apart by the thumbnail (the old one
-keeps its old frame) or by the new one still reading «Procesando…», and name the exact rows to
-delete.
+Programadas both versions show the same caption and the list order is not creation order.
+**Tell them apart by creation time, not by thumbnail** (thumbnails misled once and the new cut
+got deleted): each row's React fiber carries the post, so
+`memoizedProps.item.creationTime` (walk `.return` up from the row element until a fiber has
+`memoizedProps.item`) gives when it was created. Load the whole list (scroll until no rows are
+added), group rows by date, platform and caption, keep the newest of each group and tick the
+checkboxes of the rest, so the person only has to delete the selection. Afterwards, check every
+date has exactly one Facebook and one Instagram entry; a stray duplicate on today's date posts
+twice.
 
 ## 4. LinkedIn
 
