@@ -31,7 +31,7 @@ const build = (): Cuts => {
     'doubt',
     'StoryPitch',
     { mode: 'doubt', play: [4.4, 4.4], blend: true },
-    [say(0.2, "Maybe that's impossible.", ''), say(0, "Maybe the players don't give the ball away.", '')],
+    [say(0.2, "Maybe that's impossible.", ''), say(0, "Maybe the players don't give the ball away.", '', undefined, { emotion: 'skeptical' })],
   );
   const test = anim('test', 'StoryPitch', { mode: 'test', play: [4.4, 4.4], blend: true }, [say(0.15, 'So I tested exactly that.', '')], { min: 2.9 });
 
@@ -51,7 +51,7 @@ const build = (): Cuts => {
     'question',
     'ReaderGrid',
     { mode: 'question', blend: true },
-    [say(0.15, 'The hard cases, balls far from the centre.', ''), say(0, 'Does a guess beat pointing at the middle?', '')],
+    [say(0.15, 'The hard cases, balls far from the centre.', ''), say(0, 'Does a guess beat pointing at the middle?', '', undefined, { emotion: 'curious' })],
     // The question holds a beat before the answers.
     { min: 6.6 },
   );
@@ -74,7 +74,7 @@ const build = (): Cuts => {
     [
       say(0.15, 'On the very same tracks, as text, 35 to 38%. Below chance.', '', {
         en: 'On the very same tracks, as text, thirty-five to thirty-eight percent. Below chance.',
-      }),
+      }, { emotion: 'surprised' }),
     ],
   );
   withCues(astext, { tracks: wordAt(astext, 0, 'thirty'), below: wordAt(astext, 0, 'below') });
@@ -93,7 +93,11 @@ const build = (): Cuts => {
     'verdict',
     'ReaderGrid',
     { mode: 'verdict', blend: true },
-    [say(0.15, 'So the information is there.', ''), say(0, 'Training matters.', ''), say(0, 'The input barely does.', '')],
+    [
+      say(0.15, 'So the information is there.', '', undefined, { emotion: 'confident', speed: 1.05 }),
+      say(0, 'Training matters.', '', undefined, { emotion: 'confident', speed: 1.05 }),
+      say(0, 'The input barely does.', '', undefined, { emotion: 'confident', speed: 1.05 }),
+    ],
     // The verdict holds ~1.5 s once its last word lands.
     { min: 7.2 },
   );
@@ -121,7 +125,7 @@ const build = (): Cuts => {
     ],
   );
   withCues(flip, { screen: wordAt(flip, 0, 'minus'), pitch: wordAt(flip, 1, 'plus') });
-  const sign = anim('sign', 'CameraFlip', { mode: 'sign', blend: true, cameos: [{ pose: 'amazed', at: [0, 'flips'], dur: 2.0 }] }, [say(0.15, 'The camera flips the sign.', '')], { min: 3.6 });
+  const sign = anim('sign', 'CameraFlip', { mode: 'sign', blend: true, cameos: [{ pose: 'amazed', at: [0, 'flips'], dur: 2.0 }] }, [say(0.15, 'The camera flips the sign.', '', undefined, { emotion: 'amazed' })], { min: 3.6 });
 
   // ── Two sports.
   const basketball = anim('basketball', 'SportScale', { mode: 'sports' }, [say(0.3, 'Then I trained the same net on basketball.', '')], { min: 3.9 });

@@ -12,10 +12,10 @@ listed at the end. One problem in the article itself is listed in the last secti
 | # | Claim (spoken) | Where | Article sentence |
 |---|---|---|---|
 | 1 | "These four claims print the same way." | hook | "All four print the same way: a sentence in a serif font that sounds true." |
-| 2 | "One: a written proof." | lift 1 | "It can have a written proof." |
-| 2 | "One: exact arithmetic, box by box." | lift 2 | "a certificate that ran exact rational arithmetic over an entire region"; hero alt "Box-certified: exact rational arithmetic over the whole domain." |
-| 2 | "One: a grid, silent in between." | lift 3 | hero alt "Grid-swept: checked on a mesh, silent between the points." |
-| 2 | "And one: ten million samples, none broke it." | lift 4 | "Or it can have "I sampled ten million configurations and none of them broke it"." (the article's own illustrative example of sampling, used the same way here) |
+| 2 | "A written proof." | lift 1 | "It can have a written proof." |
+| 2 | "Exact arithmetic, box by box." | lift 2 | "a certificate that ran exact rational arithmetic over an entire region"; hero alt "Box-certified: exact rational arithmetic over the whole domain." |
+| 2 | "A grid, silent in between." | lift 3 | hero alt "Grid-swept: checked on a mesh, silent between the points." |
+| 2 | "And ten million samples; none broke it." | lift 4 | "Or it can have "I sampled ten million configurations and none of them broke it"." (the article's own illustrative example of sampling, used the same way here) |
 | 3 | "So in my last preprint, every claim carries a label." | stamps | "My last preprint … So every claim in it carries an **epistemic label** saying which one it is" |
 | 4 | "What convinced me: a certificate that lied to me three times." | focus | "This article is about what convinced me to be that pedantic. It was not a principle. It was a certificate that lied to me three times" |
 | 5 | "It had to check one lemma over a whole region." | boxes | "One lemma in that paper concerns a quintet of rings, and closing it needs a statement of the form: *over this whole four-dimensional domain of parameters…*"; "That is exactly the kind of statement you certify computationally, because the domain is continuous" |

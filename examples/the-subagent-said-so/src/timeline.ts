@@ -48,7 +48,7 @@ const build = (): Cuts => ({
     anim(
       'gemini',
       'ReportDesk',
-      { mode: 'flood', blend: true, cameos: [{ pose: 'sceptical', at: [1, 'nearly'], dur: 1.5 }], cue: { chip0: 1.49, chip1: 3.16, chip2: 3.47, ticket: 4.4, toggle: 5.7, adopt: 7.23 } },
+      { mode: 'flood', blend: true, cameos: [{ pose: 'sceptical', at: [1, 'nearly'], dur: 1.5 }], cue: { chip0: 1.6, chip1: 3.07, chip2: 3.47, ticket: 4.24, toggle: 5.54, adopt: 7.07 } },
       [
         say(0.1, 'Gemini 3 Flash: almost always, against almost never.', '', {
           en: 'Gemini three Flash: almost always, against almost never.',
@@ -63,7 +63,7 @@ const build = (): Cuts => ({
       'gpt',
       'ReportDesk',
       // Dips (no blend) out of the full-frame quote.
-      { mode: 'inverted', cue: { chip0: 2.2, chip2: 3.47, slam: 3.15 } },
+      { mode: 'inverted', cue: { chip0: 2.44, chip2: 3.71, slam: 3.39 } },
       [say(0.1, 'GPT-5.6 flips it: it trusts my message most.', '', { en: 'G P T five point six flips it: it trusts my message most.' })],
       // Holds the 36 % / 10 % chips a little after the line.
       { min: 6.0 },

@@ -11,7 +11,9 @@ export default {
     model: 'sonic-3.6-2026-08-27',
     speed: 1,
     emotion: 'excited', // default Cartesia emotion (EN); a line overrides it with its tone
-    colonsAsStops: false, // this video was voiced before colons became stops
+    // Voice a colon inside a line as a full stop (captions keep the colon): with the cloned voice
+    // the word before a colon rises like a question. Part of the voiced text, so of the line cache.
+    colonsAsStops: true,
     // Each voice may carry `post`: an ffmpeg -af chain applied to every line right after synthesis
     // (part of the line cache, so changing it re-processes). It must not change a line's length.
     voices: {

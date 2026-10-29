@@ -71,7 +71,7 @@ const build = (): Cuts => ({
       'task',
       'LayaStage',
       { mode: 'task', marks: [[1, 'four']], card: { q: Q1 } },
-      [say(0.2, 'Each dot is a player.', ''), say(0, 'Which of four sports is this?', '')],
+      [say(0.2, 'Each dot is a player.', ''), say(0, 'Which of four sports is this?', '', undefined, { emotion: 'curious' })],
       { min: 4.4, tail: BLEND_TAIL },
     ),
     // 2-3. Last time: frontier models under half, the classifier most.
@@ -122,7 +122,7 @@ const build = (): Cuts => ({
       'tag',
       'LayaStage',
       { mode: 'tag', marks: [[1, 'tagged'], [1, 'meaningless'], [1, 'gives']], card: { q: Q2 } },
-      [say(0.1, 'Was the code broken?', ''), say(0, 'I tagged each clip with a meaningless label that gives away the answer.', '', {
+      [say(0.1, 'Was the code broken?', '', undefined, { emotion: 'skeptical' }), say(0, 'I tagged each clip with a meaningless label that gives away the answer.', '', {
           en: 'I tagged each clip with a meaningless label, that gives away the answer.',
         })],
       // Full tail: the short closing cue ("away the answer.") needs its hold.
@@ -157,7 +157,7 @@ const build = (): Cuts => ({
       [
         say(0.3, 'The real test: shuffle the snapshots.', ''),
         say(0, 'If it reads movement, that should hurt.', ''),
-        say(0, 'Trained for longer, it does: once shuffled, it loses eight points.', ''),
+        say(0, 'Trained for longer, it does: once shuffled, it loses eight points.', '', undefined, { emotion: 'amazed' }),
         say(0, 'Opus, the only frontier model that read the order, lost a similar amount.', ''),
       ],
     ),
@@ -185,7 +185,7 @@ const build = (): Cuts => ({
       [say(0.2, 'Same data, same recipe; only the random seed changed.', ''), say(0, 'Some runs learned. Others never left the flat line.', '')],
     ),
     // 18. The closing sentence.
-    anim('coin', 'LossMonitor', { mode: 'coin', card: { q: Q4 } }, [say(0.2, 'One fine-tuning run is a sample, not a measurement.', '')], { min: 4.6 }),
+    anim('coin', 'LossMonitor', { mode: 'coin', card: { q: Q4 } }, [say(0.2, 'One fine-tuning run is a sample, not a measurement.', '', undefined, { emotion: 'contemplative' })], { min: 4.6 }),
     // 19 (feedback v3). The verdict, plainly: it can learn, but only for some seeds.
     anim(
       'verdict',
@@ -195,7 +195,7 @@ const build = (): Cuts => ({
         // Caption breaks after "movement." (the spoken text keeps its comma and its cached audio).
         say(0.3, 'The verdict: it can learn to read movement. But only for some seeds.', '', {
           en: 'The verdict: it can learn to read movement, but only for some seeds.',
-        }),
+        }, { emotion: 'confident', speed: 1.05 }),
       ],
       // A longer hold: the verdict card is the last thing read before the outro.
       { min: 6.2 },

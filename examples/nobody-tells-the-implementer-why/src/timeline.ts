@@ -28,14 +28,14 @@ const build = (): Cuts => ({
       [
         say(0.2, 'In my runs, the "because" survived in only 8–31% of those messages.', '', {
           en: 'In my runs, the "because" survived in only eight to thirty-one percent of those messages.',
-        }),
+        }, { emotion: 'surprised' }),
       ],
     ),
     anim(
       'erosion',
       'ErosionVsCut',
       {},
-      [say(0.3, "It isn't worn away, like in the telephone game.", ''), say(0, "It's cut.", '')],
+      [say(0.3, "It isn't worn away, like in the telephone game.", ''), say(0, "It's cut.", '', undefined, { emotion: 'confident' })],
       { min: 5 },
     ),
     anim(
@@ -52,7 +52,7 @@ const build = (): Cuts => ({
         // Split at the comma (cloned voice ~18 chars/s): the pause keeps the first cue under 17 chars/s.
         say(0.2, 'Even the lead, writing that message itself,', ''),
         say(0.2, "with the client's request in hand,", ''),
-        say(0, 'kept the reason only 24% of the time.', '', { en: 'kept the reason only twenty-four percent of the time.' }),
+        say(0, 'kept the reason only 24% of the time.', '', { en: 'kept the reason only twenty-four percent of the time.' }, { emotion: 'amazed' }),
       ],
     ),
     anim(
@@ -68,12 +68,12 @@ const build = (): Cuts => ({
       },
       [say(0.2, 'Whoever writes to the builder writes instructions.', ''), say(0, "And instructions don't carry reasons.", '')],
     ),
-    anim('code', 'HandoffShaft', { mode: 'code', play: [3, 3], cameos: [{ pose: 'laughing', at: [0, 'less'], dur: 1.4 }] }, [say(0.2, 'Whether losing it hurts the code is less tidy than I expected.', '')]),
+    anim('code', 'HandoffShaft', { mode: 'code', play: [3, 3], cameos: [{ pose: 'laughing', at: [0, 'less'], dur: 1.4 }] }, [say(0.2, 'Whether losing it hurts the code is less tidy than I expected.', '', undefined, { emotion: 'skeptical' })]),
     anim(
       'reattach',
       'HandoffShaft',
       { mode: 'reattach', play: [3, 3] },
-      [say(0.2, 'But if the why matters to whoever builds, put it in their message yourself.', ''), say(0, 'Or attach the original.', '')],
+      [say(0.2, 'But if the why matters to whoever builds, put it in their message yourself.', '', undefined, { emotion: 'confident', speed: 0.95 }), say(0, 'Or attach the original.', '', undefined, { emotion: 'confident', speed: 0.95 })],
     ),
     // The voice starts as the card pops in; the card ends OUTRO_TAIL after it.
     outro('outro', [say(0.15, 'More at javieraguilar.ai.', '', { en: 'More at javier aguilar dot A I.' })]),
