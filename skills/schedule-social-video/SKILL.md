@@ -49,13 +49,17 @@ Per video:
    the agent does it without the person; otherwise ask them to click **Add video** and pick
    `videos/NN-<slug>.mp4`. Agent upload (see *Uploading without the file dialog* below).
 3. Turn on **Customise for Facebook and Instagram** and paste each platform's block.
-4. Thumbnail: pick the most striking suggested frame (the hook frame usually wins).
+4. Thumbnail: pick the most striking suggested frame (the hook frame usually wins), or use the
+   video's poster through **Subir imagen** (the same captured-input upload as the video).
 5. Auto-captions: with both platforms selected the Share step has **Subtitles ticked by default**;
    untick it (the videos have burned-in captions) and confirm it reads "Aplica subtítulos a tu vídeo".
    With both platforms there is also an Edit step (music library): skip it without adding audio.
    If an upload stalls at 95 %, reload the composer and add the file again (texts are lost).
-6. Schedule: date `dd/mm/yyyy`, hour, minutes; confirm the zoomed date reads correctly
-   before pressing **Schedule**; check the confirmation dialog shows the same date.
+6. Schedule: select **Programar** in the scheduling options first; until then the main button
+   reads **Compartir**, which publishes now. Date: open each calendar, move with ›, click the day;
+   a missed click silently keeps today's date, so zoom on both rows. Time: click the hour segment
+   and type `18`, then the minutes and type `00`. Re-check Subtitles is unticked, press
+   **Programar**, and check the confirmation dialog shows the same date for Facebook and Instagram.
 7. Reopen the composer for the next video and ask for the next file.
 
 ### Uploading without the file dialog
