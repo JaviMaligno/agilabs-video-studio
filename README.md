@@ -1,7 +1,7 @@
 # agilabs-video-studio
 
 A Claude Code plugin that turns a blog article into a short, narrated, animated vertical
-explainer video. Claude reads the article, writes a 30-60 second script with a hook, the
+explainer video. Claude reads the article, writes a short script with a hook, the
 experiment and the finding with its exact number, and proposes a visual for every scene. Once
 you approve the script, it builds the scenes from a library of animated components (counters,
 bar comparisons, flow diagrams, key quotes, stat tiles), voices the narration with word-level

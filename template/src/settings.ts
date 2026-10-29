@@ -9,7 +9,7 @@ export type Settings = {
   subtitles: Lang[];
   /** Optional music bed (file under public/), ducked to `volume * duck` while a line plays. */
   music: null | { src: string; volume: number; duck: number };
-  /** Intended length of the main cut, in seconds (30–60 for the vertical format). */
+  /** Intended length of the main cut, in seconds: whatever the story needs (usually 45–90). Lint warns at ±20 %. */
   targetSeconds: number;
   /** Thumbnail frame: scene id + seconds into it. null = a frame from the intro. */
   poster: null | { scene: string; second: number };

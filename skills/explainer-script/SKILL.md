@@ -1,6 +1,6 @@
 ---
 name: explainer-script
-description: Write the script for a 30-60 s narrated explainer video of a blog article - hook, setup, experiment, finding with its exact number, so-what and closing card - with a visual idea per scene mapped to an animation component, caption reading-speed limits and an optional parallel Spanish version. Use when drafting or revising what an article video says, before any scene is built.
+description: Write the script for a short narrated explainer video of a blog article - hook, setup, experiment, finding with its exact number, so-what and closing card - with a visual idea per scene mapped to an animation component, caption reading-speed limits and an optional parallel Spanish version. Use when drafting or revising what an article video says, before any scene is built.
 ---
 
 # Explainer script
@@ -11,9 +11,13 @@ caption.
 
 ## Length
 
-- 30-60 s, aiming at 45 s (`targetSeconds` in `src/settings.ts`).
-- That is about **75-140 spoken words in EN**. Count them. Spanish runs about 15-20 % longer
-  for the same content.
+- As long as the story needs, no fixed cap: most land between 45 and 90 s. A video that
+  explains its point clearly at 80 s beats one cut to 60 s that loses the viewer. Cut lines
+  that repeat or add nothing, never the story or the setup.
+- Set `targetSeconds` in `src/settings.ts` to the length the script actually needs; lint only
+  warns when the cut drifts ±20 % from it.
+- The cloned voice reads about 2.5 EN words per second plus pauses: count the words to
+  estimate. Spanish runs about 15-20 % longer for the same content.
 
 ## Structure
 
@@ -42,7 +46,7 @@ caption.
 - **Numbers in the voice.** Say them the way you would explaining the result to a colleague:
   naturally, as part of the sentence. The only thing to avoid is reading a table aloud.
 - **Clarity beats brevity.** The viewer must understand what was tested before hearing the
-  result. If the setup needs another scene to make sense, add it, even past 60 s; labels
+  result. If the setup needs another scene to make sense, add it; labels
   scattered over the visual are not an explanation.
 - **Key points, loud and clear.** Each key point (what is being tested, what makes the subject
   different, the verdict) gets its own spoken sentence and its own unmistakable on-screen
