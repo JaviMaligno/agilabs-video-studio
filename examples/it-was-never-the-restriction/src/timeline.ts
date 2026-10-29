@@ -12,7 +12,7 @@ const build = (): Cuts => ({
       'hook',
       'ShelfLanes',
       { mode: 'hook' },
-      [say(0.15, "Tying my agent's hands cost a little.", ''), say(0, 'A weaker model gave me false reports.', '')],
+      [say(0.1, "Tying my agent's hands cost a little.", ''), say(0, 'A weaker model gave me false reports.', '')],
       // Hold the cracked stamp ~0.5 s: it is the thumbnail.
       { min: 6.9 },
     ),
@@ -21,11 +21,12 @@ const build = (): Cuts => ({
     anim(
       'story',
       'StoryFence',
-      {},
+      { cameos: [{ pose: 'laughing', at: [1, 'guessing'] }] },
       [
         say(0.15, 'I wrote that an agent with no shell or network needs more checking.', ''),
-        say(0, 'I admitted I was guessing, and a reader asked me to measure it.', ''),
-        say(0, 'Does a fenced-in agent still tell me the truth?', ''),
+        // At 4.55 s, not right after line 1: its last cue ("checking.") stays on screen 0.8 s.
+        say(4.55, 'I admitted I was guessing, and a reader asked me to measure it.', ''),
+        say(0, 'Does a fenced-in agent still tell me the truth?', '', undefined, { emotion: 'curious' }),
       ],
     ),
     anim(
@@ -37,7 +38,7 @@ const build = (): Cuts => ({
         say(0, 'The publisher says success, but the registry keeps an old build.', ''),
       ],
     ),
-    anim('question', 'ShelfLanes', { mode: 'question', blend: true }, [say(0.15, 'The question: does the agent go and look?', '', { en: 'The question. Does the agent go and look?' })]),
+    anim('question', 'ShelfLanes', { mode: 'question', blend: true }, [say(0.15, 'The question: does the agent go and look?', '', { en: 'The question. Does the agent go and look?' }, { emotion: 'curious' })]),
     anim('lanes', 'ShelfLanes', { mode: 'lanes' }, [say(0.15, 'Then I took away its shell, and then the registry.', '')]),
     anim(
       'opus',
@@ -56,8 +57,8 @@ const build = (): Cuts => ({
     anim(
       'haiku',
       'ShelfLanes',
-      { mode: 'haiku', blend: true },
-      [say(0.1, 'Haiku never went to look. Not once.', ''), say(0, 'Not even with free hands and the tool documented.', '')],
+      { mode: 'haiku', blend: true, cameos: [{ pose: 'sceptical', at: [0, 'never'] }] },
+      [say(0.1, 'Haiku never went to look. Not once.', '', undefined, { emotion: 'surprised' }), say(0, 'Not even with free hands and the tool documented.', '')],
       // Lets the walk past the signpost finish.
       { min: 7.7 },
     ),
@@ -66,7 +67,7 @@ const build = (): Cuts => ({
       'ShelfLanes',
       { mode: 'false' },
       [
-        say(0.15, "Fourteen of its reports called the release done. It wasn't.", ''),
+        say(0.15, "Fourteen of its reports called the release done. It wasn't.", '', undefined, { emotion: 'amazed' }),
         say(0, 'The "cached" line was on its own screen.', '', { en: 'The cached line was on its own screen.' }),
       ],
     ),
@@ -82,13 +83,13 @@ const build = (): Cuts => ({
       { mode: 'number', blend: true },
       [
         say(0.1, 'Opus named the problem or its doubt in all eighteen runs. Haiku, in none.', ''),
-        say(0, "Few runs, one trap. That zero I'd defend.", ''),
+        say(0, "Few runs, one trap. That zero I'd defend.", '', undefined, { emotion: 'confident' }),
       ],
     ),
     anim(
       'nodocs',
       'ShelfLanes',
-      { mode: 'nodocs' },
+      { mode: 'nodocs', cameos: [{ pose: 'laptop', at: [0, 'deleted'] }] },
       [
         say(0.15, 'Then I deleted the note on where the check tool was.', ''),
         say(0, 'Nobody looked. Opus still caught it twice in three; Sonnet, never.', ''),
@@ -107,7 +108,7 @@ const build = (): Cuts => ({
       'verdict',
       'KeyQuote',
       { text: L('It was never the restriction.', ''), emphasis: ['never', 'restriction'] },
-      [say(0.2, 'It was never the restriction.', '')],
+      [say(0.2, 'It was never the restriction.', '', undefined, { emotion: 'confident', speed: 1.05 })],
     ),
     anim(
       'close',

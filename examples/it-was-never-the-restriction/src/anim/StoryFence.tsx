@@ -1,9 +1,10 @@
 import React from 'react';
+import { Img, staticFile } from 'remotion';
 import { C, GRADIENT, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
 import { Stage, gradientText } from './Stage.tsx';
-import { Hand, ModelChip, ReportCard, Tag, clamp01 } from './pieces.tsx';
+import { Hand, ReportCard, Tag, clamp01 } from './pieces.tsx';
 import { SF, frameState, type StoryFenceProps } from './StoryFence.state.ts';
 
 export { frameState };
@@ -157,8 +158,15 @@ export const StoryFence: React.FC<AnimProps & StoryFenceProps> = ({ t, beats, du
     <Stage vertical={vertical} fill>
       <ArticleCard appear={s.card} sentence={s.sentence} guess={s.guess} />
       <Pen fence={s.fence} posts={s.posts} />
-      <ModelChip x={cx} y={top + 70} name="my agent" appear={s.hand} />
-      <Hand x={cx} y={top + 200} size={150} tied={s.cord} opacity={s.hand} />
+      {/* My agent, drawn (cast robot), inside the pen; its hand beside it gets tied. */}
+      {s.hand > 0 && (
+        <Img
+          src={staticFile('cast/robot-my-agent.png')}
+          style={{ position: 'absolute', left: cx - 70 - 115, top: top + 12, width: 230, height: 230, objectFit: 'contain', opacity: clamp01(s.hand), transform: `scale(${0.8 + 0.2 * clamp01(s.hand)})`, zIndex: 3 }}
+        />
+      )}
+      <Tag x={cx - 70} y={top + 246} w={220} text="my agent" appear={s.hand} size={30} strong />
+      <Hand x={cx + 150} y={top + 170} size={140} tied={s.cord} opacity={s.hand} />
       <Tag x={110} y={top + 150} w={200} text="no shell" appear={s.noShell} size={30} strong />
       <Tag x={850} y={top + 150} w={200} text="no network" appear={s.noNet} size={30} strong />
       <Bubble appear={s.bubble} />

@@ -3,6 +3,7 @@
 // the agent chip, ticket cards and the inbox badge that bury it, the brief card with its ownership
 // slot, the "owner: you" name tag, stamps, tags and dots. Brand tokens only, Inter + system mono.
 import React from 'react';
+import { Img, staticFile } from 'remotion';
 import { C, GRADIENT, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 
@@ -262,8 +263,10 @@ export const AgentChip: React.FC<{ x: number; y: number; name?: string; appear: 
 }) => {
   const a = clamp01(appear);
   if (a <= 0) return null;
-  const w = 236;
+  // The agent is drawn (the series' "my agent" robot), standing at the left end of its name pill.
+  const w = 270;
   const h = 64;
+  const robot = 104;
   return (
     <div
       style={{
@@ -299,9 +302,22 @@ export const AgentChip: React.FC<{ x: number; y: number; name?: string; appear: 
           whiteSpace: 'nowrap',
         }}
       >
-        <div style={{ width: 14, height: 14, borderRadius: 7, background: dim ? C.muted : C.accentText }} />
-        {name}
+        <span style={{ paddingLeft: 78 }}>{name}</span>
       </div>
+      {/* A light disc behind the (dark navy) robot, so it reads on the dark stage. */}
+      <div style={{ position: 'absolute', left: -12, top: (h - 96) / 2 - 2, width: 96, height: 96, borderRadius: 48, background: dim ? alpha(C.muted, 0.6) : alpha(C.text, 0.88), boxShadow: `0 0 0 3px ${alpha(C.accent, 0.8)}` }} />
+      <Img
+        src={staticFile('cast/robot-my-agent.png')}
+        style={{
+          position: 'absolute',
+          left: -16,
+          top: (h - robot) / 2 - 8,
+          width: robot,
+          height: robot,
+          objectFit: 'contain',
+          filter: dim ? 'grayscale(1) opacity(0.6)' : undefined,
+        }}
+      />
     </div>
   );
 };

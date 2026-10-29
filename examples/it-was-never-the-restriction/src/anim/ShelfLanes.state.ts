@@ -171,17 +171,18 @@ export function frameState(p: LanesProps, time: number, beats: number[], dur: nu
   // ------------------------------------------------ hook: tied hands check; free hands don't
   if (p.mode === 'hook') {
     const b1 = b(1, b0 + 2.6);
+    // Both lanes on screen from frame 0 (no fade-in): in Reels the first half second decides.
     return {
       view: 'lanes' as const,
       band: '',
       bandIn: 0,
       zoom: 0,
       lanes: [
-        lane('shell', 240, 440, { appear: E(0, 0.3), chip: 'Opus 5', chipIn: E(0, 0.3), ...checks('shell', b0 + 0.2) }),
+        lane('shell', 240, 440, { appear: 1, chip: 'Opus 5', chipIn: 1, ...checks('shell', b0 + 0.2) }),
         lane('free', 720, 440, {
-          appear: E(0.1, 0.3),
+          appear: 1,
           chip: 'Haiku 4.5',
-          chipIn: E(0.1, 0.3),
+          chipIn: 1,
           dim: 0.5 * (1 - E(b1 - 0.2, 0.3)),
           past: P(b1 + 0.1, 0.9),
           card: E(b1 + 1.1, 0.25),

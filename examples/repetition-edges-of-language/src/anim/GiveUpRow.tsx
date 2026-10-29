@@ -1,4 +1,5 @@
 import React from 'react';
+import { Img, staticFile } from 'remotion';
 import { C, alpha } from '../brand.ts';
 import { Stage, gradientText } from './Stage.tsx';
 import type { AnimProps } from './types.ts';
@@ -9,12 +10,9 @@ import { CoreChip, EmojiText } from './pieces.tsx';
 const TOP = 140;
 const STEP = 98;
 
-/** A generic human silhouette (outline, brand indigo). */
+/** A human, drawn (shared cast), so the comparison reads as a person and not an icon. */
 const Person: React.FC<{ size: number }> = ({ size }) => (
-  <svg width={size} height={size} viewBox="0 0 100 100">
-    <circle cx={50} cy={32} r={18} fill="none" stroke={C.accentText} strokeWidth={5} />
-    <path d="M18 92 C18 66 32 56 50 56 C68 56 82 66 82 92" fill="none" stroke={C.accentText} strokeWidth={5} strokeLinecap="round" />
-  </svg>
+  <Img src={staticFile('cast/person-client.png')} style={{ width: size, height: size, objectFit: 'contain' }} />
 );
 
 export const GiveUpRow: React.FC<AnimProps & GiveUpRowProps> = ({ t, beats, dur, vertical, ...p }) => {
@@ -31,6 +29,7 @@ export const GiveUpRow: React.FC<AnimProps & GiveUpRowProps> = ({ t, beats, dur,
       {s.human > 0 && (
         <div style={{ position: 'absolute', right: 10, top: 0, width: 130, display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: s.human }}>
           <Person size={120} />
+          <div style={{ fontSize: 26, fontWeight: 700, color: C.muted, marginTop: -4 }}>a human</div>
         </div>
       )}
       {s.rows.map((r, i) => {

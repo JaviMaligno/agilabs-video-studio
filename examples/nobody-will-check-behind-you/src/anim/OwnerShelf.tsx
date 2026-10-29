@@ -93,7 +93,7 @@ const HookView: React.FC<{ s: HookState; t: number }> = ({ s, t: _t }) => {
         }}
       >
         {s.title.map((w, i) => (
-          <span key={i} style={{ color: w.key && s.titleKey > 0.5 ? undefined : C.text, ...(w.key && s.titleKey > 0.5 ? gradientText : {}), opacity: 0.45 + 0.55 * w.lit }}>
+          <span key={i} style={{ color: w.key && s.titleKey > 0.5 ? undefined : C.text, ...(w.key && s.titleKey > 0.5 ? gradientText : {}), opacity: 0.55 + 0.45 * w.lit }}>
             {w.text}
           </span>
         ))}

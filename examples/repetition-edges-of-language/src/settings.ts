@@ -15,6 +15,8 @@ export type Settings = {
   poster: null | { scene: string; second: number };
   /** Title of the source article, shown in muted text on the outro card. */
   articleTitle: Label;
+  /** Optional author avatar (round, under public/), shown on the outro card. null = none. */
+  avatar?: null | string;
   /** Optional small credits line under the title on the outro card. */
   credits?: Label;
 };
@@ -28,4 +30,5 @@ export const SETTINGS: Settings = {
   poster: { scene: 'table', second: 3.2 },
   articleTitle: { en: 'Repetition at the Edges of Language', es: '' },
   credits: { en: "Model outputs from the study's data: llm-language-limits", es: '' },
+  avatar: 'avatar/avatar-profile.png',
 };

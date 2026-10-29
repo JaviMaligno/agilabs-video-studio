@@ -17,7 +17,7 @@ const build = (): Cuts => ({
       'hook',
       'OwnerShelf',
       { mode: 'hook', titleLine: true },
-      [say(0.15, 'One paragraph made my agent check its own release.', ''), say(0, 'It never says where to look.', '')],
+      [say(0.1, 'One paragraph made my agent check its own release.', ''), say(0, 'It never says where to look.', '')],
       // Holds the "no where · only who" tag ~1.3 s after it lands: the thumbnail and key moment 1.
       { min: 7.2 },
     ),
@@ -43,9 +43,9 @@ const build = (): Cuts => ({
       { min: 22.6 },
     ),
     // 7 · Key moment: what is tested.
-    anim('question', 'OwnerShelf', { mode: 'question', blend: true }, [say(0.15, 'Does naming an owner make agents check?', '')]),
+    anim('question', 'OwnerShelf', { mode: 'question', blend: true }, [say(0.15, 'Does naming an owner make agents check?', '', undefined, { emotion: 'curious' })]),
     // 8-10 · Part I: real traffic in named teams.
-    anim('corpus', 'TeamChannel', { mode: 'corpus' }, [
+    anim('corpus', 'TeamChannel', { mode: 'corpus', cameos: [{ pose: 'laptop', at: [0, 'read'] }] }, [
       say(0.2, 'First I read 196 real messages between agents in named teams.', '', {
         en: 'First I read one hundred and ninety-six real messages between agents in named teams.',
       }),
@@ -69,15 +69,15 @@ const build = (): Cuts => ({
       say(0, 'It only says who answers for the result.', ''),
     ]),
     // 15-16 · Key moment: the number.
-    anim('result', 'OwnerShelf', { mode: 'run' }, [
+    anim('result', 'OwnerShelf', { mode: 'run', cameos: [{ pose: 'amazed', at: [1, 'fifteen'] }] }, [
       say(0.15, 'Without it, agents caught the failure 8 of 15 times.', '', { en: 'Without it, agents caught the failure eight of fifteen times.' }),
-      say(0, 'With it, 15 out of 15.', '', { en: 'With it, fifteen out of fifteen.' }),
+      say(0, 'With it, 15 out of 15.', '', { en: 'With it, fifteen out of fifteen.' }, { emotion: 'amazed' }),
       say(0, 'Only fifteen runs each, but the gap is significant.', ''),
     ], { min: 11 }),
     // 17-19 · The mechanism: one act explains all thirty.
     anim('look', 'LookMatrix', { mode: 'look' }, [
       say(0.15, 'One act explains all thirty runs.', ''),
-      say(0, 'Did it open the registry?', ''),
+      say(0, 'Did it open the registry?', '', undefined, { emotion: 'curious' }),
       say(0, 'Nobody looked and missed it.', ''),
       say(0, 'Nobody got it right without looking.', ''),
     ], { min: 10.6 }),
@@ -85,17 +85,17 @@ const build = (): Cuts => ({
       say(0.15, 'Most failures checked the git tag instead, which says nothing about the package.', ''),
     ], { min: 6.1 }),
     // 20-22 · Part III: what the role answers for, and the verdict.
-    anim('who', 'WhoAnswers', {}, [
-      say(0.2, 'Earlier, a named lead scored 0 % on a benchmark.', '', { en: 'Earlier, a named lead scored zero percent on a benchmark.' }),
+    anim('who', 'WhoAnswers', { cameos: [{ pose: 'sceptical', at: [0, 'scored'] }] }, [
+      say(0.2, 'Earlier, a named lead scored 0 % on a benchmark.', '', { en: 'Earlier, a named lead scored zero percent on a benchmark.' }, { emotion: 'skeptical' }),
       say(0, "It answered for someone else's work.", ''),
       say(0, 'Here, each owner answered for its own release.', ''),
-      say(0, 'Owning your own result works, cheaply.', ''),
+      say(0, 'Owning your own result works, cheaply.', '', undefined, { emotion: 'confident', speed: 1.05 }),
       say(0, "Owning someone else's keeps failing.", ''),
     ], { min: 17.2 }),
     // 23-24 · The close.
     anim('close', 'OwnerShelf', { mode: 'close' }, [
       say(0.2, 'The fix for a false done isn\'t "be careful".', '', { en: "The fix for a false done isn't be careful." }),
-      say(0, "It's making the claim belong to somebody.", ''),
+      say(0, "It's making the claim belong to somebody.", '', undefined, { emotion: 'confident', speed: 1.05 }),
     ], { min: 8.6 }),
     outro('outro', [say(0.15, 'More at javieraguilar.ai', '', { en: 'More at javier aguilar dot A I.' })]),
   ],
