@@ -10,6 +10,9 @@ export { frameState };
 export type { GapProps };
 
 const img = (name: string) => staticFile(`cast/${name}.png`);
+/** Dark drawings (the black cat) get a light outline so they read on the dark background. */
+const OUTLINE = 'drop-shadow(0 0 2px #e2e8f0) drop-shadow(0 0 2px #e2e8f0) drop-shadow(0 0 6px rgba(226,232,240,0.45))';
+const needsOutline = (src?: string) => !!src && src.includes('cat-black');
 const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
@@ -51,18 +54,19 @@ const Dots: React.FC<{ dots: { x: number; y: number; s: number }[]; opacity: num
 
 /** A rounded card holding a drawing (or a title when there is no drawing). */
 const Card: React.FC<{
-  x: number; y: number; w: number; h: number; src?: string; title?: string; opacity?: number; scale?: number; glow?: boolean; rot?: number;
-}> = ({ x, y, w, h, src, title, opacity = 1, scale = 1, glow, rot = 0 }) => (
+  x: number; y: number; w: number; h: number; src?: string; title?: string; caption?: string; opacity?: number; scale?: number; glow?: boolean; rot?: number;
+}> = ({ x, y, w, h, src, title, caption, opacity = 1, scale = 1, glow, rot = 0 }) => (
   <div
     style={{
       position: 'absolute', left: x - w / 2, top: y - h / 2, width: w, height: h, opacity,
       transform: `scale(${scale}) rotate(${rot}deg)`, borderRadius: 26, background: C.card,
       border: `3px solid ${glow ? C.accentText : alpha(C.text, 0.14)}`,
       boxShadow: glow ? `0 0 40px ${alpha(C.accent, 0.55)}` : `0 14px 30px ${alpha(C.bg0, 0.5)}`,
-      display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', boxSizing: 'border-box',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', boxSizing: 'border-box',
     }}
   >
-    {src ? <Img src={src} style={{ width: '88%', height: '88%', objectFit: 'contain' }} /> : null}
+    {src ? <Img src={src} style={{ width: '88%', height: caption ? '70%' : '88%', objectFit: 'contain', filter: needsOutline(src) ? OUTLINE : undefined }} /> : null}
+    {caption ? <div style={{ fontFamily, fontSize: Math.round(h * 0.1), fontWeight: 700, color: C.text, textAlign: 'center', lineHeight: 1.05, marginTop: 4 }}>{caption}</div> : null}
     {title ? <div style={{ fontFamily, fontSize: 38, fontWeight: 700, color: C.text, textAlign: 'center', padding: 18, lineHeight: 1.15 }}>{title}</div> : null}
   </div>
 );
@@ -78,7 +82,7 @@ const Robot: React.FC<{ x: number; y: number; size: number; opacity?: number }> 
 );
 
 const Pic: React.FC<{ name: string; x: number; y: number; size: number; opacity?: number; scale?: number; flip?: boolean }> = ({ name, x, y, size, opacity = 1, scale = 1, flip }) => (
-  <Img src={img(name)} style={{ position: 'absolute', left: x - size / 2, top: y - size / 2, width: size, height: size, objectFit: 'contain', opacity, transform: `scale(${scale})${flip ? ' scaleX(-1)' : ''}` }} />
+  <Img src={img(name)} style={{ position: 'absolute', left: x - size / 2, top: y - size / 2, width: size, height: size, objectFit: 'contain', opacity, filter: name === 'cat-black' ? OUTLINE : undefined, transform: `scale(${scale})${flip ? ' scaleX(-1)' : ''}` }} />
 );
 
 // ------------------------------------------------------------------ modes
@@ -217,15 +221,15 @@ const HotCold: React.FC<{ s: GapState }> = ({ s }) => {
 
 const Blend: React.FC<{ s: GapState }> = ({ s }) => {
   const [a, b] = s.appear;
-  const tops = [
+  const tops: { x: number; src: string; caption?: string }[] = [
     { x: 168, src: img('cat-black') },
     { x: 468, src: img('hamster') },
-    { x: 768, title: 'My Furry Stepmom 🐾' },
+    { x: 768, src: img('furry-stepmom'), caption: 'My Furry Stepmom' },
   ];
   return (
     <>
       {tops.map((c, i) => (
-        <Card key={i} x={lerp(c.x, 468, b)} y={lerp(200, 580, b)} w={280} h={280} src={c.src} title={c.title} opacity={clamp01(a * 3 - i) * (1 - b)} scale={lerp(1, 0.5, b)} rot={(i - 1) * 4} />
+        <Card key={i} x={lerp(c.x, 468, b)} y={lerp(200, 580, b)} w={280} h={280} src={c.src} caption={c.caption} opacity={clamp01(a * 3 - i) * (1 - b)} scale={lerp(1, 0.5, b)} rot={(i - 1) * 4} />
       ))}
       <Card x={468} y={580} w={680} h={480} src={img('kitten-blocks')} opacity={b} scale={lerp(0.6, 1, b)} glow />
     </>
@@ -240,7 +244,7 @@ const Stamp: React.FC<{ s: GapState }> = ({ s }) => {
       {[img('cat-black'), img('hamster')].map((src, i) => (
         <Card key={i} x={i === 0 ? 170 : 766} y={830} w={200} h={200} src={src} opacity={0.75} />
       ))}
-      <Card x={468} y={830} w={200} h={200} title="Furry Stepmom" opacity={0.75} />
+      <Card x={468} y={830} w={200} h={200} src={img('furry-stepmom')} opacity={0.75} />
       <div
         style={{
           position: 'absolute', left: 140, top: 560, width: 656, textAlign: 'center', padding: '18px 0', borderRadius: 22,
