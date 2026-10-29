@@ -83,7 +83,12 @@ const scene = (id: string, kind: Scene['kind'], specs: Spec[], min: number, extr
   return { id, kind, ...extra, lines, beats: lines.map((l) => l.start), minSeconds };
 };
 
-export const intro = (id: string, specs: Spec[], min = 3): Scene => scene(id, 'intro', specs, min);
+/**
+ * The hook card. With `visual`, the hook opens cold instead: that animation plays from the first
+ * frame and the hook sits over it in full, its words lighting up as they are spoken.
+ */
+export const intro = (id: string, specs: Spec[], min = 3, visual?: { name: string; props: Record<string, unknown> }): Scene =>
+  scene(id, 'intro', specs, min, visual ? { anim: visual } : {});
 
 export const anim = (
   id: string,

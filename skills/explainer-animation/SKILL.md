@@ -21,7 +21,7 @@ import { L, anim, intro, outro, say, videos } from './narrate.ts';
 
 const build = (): Cuts => ({
   main: [
-    intro('hook', [say(0.4, 'EN hook line.', 'ES hook line.')]),
+    intro('hook', [say(0.1, 'EN hook line.', 'ES hook line.')]),
     anim(
       'result',
       'BarCompare',
@@ -51,6 +51,18 @@ export const TIMELINE = VIDEOS.en.main;
 - `opts.chapter` on `anim` is stored on the scene but not drawn by any component yet.
 - Run `npm run lint` after every change: length against `targetSeconds` (±20 %), caption cues
   under 0.8 s or over 17 characters/s, and component names missing from the registry.
+
+### The first second
+
+On the early reels about 40 % of viewers left within the first second, so the first frame must
+already carry something: the hook card shows the whole hook from frame 0 (no fade-in, unspoken
+words dimmed, not hidden) and its line starts at 0.1 s. Never open on an empty background.
+
+**Cold open (optional, under test).** `intro(id, [hookLine], min, { name, props })` plays that
+animation from the first frame, usually the video's most striking picture, and lays the whole hook
+over it in a dark panel under the stage, each word lighting up as it is spoken. First tried on
+`wheres-the-ball-2` (control `wheres-the-ball-3`); make it the default only if the 1 s and 3 s
+retention improve.
 
 ### Author avatar: cameos and outro
 

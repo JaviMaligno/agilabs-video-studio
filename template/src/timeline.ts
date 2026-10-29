@@ -6,7 +6,7 @@ import { L, anim, intro, outro, say, videos } from './narrate.ts';
 const build = (): Cuts => ({
   main: [
     intro('intro', [
-      say(0.4, 'The one finding of the article, in a single sentence.', 'El hallazgo del artículo, en una sola frase.'),
+      say(0.1, 'The one finding of the article, in a single sentence.', 'El hallazgo del artículo, en una sola frase.'),
     ]),
     anim(
       'quote',
