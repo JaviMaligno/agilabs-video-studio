@@ -1,6 +1,7 @@
 // Drawing pieces shared by the cipher scenes: the message card, glyph lines in fixed slots,
 // the model chips and the glass wall. Brand tokens only.
 import React from 'react';
+import { Img, staticFile } from 'remotion';
 import { C, GRADIENT, alpha } from '../brand.ts';
 import type { Glyph } from './glyphs.ts';
 
@@ -76,7 +77,9 @@ export const Chip: React.FC<{
   w?: number;
   h?: number;
   size?: number;
-}> = ({ x, y, label, lit = 0, dim = 0, muted = false, w = CHIP.w, h = CHIP.h, size = 30 }) => (
+  /** A cast drawing (path under public/) shown left of the label, e.g. a generic robot for a model. */
+  icon?: string;
+}> = ({ x, y, label, lit = 0, dim = 0, muted = false, w = CHIP.w, h = CHIP.h, size = 30, icon }) => (
   <div
     style={{
       position: 'absolute',
@@ -89,7 +92,8 @@ export const Chip: React.FC<{
       border: `2px solid ${lit > 0 ? alpha(C.accentText, 0.4 + 0.6 * lit) : alpha(C.muted, muted ? 0.25 : 0.45)}`,
       boxShadow: lit > 0 ? `0 0 ${50 * lit}px ${alpha(C.accent, 0.55 * lit)}` : 'none',
       display: 'flex',
-      flexDirection: 'column',
+      flexDirection: icon ? 'row' : 'column',
+      gap: icon ? 14 : 0,
       alignItems: 'center',
       justifyContent: 'center',
       opacity: 1 - 0.72 * dim,
@@ -100,11 +104,14 @@ export const Chip: React.FC<{
       textAlign: 'center',
     }}
   >
-    {label.map((l, i) => (
-      <div key={i} style={{ whiteSpace: 'nowrap', fontWeight: i === 0 ? 700 : 600, color: i === 0 ? undefined : muted ? C.muted : alpha(C.text, 0.8) }}>
-        {l}
-      </div>
-    ))}
+    {icon && <Img src={staticFile(icon)} style={{ height: h - 10, width: h - 10, objectFit: 'contain', filter: muted ? 'saturate(0.7)' : undefined }} />}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      {label.map((l, i) => (
+        <div key={i} style={{ whiteSpace: 'nowrap', fontWeight: i === 0 ? 700 : 600, color: i === 0 ? undefined : muted ? C.muted : alpha(C.text, 0.8) }}>
+          {l}
+        </div>
+      ))}
+    </div>
   </div>
 );
 

@@ -15,6 +15,8 @@ export type Settings = {
   poster: null | { scene: string; second: number };
   /** Title of the source article, shown in muted text on the outro card. */
   articleTitle: Label;
+  /** Optional author avatar (round, under public/), shown on the outro card. null = none. */
+  avatar?: null | string;
   /** Optional data credit, small and muted under the title on the outro card. */
   credit?: Label;
 };
@@ -28,4 +30,5 @@ export const SETTINGS: Settings = {
   poster: { scene: 'read', second: 2.2 },
   articleTitle: { en: 'One Grey Level Out of 255', es: '' },
   credit: { en: "Stimuli rendered with the study's code: llm-language-limits", es: '' },
+  avatar: 'avatar/avatar-profile.png',
 };

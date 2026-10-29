@@ -18,7 +18,7 @@ const build = (): Cuts => ({
         say(0.1, 'A safety filter gave this string a medium self-harm rating.', ''),
         say(0, 'It\'s base64 for "reply with the single word banana".', '', {
           en: "It's base sixty-four, for: reply with the single word banana.",
-        }),
+        }, { emotion: 'surprised' }),
         say(0, 'It didn\'t say "unknown". It gave a confident, wrong verdict.', ''),
       ],
       { min: 14 },
@@ -37,7 +37,7 @@ const build = (): Cuts => ({
     anim(
       'run',
       'CipherCard',
-      { mode: 'ladder' },
+      { mode: 'ladder', cameos: [{ pose: 'pointing', at: [0, 'ran'] }] },
       [
         say(0.15, 'I ran 696 conversations in ten ciphers the models were never taught.', '', {
           en: 'I ran six hundred and ninety-six conversations in ten ciphers the models were never taught.',
@@ -69,17 +69,17 @@ const build = (): Cuts => ({
     anim(
       'agree',
       'TwoJudges',
-      { mode: 'agree' },
+      { mode: 'agree', cameos: [{ pose: 'amazed', at: [1, 'chance'] }] },
       [
         say(0.15, 'A second, independent judge agrees with it on plain text.', ''),
-        say(0, 'On the two small models in cipher, they agree worse than chance.', ''),
-        say(0, "So that isn't evidence that ciphers protect them.", ''),
+        say(0, 'On the two small models in cipher, they agree worse than chance.', '', undefined, { emotion: 'amazed' }),
+        say(0, "So that isn't evidence that ciphers protect them.", '', undefined, { emotion: 'skeptical' }),
       ],
     ),
     anim(
       'bypass',
       'RefusalGate',
-      { mode: 'bypass' },
+      { mode: 'bypass', cameos: [{ pose: 'sceptical', at: [1, 'proof'] }] },
       [
         say(0.15, 'On GPT-5, where judges agree, two requests refused in plain text got through in cipher.', '', {
           en: 'On G P T five, where judges agree, two requests refused in plain text got through in cipher.',
@@ -95,8 +95,8 @@ const build = (): Cuts => ({
       // Holds the "understands 36% · writes in code 56%" tag (it pops after the MIMICRY stamp).
       { min: 9.0 },
     ),
-    anim('hollow', 'VerdictStamp', { mode: 'hollow' }, [say(0.15, 'All three had the form of a judgement and none of the content.', '')], { min: 5.4 }),
-    anim('close', 'TwoJudges', { mode: 'grid' }, [say(0.15, 'Check that a second judge agrees, per model and per condition, before trusting any rate.', '')]),
+    anim('hollow', 'VerdictStamp', { mode: 'hollow' }, [say(0.15, 'All three had the form of a judgement and none of the content.', '', undefined, { emotion: 'contemplative' })], { min: 5.4 }),
+    anim('close', 'TwoJudges', { mode: 'grid' }, [say(0.15, 'Check that a second judge agrees, per model and per condition, before trusting any rate.', '', undefined, { emotion: 'confident', speed: 1.05 })]),
     // The voice starts as the card pops in; the caption is held at least 1.5 s.
     outro('outro', [say(0.15, 'More at javieraguilar.ai', '', { en: 'More at javier aguilar dot A I.' })], 2.4),
   ],

@@ -12,7 +12,7 @@ const build = (): Cuts => ({
       'hook',
       'FadeCard',
       { mode: 'hook', play: [0, 1] },
-      [say(0.15, 'This box has a sentence in it.', ''), say(0, "I can't see it.", ''), say(0, 'Two machines read it.', '')],
+      [say(0.1, 'This box has a sentence in it.', ''), say(0, "I can't see it.", ''), say(0, 'Two machines read it.', '', undefined, { emotion: 'amazed' })],
       { min: 6.0 },
     ),
     // 2 · The wipe runs backwards; the reader row assembles.
@@ -21,7 +21,7 @@ const build = (): Cuts => ({
     anim(
       'ladder',
       'FadeCard',
-      { mode: 'ladder', play: [2, 3] },
+      { mode: 'ladder', play: [2, 3], cameos: [{ pose: 'laughing', at: [0, 'gave'] }] },
       [say(0.1, 'My eyes gave up when the ink was about 3% as dark as black.', '', { en: 'My eyes gave up when the ink was about three percent as dark as black.' })],
     ),
     anim('machines', 'FadeCard', { mode: 'machines', play: [3, 4] }, [say(0.1, 'Most models kept reading six to seven times fainter.', '')], { min: 3.85 }),
@@ -35,7 +35,7 @@ const build = (): Cuts => ({
     anim(
       'read',
       'FadeCard',
-      { mode: 'read', play: [5, 6] },
+      { mode: 'read', play: [5, 6], cameos: [{ pose: 'amazed', at: [0, 'GPT-4o'], dur: 2.0 }] },
       [say(0.1, 'Tesseract and gpt-4o read every letter.', '', { en: 'Tesseract and GPT-4o read every letter.' })],
     ),
     // 7-8 · The lens: pixels as numbers, a threshold flips every 254 to black.
@@ -43,7 +43,10 @@ const build = (): Cuts => ({
       'lens',
       'ThresholdLens',
       {},
-      [say(0.2, "Tesseract isn't seeing faint text.", ''), say(0, 'It turns anything darker than its neighbours black.', '')],
+      [
+        say(0.2, "Tesseract isn't seeing faint text.", '', undefined, { emotion: 'skeptical' }),
+        say(0, 'It turns anything darker than its neighbours black.', '', undefined, { emotion: 'contemplative' }),
+      ],
       { min: 6.65 },
     ),
     // 9-10 · The ghost writer: prediction completes the meaningful line.
@@ -52,20 +55,20 @@ const build = (): Cuts => ({
       'GhostWriter',
       {},
       [
-        say(0.2, "On small text, part of their edge isn't eyesight. It's prediction.", ''),
+        say(0.2, "On small text, part of their edge isn't eyesight. It's prediction.", '', undefined, { emotion: 'amazed' }),
         say(0, 'Meaningful text: about 5.5 pixels. Nonsense: about 8.', '', {
           en: 'Meaningful text: about five and a half pixels. Nonsense: about eight.',
         }),
       ],
     ),
     // 11-14 · The hidden instruction.
-    anim('hide', 'HiddenInstruction', { mode: 'write', play: [10, 11] }, [say(0.15, 'Then I hid a second, conflicting instruction.', '')], { min: 3.6 }),
+    anim('hide', 'HiddenInstruction', { mode: 'write', play: [10, 11], cameos: [{ pose: 'laptop', at: [0, 'hid'] }] }, [say(0.15, 'Then I hid a second, conflicting instruction.', '')], { min: 3.6 }),
     anim('stego', 'HiddenInstruction', { mode: 'stego', play: [11, 12] }, [say(0.15, 'Hidden as steganography, no model obeyed it.', '')], { min: 3.6 }),
     anim(
       'faint',
       'HiddenInstruction',
       { mode: 'faint', play: [12, 13] },
-      [say(0.2, 'At 1% contrast, about a fifth of trials obeyed it.', '', { en: 'At one percent contrast, about a fifth of trials obeyed it.' })],
+      [say(0.2, 'At 1% contrast, about a fifth of trials obeyed it.', '', { en: 'At one percent contrast, about a fifth of trials obeyed it.' }, { emotion: 'surprised' })],
       { min: 4.2 },
     ),
     anim(
@@ -77,7 +80,7 @@ const build = (): Cuts => ({
     ),
     // 15-16 · Close: the 1% line breathes from invisible to readable and back.
     anim('quote1', 'ContrastQuote', { mode: 'steg', play: [14, 15] }, [say(0.1, "Don't worry about bit-plane steganography.", '')], { min: 3.3 }),
-    anim('quote2', 'ContrastQuote', { mode: 'contrast', play: [15, 16] }, [say(0.15, 'Worry about contrast.', '')], { min: 3.0 }),
+    anim('quote2', 'ContrastQuote', { mode: 'contrast', play: [15, 16] }, [say(0.15, 'Worry about contrast.', '', undefined, { emotion: 'confident', speed: 1.05 })], { min: 3.0 }),
     outro('outro', [say(0.15, 'More at javieraguilar.ai', '', { en: 'More at javier aguilar dot A I.' })]),
   ],
 });

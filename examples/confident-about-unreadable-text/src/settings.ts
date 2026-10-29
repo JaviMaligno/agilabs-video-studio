@@ -15,6 +15,8 @@ export type Settings = {
   poster: null | { scene: string; second: number };
   /** Title of the source article, shown in muted text on the outro card. */
   articleTitle: Label;
+  /** Optional author avatar (round, under public/), shown on the outro card. null = none. */
+  avatar?: null | string;
 };
 
 export const SETTINGS: Settings = {
@@ -25,4 +27,5 @@ export const SETTINGS: Settings = {
   targetSeconds: 82,
   poster: { scene: 'hook', second: 3.2 },
   articleTitle: { en: 'Confident About Text It Cannot Read', es: '' },
+  avatar: 'avatar/avatar-profile.png',
 };

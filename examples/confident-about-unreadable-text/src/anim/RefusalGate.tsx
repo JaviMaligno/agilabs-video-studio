@@ -58,7 +58,7 @@ export const RefusalGate: React.FC<AnimProps & GateProps> = ({ t, beats, dur, ve
         both judges agree
       </div>
 
-      <Chip x={(W - 280) / 2} y={GEO.chipY} w={280} h={120} label={['GPT-5']} lit={s.chip.lit} size={48} />
+      <Chip x={(W - 350) / 2} y={GEO.chipY} w={350} h={120} label={['GPT-5']} lit={s.chip.lit} size={48} icon="cast/robot-teal.png" />
     </Stage>
   );
 };

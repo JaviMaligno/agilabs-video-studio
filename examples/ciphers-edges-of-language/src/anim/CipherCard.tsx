@@ -258,6 +258,38 @@ const Break: React.FC<{ s: BreakState; W: number; H: number }> = ({ s, W, H }) =
 };
 
 // ---------- rosetta ----------
+/** A grey stone tablet with a chipped edge, carved rule lines and a couple of cracks. */
+const StoneSlab: React.FC<{ w: number; h: number }> = ({ w, h }) => {
+  const outline = [
+    [26, 18], [w * 0.22, 4], [w * 0.5, 12], [w * 0.74, 0], [w - 34, 14], [w - 6, 64], [w, h * 0.45], [w - 12, h * 0.78],
+    [w - 30, h - 8], [w * 0.62, h - 2], [w * 0.4, h - 12], [w * 0.16, h], [14, h - 22], [0, h * 0.6], [8, h * 0.3], [2, 70],
+  ]
+    .map(([x, y]) => `${x.toFixed(0)},${y.toFixed(0)}`)
+    .join(' ');
+  return (
+    <svg width={w} height={h} style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }}>
+      <defs>
+        <linearGradient id="stone-face" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#b9bcc4" />
+          <stop offset="0.5" stopColor="#8e929c" />
+          <stop offset="1" stopColor="#6b6f79" />
+        </linearGradient>
+        <radialGradient id="stone-shade" cx="0.5" cy="0.45" r="0.7">
+          <stop offset="0.55" stopColor="#000000" stopOpacity="0" />
+          <stop offset="1" stopColor="#000000" stopOpacity="0.35" />
+        </radialGradient>
+      </defs>
+      <polygon points={outline} fill="url(#stone-face)" stroke="#4b4f58" strokeWidth={5} strokeLinejoin="round" />
+      <polygon points={outline} fill="url(#stone-shade)" />
+      {/* Carved panel holding the pairs: dark, so the light text stays readable. */}
+      <rect x={40} y={86} width={w - 80} height={h - 120} rx={16} fill="#1b1d24" opacity={0.88} stroke="#3e424c" strokeWidth={4} />
+      <path d={`M ${w * 0.74} 0 L ${w * 0.71} 34 L ${w * 0.76} 62`} stroke="#4b4f58" strokeWidth={4} fill="none" strokeLinecap="round" />
+      <path d={`M 2 ${h * 0.6} L 26 ${h * 0.64} L 20 ${h * 0.72}`} stroke="#4b4f58" strokeWidth={4} fill="none" strokeLinecap="round" />
+      <path d={`M ${w * 0.62} ${h - 2} L ${w * 0.6} ${h - 26}`} stroke="#4b4f58" strokeWidth={4} fill="none" strokeLinecap="round" />
+    </svg>
+  );
+};
+
 const ROS = { tabletTop: 10, tabletH: 400, rowY: [140, 236, 332], codeX: 520, fs: 42, cardTop: 600, cardH: 150, cardFs: 54 };
 
 const Rosetta: React.FC<{ s: RosettaState; W: number }> = ({ s, W }) => {
@@ -267,22 +299,21 @@ const Rosetta: React.FC<{ s: RosettaState; W: number }> = ({ s, W }) => {
   const codeSlot = ROS.fs * SLOT;
   return (
     <>
+      {/* A drawn stone slab (chipped outline, carved rule lines, cracks) holding the pairs. */}
       <div
         style={{
           position: 'absolute',
-          left: 30,
-          width: W - 60,
+          left: 20,
+          width: W - 40,
           top: ROS.tabletTop,
           height: ROS.tabletH,
-          borderRadius: 30,
-          background: `linear-gradient(160deg, ${alpha(C.muted, 0.22)}, ${alpha(C.card, 0.95)} 55%, ${alpha(C.muted, 0.12)})`,
-          border: `3px solid ${alpha(C.muted, 0.45)}`,
-          boxShadow: `inset 0 0 50px ${alpha('#000000', 0.55)}`,
           opacity: s.tablet.appear,
           transform: `translateY(${(1 - s.tablet.appear) * -50}px)`,
+          filter: `drop-shadow(0 14px 30px ${alpha('#000000', 0.6)})`,
         }}
       >
-        <div style={{ position: 'absolute', top: 26, width: '100%', textAlign: 'center', fontSize: 36, fontWeight: 800, letterSpacing: '0.18em', color: C.muted }}>
+        <StoneSlab w={W - 40} h={ROS.tabletH} />
+        <div style={{ position: 'absolute', top: 30, width: '100%', textAlign: 'center', fontSize: 36, fontWeight: 800, letterSpacing: '0.18em', color: '#3b3f4a' }}>
           ROSETTA STONE
         </div>
       </div>

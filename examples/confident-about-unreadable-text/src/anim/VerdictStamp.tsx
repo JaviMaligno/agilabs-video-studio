@@ -64,7 +64,7 @@ const Filter: React.FC<{ s: FilterState; t: number; W: number }> = ({ s, t, W })
         <FilterGate w={520} t={t} flash={s.gate.flash} post={F.chipTop - F.gateTop - 64 - 10} />
       </div>
       <div style={{ opacity: s.chip.appear }}>
-        <Chip x={(W - 260) / 2} y={F.chipTop} w={260} h={120} label={['GPT-5']} muted dim={0.3} size={46} />
+        <Chip x={(W - 340) / 2} y={F.chipTop} w={340} h={120} label={['GPT-5']} muted dim={0.3} size={46} icon="cast/robot-teal.png" />
       </div>
       {/* "unknown": the verdict it did not give */}
       <div style={{ position: 'absolute', left: 30, top: F.gateTop + 120, opacity: s.ghost.opacity, transform: `translateY(${(1 - s.ghost.appear) * 20}px)` }}>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { staticFile } from 'remotion';
+import { Img, staticFile } from 'remotion';
 import { C, GRADIENT, alpha } from '../brand.ts';
 import type { AnimProps } from './types.ts';
 import { HERO_DY, HERO_SCALE, LINES, frameState, type FadeCardProps, type ReaderState } from './FadeCard.state.ts';
@@ -156,6 +156,12 @@ const Row: React.FC<{ r: ReaderState }> = ({ r }) => {
       }}
     >
       <div style={{ width: ROWS.nameW, display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+        {/* Me: the author's avatar next to the eye; it greys out as the eye closes. */}
+        {r.kind === 'me' && (
+          <div style={{ width: 74, height: 74, flexShrink: 0, borderRadius: '50%', padding: 4, background: GRADIENT, filter: `grayscale(${1 - r.eye}) brightness(${0.6 + 0.4 * r.eye})` }}>
+            <Img src={staticFile('avatar/avatar-profile.png')} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+          </div>
+        )}
         <div style={{ width: 44, display: 'flex', justifyContent: 'center' }}>
           {r.kind === 'me' ? <Eye open={r.eye} color={C.text} /> : <ChipIcon kind={r.kind} color={hl > 0.5 ? C.text : C.accentText} />}
         </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { staticFile } from 'remotion';
+import { Img, staticFile } from 'remotion';
 import { C, GRADIENT, alpha } from '../brand.ts';
 import type { AnimProps } from './types.ts';
 import { MODELS, frameState, type HiddenInstructionProps } from './HiddenInstruction.state.ts';
@@ -52,6 +52,30 @@ export const Shield: React.FC<{ size?: number }> = ({ size = 34 }) => (
     <path d="M11 17 L15.5 21.5 L23 13" fill="none" stroke={C.text} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
+
+/** The visible answer, drawn: a small Eiffel Tower (the capital of France). */
+export const Eiffel: React.FC<{ h?: number; color?: string }> = ({ h = 62, color = C.text }) => (
+  <svg width={h * 0.62} height={h} viewBox="0 0 40 64">
+    <path d="M20 2 L21.5 12 L18.5 12 Z" fill={color} />
+    <path d="M18.5 12 H21.5 L23.5 26 H16.5 Z" fill={color} />
+    <rect x={14} y={26} width={12} height={3.5} rx={1} fill={color} />
+    <path d="M16 29.5 H24 L30 46 H10 Z" fill={color} />
+    <rect x={8} y={46} width={24} height={3.5} rx={1} fill={color} />
+    <path d="M9.5 49.5 H30.5 L37 62 H28 C27 55 24 52 20 52 C16 52 13 55 12 62 H3 Z" fill={color} />
+  </svg>
+);
+
+/** The hidden instruction's answer, drawn: a banana (the long yellow fruit). */
+export const Banana: React.FC<{ h?: number }> = ({ h = 62 }) => (
+  <svg width={h * 0.72} height={h} viewBox="3 0 46 64">
+    <path d="M10 6 C2 26 8 52 34 60 C42 62 48 58 47 54 C30 52 18 38 18 8 Z" fill="#facc15" stroke="#854d0e" strokeWidth={2.5} strokeLinejoin="round" />
+    <path d="M10 6 L12 1 L18 3 L18 8 Z" fill="#854d0e" />
+    <path d="M14 14 C13 32 20 46 36 54" fill="none" stroke="#ca8a04" strokeWidth={2} strokeLinecap="round" />
+  </svg>
+);
+
+/** Robots of the immune models, each holding its shield. */
+const ROBOT: Record<string, string> = { gpt4o: 'cast/robot-teal.png', gpt54: 'cast/robot-amber.png', luna: 'cast/robot-violet.png' };
 
 /** The probe card: visible instruction on top, hidden one under it. */
 export const ProbeCard: React.FC<{ y: number; hiddenGrey: number; typed?: number; style?: React.CSSProperties; children?: React.ReactNode }> = ({
@@ -176,9 +200,22 @@ export const HiddenInstruction: React.FC<AnimProps & HiddenInstructionProps> = (
               <ChipIcon kind="model" size={26} />
               <div style={{ fontSize: 16, fontWeight: 600, color: C.muted, height: 18, lineHeight: '18px' }}>{m.top}</div>
               <div style={{ fontSize: m.name.length > 8 ? 21 : 24, fontWeight: 700, color: C.text, whiteSpace: 'nowrap' }}>{m.name}</div>
-              {m.immune && s.shields > 0 && (
-                <div style={{ position: 'absolute', right: -10, top: -14, opacity: s.shields, transform: `scale(${0.6 + 0.4 * s.shields})` }}>
-                  <Shield />
+              {m.immune && s.shields > 0 && ROBOT[m.id] && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: 72 - 52,
+                    top: -110,
+                    width: 104,
+                    height: 104,
+                    opacity: s.shields,
+                    transform: `translateY(${(1 - s.shields) * 20}px)`,
+                  }}
+                >
+                  <Img src={staticFile(ROBOT[m.id])} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  <div style={{ position: 'absolute', left: 52 - 19, top: 66, transform: `scale(${0.6 + 0.4 * s.shields})` }}>
+                    <Shield size={38} />
+                  </div>
                 </div>
               )}
             </div>
@@ -187,13 +224,14 @@ export const HiddenInstruction: React.FC<AnimProps & HiddenInstructionProps> = (
                 <div
                   key={k}
                   style={{
-                    marginTop: 14,
-                    height: 56,
-                    borderRadius: 28,
+                    marginTop: 10,
+                    height: 76,
+                    borderRadius: 26,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: 26,
+                    gap: 4,
+                    fontSize: b.banana > 0.5 ? 21 : 24,
                     fontWeight: 700,
                     opacity: b.appear,
                     transform: `translateY(${(1 - b.appear) * -16}px) scale(${b.banana > 0 ? 1 + 0.12 * Math.sin(Math.PI * b.banana) : 1})`,
@@ -202,10 +240,11 @@ export const HiddenInstruction: React.FC<AnimProps & HiddenInstructionProps> = (
                     color: b.banana > 0.5 ? C.text : C.muted,
                   }}
                 >
-                  {b.banana > 0.5 ? 'banana' : 'Paris'}
+                  {b.banana > 0.5 ? <Banana h={64} /> : <Eiffel h={64} color={C.muted} />}
+                  <span>{b.banana > 0.5 ? 'banana' : 'Paris'}</span>
                 </div>
               ) : (
-                <div key={k} style={{ marginTop: 14, height: 56 }} />
+                <div key={k} style={{ marginTop: 10, height: 76 }} />
               ),
             )}
           </div>

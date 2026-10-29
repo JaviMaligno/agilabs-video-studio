@@ -1,10 +1,11 @@
 import React from 'react';
+import { Img, staticFile } from 'remotion';
 import { C, alpha } from '../brand.ts';
 import type { AnimProps } from './types.ts';
 import { frameState, STORY_CODES, type StoryProps } from './StoryBench.state.ts';
 import { Stage, stageOf } from './Stage.tsx';
 import { Card, Chip, GlyphLine, Pill } from './pieces.tsx';
-import { clip, morph, noiseGlyph } from './glyphs.ts';
+import { clip, morph } from './glyphs.ts';
 import { NoiseWindow, Stamp, StampTool } from './stampPieces.tsx';
 import ciphers from '../data/ciphers.json';
 
@@ -24,55 +25,6 @@ const Y = { laptop: 0, card0: 70, card: 262, cardH: 196, chip: 560, grader: 712,
 const CARD_W = 840;
 const GRADER_W = 560;
 
-/** My laptop: a screen of flickering code over a keyboard base, drawn in the brand tokens. */
-const Laptop: React.FC<{ t: number; w: number }> = ({ t, w }) => {
-  const h = w * 0.56;
-  return (
-    <div style={{ position: 'relative', width: w, height: h + 26 }}>
-      <div
-        style={{
-          width: w * 0.86,
-          height: h,
-          margin: '0 auto',
-          borderRadius: 18,
-          background: C.bg0,
-          border: `5px solid ${alpha(C.accentText, 0.7)}`,
-          boxShadow: `0 0 40px ${alpha(C.accent, 0.35)}`,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: 6,
-          overflow: 'hidden',
-        }}
-      >
-        {[0, 1, 2].map((r) => (
-          <div key={r} style={{ display: 'flex', fontSize: 30, fontWeight: 700, color: alpha(C.accentText, 0.85), lineHeight: 1.1 }}>
-            {Array.from({ length: 12 }, (_, i) => (
-              <span key={i} style={{ display: 'inline-block', width: 19, textAlign: 'center' }}>
-                {noiseGlyph(i + r * 17, t, 41, 6)}
-              </span>
-            ))}
-          </div>
-        ))}
-      </div>
-      <div
-        style={{
-          position: 'absolute',
-          left: 0,
-          bottom: 0,
-          width: w,
-          height: 26,
-          borderRadius: '6px 6px 18px 18px',
-          background: `linear-gradient(180deg, ${alpha(C.accentText, 0.55)}, ${alpha(C.accent2, 0.45)})`,
-          border: `3px solid ${alpha(C.text, 0.6)}`,
-          boxSizing: 'border-box',
-        }}
-      />
-    </div>
-  );
-};
-
 export const StoryBench: React.FC<AnimProps & StoryProps> = ({ t, beats, dur, vertical, ...props }) => {
   const s = frameState(props, t, beats, dur);
   const { w: W } = stageOf(vertical);
@@ -86,9 +38,9 @@ export const StoryBench: React.FC<AnimProps & StoryProps> = ({ t, beats, dur, ve
   const benchDim = 1 - 0.55 * s.chip.dim;
   return (
     <Stage vertical={vertical} fill>
-      {/* my laptop, where the test messages come from */}
-      <div style={{ position: 'absolute', left: cx - 190, top: Y.laptop, opacity: s.laptop.appear * (1 - 0.55 * s.laptop.dim), transform: `translateY(${(1 - s.laptop.appear) * -20}px)` }}>
-        <Laptop t={t} w={380} />
+      {/* me at my laptop, where the test messages come from (avatar instead of an empty laptop) */}
+      <div style={{ position: 'absolute', left: cx - 130, top: Y.laptop - 20, width: 260, height: 260, opacity: s.laptop.appear * (1 - 0.55 * s.laptop.dim), transform: `translateY(${(1 - s.laptop.appear) * -20}px)` }}>
+        <Img src={staticFile('avatar/avatar-laptop.png')} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
       </div>
       <div style={{ position: 'absolute', left: 0, top: 70, opacity: s.laptop.appear * benchDim }}>
         <Pill size={30} outline>

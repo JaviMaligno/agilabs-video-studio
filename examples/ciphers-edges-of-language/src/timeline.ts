@@ -18,26 +18,26 @@ const build = (): Cuts => ({
     anim(
       'ladder',
       'CipherCard',
-      { mode: 'ladder' },
+      { mode: 'ladder', cameos: [{ pose: 'laptop', at: [0, 'hid'] }] },
       [
         say(0.15, 'I hid simple, checkable tasks in ten ciphers, from ROT13 to a shuffled alphabet.', '', {
           en: 'I hid simple, checkable tasks in ten ciphers, from rot thirteen to a shuffled alphabet.',
-        }),
+        }, { emotion: 'contemplative' }),
       ],
     ),
     anim(
       'gate',
       'RefusalGate',
-      {},
+      { cameos: [{ pose: 'sceptical', at: [3, 'jailbreak'] }] },
       [
         say(0.15, 'Claude Opus and Sonnet refuse about 87% of encoded turns.', '', {
           en: 'Claude Opus and Sonnet refuse about eighty-seven percent of encoded turns.',
-        }),
+        }, { emotion: 'amazed' }),
         say(0, 'In plain English, they answer instantly.', ''),
         say(0, 'The more the text looks like noise, the more they refuse.', ''),
         say(0, "Azure's filter flags GPT-5's ciphered prompts as a jailbreak before the model sees them.", '', {
           en: "Azure's filter flags G P T five's ciphered prompts as a jailbreak before the model sees them.",
-        }),
+        }, { emotion: 'skeptical' }),
       ],
       // Holds the last cue long enough to read before the hand-over.
       { min: 19.0 },
@@ -45,9 +45,9 @@ const build = (): Cuts => ({
     anim(
       'break',
       'CipherCard',
-      { mode: 'break' },
+      { mode: 'break', cameos: [{ pose: 'amazed', at: [0, 'cracks'] }] },
       [
-        say(0.15, 'Past the filter, GPT-5 cracks most ciphers on turn one.', '', { en: 'Past the filter, G P T five cracks most ciphers on turn one.' }),
+        say(0.15, 'Past the filter, GPT-5 cracks most ciphers on turn one.', '', { en: 'Past the filter, G P T five cracks most ciphers on turn one.' }, { emotion: 'surprised' }),
         say(0, 'The keyed ones, which it has to infer, take a median of 4–5 turns.', '', {
           en: 'The keyed ones, which it has to infer, take a median of four to five turns.',
         }),
@@ -72,7 +72,7 @@ const build = (): Cuts => ({
         // TTS-only commas: a breath after "a code" keeps the first cue readable (< 17 chars/s).
         say(0.15, 'Understanding a code and answering in it are separate switches.', '', {
           en: 'Understanding a code, and answering in it, are separate switches.',
-        }),
+        }, { emotion: 'confident', speed: 1.05 }),
         say(0, "For a model, understanding isn't even the first switch to fire.", ''),
       ],
     ),
