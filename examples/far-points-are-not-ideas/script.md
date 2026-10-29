@@ -4,6 +4,7 @@ Article: https://www.javieraguilar.ai/en/blog/far-points-are-not-ideas/ · EN on
 
 | Scene | Component | EN line | Visual | Source sentence |
 |---|---|---|---|---|
+| tweet (screenshot) | — | — | Real tweet screenshot (public/cast/tweet.png, captured 2026-10-29) | — |
 | hook | intro (curious) | Can AI invent a new idea by picking an empty spot on the map of everything that exists? | Hook card | "a recipe on X for getting AI to invent genuinely new ideas" |
 | tweet | GapMap tweet | A tweet proposed exactly that: / map every game on Steam, pick points far from all of them, / and turn each one back into a game. | Tweet card, Steam dot map, far star | "You embed the games on Steam, pick points in the space that are far from all of them, turn each point back into a game description" |
 | friend | GapMap friend | A friend said image models already do it: / ask for an astronaut riding a horse, and you get one. | Friend caricature, astronaut on a horse | "A friend replied ... image diffusion shows strange, meaningful corners exist: an astronaut riding a horse." |
@@ -14,8 +15,8 @@ Article: https://www.javieraguilar.ai/en/blog/far-points-are-not-ideas/ · EN on
 | stamp | GapMap stamp (confident) | It just blends whatever you show it. | "= its neighbours" stamp | "Decoding a point with an LLM blends its neighbours." |
 | search | GapMap search (last line amazed) | Then a real search, with no neighbours at all. / The best coherent text I found sits at 0.14. / The point is at 1. | Probe on a 0–1 ruler stops at 0.14 | "The best I found stays at 0.14 from a point that sits at 1" |
 | cap | GapMap cap | Texts live on a narrow cap of the sphere. / Far points sit outside it. | Sphere with lit cap, star outside | "they occupy a narrow cap of the sphere ... FAR points ... fall outside the cap" |
-| museums | GapMap museums, cameo amazed | What did give new ideas was simply asking for one. / Though one model wrote 46 museums out of 50… | Robot, 50 tiles fill with museums, 46/50 | "Novelty came from asking for it"; "luna through Codex wrote 46 museums out of 50" |
-| diverse | GapMap diverse | …until it could see what it had already proposed. | Robot sees its earlier ideas; tiles diversify | "PLAIND, in which the model sees the titles it has already proposed. Repetition drops" |
+| museums | GapMap museums, cameo amazed | What did work was asking with no map at all. / At first, one model repeated itself: 46 museums out of 50. | Robot, 50 tiles fill with museums, 46/50 | "the most novel output was the one that did not use the map: PLAIN"; "luna through Codex wrote 46 museums out of 50" |
+| diverse | GapMap diverse | Once it could see its earlier ideas, they varied, / and stayed the most original of the whole test. | Tiles diversify; "most original" | "PLAIND, in which the model sees the titles it has already proposed. Repetition drops ... and novelty stays the highest in all three catalogues" |
 | verdict | KeyQuote (confident 1.05) | A point far from everything isn't an idea. / Almost always, no text fits there. | Quote | "a point far from everything is not an idea waiting for someone to write it down. Almost always, it is a place where no text fits." |
 | outro | outro | More at javieraguilar.ai. | Outro with avatar | — |
 

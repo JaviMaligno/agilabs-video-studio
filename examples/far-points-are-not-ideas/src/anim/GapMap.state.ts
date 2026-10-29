@@ -47,7 +47,9 @@ export function frameState(props: GapProps, t: number, beats: number[], dur: num
   const tt = sceneTime(t, dur);
   const appear = times.map((s) => easeOutCubic(progress(tt, s, STEP_LEN)));
   const len = MOVE_LEN[mode] ?? 0;
-  const prog = len > 0 ? progress(tt, Math.min(times[0] ?? 0, Math.max(0, dur - len)), len) : appear[0] ?? 0;
+  // The museum pile fills while its second line is spoken; other long moves start on step 0.
+  const moveStart = mode === 'museums' ? (times[1] ?? times[0] ?? 0) : (times[0] ?? 0);
+  const prog = len > 0 ? progress(tt, Math.min(moveStart, Math.max(0, dur - len)), len) : appear[0] ?? 0;
   const wobble = Number.isFinite(t) ? Math.sin(t * 2.4) : 0;
   return { mode, appear, progress: prog, wobble };
 }

@@ -11,7 +11,7 @@
 | It blends whatever you show it | stamp | "Decoding a point with an LLM blends its neighbours. ... what comes out depends on what you show it." |
 | Search with no neighbours; best coherent text at 0.14; point at 1 | search, on screen "0.14", "the point: 1" | "The best I found stays at 0.14 from a point that sits at 1" |
 | Texts on a narrow cap; far points outside | cap | "they occupy a narrow cap of the sphere ... so they fall outside the cap" |
-| Asking for one gave new ideas | museums | "Novelty came from asking for it" |
+| Asking with no map worked | museums | "For the judges, the most novel output was the one that did not use the map: PLAIN" |
 | 46 museums out of 50 | museums, on screen "46/50" | "luna through Codex wrote 46 museums out of 50" |
-| Fixed when the model sees its earlier proposals | diverse | "PLAIND, in which the model sees the titles it has already proposed. Repetition drops almost to the level of the guided arms" |
+| Seeing its earlier ideas, they varied and stayed the most original | diverse, on screen "most original" | "PLAIND, in which the model sees the titles it has already proposed. Repetition drops almost to the level of the guided arms, and novelty stays the highest in all three catalogues" |
 | A point far from everything isn't an idea; almost always no text fits | verdict | "a point far from everything is not an idea waiting for someone to write it down. Almost always, it is a place where no text fits." |

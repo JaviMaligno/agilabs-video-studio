@@ -85,23 +85,20 @@ const Pic: React.FC<{ name: string; x: number; y: number; size: number; opacity?
 
 const MAP = blob(110, 340, 590, 280, 230, 3);
 
+const TWEET_MAP = blob(80, 300, 790, 250, 120, 3);
+
 const Tweet: React.FC<{ s: GapState }> = ({ s }) => {
   const [a, b, c] = s.appear;
   return (
     <>
-      <div style={{ position: 'absolute', left: 58, top: 20 + (1 - a) * 30, width: 820, height: 230, opacity: a, borderRadius: 28, background: C.card, border: `2px solid ${alpha(C.text, 0.12)}`, padding: 30, boxSizing: 'border-box' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <div style={{ width: 70, height: 70, borderRadius: 35, background: GRADIENT }} />
-          <div style={{ fontFamily, fontSize: 36, fontWeight: 700, color: C.text }}>@syntheticbeef</div>
-        </div>
-        {[0.95, 0.8, 0.6].map((w, i) => (
-          <div key={i} style={{ marginTop: 18, height: 18, width: `${w * 100}%`, borderRadius: 9, background: alpha(C.text, 0.22) }} />
-        ))}
+      {/* The real tweet (screenshot, public/cast/tweet.png), on a white card. */}
+      <div style={{ position: 'absolute', left: 38, top: 10 + (1 - a) * 30, width: 860, padding: 22, borderRadius: 30, background: '#ffffff', opacity: a, boxShadow: `0 18px 40px ${alpha(C.bg0, 0.6)}`, boxSizing: 'border-box' }}>
+        <Img src={img('tweet')} style={{ width: '100%', display: 'block' }} />
       </div>
-      <Dots dots={MAP} opacity={b} />
-      <Label x={340} y={850} text="every game on Steam" size={36} color={C.muted} opacity={b} />
-      <Star x={790} y={420} opacity={c} pulse={s.wobble} />
-      <Label x={790} y={500} text="far from all" size={36} color="#fde68a" opacity={c} w={300} />
+      <Dots dots={TWEET_MAP} opacity={b} />
+      <Label x={300} y={930} text="every game on Steam" size={36} color={C.muted} opacity={b} />
+      <Star x={790} y={760} opacity={c} pulse={s.wobble} />
+      <Label x={790} y={840} text="far from all" size={36} color="#fde68a" opacity={c} w={300} />
     </>
   );
 };
@@ -330,13 +327,14 @@ const Museums: React.FC<{ s: GapState; diverse?: boolean }> = ({ s, diverse }) =
       </div>
       {GRID.map((g, i) => {
         if (i >= shown) return null;
-        const name = diverse ? (b > 0.5 ? VARIED[(i * 5 + 3) % VARIED.length] : 'museum') : ODD.has(i) ? VARIED[i % 6] : 'museum';
+        const name = diverse ? (a > 0.5 ? VARIED[(i * 5 + 3) % VARIED.length] : 'museum') : ODD.has(i) ? VARIED[i % 6] : 'museum';
         return <Pic key={i} name={name} x={g.x} y={g.y} size={70} opacity={diverse ? 1 : 1} />;
       })}
       {!diverse ? (
-        <div style={{ position: 'absolute', left: 168, top: 800, width: 600, textAlign: 'center', fontFamily, fontSize: 120, fontWeight: 900, opacity: b, ...gradientText }}>46/50</div>
+        <div style={{ position: 'absolute', left: 168, top: 800, width: 600, textAlign: 'center', fontFamily, fontSize: 120, fontWeight: 900, opacity: b * clamp01((s.progress - 0.8) / 0.2), ...gradientText }}>46/50</div>
       ) : null}
-      {!diverse ? <Label x={468} y={940} text="museums" size={44} color={C.muted} opacity={b} /> : null}
+      {!diverse ? <Label x={468} y={940} text="museums" size={44} color={C.muted} opacity={b * clamp01((s.progress - 0.8) / 0.2)} /> : null}
+      {diverse ? <div style={{ position: 'absolute', left: 118, top: 820, width: 700, textAlign: 'center', fontFamily, fontSize: 96, fontWeight: 900, opacity: b, ...gradientText }}>most original</div> : null}
     </>
   );
 };

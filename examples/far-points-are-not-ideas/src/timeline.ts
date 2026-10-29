@@ -77,11 +77,16 @@ const build = (): Cuts => ({
       'GapMap',
       { mode: 'museums', cameos: [{ pose: 'amazed', at: [1, 'museums'], dur: 2 }] },
       [
-        say(0.2, 'What did give new ideas was simply asking for one.', ''),
-        say(0, 'Though one model wrote 46 museums out of 50…', '', { en: 'Though one model wrote forty-six museums out of fifty…' }),
+        say(0.2, 'What did work was asking with no map at all.', ''),
+        say(0, 'At first, one model repeated itself: 46 museums out of 50.', '', { en: 'At first, one model repeated itself: forty-six museums out of fifty.' }, { emotion: 'amazed' }),
       ],
     ),
-    anim('diverse', 'GapMap', { mode: 'diverse' }, [say(0.1, '…until it could see what it had already proposed.', '')]),
+    anim(
+      'diverse',
+      'GapMap',
+      { mode: 'diverse' },
+      [say(0.1, 'Once it could see its earlier ideas, they varied,', ''), say(0, 'and stayed the most original of the whole test.', '', undefined, { emotion: 'confident' })],
+    ),
     anim(
       'verdict',
       'KeyQuote',
