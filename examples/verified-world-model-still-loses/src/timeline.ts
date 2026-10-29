@@ -27,11 +27,11 @@ const build = (): Cuts => ({
     anim(
       'story',
       'StoryGate',
-      {},
+      { cameos: [{ pose: 'laptop', at: [0, 'reproducing'] }] },
       [
         say(0.2, "I was reproducing a DeepMind result: AI writes a game's rules as code, a world model.", ''),
         say(0, 'A planner trusts that code once it passes a check.', ''),
-        say(0, "But does passing the check mean it's right?", ''),
+        say(0, "But does passing the check mean it's right?", '', undefined, { emotion: 'curious' }),
       ],
       { tail: 1.0 },
     ),
@@ -43,10 +43,11 @@ const build = (): Cuts => ({
         nodes: [
           { id: 'rules', label: 'game rules, in words' },
           { id: 'code', label: 'the rules, as code' },
-          { id: 'plan', label: 'planner searches the code' },
+          // The planner and the AI that writes the code are drawn (public/cast/robots), not lettered.
+          { id: 'plan', label: 'planner searches the code', icon: 'cast/robots/robot-graphite.png' },
         ],
         edges: [
-          { from: 'rules', to: 'code', label: 'AI writes' },
+          { from: 'rules', to: 'code', label: 'AI writes', icon: 'cast/robots/robot-teal.png' },
           { from: 'code', to: 'plan', label: 'plays on' },
         ],
       },
@@ -57,13 +58,13 @@ const build = (): Cuts => ({
       'DepthWell',
       { mode: 'gate', chip: TRUTH, chipIn: true, stamp: { text: 'GATE · 100%', sub: 'next state · legal moves · outcome', beat: 1, delay: 1.75 } },
       [
-        say(0.2, 'First, a check: replay random games.', ''),
+        say(0.2, 'First, a check: replay random games.', '', undefined, { emotion: 'contemplative' }),
         say(0, 'Every move must match: 100%.', '', { en: 'Every move must match: a hundred percent.' }),
       ],
     ),
-    anim('question', 'QuestionCard', { mode: 'ask' }, [say(0.3, 'Does passing it make the model good enough to plan with?', '')], { min: 4.2, ...BLEND }),
+    anim('question', 'QuestionCard', { mode: 'ask' }, [say(0.3, 'Does passing it make the model good enough to plan with?', '', undefined, { emotion: 'curious' })], { min: 4.2, ...BLEND }),
     anim('null', 'QuestionCard', { mode: 'yes', stampDelay: 2.15 }, [say(0.2, 'On small games with complete rules, yes.', '')], { min: 3.6 }),
-    anim('rule', 'DepthWell', { mode: 'rule', chip: TRUTH, chipIn: true }, [say(0.2, 'So I gave a small chess game one extra rule.', '')], { min: 3.4, ...BLEND }),
+    anim('rule', 'DepthWell', { mode: 'rule', chip: TRUTH, chipIn: true, cameos: [{ pose: 'pointing', at: [0, 'gave'], dur: 2.0 }] }, [say(0.2, 'So I gave a small chess game one extra rule.', '')], { min: 3.4, ...BLEND }),
     anim('ruleCap', 'DepthWell', { mode: 'ruleCap', chip: TRUTH }, [say(0.15, 'At the move limit, the side with more pieces wins.', '')], { min: 4.4, ...BLEND }),
     anim(
       'random',
@@ -95,7 +96,7 @@ const build = (): Cuts => ({
       'gate2',
       'DepthWell',
       { mode: 'gate', sample: 'missed', floor: 'model', chip: MODEL, stamp: { text: 'CHECK PASSED · 100%', sub: 'when no sampled game reached the rule', beat: 0, delay: 2.6 } },
-      [say(0.15, 'When the random games missed it, it still passed at 100%,', '', { en: 'When the random games missed it, it still passed at a hundred percent,' })],
+      [say(0.15, 'When the random games missed it, it still passed at 100%,', '', { en: 'When the random games missed it, it still passed at a hundred percent,' }, { emotion: 'surprised' })],
       BLEND,
     ),
     anim(
@@ -108,7 +109,7 @@ const build = (): Cuts => ({
     anim(
       'meter',
       'WinRateMeter',
-      { delays: { model: 0.8, fair: 1.5 } },
+      { delays: { model: 0.8, fair: 1.5 }, cameos: [{ pose: 'sceptical', at: [0, 'lost'] }] },
       [
         say(0.3, 'At play it lost: win rate 0.404;', '', { en: 'At play it lost: win rate point four oh four;' }),
         say(0, 'a fair baseline gets 0.495.', '', { en: 'a fair baseline gets point four nine five.' }),
@@ -116,9 +117,9 @@ const build = (): Cuts => ({
       { tail: 3.1 },
     ),
     anim('mechanism', 'DepthWell', { mode: 'mechanism', chip: MODEL }, [say(0.2, 'The few positions it gets wrong are the ones that decide games.', '')], { min: 4.4 }),
-    anim('verdict', 'QuestionCard', { mode: 'verdict', stampDelay: 2.45 }, [say(0.25, "Verdict: it passed the check, yet wasn't good enough to plan with.", '')], { tail: 1.25 }),
+    anim('verdict', 'QuestionCard', { mode: 'verdict', stampDelay: 2.45 }, [say(0.25, "Verdict: it passed the check, yet wasn't good enough to plan with.", '', undefined, { emotion: 'confident', speed: 1.05 })], { tail: 1.25 }),
     anim('repair', 'DepthWell', { mode: 'repair', chip: MODEL }, [say(0.2, 'Even with the rule in its examples, it stayed blind to it.', '')], { min: 4.9, ...BLEND }),
-    anim('lesson', 'DepthWell', { mode: 'lesson', chip: MODEL }, [say(0.2, "A check vouches for a model where you sample, not where it's used.", '', { en: "A check vouches for a model, where you sample, not where it's used." })], { tail: 1.0 }),
+    anim('lesson', 'DepthWell', { mode: 'lesson', chip: MODEL }, [say(0.2, "A check vouches for a model where you sample, not where it's used.", '', { en: "A check vouches for a model, where you sample, not where it's used." }, { emotion: 'confident' })], { tail: 1.0 }),
     anim(
       'fix',
       'DepthWell',

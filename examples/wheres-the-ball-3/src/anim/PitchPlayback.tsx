@@ -1,4 +1,5 @@
 import React from 'react';
+import { Img, staticFile } from 'remotion';
 import { C, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
@@ -72,7 +73,10 @@ export const PitchPlayback: React.FC<AnimProps & PitchProps> = (p) => {
         );
       })}
       {s.guessTag > 0 && (
-        <div style={{ position: 'absolute', left: px(s.guesses[2]).x - 40, top: px(s.guesses[2]).y - 150, opacity: s.guessTag }}>
+        // The frontier models, drawn (public/cast/robot-graphite.png, grey like their crosshairs) on top of the
+        // tag, over open grass: beside it, the robot would cover a player.
+        <div style={{ position: 'absolute', left: px(s.guesses[2]).x - 40, top: px(s.guesses[2]).y - 150 - 108, opacity: s.guessTag, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <Img src={staticFile('cast/robot-graphite.png')} style={{ width: 104, height: 104, objectFit: 'contain' }} />
           <Tag text="frontier AI" opacity={1} size={40} />
         </div>
       )}

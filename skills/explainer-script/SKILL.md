@@ -88,6 +88,12 @@ initials, labels or plain text boxes, propose the drawing instead: a caricature 
 literal screenshot. Keep text for numbers, quotes and the question on screen. Flag each one in the
 script ("Ana, Bea, Carlos, Diego as caricatures") so the assets get made before the build.
 
+**Tone per line (optional).** The narration is voiced `excited` by default. Where a line
+reads better in another register, mark it in the script with its emotion: a question
+`curious`, a plain statement of method `contemplative` or `confident`, a doubt `skeptical`, a
+reveal `amazed` or `surprised`, the verdict `confident` (speed 1.05). A handful per video, on the
+lines that carry the change of mood; the rest keep the default (see `narration`).
+
 **Author cameos (optional).** When the video has an author avatar (see `explainer-animation`),
 mark 2-3 moments for it in the script: a *role* cameo where the narration says what the author
 did ("I trained…", "I labelled…"), or a *reaction* at a reveal (amazed), a failure or dubious

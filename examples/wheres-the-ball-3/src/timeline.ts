@@ -108,8 +108,8 @@ const build = (): Cuts => ({
     anim(
       'drawers',
       'BlackBox',
-      { mode: 'drawers', layout: 'box', marks: [[0, 'three'], [1, 'computing']], card: { q: Q0 } },
-      [say(0.2, 'So I opened it three ways.', ''), say(0, 'What is it really computing?', '')],
+      { mode: 'drawers', layout: 'box', marks: [[0, 'three'], [1, 'computing']], card: { q: Q0 }, cameos: [{ pose: 'pointing', at: [0, 'opened'] }] },
+      [say(0.2, 'So I opened it three ways.', ''), say(0, 'What is it really computing?', '', undefined, { emotion: 'curious' })],
       { tail: 1.0 },
     ),
     // 6-9. Opening 1: geometry.
@@ -157,8 +157,8 @@ const build = (): Cuts => ({
     anim(
       'rule',
       'HoleTest',
-      { mode: 'rule', layout: 'ring', marks: [[0, 'rule'], [1, 'beats']], card: { q: Q2 } },
-      [say(0.2, 'My rule, set in advance.', ''), say(0, 'It only counts if it beats plain geometry.', '')],
+      { mode: 'rule', layout: 'ring', marks: [[0, 'rule'], [1, 'beats']], card: { q: Q2 }, cameos: [{ pose: 'thinking', at: [0, 'rule'] }] },
+      [say(0.2, 'My rule, set in advance.', '', undefined, { emotion: 'contemplative' }), say(0, 'It only counts if it beats plain geometry.', '')],
       { tail: 1.4 },
     ),
     anim(
@@ -202,8 +202,15 @@ const build = (): Cuts => ({
     anim(
       'tangled',
       'ConfidenceCloud',
-      { mode: 'tangled', layout: 'minis', marks: [[0, 'tangled'], [0, 'hardest'], [1, 'opposite']], card: { q: Q3 } },
-      [say(0.3, 'I expected balls tangled in a crowd to be hardest.', ''), say(0, "It's the opposite.", '')],
+      {
+        mode: 'tangled',
+        layout: 'minis',
+        marks: [[0, 'tangled'], [0, 'hardest'], [1, 'opposite']],
+        card: { q: Q3 },
+        // Only ~1.7 s of scene are left after "opposite": a short reaction, gone before the blend.
+        cameos: [{ pose: 'laughing', at: [1, 'opposite'], dur: 1.1 }],
+      },
+      [say(0.3, 'I expected balls tangled in a crowd to be hardest.', ''), say(0, "It's the opposite.", '', undefined, { emotion: 'surprised' })],
       { tail: BLEND_TAIL + 0.3 },
     ),
     anim(
@@ -226,7 +233,7 @@ const build = (): Cuts => ({
         marks: [[0, 'less'], [1, 'sure'], [1, 'wrong']],
         card: { q: Q3, stamp: { text: 'Blind spot', at: [1, 'wrong'], after: 0.2, tone: 'accent' } },
       },
-      [say(0.2, 'And on those, it claims less uncertainty.', ''), say(0, "It's most sure exactly where it's most wrong.", '')],
+      [say(0.2, 'And on those, it claims less uncertainty.', ''), say(0, "It's most sure exactly where it's most wrong.", '', undefined, { emotion: 'amazed' })],
       { tail: 1.6 },
     ),
     // 19-20. The verdict.
@@ -239,7 +246,7 @@ const build = (): Cuts => ({
         marks: [[1, 'geometry'], [1, 'weighted'], [1, 'heading']],
         card: { q: Q4, stamp: { text: 'Mostly geometry', at: [1, 'geometry'], after: 0.3, tone: 'ok' } },
       },
-      [say(0.3, 'So the verdict.', ''), say(0, 'It was mostly geometry, one weighted average of where the runners are heading.', '')],
+      [say(0.3, 'So the verdict.', '', undefined, { emotion: 'confident', speed: 1.05 }), say(0, 'It was mostly geometry, one weighted average of where the runners are heading.', '', undefined, { emotion: 'confident', speed: 1.05 })],
       { tail: 1.4 },
     ),
     anim(

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Easing, interpolate } from 'remotion';
+import { Easing, Img, interpolate, staticFile } from 'remotion';
 import { C, alpha } from '../brand.ts';
 import { tx } from '../types.ts';
 import type { AnimProps } from './types.ts';
@@ -62,6 +62,9 @@ export const FlowDiagram: React.FC<AnimProps & FlowDiagramProps> = (p) => {
         const label = p.edges[i]?.label;
         if (!e.valid || !st.valid || label === undefined) return null;
         const [x, y] = e.label;
+        const icon = p.edges[i]?.icon;
+        // An edge with a drawn actor (e.g. the AI that writes): the picture sits before the words.
+        const iconSize = Math.round(labelSize * 3.2);
         return (
           <div
             key={`l${i}`}
@@ -78,15 +81,18 @@ export const FlowDiagram: React.FC<AnimProps & FlowDiagramProps> = (p) => {
               color: st.broken ? C.muted : C.accentText,
               fontStyle: st.broken ? 'italic' : 'normal',
               opacity: interpolate(st.draw, [0.4, 1], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }),
+              ...(icon ? { display: 'flex', alignItems: 'center', gap: 14, justifyContent: e.labelAlign === 'left' ? 'flex-start' : 'center' } : {}),
             }}
           >
-            {tx(label, p.lang)}
+            {icon && <Img src={staticFile(icon)} style={{ width: iconSize, height: iconSize, objectFit: 'contain', flexShrink: 0 }} />}
+            {icon ? <span>{tx(label, p.lang)}</span> : tx(label, p.lang)}
           </div>
         );
       })}
       {geo.nodes.map((n, i) => {
         const appear = s.nodes[i]?.appear ?? 0;
         const scale = interpolate(appear, [0, 1], [0.86, 1], { easing: Easing.out(Easing.back(1.6)) });
+        const icon = p.nodes[i].icon;
         return (
           <div
             key={n.id}
@@ -112,9 +118,11 @@ export const FlowDiagram: React.FC<AnimProps & FlowDiagramProps> = (p) => {
               lineHeight: 1.15,
               textAlign: 'center',
               color: C.text,
+              gap: icon ? 16 : 0,
             }}
           >
-            {tx(p.nodes[i].label, p.lang)}
+            {icon && <Img src={staticFile(icon)} style={{ height: Math.round(n.h * 0.82), width: Math.round(n.h * 0.82), objectFit: 'contain', flexShrink: 0 }} />}
+            {icon ? <span>{tx(p.nodes[i].label, p.lang)}</span> : tx(p.nodes[i].label, p.lang)}
           </div>
         );
       })}

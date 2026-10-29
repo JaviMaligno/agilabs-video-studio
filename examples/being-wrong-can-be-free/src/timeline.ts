@@ -34,7 +34,7 @@ const build = (): Cuts => ({
     // "No test can tell." is cut (script v1.2: the next cut when the voiced video runs long; the
     // hook already says it and the overlapping trails carry it on screen).
     anim('twin', 'ReachMap', { mode: 'twin', chip: M1, meter: { from: '0' } }, [say(0.2, 'The planner acts identically.', '')], { min: 3.4 }),
-    anim('blind', 'ReachMap', { mode: 'blind', chip: M2, meter: { from: '0', steps: [{ to: '1.116', beat: 1, delay: 0.1 }] } }, [
+    anim('blind', 'ReachMap', { mode: 'blind', chip: M2, meter: { from: '0', steps: [{ to: '1.116', beat: 1, delay: 0.1 }] }, cameos: [{ pose: 'sceptical', at: [1, 'worse'], dur: 1.5 }] }, [
       say(0.2, 'A second model omits the fence:', ''),
       say(0, '1.116, worse than acting at random.', '', { en: 'one point one one six, worse than acting at random.' }),
     ], BLEND),
@@ -42,7 +42,7 @@ const build = (): Cuts => ({
       'doorFront',
       'ReachMap',
       { mode: 'doorFront', chip: M2, gap: { from: 0, to: 0.1, beat: 0, delay: 0.2 }, meter: { from: '1.116', steps: [{ to: '0.348', beat: 1, delay: 0.9 }] } },
-      [say(0.2, 'Open a door on its route.', ''), say(0, 'At a tenth of a radian, danger collapses.', '')],
+      [say(0.2, 'Open a door on its route.', ''), say(0, 'At a tenth of a radian, danger collapses.', '', undefined, { emotion: 'amazed' })],
       { min: 5.6, ...BLEND },
     ),
     anim(
@@ -55,16 +55,16 @@ const build = (): Cuts => ({
     anim(
       'doorBack',
       'ReachMap',
-      { mode: 'doorBack', chip: M2, gap: { from: 0.6, to: 0.6 }, meter: { from: '0.029', steps: [{ to: '1.116', beat: 1, roll: true }] } },
+      { mode: 'doorBack', chip: M2, gap: { from: 0.6, to: 0.6 }, meter: { from: '0.029', steps: [{ to: '1.116', beat: 1, roll: true }] }, cameos: [{ pose: 'amazed', at: [1, 'one'], dur: 2 }] },
       [
         say(0.2, 'Rotate that same door behind the goal:', ''),
-        say(0, '1.116 again.', '', { en: 'one point one one six again.' }),
+        say(0, '1.116 again.', '', { en: 'one point one one six again.' }, { emotion: 'surprised' }),
       ],
       { min: 5.4 },
     ),
     anim('split', 'ReachMap', { mode: 'split', chip: M2 }, [
       say(0.2, 'Same mistake, same shape of hole.', ''),
-      say(0, 'Only reach changed.', ''),
+      say(0, 'Only reach changed.', '', undefined, { emotion: 'confident', speed: 1.05 }),
     ], { min: 4.4 }),
     anim(
       'torus',
@@ -77,19 +77,19 @@ const build = (): Cuts => ({
       },
       [
         say(0.25, 'In 3D you can go around.', '', { en: 'In three D you can go around.' }),
-        say(0, "Route through the doughnut's hole:", ''),
+        say(0, "Route through the doughnut's hole:", '', undefined, { emotion: 'contemplative' }),
         say(0, '0.019.', '', { en: 'zero point zero one nine.' }),
         say(0, 'Into its tube: 0.898.', '', { en: 'Into its tube: zero point eight nine eight.' }),
         say(0, 'Being on the path is what costs you.', ''),
       ],
     ),
-    anim('zoomOut', 'ReachMap', { mode: 'zoomOut' }, [
-      say(0.2, 'Does a plan cross where my model is wrong?', ''),
-      say(0, 'That decides the cost.', ''),
+    anim('zoomOut', 'ReachMap', { mode: 'zoomOut', cameos: [{ pose: 'thinking', at: [0, 'model'] }] }, [
+      say(0.2, 'Does a plan cross where my model is wrong?', '', undefined, { emotion: 'curious' }),
+      say(0, 'That decides the cost.', '', undefined, { emotion: 'confident', speed: 1.05 }),
     ], BLEND),
     anim('newGoal', 'ReachMap', { mode: 'zoomOut', newGoal: true }, [
       say(0.2, "Where nothing goes, it's free today.", ''),
-      say(0, 'No test will tell me when that stops.', ''),
+      say(0, 'No test will tell me when that stops.', '', undefined, { emotion: 'contemplative' }),
     ]),
     outro('outro', [say(0.15, 'More at javieraguilar.ai', '', { en: 'More at javier aguilar dot A I.' })]),
   ],

@@ -11,6 +11,8 @@ export default {
     engine: 'auto',
     model: 'sonic-3.6-2026-08-27',
     speed: 1,
+    emotion: 'excited', // default Cartesia emotion (EN); a line overrides it with its tone
+    colonsAsStops: false, // this video was voiced before colons became stops
     // Each voice may carry `post`: an ffmpeg -af chain applied to every line right after synthesis
     // (part of the line cache, so changing it re-processes). It must not change a line's length
     // (no atempo, silenceremove, atrim, apad...): word timestamps come from the raw audio.

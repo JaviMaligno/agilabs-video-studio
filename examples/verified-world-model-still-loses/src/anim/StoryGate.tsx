@@ -1,4 +1,5 @@
 import React from 'react';
+import { Img, staticFile } from 'remotion';
 import { C, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
@@ -16,6 +17,8 @@ const TREE_TOP = 995;
 const TREE_X = GATE.x + GATE.w / 2;
 const LEVEL_Y = [TREE_TOP, TREE_TOP + 90, TREE_TOP + 180];
 const SPREAD = [0, 120, 62];
+/** Size of the planner robot drawn at the tree's root. */
+const PLANNER = 120;
 
 const nodeXY = (level: number, i: number, n: number) => ({ x: TREE_X + (i - (n - 1) / 2) * SPREAD[level], y: LEVEL_Y[level] });
 
@@ -132,6 +135,11 @@ export const StoryGate: React.FC<AnimProps & StoryGateProps> = (p) => {
         })}
       </svg>
 
+      {/* The AI that writes the code, drawn (same robot as the setup diagram), above its label. */}
+      <Img
+        src={staticFile('cast/robots/robot-teal.png')}
+        style={{ position: 'absolute', left: (BOARD.cx + size / 2 + CARD.x) / 2 - 48, top: BOARD.cy - 172, width: 96, height: 96, objectFit: 'contain', opacity: s.arrow.draw }}
+      />
       {/* "AI writes" over the arrow. */}
       <div style={{ position: 'absolute', left: BOARD.cx + size / 2 + 4, width: CARD.x - (BOARD.cx + size / 2) - 4, top: BOARD.cy - 70, textAlign: 'center', fontSize: 34, fontWeight: 700, color: C.accentText, opacity: s.arrow.draw }}>
         AI writes
@@ -230,6 +238,22 @@ export const StoryGate: React.FC<AnimProps & StoryGateProps> = (p) => {
         >
           ?
         </div>
+      )}
+      {/* The planner, drawn (public/cast): a robot standing at the root of its search tree. */}
+      {s.tree.nodes[0].pop > 0 && (
+        <Img
+          src={staticFile('cast/robots/robot-graphite.png')}
+          style={{
+            position: 'absolute',
+            left: TREE_X - PLANNER - 34,
+            top: TREE_TOP - PLANNER / 2 - 10,
+            width: PLANNER,
+            height: PLANNER,
+            objectFit: 'contain',
+            opacity: s.tree.nodes[0].pop,
+            transform: `scale(${0.7 + 0.3 * s.tree.nodes[0].pop})`,
+          }}
+        />
       )}
       <div style={{ position: 'absolute', left: TREE_X - 200, width: 400, top: LEVEL_Y[2] + 34, textAlign: 'center', fontSize: 34, fontWeight: 700, color: C.accentText, opacity: s.tree.label.opacity }}>
         planner plays on it

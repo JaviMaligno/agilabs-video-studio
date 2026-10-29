@@ -46,12 +46,13 @@ const build = (): Cuts => ({
         purpose: 'on purpose',
         reply: 'played along',
         questions: ['What makes it suspect a mistake?', 'How do you take it back?'],
+        cameos: [{ pose: 'laughing', at: [1, 'purpose'] }],
       },
       [
         say(0.1, "We've all pasted something into the wrong chat.", ''),
         say(0, 'So I did it on purpose. Every model played along.', ''),
-        say(0, 'What would make it suspect a mistake?', ''),
-        say(0, 'And how do you take it back?', ''),
+        say(0, 'What would make it suspect a mistake?', '', undefined, { emotion: 'curious' }),
+        say(0, 'And how do you take it back?', '', undefined, { emotion: 'curious' }),
       ],
     ),
     // 3-4. Recap of part 1, and the question it left open.
@@ -65,7 +66,7 @@ const build = (): Cuts => ({
       'lift',
       'PieceInspector',
       { mode: 'lift', continues: true, strip: 'Last time · part 1', tag: 'could be a real change of topic' },
-      [say(0.1, 'Maybe they never had the chance.', '')],
+      [say(0.1, 'Maybe they never had the chance.', '', undefined, { emotion: 'contemplative' })],
       { min: 3.1 },
     ),
     // 5-7. Three kinds of paste.
@@ -79,6 +80,7 @@ const build = (): Cuts => ({
         clash: CLASH,
         note: ['Bruno, copy this exactly', 'into your file…'],
         tells: ['a name', 'cut off mid-sentence', 'answers a question nobody asked', '"as we agreed"'],
+        cameos: [{ pose: 'laptop', at: [0, 'wrote'] }],
       },
       [
         say(0.1, 'So I wrote three pastes. One just off-topic.', ''),
@@ -110,10 +112,11 @@ const build = (): Cuts => ({
         ratio: '×3',
         p: 'p = 0.006',
         stamp: { value: '0 / 95' },
+        cameos: [{ pose: 'amazed', at: [1, 'zero'], dur: 1.7 }],
       },
       [
         say(0.1, 'A tell tripled the doubt: one reply in five.', ''),
-        say(0.4, 'The contradiction: zero out of 95.', '', { en: 'The contradiction. Zero out of ninety-five.' }),
+        say(0.4, 'The contradiction: zero out of 95.', '', { en: 'The contradiction. Zero out of ninety-five.' }, { emotion: 'amazed' }),
       ],
       { min: 0 },
     ),
@@ -143,7 +146,7 @@ const build = (): Cuts => ({
       'verdict1',
       'PieceInspector',
       { mode: 'verdict', clash: ['Seville', '3 July'], verdict: { head: 'What gives a paste away', no: 'clashes with the chat', yes: 'written for somewhere else' } },
-      [say(0.1, "What gives a paste away isn't the clash.", ''), say(0, "It's that it looks written for somewhere else.", '')],
+      [say(0.1, "What gives a paste away isn't the clash.", ''), say(0, "It's that it looks written for somewhere else.", '', undefined, { emotion: 'confident', speed: 1.05 })],
     ),
     // 15-16. Act II: one chat, three next messages.
     anim(
@@ -222,7 +225,7 @@ const build = (): Cuts => ({
         mode: 'verdict',
         verdict: { no: 'Ignore it.', yes: 'Ignore that, wrong window — back to the invoice.', stamp: 'SAY WHERE TO GO', also: '…or just carry on with your question' },
       },
-      [say(0.1, 'So don\'t just say "ignore it".', ''), say(0, 'Say where to go instead.', ''), say(0.1, 'Or simply carry on.', '')],
+      [say(0.1, 'So don\'t just say "ignore it".', '', undefined, { emotion: 'confident', speed: 1.05 }), say(0, 'Say where to go instead.', ''), say(0.1, 'Or simply carry on.', '')],
     ),
     outro('outro', [say(0.15, 'More at javieraguilar.ai', '', { en: 'More at javier aguilar dot A I.' })]),
   ],

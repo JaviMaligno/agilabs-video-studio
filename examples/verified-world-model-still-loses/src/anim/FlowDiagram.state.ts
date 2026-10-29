@@ -1,8 +1,9 @@
 import type { Label } from '../types.ts';
 import { progress, sceneTime, stepTimes } from './steps.ts';
 
-export type FlowNode = { id: string; label: Label; /** Scene second it appears at; default: its own beat. */ at?: number };
-export type FlowEdge = { from: string; to: string; label?: Label; /** Drawn dashed and muted, with a gap. */ broken?: boolean };
+/** `icon`: a cast illustration under public/ (e.g. 'cast/robots/robot-teal.png'), drawn beside the label. */
+export type FlowNode = { id: string; label: Label; /** Scene second it appears at; default: its own beat. */ at?: number; icon?: string };
+export type FlowEdge = { from: string; to: string; label?: Label; /** Drawn dashed and muted, with a gap. */ broken?: boolean; icon?: string };
 export type FlowDiagramProps = { nodes: FlowNode[]; edges: FlowEdge[]; layout: 'vertical' | 'horizontal' };
 
 export type Point = [number, number];

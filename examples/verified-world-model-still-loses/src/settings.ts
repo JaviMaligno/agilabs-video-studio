@@ -15,6 +15,8 @@ export type Settings = {
   poster: null | { scene: string; second: number };
   /** Title of the source article, shown in muted text on the outro card. */
   articleTitle: Label;
+  /** Optional author avatar (round, under public/), shown on the outro card. null = none. */
+  avatar?: null | string;
   /** Optional credit, small and muted under the title on the outro card. */
   credit?: Label;
 };
@@ -28,4 +30,5 @@ export const SETTINGS: Settings = {
   poster: { scene: 'hook', second: 6.0 },
   articleTitle: { en: 'A World Model Can Pass Every Test and Still Lose', es: 'Un modelo del mundo puede pasar todos los tests y aun así perder' },
   credit: { en: 'Game lengths and results: code-world-models (open repo) · preprint arXiv:2607.14169', es: '' },
+  avatar: 'avatar/avatar-profile.png',
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Img, staticFile } from 'remotion';
 import { C, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import { tx } from '../types.ts';
@@ -69,8 +70,22 @@ const MapSvg: React.FC<{ w: World; box: Box; id: string; t: number; labelScale?:
   const sx1 = full ? 1080 : box.left + box.w;
   const clip = { x: v.x0 + (sx0 - ox) * px, y: v.y0 + (box.top - oy) * px, w: (sx1 - sx0) * px, h: box.h * px };
   const feather = 80 * px;
+  // Cartoon robots riding just above (truth twin) or below the physical dot, at a fixed
+  // screen size so they read on a phone; the dot stays the body that meets the fence and the door.
+  const SPR = Math.max(96, 112 * labelScale);
+  const twin = w.robots.length > 1;
+  const halo = ROBOT_R * 2.2 * s + 4;
+  const sprite = (r: World['robots'][number]) => {
+    // Alone it rides below the dot, clear of the 'promised route' and door labels above the route.
+    const below = !twin || r.kind === 'model';
+    const cx = ox + (r.x - v.x0) * s;
+    const cy = oy + (r.y - v.y0) * s;
+    const top = below ? cy + halo : cy - halo - SPR;
+    return { cx, cy: top + SPR / 2, top, below };
+  };
 
   return (
+    <>
     <svg width={1080} height={1920} viewBox="0 0 1080 1920" style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }}>
       <defs>
         <radialGradient id={`${id}-glow`} gradientUnits="userSpaceOnUse" cx={START.x} cy={START.y} r={Math.max(0.01, w.glow.radius)}>
@@ -248,8 +263,8 @@ const MapSvg: React.FC<{ w: World; box: Box; id: string; t: number; labelScale?:
               )}
               {r.label > 0 && (
                 <text
-                  x={r.x - 0.3}
-                  y={r.kind === 'truth' ? r.y - 0.75 : r.y + 1.2}
+                  x={r.x - (SPR / 2 + 10) * px}
+                  y={r.y + (sprite(r).cy - (oy + (r.y - v.y0) * s) + 14) * px}
                   textAnchor="end"
                   fontFamily={fontFamily}
                   fontWeight={700}
@@ -273,6 +288,19 @@ const MapSvg: React.FC<{ w: World; box: Box; id: string; t: number; labelScale?:
         </g>
       </g>
     </svg>
+    {w.robots.map((r, i) => {
+      if (!(r.opacity > 0)) return null;
+      const sp = sprite(r);
+      const ghost = twin && r.kind === 'model';
+      return (
+        <Img
+          key={`spr${i}`}
+          src={staticFile(ghost ? 'cast/robot-rose.png' : 'cast/robot-sky.png')}
+          style={{ position: 'absolute', left: sp.cx - SPR / 2, top: sp.top, width: SPR, height: SPR, objectFit: 'contain', opacity: r.opacity * (ghost ? 0.85 : 1), filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.5))' }}
+        />
+      );
+    })}
+    </>
   );
 };
 

@@ -15,6 +15,8 @@ export type Settings = {
   poster: null | { scene: string; second: number };
   /** Title of the source article, shown in muted text on the outro card. */
   articleTitle: Label;
+  /** Optional author avatar (round, under public/), shown on the outro card. null = none. */
+  avatar?: null | string;
   /** Optional credit, small and muted under the title on the outro card. */
   credit?: Label;
 };
@@ -28,4 +30,5 @@ export const SETTINGS: Settings = {
   poster: { scene: 'doorBack', second: 5.3 },
   articleTitle: { en: 'Being Wrong Can Be Free', es: 'Equivocarse puede salir gratis' },
   credit: { en: 'Simulator, results and proofs: code-world-models (open repo)', es: 'Simulador, resultados y pruebas: code-world-models (repo abierto)' },
+  avatar: 'avatar/avatar-profile.png',
 };

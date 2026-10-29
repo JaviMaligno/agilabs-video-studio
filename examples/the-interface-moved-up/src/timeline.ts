@@ -59,8 +59,8 @@ const build = (): Cuts => ({
       at(s, 0, 'result'),
     ]),
     // A snap back to the macro start: a dip, not a blend.
-    anim('ladder', 'PullBack', { mode: 'ladder' }, [say(0.15, 'Each jump raised what the human looks at.', '')]),
-    cued(anim('code', 'PullBack', { mode: 'code', blend: true }, [say(0.15, 'In the editor, I typed; the model completed.', '')], { min: 4.2 }), (s) => [
+    anim('ladder', 'PullBack', { mode: 'ladder' }, [say(0.15, 'Each jump raised what the human looks at.', '', undefined, { emotion: 'contemplative' })]),
+    cued(anim('code', 'PullBack', { mode: 'code', blend: true, cameos: [{ pose: 'laptop', at: [0, 'typed'] }] }, [say(0.15, 'In the editor, I typed; the model completed.', '')], { min: 4.2 }), (s) => [
       at(s, 0, 'I'),
       at(s, 0, 'model'),
       at(s, 0, 'completed'),
@@ -74,7 +74,7 @@ const build = (): Cuts => ({
       anim(
         'saturate',
         'PullBack',
-        { mode: 'saturate', blend: true },
+        { mode: 'saturate', blend: true, cameos: [{ pose: 'laughing', at: [0, 'saturate'], dur: 2.0 }] },
         [say(0.15, 'Then the cloud, partly for capacity: several agents at once saturate a laptop.', '')],
         // ~0.4 s hold after the line: the panes lift to the cloud on "laptop".
         { min: 6.7 },
@@ -88,7 +88,7 @@ const build = (): Cuts => ({
       at(s, 0, 'result'),
     ]),
     cued(
-      anim('nested', 'PullBack', { mode: 'nested', blend: true }, [say(0.15, 'No surface disappeared.', ''), say(0, 'The editor just stopped being the centre.', '')]),
+      anim('nested', 'PullBack', { mode: 'nested', blend: true }, [say(0.15, 'No surface disappeared.', '', undefined, { emotion: 'confident' }), say(0, 'The editor just stopped being the centre.', '')]),
       (s) => [at(s, 0, 'surface'), at(s, 0, 'disappeared'), at(s, 1, 'editor'), at(s, 1, 'centre')],
     ),
     cued(
@@ -96,7 +96,7 @@ const build = (): Cuts => ({
       (s) => [at(s, 0, 'terminal'), at(s, 0, 'app'), at(s, 0, 'phone'), at(s, 1, 'harness')],
     ),
     cued(
-      anim('conveyor', 'PullBack', { mode: 'conveyor' }, [say(0.2, 'Next, a ticket arrives, an agent builds it, and nobody opens a session.', '')], {
+      anim('conveyor', 'PullBack', { mode: 'conveyor', cameos: [{ pose: 'amazed', at: [0, 'nobody'], dur: 1.9 }] }, [say(0.2, 'Next, a ticket arrives, an agent builds it, and nobody opens a session.', '', undefined, { emotion: 'amazed' })], {
         // The last cue ("a session.") needs a little more than the tail to stay >= 0.8 s.
         min: 5.75,
       }),
@@ -118,8 +118,8 @@ const build = (): Cuts => ({
         'PullBack',
         { mode: 'contract', blend: true },
         [
-          say(0.15, "What sets a team apart won't be the window.", ''),
-          say(0, "It's what its agents may do, what they receive, what they return, and when they call a human.", ''),
+          say(0.15, "What sets a team apart won't be the window.", '', undefined, { emotion: 'confident', speed: 1.05 }),
+          say(0, "It's what its agents may do, what they receive, what they return, and when they call a human.", '', undefined, { emotion: 'confident', speed: 1.05 }),
         ],
         { min: 10.0 },
       ),

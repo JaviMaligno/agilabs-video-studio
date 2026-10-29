@@ -11,6 +11,10 @@ export default {
     engine: 'auto',
     model: 'sonic-3.6-2026-08-27',
     speed: 1,
+    // Default Cartesia emotion for every English line (unset = inferred from the text). 'excited'
+    // was chosen by ear over neutral, 'enthusiastic' and 'confident' for the cloned voice. A line
+    // can override it with say(..., { emotion, speed }): see explainer-script.
+    emotion: 'excited',
     // Voice a colon inside a line as a full stop (captions keep the colon): with the cloned voice
     // the word before a colon rises like a question. Part of the voiced text, so of the line cache.
     colonsAsStops: true,

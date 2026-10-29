@@ -14,8 +14,8 @@ const build = (): Cuts => ({
       'doors',
       'ReportDesk',
       // Cues from the word timestamps: one copy drops per door as it is named.
-      { mode: 'doors', blend: true, cue: { drop0: 4.48, drop1: 5.68, drop2: 6.96, chips: 7.91 } },
-      [say(0.1, 'Same report, word for word. I changed only the door.', ''), say(0, "Its own subagent. A teammate's file. My message.", '')],
+      { mode: 'doors', blend: true, cameos: [{ pose: 'laptop', at: [0, 'changed'] }], cue: { drop0: 4.48, drop1: 5.65, drop2: 6.86, chips: 7.99 } },
+      [say(0.1, 'Same report, word for word. I changed only the door.', '', undefined, { emotion: 'confident' }), say(0, "Its own subagent. A teammate's file. My message.", '')],
       // Silent beat at the end: the three model chips and the episode count (script scene 5).
       { min: 9.3 },
     ),
@@ -35,11 +35,11 @@ const build = (): Cuts => ({
     anim(
       'check',
       'ReportDesk',
-      { mode: 'check', blend: true, cue: { chip0: 9.08 } },
+      { mode: 'check', blend: true, cue: { chip0: 8.68 }, cameos: [{ pose: 'amazed', at: [2, 'quarter'], dur: 1.7 }] },
       [
-        say(0.1, 'The gap was in checking.', ''),
+        say(0.1, 'The gap was in checking.', '', undefined, { emotion: 'contemplative' }),
         say(0, 'Without the fact, Opus checked every file and message.', ''),
-        say(0, "Its own subagent's report? Answered straight away a quarter of the time.", ''),
+        say(0, "Its own subagent's report? Answered straight away a quarter of the time.", '', undefined, { emotion: 'amazed' }),
       ],
       // Holds the last cue long enough to stay under 17 chars/s.
       { min: 11.4 },
@@ -48,25 +48,27 @@ const build = (): Cuts => ({
     anim(
       'gemini',
       'ReportDesk',
-      { mode: 'flood', blend: true, cue: { chip0: 1.65, chip1: 3.23, chip2: 3.47, ticket: 4.4, toggle: 5.7, adopt: 7.36 } },
+      { mode: 'flood', blend: true, cameos: [{ pose: 'sceptical', at: [1, 'nearly'], dur: 1.5 }], cue: { chip0: 1.49, chip1: 3.16, chip2: 3.47, ticket: 4.4, toggle: 5.7, adopt: 7.23 } },
       [
         say(0.1, 'Gemini 3 Flash: almost always, against almost never.', '', {
           en: 'Gemini three Flash: almost always, against almost never.',
-        }),
+        }, { emotion: 'surprised' }),
         say(0, 'From its subagent, it adopted the wrong conclusion nearly every time.', ''),
       ],
+      // Holds the last cue long enough to stay under 17 chars/s.
+      { min: 9.6 },
     ),
-    anim('quote', 'ReportDesk', { mode: 'quote', blend: true }, [say(0.1, 'Once the work has been delegated, it counts as done.', '')]),
+    anim('quote', 'ReportDesk', { mode: 'quote', blend: true }, [say(0.1, 'Once the work has been delegated, it counts as done.', '', undefined, { emotion: 'skeptical' })]),
     anim(
       'gpt',
       'ReportDesk',
       // Dips (no blend) out of the full-frame quote.
-      { mode: 'inverted', cue: { chip0: 2.36, chip2: 3.63, slam: 3.23 } },
+      { mode: 'inverted', cue: { chip0: 2.2, chip2: 3.47, slam: 3.15 } },
       [say(0.1, 'GPT-5.6 flips it: it trusts my message most.', '', { en: 'G P T five point six flips it: it trusts my message most.' })],
       // Holds the 36 % / 10 % chips a little after the line.
       { min: 6.0 },
     ),
-    anim('open', 'ReportDesk', { mode: 'open', blend: true }, [say(0.1, "When your agent relays a subagent's claim, ask what it checked itself.", '')]),
+    anim('open', 'ReportDesk', { mode: 'open', blend: true }, [say(0.1, "When your agent relays a subagent's claim, ask what it checked itself.", '', undefined, { emotion: 'confident', speed: 1.05 })]),
     outro('outro', [say(0.15, 'More at javieraguilar.ai', '', { en: 'More at javier aguilar dot A I.' })]),
   ],
 });

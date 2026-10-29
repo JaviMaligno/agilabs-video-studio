@@ -58,3 +58,19 @@ export function lineHash(parts, text, post = '') {
   const key = [...parts, text].join('|') + (post ? `|post:${post}` : '');
   return createHash('sha1').update(key).digest('hex');
 }
+
+// ── Colons. Javier's cloned voice reads a colon inside a line as a question: the word before it
+// rises ("It said:" sounds like "It said?"). A full stop makes it fall. So by default the TTS
+// voices a colon followed by a space (or ending the line) as a full stop, capitalising the next
+// word; the caption keeps its colon. Clock times, ratios and URLs ("10:30", "3:1", "https://")
+// have no space after the colon and are left alone. Opt out with `tts.colonsAsStops: false`.
+/**
+ * @param {string} text the voiced text of a line (its spoken form, or else its caption)
+ * @returns {string}
+ */
+export function colonsAsStops(text) {
+  return text
+    .replace(/:\s+(["“‘'(]?)(\p{L})/gu, (_, q, c) => `. ${q}${c.toUpperCase()}`)
+    .replace(/:\s+/g, '. ')
+    .replace(/:$/, '.');
+}

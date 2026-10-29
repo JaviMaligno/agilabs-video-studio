@@ -15,6 +15,8 @@ export type Settings = {
   poster: null | { scene: string; second: number };
   /** Title of the source article, shown in muted text on the outro card. */
   articleTitle: Label;
+  /** Optional author avatar (round, under public/), shown on the outro card. null = none. */
+  avatar?: null | string;
 };
 
 export const SETTINGS: Settings = {
@@ -25,4 +27,5 @@ export const SETTINGS: Settings = {
   targetSeconds: 65,
   poster: { scene: 'dashboard', second: 7.0 },
   articleTitle: { en: 'The Interface Moved Up', es: '' },
+  avatar: 'avatar/avatar-profile.png',
 };

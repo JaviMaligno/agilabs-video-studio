@@ -1,6 +1,7 @@
 // The inspection desk: mail slots, trays, the notebook, envelopes and the VERIFIED stamp.
 // Brand tokens only (brand.ts), Inter. State in ReportDesk.state.ts.
 import React from 'react';
+import { Img, staticFile } from 'remotion';
 import { C, GRADIENT, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
@@ -184,23 +185,13 @@ const Magnifier: React.FC<{ m: Tool }> = ({ m }) => (
 
 // ---------------------------------------------------------------- slots, chips, trays
 
-const Glyph: React.FC<{ i: number; size: number; color: string }> = ({ i, size, color }) => (
-  <svg width={size} height={size} viewBox="0 0 40 40" style={{ display: 'block', flex: 'none' }}>
-    {i === 0 && (
-      <>
-        <circle cx={20} cy={13} r={8} fill={color} />
-        <path d="M5 37 C5 25 35 25 35 37 Z" fill={color} />
-      </>
-    )}
-    {i === 1 && (
-      <>
-        <path d="M8 3 H26 L33 10 V37 H8 Z" fill="none" stroke={color} strokeWidth={3.2} strokeLinejoin="round" />
-        <line x1={13} y1={18} x2={28} y2={18} stroke={color} strokeWidth={3} />
-        <line x1={13} y1={25} x2={28} y2={25} stroke={color} strokeWidth={3} />
-      </>
-    )}
-    {i === 2 && <path d="M4 6 H36 V28 H18 L9 36 V28 H4 Z" fill="none" stroke={color} strokeWidth={3.2} strokeLinejoin="round" />}
-  </svg>
+/**
+ * Who stands behind each door, drawn (public/cast/): the subagent robot with its notes, a teammate
+ * handing over a file, and the author himself for "my message". The text label stays under it.
+ */
+const SLOT_PIC = ['cast/subagent.png', 'cast/teammate.png', 'cast/me.png'].map((f) => staticFile(f));
+const SlotPic: React.FC<{ i: number; size: number; style?: React.CSSProperties }> = ({ i, size, style }) => (
+  <Img src={SLOT_PIC[i]} style={{ width: size, height: size, objectFit: 'contain', display: 'block', flex: 'none', ...style }} />
 );
 
 const Panel: React.FC<{ i: number; lit: number }> = ({ i, lit }) => {
@@ -215,14 +206,14 @@ const Panel: React.FC<{ i: number; lit: number }> = ({ i, lit }) => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        paddingTop: 46,
+        paddingTop: 36,
         boxSizing: 'border-box',
         position: 'relative',
       }}
     >
       <div style={{ position: 'absolute', left: 34, right: 34, top: 14, height: 18, borderRadius: 9, background: C.bg0, boxShadow: `inset 0 3px 6px ${alpha(C.bg0, 0.95)}` }} />
-      <Glyph i={i} size={40} color={hero ? C.accentText : C.muted} />
-      <div style={{ marginTop: 8, fontSize: 30, fontWeight: 600, lineHeight: 1.12, textAlign: 'center', color: hero ? C.text : alpha(C.text, 0.85) }}>
+      <SlotPic i={i} size={90} />
+      <div style={{ marginTop: 0, fontSize: 28, fontWeight: 600, lineHeight: 1.02, textAlign: 'center', color: hero ? C.text : alpha(C.text, 0.85) }}>
         {SLOT_LABELS[i].map((l) => (
           <div key={l}>{l}</div>
         ))}
@@ -439,8 +430,8 @@ const Subagent: React.FC<{ s: BoardState }> = ({ s }) => {
       </div>
       {/* The subagent: a small figure with a thin notebook. */}
       <div style={{ position: 'absolute', left: 660, top: 660, width: 220, display: 'flex', flexDirection: 'column', alignItems: 'center', transform: `scale(${0.7 + 0.3 * a.appear})` }}>
-        <Glyph i={0} size={110} color={C.accentText} />
-        <div style={{ fontSize: 32, fontWeight: 700, color: C.text, marginTop: 6 }}>subagent</div>
+        <SlotPic i={0} size={130} />
+        <div style={{ fontSize: 32, fontWeight: 700, color: C.text, marginTop: 4 }}>subagent</div>
         {[0, 1].map((i) => (
           <div key={i} style={{ marginTop: i ? 6 : 16, width: 160, height: 36, borderRadius: 6, background: C.card, border: `2px solid ${alpha(C.muted, 0.35)}` }} />
         ))}
@@ -653,7 +644,7 @@ const HookView: React.FC<{ s: HookState }> = ({ s }) => (
     <div style={{ position: 'absolute', left: 190, top: 384, width: 580, height: 132, borderRadius: 22, padding: 5, boxSizing: 'border-box', background: GRADIENT, boxShadow: `0 12px 30px ${alpha(C.bg0, 0.8)}` }}>
       <div style={{ width: '100%', height: '100%', borderRadius: 18, background: C.bg1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, position: 'relative' }}>
         <div style={{ position: 'absolute', left: 40, right: 40, bottom: 12, height: 20, borderRadius: 10, background: C.bg0, boxShadow: `inset 0 3px 6px ${alpha(C.bg0, 0.95)}` }} />
-        <Glyph i={0} size={50} color={C.accentText} />
+        <SlotPic i={0} size={96} style={{ marginBottom: 20 }} />
         <span style={{ fontSize: 44, fontWeight: 700, color: C.text, marginBottom: 14 }}>its own subagent</span>
       </div>
     </div>

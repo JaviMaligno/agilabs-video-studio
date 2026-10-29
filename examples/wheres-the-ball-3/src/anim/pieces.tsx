@@ -296,6 +296,37 @@ export const Stamp: React.FC<{ text: string; pop: number; tone?: 'ok' | 'muted' 
  * The 60 kB black box, `w` pixels wide (height 0.78 w). `drawers` 0..1 outlines its three drawers;
  * `open[i]` 0..1 pulls drawer i out; `face` shows the "?" on its front; `lid` 0..1 opens it flat.
  */
+/** A drawer's picture: a set square (geometry), a ring of players round a hole (topology), a gauge (confidence). */
+const DrawerIcon: React.FC<{ i: number; size: number; color: string }> = ({ i, size, color }) => (
+  <svg width={size} height={size} viewBox="-30 -30 60 60" style={{ flex: 'none', overflow: 'visible' }}>
+    {i === 0 && (
+      <g fill="none" stroke={color} strokeWidth={4.5} strokeLinejoin="round" strokeLinecap="round">
+        <path d="M -24 24 L -24 -24 L 24 24 Z" />
+        <path d="M -14 14 L -14 -2 L 2 14 Z" />
+        {[-14, -4, 6].map((y) => (
+          <line key={y} x1={-24} y1={y} x2={-18} y2={y} />
+        ))}
+      </g>
+    )}
+    {i === 1 && (
+      <g fill={color}>
+        {[0, 1, 2, 3, 4, 5, 6].map((k) => {
+          const a = (k / 7) * Math.PI * 2 - Math.PI / 2;
+          return <circle key={k} cx={22 * Math.cos(a)} cy={22 * Math.sin(a)} r={5.5} />;
+        })}
+        <circle r={8} fill="none" stroke={color} strokeWidth={3} strokeDasharray="3 3" />
+      </g>
+    )}
+    {i === 2 && (
+      <g fill="none" stroke={color} strokeWidth={4.5} strokeLinecap="round">
+        <path d="M -25 12 A 25 25 0 0 1 25 12" />
+        <line x1={0} y1={12} x2={14} y2={-10} />
+        <circle cx={0} cy={12} r={4} fill={color} />
+      </g>
+    )}
+  </svg>
+);
+
 export const BoxGlyph: React.FC<{
   w: number;
   face?: number;
@@ -412,7 +443,11 @@ export const BoxGlyph: React.FC<{
                   whiteSpace: 'nowrap',
                 }}
               >
-                <span style={{ width: w * 0.09, height: w * 0.022, borderRadius: 99, background: alpha(C.text, 0.55), flex: 'none' }} />
+                {labels.length ? (
+                  <DrawerIcon i={i} size={w * 0.085} color={l > 0 ? C.accentText : C.muted} />
+                ) : (
+                  <span style={{ width: w * 0.09, height: w * 0.022, borderRadius: 99, background: alpha(C.text, 0.55), flex: 'none' }} />
+                )}
                 {labels[i] ?? ''}
               </div>
             );

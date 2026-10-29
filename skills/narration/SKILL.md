@@ -7,12 +7,19 @@ description: Voice the narration of an article explainer video - Cartesia TTS wi
 
 `npm run tts` voices every line of `src/timeline.ts` into `public/audio/<lang>/<key>.wav`, with
 Cartesia's word timestamps in `<key>.words.json`, and rewrites `src/audio.generated.ts` with the
-real line lengths. Lines are cached by engine, voice, model, speed, text and the voice's `post` chain: only new or edited
+real line lengths. Lines are cached by engine, voice, model, speed, emotion, text and the voice's `post` chain: only new or edited
 lines are voiced again. `npm run tts -- en` or `-- es` limits it to one language.
 
 ## Cartesia setup
 
 - Settings live in `video.config.mjs` (`tts`): model `sonic-3.6-2026-08-27`, speed `1`.
+- **Emotion.** `tts.emotion: 'excited'` voices every English line with that Cartesia emotion
+  (Javier chose it by ear over neutral, `enthusiastic` and `confident`). A line may override
+  emotion and speed with its `tone`: `say(0, 'So the verdict.', '', undefined, { emotion:
+  'confident', speed: 1.05 })`. Use only Cartesia's emotion list (`curious`, `amazed`,
+  `surprised`, `confident`, `skeptical`, `contemplative`, `determined`, `triumphant`...), match it
+  to what the words say, and keep speed within 1.0-1.08: `confident` at 1.1 sounded too fast.
+  Emotions are English only; Spanish lines ignore them.
 - EN voice: Javier's own cloned voice, `b7abe199-5f62-45fd-b77a-d12a1fe80a36`, with a `post`
   clean-up chain (below). Alternative stock voice: Quentin, `5568a7df-e5ab-4442-9fae-2e9ba1b15ad8`
   (en-GB), without `post`.
