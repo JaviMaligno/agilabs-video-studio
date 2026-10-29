@@ -14,7 +14,7 @@ const build = (): Cuts => {
   const part1 = anim(
     'part1',
     'StoryPitch',
-    { mode: 'part1', play: [0, 4.0], cameos: [{ pose: 'laptop', at: [0, 'erased'] }] },
+    { mode: 'part1', play: [2.0, 4.0], cameos: [{ pose: 'laptop', at: [0, 'erased'] }] },
     [say(0.3, 'In part one, I erased the ball from football footage and kept the players.', '')],
     // Holds the long closing cue long enough to read (17 chars/s).
     { min: 5.6 },
@@ -159,7 +159,12 @@ const build = (): Cuts => {
   withCues(positions, { out: wordAt(positions, 0, 'out'), both: wordAt(positions, 0, 'positions') });
 
   const scenes: Scene[] = [
-    intro('hook', [say(0.4, "A model small enough to email finds the hidden ball where frontier AI can't.", '')]),
+    // Cold open (hook test, 2026-10-29): the players and the hidden-ball "?" are moving from the first
+    // frame, the whole hook over them, the voice from 0.1 s. Control for the test: wheres-the-ball-3.
+    intro('hook', [say(0.1, "A model small enough to email finds the hidden ball where frontier AI can't.", '')], 3, {
+      name: 'StoryPitch',
+      props: { mode: 'part1', play: [0, 2.0] },
+    }),
     part1,
     middle,
     doubt,
