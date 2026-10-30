@@ -19,3 +19,4 @@ template/public/music/
 
 # OS / editor
 .DS_Store
+__pycache__/
