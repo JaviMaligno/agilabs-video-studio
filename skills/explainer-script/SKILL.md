@@ -137,6 +137,10 @@ Write `script.md` as a table, one row per narration line:
 - Under the table, a **Must show** list: each thing the author asked to see, in their words. The
   stills check confirms each one with its timestamp before delivery.
 - End with the word count (EN) and the estimated length.
+- **Spoken figures:** run `python3 <this skill's folder>/scripts/script_lint.py <path>/script.md`
+  and rewrite every line it
+  flags: the voice says the figure that carries the point, the others go into words ("almost
+  never", "about half") or into the Visual column. Run it again until it is clean.
 - **Cold-viewer check before presenting:** read only the first ~15 s of narration as someone
   who has never seen the article. Can they say, in one sentence, what real situation this is
   about? If not, the story is missing: add it, even if the video gets longer.
