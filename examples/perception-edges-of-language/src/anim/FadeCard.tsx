@@ -5,6 +5,8 @@ import type { AnimProps } from './types.ts';
 import { HERO_DY, HERO_SCALE, LINES, frameState, type FadeCardProps, type ReaderState } from './FadeCard.state.ts';
 import { Stage, gradientText } from './Stage.tsx';
 import { CARD, ROWS, RULER, TICKS, greyOf, ratioAt } from './perception.ts';
+import { SETTINGS } from '../settings.ts';
+import { Ghost, HookBats, ghostPose } from './Halloween.tsx';
 
 export { frameState };
 export type { FadeCardProps };
@@ -387,11 +389,27 @@ export const FadeCard: React.FC<AnimProps & FadeCardProps> = (p) => {
           </div>
         )}
       </SentenceCard>
+      {SETTINGS.halloween &&
+        (() => {
+          // The ghost peeks over the card's top-right edge; the card scales from its bottom edge.
+          const k = 1 + (HERO_SCALE - 1) * s.hero;
+          return (
+            <Ghost
+              id={p.mode}
+              x={CARD.x + CARD.w / 2 + 300 * k}
+              y={CARD.y + CARD.h * (1 - k)}
+              scale={0.78 + 0.32 * s.hero}
+              t={p.t}
+              pose={ghostPose(p.mode, p.t, p.beats)}
+            />
+          );
+        })()}
       <Ruler s={s} />
       {s.readers.map((r) => (
         <Row key={r.id} r={r} />
       ))}
       </div>
+      {SETTINGS.halloween && p.mode === 'hook' && <HookBats t={p.t} />}
     </Stage>
   );
 };

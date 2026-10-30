@@ -56,7 +56,7 @@ const build = (): Cuts => ({
     ),
     // Stamps land one per beat from "label" (word timestamps); the line under them is read after.
     anim('stamp', 'CoverageTiles', { mode: 'stamp', blend: true, cue: { stamp: 0.05 + 3.08 } }, [say(0.05, 'So in my last preprint, every claim carries a label.', '')], { min: 5.3 }),
-    anim('focus', 'CoverageTiles', { mode: 'focus', blend: true, cameos: [{ pose: 'sceptical', at: [0, 'lied'], dur: 2.4 }], cue: { tally: 0.2 + 3.16 } }, [say(0.2, 'What convinced me: a certificate that lied to me three times.', '', { en: 'What convinced me. A certificate that lied to me three times.' })]),
+    anim('focus', 'CoverageTiles', { mode: 'focus', blend: true, cameos: [{ pose: 'sceptical', at: [0, 'lied'], dur: 2.4 }], cue: { tally: 0.2 + 3.16, lied: 0.2 + 2.68 } }, [say(0.2, 'What convinced me: a certificate that lied to me three times.', '', { en: 'What convinced me. A certificate that lied to me three times.' })]),
     anim('boxes', 'CoverageTiles', { mode: 'boxes', blend: true, cue: { wave: 0.05 + 1.0 } }, [say(0.05, 'It had to check one lemma over a whole region.', '', undefined, { emotion: 'contemplative' })]),
     anim('reviewer', 'CoverageTiles', { mode: 'reviewer', blend: true, cue: { send: 0.05 + 0.92, break: 0.05 + 2.41 } }, [say(0.05, 'A separate model got only the statement, told to break it.', '')]),
     anim('refute', 'CoverageTiles', { mode: 'refute', blend: true, cue: { refute: 0.05 + 0.84, chips: 0.05 + 1.97 } }, [say(0.05, 'Version one fell at once: part of it was only sampled.', '', undefined, { emotion: 'surprised' })]),

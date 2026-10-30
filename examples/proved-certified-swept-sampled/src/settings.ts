@@ -19,6 +19,8 @@ export type Settings = {
   avatar?: null | string;
   /** Optional small credit line under the title on the outro card. */
   credit?: Label;
+  /** Halloween variant (31 Oct): drawings and gags in the animations. false = the regular video. */
+  halloween?: boolean;
 };
 
 export const SETTINGS: Settings = {
@@ -31,4 +33,5 @@ export const SETTINGS: Settings = {
   articleTitle: { en: 'Proved, Certified, Swept, Sampled', es: '' },
   credit: { en: 'Certificates and verification reports: open source (calamares)', es: '' },
   avatar: 'avatar/avatar-profile.png',
+  halloween: true,
 };

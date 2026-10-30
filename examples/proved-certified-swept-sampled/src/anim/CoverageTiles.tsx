@@ -20,13 +20,15 @@ import {
   type TilesProps,
   type TilesState,
 } from './CoverageTiles.state.ts';
+import { Bat, Ghost, HALLOWEEN, bump } from './halloween.tsx';
+import { easeOutCubic, progress, sceneTime } from './steps.ts';
 
 export { frameState };
 
 const DOTS = scatter(SCATTER_N);
 
 /** The coverage pattern under a card, drawn in SVG inside rect `r`. */
-const Pattern: React.FC<{ tile: Tile; r: Rect; big: boolean; id: string }> = ({ tile, r, big, id }) => {
+const Pattern: React.FC<{ tile: Tile; r: Rect; big: boolean; id: string; ghosts?: GridGhosts }> = ({ tile, r, big, id, ghosts }) => {
   const p = tile.pattern;
   const clip = `clip-${id}`;
   const cw = r.w / NX;
@@ -102,6 +104,7 @@ const Pattern: React.FC<{ tile: Tile; r: Rect; big: boolean; id: string }> = ({ 
               </g>
             );
           })}
+        {p.kind === 2 && ghosts && ghosts.show > 0 && <GapGhosts r={r} g={ghosts} />}
         {p.kind === 3 &&
           DOTS.map((q, k) => {
             const local = Math.min(1, Math.max(0, p.reveal * 1.6 - q.d * 0.6));
@@ -113,7 +116,73 @@ const Pattern: React.FC<{ tile: Tile; r: Rect; big: boolean; id: string }> = ({ 
   );
 };
 
-const TileView: React.FC<{ tile: Tile; i: number; big: boolean }> = ({ tile, i, big }) => {
+/** Halloween, lift: little ghosts peeking out of the gaps the grid never checks. */
+type GridGhosts = { show: number; t: number };
+const GAPS = [
+  { i: 1, j: 0, at: 0, tilt: -8, look: 1 },
+  { i: 4, j: 1, at: 0.25, tilt: 6, look: -1 },
+  { i: 2, j: 2, at: 0.5, tilt: -4, look: 1 },
+];
+const GapGhosts: React.FC<{ r: Rect; g: GridGhosts }> = ({ r, g }) => (
+  <>
+    {GAPS.map((q, k) => {
+      const p = easeOutCubic(progress(g.show, q.at / 1.4, 0.45));
+      const x = ((q.i + 1) / LATTICE.nx) * r.w;
+      const y = ((q.j + 1) / LATTICE.ny) * r.h;
+      return <Ghost key={k} x={x} y={y + 18 * (1 - p) + 2 * Math.sin(g.t * 3 + k * 2)} size={40} opacity={p} t={g.t + k} tilt={q.tilt} look={q.look} />;
+    })}
+  </>
+);
+
+/** Halloween, hook: a few bats crossing above the title, in the strip under the badge. */
+const BATS = [
+  { at: 0.5, y: -24, span: 92, speed: 1.25, dir: 1 },
+  { at: 0.72, y: -40, span: 70, speed: 1.4, dir: 1 },
+  { at: 0.9, y: -12, span: 62, speed: 1.1, dir: 1 },
+  { at: 5.1, y: -28, span: 82, speed: 1.3, dir: -1 },
+  { at: 5.35, y: -14, span: 62, speed: 1.15, dir: -1 },
+];
+const Bats: React.FC<{ t: number }> = ({ t }) => (
+  <svg style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }} width={W} height={10}>
+    {BATS.map((b, k) => {
+      const q = progress(t, b.at, b.speed);
+      if (q <= 0 || q >= 1) return null;
+      const x = b.dir > 0 ? -120 + q * (W + 240) : W + 120 - q * (W + 240);
+      return <Bat key={k} x={x} y={b.y + 8 * Math.sin(q * 9 + k)} span={b.span} flap={Math.sin(t * 26 + k * 1.7)} />;
+    })}
+  </svg>
+);
+
+/** Halloween, focus: a ghost sheet drops over the certificate on "lied", boxes still showing. */
+const Sheet: React.FC<{ drop: number; t: number }> = ({ drop, t }) => {
+  if (drop <= 0) return null;
+  const R = BIG;
+  const w = R.w + 40;
+  const h = R.h + 14;
+  const n = 8;
+  const sw = w / n;
+  let hem = '';
+  for (let k = n; k > 0; k--) {
+    const x0 = k * sw;
+    const wv = Math.sin(t * 4 + k) * 8;
+    hem += ` Q ${x0 - sw / 2} ${h + 26 + wv} ${x0 - sw} ${h - 4}`;
+  }
+  const blink = bump(progress(t, 3.9, 0.22));
+  return (
+    <svg style={{ position: 'absolute', left: R.x - 20, top: R.y - 12, overflow: 'visible', opacity: drop, transform: `translateY(${-(1 - drop) * 140}px)` }} width={w} height={h}>
+      <path d={`M 0 ${h - 4} L 6 150 Q 14 0 190 0 L ${w - 190} 0 Q ${w - 14} 0 ${w - 6} 150 L ${w} ${h - 4}${hem} Z`} fill={alpha(C.text, 0.26)} stroke={alpha(C.text, 0.8)} strokeWidth={3} />
+      {[0.3, 0.5, 0.7].map((f, k) => (
+        <path key={k} d={`M ${w * f} 60 Q ${w * f + 14} ${h * 0.55} ${w * f - 6} ${h - 30}`} fill="none" stroke={alpha(C.text, 0.22)} strokeWidth={4} strokeLinecap="round" />
+      ))}
+      {/* A sly look: one eye half shut, the other blinks once. */}
+      <ellipse cx={w / 2 - 100} cy={178} rx={30} ry={20} fill={C.bg0} />
+      <ellipse cx={w / 2 + 100} cy={170} rx={30} ry={42 * (1 - 0.9 * blink)} fill={C.bg0} />
+      <path d={`M ${w / 2 - 70} 262 Q ${w / 2 + 10} 312 ${w / 2 + 82} 246`} fill="none" stroke={C.bg0} strokeWidth={12} strokeLinecap="round" />
+    </svg>
+  );
+};
+
+const TileView: React.FC<{ tile: Tile; i: number; big: boolean; ghosts?: GridGhosts }> = ({ tile, i, big, ghosts }) => {
   const r = tile.rect;
   const header = big ? HEADER * (1 - tile.away) : HEADER;
   const region: Rect = { x: 0, y: header, w: r.w, h: r.h - header };
@@ -121,7 +190,7 @@ const TileView: React.FC<{ tile: Tile; i: number; big: boolean }> = ({ tile, i, 
   const sentenceSize = 23 + 15 * tile.cover;
   return (
     <div style={{ position: 'absolute', left: r.x, top: r.y, width: r.w, height: r.h, opacity: tile.opacity }}>
-      <Pattern tile={tile} r={region} big={big} id={`t${i}`} />
+      <Pattern tile={tile} r={region} big={big} id={`t${i}`} ghosts={ghosts} />
       {tile.sub.appear > 0 && (
         <div style={{ position: 'absolute', left: 12, right: 12, bottom: 14, display: 'flex', justifyContent: 'center', opacity: tile.sub.appear, transform: `translateY(${(1 - tile.sub.appear) * 14}px)` }}>
           <div style={{ padding: '7px 16px', borderRadius: 14, background: alpha(C.bg0, 0.88), border: `1.5px solid ${alpha(C.accentText, 0.5)}`, fontSize: 26, fontWeight: 700, color: C.text, textAlign: 'center', lineHeight: 1.15, whiteSpace: 'pre-line' }}>
@@ -336,6 +405,11 @@ const Reviewer: React.FC<{ r: NonNullable<TilesState['reviewer']> }> = ({ r }) =
 export const CoverageTiles: React.FC<AnimProps & TilesProps> = ({ t, beats, dur, vertical, ...p }) => {
   const s = frameState(p, t, beats, dur);
   const region = !['same', 'lift', 'stamp', 'software', 'close'].includes(p.mode);
+  const st = sceneTime(t, dur);
+  const silent = p.cue?.silent;
+  const ghosts: GridGhosts | undefined = HALLOWEEN && p.mode === 'lift' && silent !== undefined ? { show: Math.max(0, st - silent - 0.35), t: st } : undefined;
+  const lied = p.cue?.lied;
+  const sheet = HALLOWEEN && p.mode === 'focus' && lied !== undefined ? easeOutCubic(progress(st, lied - 0.1, 0.45)) : 0;
   return (
     <Stage vertical={vertical} fill>
       <div style={{ position: 'absolute', left: 0, top: 0, width: W, height: H }}>
@@ -393,8 +467,10 @@ export const CoverageTiles: React.FC<AnimProps & TilesProps> = ({ t, beats, dur,
             {s.regionLabel.text}
           </div>
         )}
-        {s.tiles.map((tile, i) => (region && i !== 1 && tile.opacity <= 0 ? null : <TileView key={i} tile={tile} i={i} big={region && i === 1} />))}
+        {s.tiles.map((tile, i) => (region && i !== 1 && tile.opacity <= 0 ? null : <TileView key={i} tile={tile} i={i} big={region && i === 1} ghosts={i === 2 ? ghosts : undefined} />))}
         {region && <RegionOverlays s={s} />}
+        {sheet > 0 && <Sheet drop={sheet} t={st} />}
+        {HALLOWEEN && p.mode === 'same' && <Bats t={st} />}
         {s.tally && <Tally value={s.tally.value} appear={s.tally.appear} pulse={s.tally.pulse} />}
       </div>
     </Stage>

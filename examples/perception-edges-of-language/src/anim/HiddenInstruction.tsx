@@ -6,6 +6,8 @@ import { MODELS, frameState, type HiddenInstructionProps } from './HiddenInstruc
 import { Stage, gradientText } from './Stage.tsx';
 import { ChipIcon } from './FadeCard.tsx';
 import { greyOf } from './perception.ts';
+import { SETTINGS } from '../settings.ts';
+import { JackOLantern } from './Halloween.tsx';
 
 export { frameState };
 export type { HiddenInstructionProps };
@@ -137,6 +139,24 @@ export const HiddenInstruction: React.FC<AnimProps & HiddenInstructionProps> = (
           </div>
         ))}
       <ProbeCard y={24} hiddenGrey={g} typed={s.typed} style={{ transform: `scale(${1 - 0.1 * s.split})` }}>
+        {SETTINGS.halloween && (
+          // The jack-o'-lantern keeps the hidden line: dark (candle out) while nobody obeys it,
+          // lit as the banana answers come in.
+          <JackOLantern
+            t={p.t}
+            lit={p.mode === 'qwen' ? 1 : p.mode === 'faint' ? Math.max(0, ...s.bubbles.flatMap((b) => b.items.map((it) => it.banana * it.appear))) : 0}
+            smoke={p.mode === 'stego' ? 1 : 0}
+            size={150}
+            style={{
+              position: 'absolute',
+              right: 26,
+              top: 16,
+              opacity: p.mode === 'write' ? Math.min(1, s.typed * 2.5) : 1,
+              transform: `scale(${p.mode === 'write' ? 0.6 + 0.4 * Math.min(1, s.typed * 2.5) : 1})`,
+              transformOrigin: '50% 100%',
+            }}
+          />
+        )}
         {s.split > 0.01 && (
           <div style={{ position: 'absolute', left: 20, bottom: 16, fontSize: 28, fontWeight: 700, color: '#64748b', opacity: s.split }}>{LAYERS[0]}</div>
         )}

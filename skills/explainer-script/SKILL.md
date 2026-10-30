@@ -140,5 +140,27 @@ Write `script.md` as a table, one row per narration line:
 - **Cold-viewer check before presenting:** read only the first ~15 s of narration as someone
   who has never seen the article. Can they say, in one sentence, what real situation this is
   about? If not, the story is missing: add it, even if the video gets longer.
+
+## Script check
+
+Run it on the finished table before presenting, line by line, and fix what it finds:
+
+1. **Thread.** Write the thesis in one sentence. Next to each scene, the step of the thesis it
+   carries. A scene that explains a secondary number (why a multiplier shrinks, where the rest of a
+   cost goes, an extra metric) is left to the article; the video keeps the thesis and the example
+   that shows it.
+2. **The final state.** When the article compares several models, arms or versions, the video
+   shows them in one comparison, as they stand at the end of the article, whatever order the
+   article found them in.
+3. **Scope in the wording.** The article's hedges travel as the scope of each claim ("on these
+   five cases", "in this setup"). Whatever the study left for later stays in the article: the video
+   says what was done and what it showed.
+4. **Bridges.** Each change of register (into an everyday example, into the result) opens with a
+   short line that announces it.
+5. **The last line.** The line before the outro card answers the viewer's "so what do I do?": it
+   names the choice, the practices or the rule, in the article's terms, as a full sentence that
+   ends the video.
+6. **Drawn.** Every person, model and object in the visuals is a drawing; text is for numbers,
+   quotes and the question on screen.
 - Present the route overview (hook, cold-viewer line, verdict, Must show) and carry on building;
   the author reviews the finished video.

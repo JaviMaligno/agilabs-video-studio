@@ -19,6 +19,8 @@ export type Settings = {
   avatar?: null | string;
   /** Optional data credit, small and muted under the title on the outro card. */
   credit?: Label;
+  /** Halloween variant (31 Oct): ghost, bats and jack-o'-lantern drawn into the scenes. false = the regular video. */
+  halloween?: boolean;
 };
 
 export const SETTINGS: Settings = {
@@ -31,4 +33,5 @@ export const SETTINGS: Settings = {
   articleTitle: { en: 'One Grey Level Out of 255', es: '' },
   credit: { en: "Stimuli rendered with the study's code: llm-language-limits", es: '' },
   avatar: 'avatar/avatar-profile.png',
+  halloween: true,
 };
