@@ -99,3 +99,10 @@ export const cartesiaHeaders = (key, json = true) => ({
   'Cartesia-Version': CARTESIA.version,
   ...(json ? { 'Content-Type': 'application/json' } : {}),
 });
+
+/**
+ * Runs the Remotion CLI through this Node, not through `npx`: on Windows `npx` is a .cmd shim
+ * that execFileSync cannot start (it fails with pid 0 and no output).
+ */
+export const remotion = (args) =>
+  execFileSync(process.execPath, [at('node_modules', '@remotion', 'cli', 'remotion-cli.js'), ...args], { stdio: 'inherit', cwd: at() });

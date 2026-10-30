@@ -4,8 +4,7 @@
 // Env: CONCURRENCY=n render threads (default: half the CPU threads).
 import fs from 'node:fs';
 import os from 'node:os';
-import { execFileSync } from 'node:child_process';
-import { at, ffmpegReport, loudness, probe, LOUDNESS } from './lib.mjs';
+import { remotion, at, ffmpegReport, loudness, probe, LOUDNESS } from './lib.mjs';
 import { makeMusicBed } from './music.mjs';
 
 const args = process.argv.slice(2);
@@ -25,7 +24,7 @@ const final = at('out', `${name}.mp4`);
 fs.mkdirSync(at('out'), { recursive: true });
 
 const concurrency = process.env.CONCURRENCY ?? String(Math.max(2, Math.floor(os.cpus().length / 2)));
-execFileSync('npx', ['remotion', 'render', 'src/index.ts', id, raw, '--crf=18', `--concurrency=${concurrency}`], { stdio: 'inherit', cwd: at() });
+remotion(['render', 'src/index.ts', id, raw, '--crf=18', `--concurrency=${concurrency}`]);
 
 // Measure, then apply as one linear gain so the voice does not "pump".
 const target = `I=${LOUDNESS.I}:TP=${LOUDNESS.truePeak}:LRA=11`;

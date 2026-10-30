@@ -6,7 +6,7 @@
 // Usage: npm run deliver
 import fs from 'node:fs';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { at, loudness, probe } from './lib.mjs';
+import { remotion, at, loudness, probe } from './lib.mjs';
 
 const { SETTINGS } = await import('../src/settings.ts');
 const { VIDEOS } = await import('../src/timeline.ts');
@@ -49,7 +49,7 @@ for (const voice of SETTINGS.voices) {
   const poster = posterFrame(scenes);
   const posterFile = `poster-${voice}.png`;
   const props = JSON.stringify({ voice, subs, vertical: true, noSubs: true });
-  execFileSync('npx', ['remotion', 'still', 'src/index.ts', `Main-${voice.toUpperCase()}-vertical`, `out/${posterFile}`, `--frame=${poster.frame}`, `--props=${props}`], { stdio: 'inherit', cwd: at() });
+  remotion(['still', 'src/index.ts', `Main-${voice.toUpperCase()}-vertical`, `out/${posterFile}`, `--frame=${poster.frame}`, `--props=${props}`]);
   manifest.posters.push({ file: posterFile, voice, ...poster });
 
   for (const format of ['vertical', 'landscape']) {
