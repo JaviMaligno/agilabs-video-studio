@@ -34,7 +34,7 @@ export function frameState(_p: ThresholdLensProps, time: number, beats: number[]
 
   const zoomIn = easeInOut(P(b0 + 0.2, 1.3));
   const sweep = P(b1 + 0.2, 1.7);
-  const zoomOut = easeInOut(P(b1 + 2.2, 0.9));
+  const zoomOut = easeInOut(P(beats.length > 2 ? beatAt(beats, 2) - 0.1 : b1 + 2.2, 0.9));
   const zoom = clamp01(zoomIn - zoomOut);
   const cell = lerp(CROP.cell, GRID.cell, zoom);
   const x = lerp(CROP.x, GRID.x, zoom);

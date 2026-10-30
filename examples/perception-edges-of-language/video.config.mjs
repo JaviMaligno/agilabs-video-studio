@@ -10,7 +10,7 @@ export default {
     // voice for the whole language. 'cartesia' fails instead of switching; 'kokoro' stays offline.
     engine: 'auto',
     model: 'sonic-3.6-2026-08-27',
-    speed: 1.1,
+    speed: 1,
     emotion: 'excited', // default Cartesia emotion (EN); a line overrides it with its tone
     colonsAsStops: true, // voice a colon inside a line as a full stop
     // Each voice may carry `post`: an ffmpeg -af chain applied to every line right after synthesis

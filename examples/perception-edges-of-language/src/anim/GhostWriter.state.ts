@@ -35,10 +35,19 @@ export function frameState(_p: GhostWriterProps, time: number, beats: number[], 
   const b1 = beats.length > 1 ? beatAt(beats, 1) : b0 + 4;
   const P = (start: number, len: number) => progress(t, fit(start, len, dur), len);
 
-  // Line 1: 32 → 8.6 px; line 2: 8.6 → 5 px, reaching 5.5 around "5.5 pixels".
-  const s1 = easeOutCubic(P(b0 + 0.3, Math.max(0.8, b1 - b0 - 0.4)));
-  const s2 = P(b1 + 0.1, 1.9);
+  // Four lines (v2): the text shrinks to 8.6 px over lines 1-2 ("…eyesight." / "It's prediction."),
+  // then 8.6 → 5 px on line 3 ("Real words stay readable smaller than nonsense."): the nonsense line
+  // is lost first, the meaningful one later; the "prediction" bracket lands on line 4.
+  // Two lines (v1): shrink on line 1, 8.6 → 5 px on line 2.
+  const four = beats.length > 3;
+  const b2 = four ? beatAt(beats, 2) : b1;
+  const b3 = four ? beatAt(beats, 3) : b1 + 3.65;
+  const SHRINK2 = four ? Math.max(1.9, b3 - b2 - 0.3) : 1.9;
+  const s1 = easeOutCubic(P(b0 + 0.3, Math.max(0.8, b2 - b0 - 0.4)));
+  const s2 = P(b2 + 0.1, SHRINK2);
   const size = s2 > 0 ? logLerp(8.6, 5, s2) : logLerp(SIZE_MAX, 8.6, s1);
+  // When the shrink crosses a size (s2 is linear in time, size log-linear in s2).
+  const crossAt = (px: number) => b2 + 0.1 + SHRINK2 * (Math.log(8.6 / px) / Math.log(8.6 / 5));
 
   const blob = clamp01((GHOST_FROM - size) / (GHOST_FROM - 6));
   const meaningRead = size >= MEANING_STOP ? 1 : 0;
@@ -59,8 +68,8 @@ export function frameState(_p: GhostWriterProps, time: number, beats: number[], 
     ocr: { appear: easeOutCubic(P(b0 + 1.2, 0.5)), on: size >= OCR_STOP ? 1 : 0 },
     // The marks pop on the words that name them (line 2: "five" ~b1+1.5, "Nonsense" ~b1+3.0,
     // "eight" ~b1+4.1 in the current voice), the gap bracket lands as "eight" is said.
-    mark55: easeOutCubic(P(b1 + 1.4, 0.45)),
-    mark8: easeOutCubic(P(b1 + 2.95, 0.45)),
-    bracket: easeOutCubic(P(b1 + 3.65, 0.5)),
+    mark55: easeOutCubic(P(four ? crossAt(MEANING_STOP) : b1 + 1.4, 0.45)),
+    mark8: easeOutCubic(P(four ? crossAt(NONSENSE_STOP) : b1 + 2.95, 0.45)),
+    bracket: easeOutCubic(P(four ? b3 + 0.15 : b3, 0.5)),
   };
 }

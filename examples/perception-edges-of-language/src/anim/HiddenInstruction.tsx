@@ -175,11 +175,11 @@ export const HiddenInstruction: React.FC<AnimProps & HiddenInstructionProps> = (
               opacity: s.pct,
             }}
           >
-            hidden line: <span style={gradientText}>1% contrast</span>
+            hidden line: <span style={gradientText}>faint ink</span>
           </div>
         )}
       </ProbeCard>
-      {/* 0.222 ≈ 1 in 5 */}
+      {/* ≈ 1 in 5 (0.222 in the article's table) */}
       {s.faintTag > 0 && (
         <div
           style={{
@@ -192,8 +192,8 @@ export const HiddenInstruction: React.FC<AnimProps & HiddenInstructionProps> = (
             transform: `scale(${0.85 + 0.15 * s.faintTag})`,
           }}
         >
-          <div style={{ fontSize: 96, fontWeight: 800, lineHeight: 1, ...gradientText }}>0.222</div>
-          <div style={{ fontSize: 40, fontWeight: 700, color: C.text, marginTop: 14 }}>≈ 1 in 5 trials obeyed</div>
+          <div style={{ fontSize: 96, fontWeight: 800, lineHeight: 1, ...gradientText }}>≈ 1 in 5</div>
+          <div style={{ fontSize: 40, fontWeight: 700, color: C.text, marginTop: 14 }}>trials obeyed the spell</div>
         </div>
       )}
       {/* Model chips and their answers */}
@@ -272,8 +272,8 @@ export const HiddenInstruction: React.FC<AnimProps & HiddenInstructionProps> = (
       })}
       {s.zeroTag > 0 && (
         <div style={{ position: 'absolute', left: X, width: W, top: 880, textAlign: 'center', opacity: s.zeroTag * (1 - s.pct) }}>
-          <span style={{ fontSize: 64, fontWeight: 800, ...gradientText }}>0.000</span>
-          <span style={{ fontSize: 36, fontWeight: 700, color: C.text }}> obeyed the hidden line</span>
+          <span style={{ fontSize: 64, fontWeight: 800, ...gradientText }}>no model</span>
+          <span style={{ fontSize: 36, fontWeight: 700, color: C.text }}> obeyed the spell</span>
         </div>
       )}
       {s.qwen > 0 && (
@@ -295,7 +295,7 @@ export const HiddenInstruction: React.FC<AnimProps & HiddenInstructionProps> = (
       )}
       {s.shields > 0 && (
         <div style={{ position: 'absolute', left: 80 - 72, top: 1018, display: 'flex', alignItems: 'center', gap: 10, opacity: s.shields, fontSize: 32, fontWeight: 700 }}>
-          <Shield size={38} /> immune to all six methods
+          <Shield size={38} /> immune to every trick
         </div>
       )}
     </Stage>

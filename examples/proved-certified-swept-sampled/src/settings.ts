@@ -33,5 +33,5 @@ export const SETTINGS: Settings = {
   articleTitle: { en: 'Proved, Certified, Swept, Sampled', es: '' },
   credit: { en: 'Certificates and verification reports: open source (calamares)', es: '' },
   avatar: 'avatar/avatar-profile.png',
-  halloween: true,
+  halloween: false,
 };

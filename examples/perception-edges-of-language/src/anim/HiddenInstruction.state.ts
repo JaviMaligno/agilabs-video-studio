@@ -56,18 +56,22 @@ export function frameState(p: HiddenInstructionProps, time: number, beats: numbe
     split = p.mode === 'faint' ? 1 - easeInOut(P(0, 0.7)) : 0;
     pct = p.mode === 'faint' ? easeOutCubic(P(0.5, 0.4)) : 1;
     const span = Math.max(0.8, end - b0 - 0.9);
+    // Two lines: the bubbles rain during the first, the banana flips and the tag land on the second.
+    const b1 = beats.length > 1 ? beatAt(beats, 1) : null;
+    const flipAt = b1 !== null ? b1 + 0.2 : b0 + span * 0.75;
+    const rain = b1 !== null ? Math.max(0.8, b1 - b0 - 0.1) : span;
     MODELS.forEach((_, i) => {
       for (let k = 0; k < 3; k++) {
         if (p.mode === 'qwen' || k === 0) bubbleAppear[i][k] = 1;
-        else bubbleAppear[i][k] = easeOutCubic(P(b0 + 0.1 + ((k - 1) * 6 + i) * (span / 14), 0.3));
+        else bubbleAppear[i][k] = easeOutCubic(P(b0 + 0.1 + ((k - 1) * 6 + i) * (rain / 14), 0.3));
         const isBanana = BANANA.has(`${i}-${k}`);
-        if (isBanana) flip[i][k] = p.mode === 'qwen' ? 1 : easeOutCubic(P(b0 + span * 0.75 + (i - 3) * 0.12 + k * 0.05, 0.3));
+        if (isBanana) flip[i][k] = p.mode === 'qwen' ? 1 : easeOutCubic(P(flipAt + (i - 3) * 0.12 + k * 0.05, 0.3));
       }
     });
-    faintTag = p.mode === 'faint' ? easeOutCubic(P(b0 + span * 0.9, 0.45)) : 1;
+    faintTag = p.mode === 'faint' ? easeOutCubic(P(b1 !== null ? b1 + 0.9 : b0 + span * 0.9, 0.45)) : 1;
     if (p.mode === 'qwen') {
       qwen = easeOutCubic(P(b0 + 0.1, 0.5));
-      shields = easeOutCubic(P(b0 + 0.9, 0.5));
+      shields = easeOutCubic(P(b1 !== null ? b1 + 0.1 : b0 + 0.9, 0.5));
     }
   }
 
