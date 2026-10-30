@@ -38,3 +38,11 @@ test('flags caption cues that are too fast or too short', () => {
   assert.ok(issues.some((m) => /chars\/s/.test(m)), issues.join('\n'));
   assert.ok(issues.some((m) => /0\.8 s/.test(m)), issues.join('\n'));
 });
+
+test('flags on-screen text the scene does not leave time to read', () => {
+  const statements = [1, 2, 3, 4].map((i) => ({ label: { en: `${words(8)} ${i}`, es: '' }, id: `s${i}` }));
+  const short = anim('statements', 'Known', { stats: statements }, [say(0, words(6), words(6))], { min: 4 });
+  const long = anim('statements', 'Known', { stats: statements }, [say(0, words(6), words(6))], { min: 12 });
+  assert.ok(lintTimeline([short], 4, { known: ['Known'] }).some((m) => /words on screen/.test(m)));
+  assert.ok(!lintTimeline([long], 12, { known: ['Known'] }).some((m) => /words on screen/.test(m)));
+});

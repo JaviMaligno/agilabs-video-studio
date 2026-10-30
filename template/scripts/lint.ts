@@ -4,8 +4,8 @@
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { heldCuesOf } from '../src/captions.ts';
-import { FPS, handOverAt, sceneStarts } from '../src/timing.ts';
-import type { Lang, Scene } from '../src/types.ts';
+import { FPS, handOverAt, sceneFrames, sceneStarts } from '../src/timing.ts';
+import { tx, type Lang, type Scene, type Text } from '../src/types.ts';
 
 /** Shortest time a cue may stay on screen, in seconds. */
 export const MIN_CUE_SECONDS = 0.8;
@@ -15,6 +15,29 @@ export const MAX_CPS = 17;
 export const LENGTH_TOLERANCE = 0.2;
 /** Characters per caption row in the vertical format (same as the Captions component). */
 const ROW_CHARS = 32;
+/** Reading speed for text drawn on the stage (labels, quotes, statements), in words per second. */
+export const ON_SCREEN_WPS = 3.5;
+/** Time to take in a stage before reading it, in seconds. */
+export const ON_SCREEN_DWELL = 1;
+/** Prop keys that hold identifiers or settings rather than text a viewer reads. */
+const NOT_TEXT = new Set(['id', 'from', 'to', 'pose', 'side', 'layout', 'name', 'src', 'image', 'color', 'emphasis', 'unit', 'prefix', 'suffix']);
+
+/** Words of on-screen text in an anim scene's props: every string and Label, in `lang`. */
+export const onScreenWords = (props: unknown, lang: Lang): number => {
+  const count = (s: string) => s.split(/\s+/).filter(Boolean).length;
+  const walk = (v: unknown, key = ''): number => {
+    if (NOT_TEXT.has(key)) return 0;
+    if (typeof v === 'string') return count(v);
+    if (Array.isArray(v)) return v.reduce((n, x) => n + walk(x), 0);
+    if (v && typeof v === 'object') {
+      const o = v as Record<string, unknown>;
+      if (typeof o.en === 'string' && Object.keys(o).every((k) => k === 'en' || k === 'es')) return count(tx(o as Text, lang));
+      return Object.entries(o).reduce((n, [k, x]) => n + walk(x, k), 0);
+    }
+    return 0;
+  };
+  return walk(props);
+};
 
 /**
  * Names registered in src/anim/index.ts, read from its source: the registry imports .tsx
@@ -42,6 +65,10 @@ export function lintTimeline(scenes: Scene[], target: number, opts: LintOptions 
     if (scene.kind === 'anim') {
       const name = scene.anim?.name;
       if (!name || !known.has(name)) issues.push(`scene "${scene.id}": animation "${name ?? '(none)'}" is not registered in src/anim/index.ts`);
+      const n = onScreenWords(scene.anim?.props, subs);
+      const need = n / ON_SCREEN_WPS + ON_SCREEN_DWELL;
+      const shown = sceneFrames(scene) / FPS;
+      if (n && shown < need) issues.push(`scene "${scene.id}": ${n} words on screen need ~${need.toFixed(1)} s to read, the scene lasts ${shown.toFixed(1)} s (raise its min or cut text)`);
     }
     for (const [i, line] of scene.lines.entries()) {
       // The same cues as on screen: the last one of a line held into the silence after it.

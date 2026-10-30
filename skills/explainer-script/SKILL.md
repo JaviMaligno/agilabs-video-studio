@@ -23,9 +23,10 @@ caption.
 
 1. **Hook, within the first 3 s.** The surprising finding or a concrete question. Never "In
    this video...", "Today I want to talk about...", or a greeting. Intro card.
-2. **The story, right after the hook (~10 s, two or three lines).** Where this comes from, told
-   as a story in plain words: the real situation the article starts from, what kept going wrong,
-   and why it mattered. No scripts, conditions, models or numbers yet. A viewer who never read
+2. **The story, right after the hook (~10 s, two or three lines).** The viewer's story, told in
+   plain words: a situation they recognise from their own work or life, what goes wrong in it,
+   and why it matters to them. The author's own case enters when it is the example that makes
+   the viewer's situation concrete. No scripts, conditions, models or numbers yet. A viewer who never read
    the article must know what the video is about before anything technical appears; without
    this, the rest of the video is lost on them, however good it is. Spending ten seconds here is
    always worth it: cut later content before cutting the story.
@@ -52,6 +53,27 @@ caption.
   different, the verdict) gets its own spoken sentence and its own unmistakable on-screen
   moment: a card, a stamp, a big line. The closing must say plainly what the result means
   (good, bad, or "only sometimes"), as the article concludes it.
+
+## What each line carries
+
+The viewer is the protagonist and the author is the guide who has tried something for them. Each
+line moves the viewer one step toward the verdict:
+
+- **What was done and what it showed.** The video tells the experiment that happened; the scope
+  of the claim comes from the article's own hedges ("on these runs").
+- **The weight on the evidence for the verdict.** The strongest result gets the clearest moment;
+  the nuance the article keeps is said once, as the article says it.
+- **One thread.** Every scene serves the thesis; a detail that opens a second topic stays in the
+  article.
+- **A bridge before an everyday example.** A short line announces the switch ("Think of a
+  delivery."), so the example arrives as a step of the argument.
+- **A closing that lands.** The last line before the outro states the verdict in a full sentence
+  that sounds like an ending.
+- **Lists said the way a person speaks.** Items in an enumeration open with different words.
+
+Text drawn on the stage needs time to be read: about 3.5 words per second plus a second to take in
+the stage. `npm run lint` checks it for the library components; for a bespoke component with its
+own text, check it in the stills.
 
 ## Captions
 
@@ -112,8 +134,11 @@ Write `script.md` as a table, one row per narration line:
 |---|---|---|---|---|---|
 
 - "Source sentence" quotes the article for every number and every claim in the line.
+- Under the table, a **Must show** list: each thing the author asked to see, in their words. The
+  stills check confirms each one with its timestamp before delivery.
 - End with the word count (EN) and the estimated length.
 - **Cold-viewer check before presenting:** read only the first ~15 s of narration as someone
   who has never seen the article. Can they say, in one sentence, what real situation this is
   about? If not, the story is missing: add it, even if the video gets longer.
-- Present it for approval before anything is built.
+- Present the route overview (hook, cold-viewer line, verdict, Must show) and carry on building;
+  the author reviews the finished video.

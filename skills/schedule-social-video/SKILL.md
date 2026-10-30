@@ -28,9 +28,14 @@ narration says them, 4-5 hashtags, no claims stronger than the article.
 
 ## 2. Calendar
 
-- One reel every two days at a fixed evening hour (18:00 local) works; check the blog
-  publish schedule and the LinkedIn schedule first so a video never lands before its
-  article is live, and avoid same-day clashes with article posts.
+- **A new article's reel goes out the day the article does**, and its part 2 the next day (two
+  reels on one day compete). The rest of the calendar runs one reel every two days at a fixed
+  evening hour (18:00 local). Check the blog publish schedule and the LinkedIn schedule first: a
+  reel goes out on or after its article's day.
+- **Everything not yet published can be reordered** (Business Suite reschedules without
+  re-uploading), except today's reel. Propose the best overall order (series together, recent
+  articles near their publication, topical reels on their date) rather than only filling gaps.
+- Work out weekdays with `date` (`date -j -f %Y-%m-%d 2026-11-04 +%A` on macOS), never by hand.
 - **Business Suite only schedules up to 29 days ahead, on Facebook and on Instagram.** Anything
   later cannot be scheduled yet: leave it out, note the date from which it can be scheduled
   (post date minus 29 days) and add a reminder to the project calendar.
@@ -139,3 +144,11 @@ re-rendered videos replace that file before the post date.
 
 Verify in the Planner month view that each day shows both the Instagram and the Facebook
 item, then record the calendar (date, slug, platforms) where the project keeps it.
+
+## 6. Metrics, about 72 h after each reel
+
+Record each reel in the project's metrics file (for AGILabs, `metricas-reels.md` in the hand-off
+folder): from Business Suite (Content → Published, columns) reach, views, likes, comments, shares,
+saves, new followers and average watch time; from the Instagram app (the reel's insights) the
+retention at 1 s and 3 s and the share of non-followers. These numbers decide the features under
+test (cold open, cover frame): a feature becomes the default when it improves them.
