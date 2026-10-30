@@ -6,6 +6,8 @@ import { MODELS, frameState, type HiddenInstructionProps } from './HiddenInstruc
 import { Stage, gradientText } from './Stage.tsx';
 import { ChipIcon } from './FadeCard.tsx';
 import { greyOf } from './perception.ts';
+import { SETTINGS } from '../settings.ts';
+import { JackOLantern } from './Halloween.tsx';
 
 export { frameState };
 export type { HiddenInstructionProps };
@@ -137,6 +139,24 @@ export const HiddenInstruction: React.FC<AnimProps & HiddenInstructionProps> = (
           </div>
         ))}
       <ProbeCard y={24} hiddenGrey={g} typed={s.typed} style={{ transform: `scale(${1 - 0.1 * s.split})` }}>
+        {SETTINGS.halloween && (
+          // The jack-o'-lantern keeps the hidden line: dark (candle out) while nobody obeys it,
+          // lit as the banana answers come in.
+          <JackOLantern
+            t={p.t}
+            lit={p.mode === 'qwen' ? 1 : p.mode === 'faint' ? Math.max(0, ...s.bubbles.flatMap((b) => b.items.map((it) => it.banana * it.appear))) : 0}
+            smoke={p.mode === 'stego' ? 1 : 0}
+            size={150}
+            style={{
+              position: 'absolute',
+              right: 26,
+              top: 16,
+              opacity: p.mode === 'write' ? Math.min(1, s.typed * 2.5) : 1,
+              transform: `scale(${p.mode === 'write' ? 0.6 + 0.4 * Math.min(1, s.typed * 2.5) : 1})`,
+              transformOrigin: '50% 100%',
+            }}
+          />
+        )}
         {s.split > 0.01 && (
           <div style={{ position: 'absolute', left: 20, bottom: 16, fontSize: 28, fontWeight: 700, color: '#64748b', opacity: s.split }}>{LAYERS[0]}</div>
         )}
@@ -155,11 +175,11 @@ export const HiddenInstruction: React.FC<AnimProps & HiddenInstructionProps> = (
               opacity: s.pct,
             }}
           >
-            hidden line: <span style={gradientText}>1% contrast</span>
+            hidden line: <span style={gradientText}>faint ink</span>
           </div>
         )}
       </ProbeCard>
-      {/* 0.222 ≈ 1 in 5 */}
+      {/* ≈ 1 in 5 (0.222 in the article's table) */}
       {s.faintTag > 0 && (
         <div
           style={{
@@ -172,8 +192,8 @@ export const HiddenInstruction: React.FC<AnimProps & HiddenInstructionProps> = (
             transform: `scale(${0.85 + 0.15 * s.faintTag})`,
           }}
         >
-          <div style={{ fontSize: 96, fontWeight: 800, lineHeight: 1, ...gradientText }}>0.222</div>
-          <div style={{ fontSize: 40, fontWeight: 700, color: C.text, marginTop: 14 }}>≈ 1 in 5 trials obeyed</div>
+          <div style={{ fontSize: 96, fontWeight: 800, lineHeight: 1, ...gradientText }}>≈ 1 in 5</div>
+          <div style={{ fontSize: 40, fontWeight: 700, color: C.text, marginTop: 14 }}>trials obeyed the spell</div>
         </div>
       )}
       {/* Model chips and their answers */}
@@ -252,8 +272,8 @@ export const HiddenInstruction: React.FC<AnimProps & HiddenInstructionProps> = (
       })}
       {s.zeroTag > 0 && (
         <div style={{ position: 'absolute', left: X, width: W, top: 880, textAlign: 'center', opacity: s.zeroTag * (1 - s.pct) }}>
-          <span style={{ fontSize: 64, fontWeight: 800, ...gradientText }}>0.000</span>
-          <span style={{ fontSize: 36, fontWeight: 700, color: C.text }}> obeyed the hidden line</span>
+          <span style={{ fontSize: 64, fontWeight: 800, ...gradientText }}>no model</span>
+          <span style={{ fontSize: 36, fontWeight: 700, color: C.text }}> obeyed the spell</span>
         </div>
       )}
       {s.qwen > 0 && (
@@ -275,7 +295,7 @@ export const HiddenInstruction: React.FC<AnimProps & HiddenInstructionProps> = (
       )}
       {s.shields > 0 && (
         <div style={{ position: 'absolute', left: 80 - 72, top: 1018, display: 'flex', alignItems: 'center', gap: 10, opacity: s.shields, fontSize: 32, fontWeight: 700 }}>
-          <Shield size={38} /> immune to all six methods
+          <Shield size={38} /> immune to every trick
         </div>
       )}
     </Stage>

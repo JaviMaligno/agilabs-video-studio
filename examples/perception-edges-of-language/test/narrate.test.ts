@@ -76,7 +76,7 @@ test('sceneStarts overlaps scenes by the transition', () => {
 test('settings and timeline of this video', () => {
   assert.deepEqual(SETTINGS.voices, ['en']);
   assert.deepEqual(SETTINGS.subtitles, ['en']);
-  assert.equal(SETTINGS.targetSeconds, 57);
+  assert.equal(SETTINGS.targetSeconds, 75);
   assert.deepEqual(SETTINGS.music, { src: 'music/bed.wav', volume: 0.2, duck: 0.3 });
   assert.equal(TIMELINE.at(-1)?.kind, 'outro');
   assert.ok(

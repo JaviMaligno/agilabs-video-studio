@@ -30,18 +30,22 @@ when installed as a plugin; next to `skills/` in the plugin repo).
   setup", "on these 20 runs"), the script hedges too. No punchier-than-source wording.
 - **Branding.** AGILabs only: the AGILabs badge and `javieraguilar.ai`. No personal name
   anywhere, not in the cards, the poster, the captions or the file metadata.
-- **Approval gate.** Nothing is built before the script is approved.
+- **Route overview, then build.** Before building, show the author a short overview of the route: the
+  hook, the line that tells a cold viewer what the video is about, the verdict, and the "Must show"
+  list. Then carry on building; they review the finished video. The full `script.md` is there
+  whenever he asks to read it.
 
 ## Workflow
 
 1. **Pick the article.** Use the one named. If none is named, read the published articles and
-   propose 2-3 candidates, each with its title, a hook line, the key number (quoted) and a
-   visual idea. Favour articles with an experiment, a clear number and a mechanism that can be
-   drawn. Let the person choose.
+   propose 2-3 candidates, each with its title, a hook line, the visual idea and the key number
+   (quoted). Favour articles whose story can be drawn: people, objects, a mechanism, a scene that
+   moves. Let the person choose.
 2. **Write the script** with `explainer-script`: the narration lines (EN, ES optional), a visual
    idea per scene mapped to a library component or flagged "bespoke", and the source sentence
    for every number.
-3. **STOP for approval.** Show the script and wait. Apply edits and show it again if asked.
+3. **Overview of the route.** Show the overview (see above) and continue. When the author answers
+   with changes, apply them and keep building.
 4. **Create the video folder.** Copy the template without its generated files:
    - inside the plugin repo: `examples/<article-slug>/`;
    - from any other repo: `./video/<article-slug>/`.
@@ -75,6 +79,28 @@ when installed as a plugin; next to `skills/` in the plugin repo).
 
 Open its folder, run `npm ci` if `node_modules` is missing, change `src/timeline.ts` or the
 settings, then repeat from step 6. TTS only re-voices lines whose text changed.
+
+**Changing what the author pointed at.** The approved version is the one in git. Start from it, write
+the list of lines that change (before → after) and change exactly those; when you hand the change
+to another agent, hand it that list and the instruction to keep everything else. Check with
+`git diff` that the diff holds only those lines. If another change looks necessary (a factual fix),
+name it to the author on its own.
+
+**Keep the approved takes.** Before re-voicing a video the author has approved, copy `public/audio/` to
+`out/approved-audio-<date>/`. A take they liked (a reaction that came through in the voice) can then
+be restored by copying its WAV and `.words.json` back.
+
+**Videos made from an older template.** Each video folder carries its own copy of the template, so
+template fixes reach it only when applied. The plugin's `scripts/migrate/` holds the migrations
+(`apply_avatar.py` for cameos and the outro avatar, `apply_tone.py` for per-line tones and the
+`excited` default); each is idempotent and fails loudly when an anchor is missing.
+
+## Trying a new idea
+
+A new feature (a cold open, a cover frame, a new card) is tried first in one video's folder, as an
+option that is off by default in the template. It moves into the template once the author approves
+the result, or once the metric it targets improves (see `schedule-social-video`), and is then
+applied to the videos still to be published.
 
 ## Where things go
 

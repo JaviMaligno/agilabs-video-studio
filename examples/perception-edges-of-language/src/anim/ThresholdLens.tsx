@@ -5,6 +5,9 @@ import { COLS_N, CROP, ROWS_N, frameState, type ThresholdLensProps } from './Thr
 import { Stage, gradientText } from './Stage.tsx';
 import { StimulusCard, ChipIcon } from './FadeCard.tsx';
 import { CARD } from './perception.ts';
+import { SETTINGS } from '../settings.ts';
+import { Spider } from './Halloween.tsx';
+import { beatAt, easeOutCubic, progress } from './steps.ts';
 
 export { frameState };
 export type { ThresholdLensProps };
@@ -102,9 +105,13 @@ export const ThresholdLens: React.FC<AnimProps & ThresholdLensProps> = (p) => {
           Tesseract <span style={{ color: C.muted, fontWeight: 600 }}>· arithmetic on pixel values</span>
         </div>
         <div style={{ opacity: s.rule, fontSize: 34, fontWeight: 800, transform: `translateY(${(1 - s.rule) * 12}px)` }}>
-          <span>darker than its neighbours</span> <span style={gradientText}>→ 0</span>
+          <span>darker than its neighbours</span> <span style={gradientText}>→ black</span>
         </div>
       </div>
+      {/* Halloween: once the card is back and crisp, a spider lets itself down under it. */}
+      {SETTINGS.halloween && p.beats.length > 2 && (
+        <Spider x={800} top={CARD.y + CARD.h} len={300} drop={easeOutCubic(progress(p.t, beatAt(p.beats, 2) + 0.7, 1.3))} t={p.t} size={64} />
+      )}
     </Stage>
   );
 };

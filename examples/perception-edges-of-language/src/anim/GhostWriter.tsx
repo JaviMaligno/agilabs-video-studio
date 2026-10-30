@@ -5,6 +5,9 @@ import type { AnimProps } from './types.ts';
 import { MEANING_STOP, NONSENSE_STOP, SIZE_MAX, SIZE_MIN, frameState, type GhostWriterProps } from './GhostWriter.state.ts';
 import { Stage, gradientText } from './Stage.tsx';
 import { ChipIcon } from './FadeCard.tsx';
+import { SETTINGS } from '../settings.ts';
+import { Ghost } from './Halloween.tsx';
+import { clamp01 } from './steps.ts';
 
 export { frameState };
 export type { GhostWriterProps };
@@ -51,7 +54,7 @@ const Line: React.FC<{
           color: read ? C.accentText : C.muted,
         }}
       >
-        {read ? 'models read it' : `lost at ${lostAt}`}
+        {read ? 'models read it' : lostAt}
       </div>
       <div
         style={{
@@ -113,7 +116,7 @@ export const GhostWriter: React.FC<AnimProps & GhostWriterProps> = (p) => {
   const gy = 620;
   return (
     <Stage vertical={p.vertical} fill>
-      <Line y={0} label="meaningful" mask="visible" scale={s.scale} blur={s.blur} read={s.meaning.read} ghost={s.meaning.ghost} ghostText={s.meaning.ghostText} lostAt="≈5.5 px" labels={s.labels} />
+      <Line y={0} label="meaningful" mask="visible" scale={s.scale} blur={s.blur} read={s.meaning.read} ghost={s.meaning.ghost} ghostText={s.meaning.ghostText} lostAt="lost" labels={s.labels} />
       <Line
         y={300}
         label="nonsense"
@@ -123,30 +126,41 @@ export const GhostWriter: React.FC<AnimProps & GhostWriterProps> = (p) => {
         read={s.nonsense.read}
         ghost={s.nonsense.ghost}
         ghostText={s.nonsense.ghostText}
-        lostAt="≈8 px"
+        lostAt="lost"
         labels={s.labels}
       />
+      {/* Halloween: the ghost rises inside the meaningful card's corner and "ghost-writes" with its quill. */}
+      {SETTINGS.halloween && s.labels > 0 && (
+        <Ghost
+          id="writer"
+          x={X + W - 80}
+          y={46 + CARD_H}
+          scale={0.8}
+          t={p.t}
+          pose={{ rise: clamp01(Math.max(s.meaning.ghost * 1.6, s.mark55, s.bracket)), cover: 0, lookX: -1, lookY: 0.4, quill: clamp01(Math.max(s.meaning.ghost * 1.6, s.mark55, s.bracket)) }}
+        />
+      )}
       {/* Font-height gauge */}
       <div style={{ position: 'absolute', left: X, top: gy, width: W, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', opacity: s.labels }}>
-        <span style={{ fontSize: 30, fontWeight: 700, color: C.muted }}>font height</span>
-        <span style={{ fontSize: 48, fontWeight: 800, color: C.text }}>{s.size.toFixed(1)} px</span>
+        <span style={{ fontSize: 30, fontWeight: 700, color: C.muted }}>text size</span>
+        <span style={{ fontSize: 34, fontWeight: 800, color: C.text }}>smaller →</span>
       </div>
       <div style={{ position: 'absolute', left: X, top: gy + 80, width: W, height: 12, borderRadius: 6, background: C.card, boxShadow: `0 0 0 2px ${alpha(C.text, 0.12)}`, opacity: s.labels }} />
       <div style={{ position: 'absolute', left: tx(s.size) - 3, top: gy + 64, width: 6, height: 44, borderRadius: 3, background: C.text, opacity: s.labels }} />
       {[
-        { size: NONSENSE_STOP, label: '≈8 px', a: s.mark8 },
-        { size: MEANING_STOP, label: '≈5.5 px', a: s.mark55 },
+        { size: NONSENSE_STOP, label: 'nonsense', a: s.mark8 },
+        { size: MEANING_STOP, label: 'real words', a: s.mark55 },
       ].map((m) => (
         <React.Fragment key={m.label}>
           <div style={{ position: 'absolute', left: tx(m.size) - 2, top: gy + 116, width: 4, height: 26, background: C.accentText, opacity: m.a }} />
           <div
             style={{
               position: 'absolute',
-              left: tx(m.size) - 80,
-              width: 160,
+              left: tx(m.size) - 85,
+              width: 170,
               textAlign: 'center',
               top: gy + 146,
-              fontSize: 32,
+              fontSize: 28,
               fontWeight: 800,
               color: C.text,
               opacity: m.a,
@@ -182,7 +196,7 @@ export const GhostWriter: React.FC<AnimProps & GhostWriterProps> = (p) => {
               opacity: s.bracket,
             }}
           >
-            2.5 px <span style={gradientText}>= prediction</span>
+            <span style={gradientText}>prediction</span>
           </div>
         </>
       )}

@@ -5,6 +5,8 @@ import type { AnimProps } from './types.ts';
 import { HERO_DY, HERO_SCALE, LINES, frameState, type FadeCardProps, type ReaderState } from './FadeCard.state.ts';
 import { Stage, gradientText } from './Stage.tsx';
 import { CARD, ROWS, RULER, TICKS, greyOf, ratioAt } from './perception.ts';
+import { SETTINGS } from '../settings.ts';
+import { Ghost, HookBats, ghostPose } from './Halloween.tsx';
 
 export { frameState };
 export type { FadeCardProps };
@@ -240,21 +242,21 @@ const Ruler: React.FC<{ s: ReturnType<typeof frameState> }> = ({ s }) => {
       {TICKS.map((tk, i) => (
         <React.Fragment key={i}>
           <div style={{ position: 'absolute', left: RULER.x + tk.pos * RULER.w - 1.5, top: RULER.y + RULER.h + 2, width: 3, height: 12, background: C.muted }} />
-          {tk.label && (
+          {(i === 0 || i === TICKS.length - 1) && (
             <div
               style={{
                 position: 'absolute',
                 left: RULER.x + tk.pos * RULER.w - 40,
-                width: 80,
-                textAlign: i === TICKS.length - 1 ? 'right' : 'center',
-                transform: i === TICKS.length - 1 ? 'translateX(-30px)' : i === 0 ? 'translateX(28px)' : undefined,
+                width: 140,
+                textAlign: i === TICKS.length - 1 ? 'right' : 'left',
+                transform: i === TICKS.length - 1 ? 'translateX(-100px)' : 'translateX(40px)',
                 top: RULER.y + RULER.h + 16,
                 fontSize: 24,
                 fontWeight: 600,
                 color: C.muted,
               }}
             >
-              {tk.label}
+              {i === 0 ? 'black' : 'faintest'}
             </div>
           )}
         </React.Fragment>
@@ -281,7 +283,7 @@ const Ruler: React.FC<{ s: ReturnType<typeof frameState> }> = ({ s }) => {
           whiteSpace: 'nowrap',
         }}
       >
-        <span>ink grey {s.marker.grey}</span>
+        <span>ink</span>
         {/* The same fade, stretched along the log ruler so it stays visible past grey ~235. Always
             laid out (opacity 0 when off) so blended scenes put the label in the same place. */}
         {(
@@ -299,7 +301,6 @@ const Ruler: React.FC<{ s: ReturnType<typeof frameState> }> = ({ s }) => {
             }}
           >
             <span style={{ fontSize: 30, fontWeight: 800, color: rgb(s.chipInk) }}>Aa</span>
-            <span style={{ fontSize: 15, fontWeight: 700, color: '#6b6b80', letterSpacing: '0.04em' }}>LOG</span>
           </span>
         )}
       </div>
@@ -320,7 +321,7 @@ const Ruler: React.FC<{ s: ReturnType<typeof frameState> }> = ({ s }) => {
               transform: `translateY(${(1 - s.human) * 10}px)`,
             }}
           >
-            me: 0.030 <span style={{ color: C.muted, fontWeight: 600 }}>· 3%</span>
+            me
           </div>
         </>
       )}
@@ -365,33 +366,29 @@ export const FadeCard: React.FC<AnimProps & FadeCardProps> = (p) => {
     <Stage vertical={p.vertical} fill>
       <div style={{ position: 'absolute', inset: 0, transform: `translateY(${s.hero * HERO_DY}px)` }}>
       <SentenceCard glyphs={s.glyphs} style={{ transform: `scale(${1 + (HERO_SCALE - 1) * s.hero})`, transformOrigin: '50% 100%' }}>
-        {s.floorTag > 0 && (
-          <div
-            style={{
-              position: 'absolute',
-              right: 18,
-              bottom: 14,
-              opacity: s.floorTag,
-              transform: `scale(${0.7 + 0.3 * s.floorTag})`,
-              transformOrigin: 'right bottom',
-              background: C.bg0,
-              borderRadius: 14,
-              padding: '6px 18px',
-              fontSize: 46,
-              fontWeight: 800,
-              color: C.text,
-            }}
-          >
-            <span style={gradientText}>254</span>
-            <span style={{ color: C.muted }}> / 255</span>
-          </div>
-        )}
+        {/* v2: the "254 / 255" floor tag is gone; the narration says "almost white on white". */}
       </SentenceCard>
+      {SETTINGS.halloween &&
+        (() => {
+          // The ghost peeks over the card's top-right edge; the card scales from its bottom edge.
+          const k = 1 + (HERO_SCALE - 1) * s.hero;
+          return (
+            <Ghost
+              id={p.mode}
+              x={CARD.x + CARD.w / 2 + 300 * k}
+              y={CARD.y + CARD.h * (1 - k)}
+              scale={0.78 + 0.32 * s.hero}
+              t={p.t}
+              pose={ghostPose(p.mode, p.t, p.beats)}
+            />
+          );
+        })()}
       <Ruler s={s} />
       {s.readers.map((r) => (
         <Row key={r.id} r={r} />
       ))}
       </div>
+      {SETTINGS.halloween && p.mode === 'hook' && <HookBats t={p.t} />}
     </Stage>
   );
 };

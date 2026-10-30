@@ -126,9 +126,26 @@ When the script flags a scene "bespoke":
    plugin's template.
 
 **Generated images.** Most scenes should be drawn in code (SVG and CSS from the brand tokens).
-If a scene truly needs a generated image (a background, a base image, a textured moment), an
-image model can make it, for example the Codex CLI's image generation. Save it under
-`public/`, load it with `staticFile()`, keep it inside the brand palette, and check the still.
+Drawings (people as caricatures, objects, the author's avatar poses) and the scenes that truly need
+a generated image come from an image model, usually the Codex CLI. Save them under `public/`, load
+them with `staticFile()`, keep them inside the brand palette, and check the still.
+
+## Assets with Codex
+
+- **One call per asset**, in a folder holding the references, with stdin closed so it never waits
+  for input: `codex exec -s workspace-write "<prompt>" < /dev/null`. Within a minute or two, check
+  that it is producing output; several assets run well as parallel calls.
+- **Style by reference.** Put the style references in the folder (`ref-style.png`, the avatar's
+  identity sheet) and say what they are for: "DRAWING STYLE reference only", so the model copies
+  the line and the shading and draws its own subject. Ask for transparent PNGs at the size the
+  scene uses.
+- **The author's avatar** keeps one identity across every pose: pass the identity sheet and ask for
+  the new pose as "IDENTICAL character, changing ONLY <pose / outfit>". A small fix (an eye colour,
+  a shade of the T-shirt) is a recolour with Pillow, which keeps everything else exactly as it was.
+- **Stories** (1080×1920 images for a reel's story) keep the top third clear for the text the
+  author adds in the app.
+- **Show finished candidates.** Each option offered for a choice is rendered and ready to use as
+  it is.
 
 ## Vertical safe area (1080x1920)
 
@@ -150,3 +167,10 @@ Take one still per scene once its last step has played, plus one every ~3 s (eve
 at 30 fps). Check: AGILabs badge and nothing else as branding, nothing outside the safe area,
 no text overflowing its box, every figure equal to the article, and the caption on screen
 matching what the animation shows at that moment.
+
+Two more checks before delivery:
+
+- **Must show.** Each item of the script's Must show list appears on screen; note its timestamp.
+- **Time to read.** Text on the stage stays long enough to be read (~3.5 words/s plus 1 s), and
+  the stage carries something at every moment. `npm run lint` covers the library components;
+  bespoke components with their own text are checked here.

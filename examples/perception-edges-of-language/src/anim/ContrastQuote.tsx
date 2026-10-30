@@ -5,6 +5,8 @@ import { frameState, type ContrastQuoteProps } from './ContrastQuote.state.ts';
 import { Stage, gradientText } from './Stage.tsx';
 import { MaskLine, ProbeCard } from './HiddenInstruction.tsx';
 import { greyOf } from './perception.ts';
+import { SETTINGS } from '../settings.ts';
+import { HookBats } from './Halloween.tsx';
 
 export { frameState };
 export type { ContrastQuoteProps };
@@ -44,7 +46,7 @@ export const ContrastQuote: React.FC<AnimProps & ContrastQuoteProps> = (p) => {
       {!steg && (
         <div style={{ position: 'absolute', left: 30, width: 900, top: 350, display: 'flex', justifyContent: 'flex-end', opacity: s.card }}>
           <div style={{ fontSize: 30, fontWeight: 700, color: C.muted }}>
-            hidden line, contrast <span style={{ color: C.accentText }}>{(s.ratio * 100).toFixed(s.ratio < 0.1 ? 1 : 0)}%</span>
+            the hidden spell, <span style={{ color: C.accentText }}>{s.breath > 0.12 ? 'showing itself' : 'invisible'}</span>
           </div>
         </div>
       )}
@@ -84,6 +86,17 @@ export const ContrastQuote: React.FC<AnimProps & ContrastQuoteProps> = (p) => {
           );
         })}
       </div>
+      {/* Halloween: the hook's bats come back across the gap under the card, as a bookend. */}
+      {SETTINGS.halloween && !steg && (
+        <HookBats
+          t={p.t}
+          flock={[
+            { t0: 0.6, y: 430, size: 96 },
+            { t0: 1.0, y: 500, size: 76 },
+            { t0: 1.3, y: 455, size: 64 },
+          ]}
+        />
+      )}
     </Stage>
   );
 };
