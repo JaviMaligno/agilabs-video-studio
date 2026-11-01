@@ -25,7 +25,7 @@ const final = at('out', `${name}.mp4`);
 fs.mkdirSync(at('out'), { recursive: true });
 
 const concurrency = process.env.CONCURRENCY ?? String(Math.max(2, Math.floor(os.cpus().length / 2)));
-execFileSync('npx', ['remotion', 'render', 'src/index.ts', id, raw, '--crf=18', `--concurrency=${concurrency}`], { stdio: 'inherit', cwd: at() });
+execFileSync(process.execPath, [at('node_modules', '@remotion', 'cli', 'remotion-cli.js'), 'render', 'src/index.ts', id, raw, '--crf=18', `--concurrency=${concurrency}`], { stdio: 'inherit', cwd: at() });
 
 // Measure, then apply as one linear gain so the voice does not "pump".
 const target = `I=${LOUDNESS.I}:TP=${LOUDNESS.truePeak}:LRA=11`;

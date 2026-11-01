@@ -227,6 +227,9 @@ const Board: React.FC<{ s: ReturnType<typeof frameState>; lang: Lang; top: numbe
             fontSize: 34,
             fontWeight: 700,
             color: k === 0 ? C.accentText : alpha(C.muted, 0.8),
+            // The article ranks only the top (Qwen) and the bottom two under both rules: the middle
+            // rank numbers fade once the stack is ranked by the rules.
+            opacity: k >= 1 && k <= 3 ? 1 - 0.85 * s.header : 1,
           }}
         >
           #{k + 1}
