@@ -204,6 +204,11 @@ test('LeaderboardFlip: the article figures, ranked by bugs fixed', () => {
     ['Sonnet 30 0 0', 'Opus 29 1 1', 'Sol 29 28 null', 'Haiku 25 7 null', 'Luna 22 3 null', 'Qwen 22 19 18'],
   );
   for (let i = 1; i < board.MODELS.length; i++) assert.ok(board.MODELS[i - 1].fixed >= board.MODELS[i].fixed);
+  // One cast robot per model, all different, carried into every card and the focus card.
+  assert.equal(new Set(board.MODELS.map((m) => m.robot)).size, board.MODELS.length);
+  const s = board.frameState({ mode: 'cold' }, 0, [0.1], 6);
+  assert.deepEqual(s.cards.map((c) => c.robot), board.MODELS.map((m) => m.robot));
+  assert.equal(board.frameState({ mode: 'focus', focus: 'Qwen' }, 1, [0.2], 6).focus!.robot, 'graphite');
 });
 
 test('LeaderboardFlip: the stack lands reversed, Qwen on top, Opus and Sonnet last', () => {

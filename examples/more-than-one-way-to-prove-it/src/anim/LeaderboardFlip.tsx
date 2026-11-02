@@ -1,4 +1,5 @@
 import React from 'react';
+import { Img, staticFile } from 'remotion';
 import { C, GRADIENT, alpha } from '../brand.ts';
 import type { Lang } from '../types.ts';
 import type { AnimProps } from './types.ts';
@@ -34,6 +35,11 @@ const T = {
 } as const;
 const tr = (k: keyof typeof T, lang: Lang) => T[k][lang] || T[k].en;
 const colourOf = (v: Verdict) => (v === 'pass' ? GREEN : v === 'fail' ? RED : C.muted);
+
+/** The model's cast robot (one colour per model, the same in every scene). */
+const Robot: React.FC<{ colour: string; size: number; style?: React.CSSProperties }> = ({ colour, size, style }) => (
+  <Img src={staticFile(`cast/robot-${colour}.png`)} style={{ flex: 'none', width: size, height: size, objectFit: 'contain', ...style }} />
+);
 
 /** A round rubber stamp with a tick or a cross: it lands big and settles. */
 const RoundStamp: React.FC<{ verdict: Verdict; pop: number; size: number; style?: React.CSSProperties }> = ({ verdict, pop, size, style }) =>
@@ -197,8 +203,8 @@ const Board: React.FC<{ s: ReturnType<typeof frameState>; lang: Lang; top: numbe
   withHeader,
 }) => {
   const step = cardH + gap;
-  const rankW = 70;
-  const cardW = 800;
+  const rankW = 60;
+  const cardW = 814;
   const left = rankW + 6;
   const headerH = withHeader ? 58 : 0;
   // Cards rising pass in front of cards falling.
@@ -241,11 +247,11 @@ const Board: React.FC<{ s: ReturnType<typeof frameState>; lang: Lang; top: numbe
         const tint = colourOf(c.verdict);
         const border = c.pop > 0 ? alpha(tint, 0.35 + 0.5 * c.pop) : alpha(C.text, 0.1);
         const counter = (label: string, value: string, frac: number, colour: string, show = 1) => (
-          <div style={{ width: 196, display: 'flex', flexDirection: 'column', gap: 4, opacity: show }}>
+          <div style={{ width: 168, display: 'flex', flexDirection: 'column', gap: 4, opacity: show }}>
             <div style={{ fontSize: 21, fontWeight: 700, letterSpacing: '0.1em', color: C.muted }}>{label}</div>
-            <div style={{ fontFamily: MONO, fontSize: cardH > 125 ? 40 : 36, fontWeight: 700, lineHeight: 1.05, color: C.text }}>{value}</div>
-            <div style={{ height: 6, width: 170, borderRadius: 3, background: alpha(C.text, 0.08) }}>
-              <div style={{ height: 6, width: 170 * frac, borderRadius: 3, background: colour }} />
+            <div style={{ fontFamily: MONO, fontSize: cardH > 125 ? 38 : 34, fontWeight: 700, lineHeight: 1.05, color: C.text }}>{value}</div>
+            <div style={{ height: 6, width: 150, borderRadius: 3, background: alpha(C.text, 0.08) }}>
+              <div style={{ height: 6, width: 150 * frac, borderRadius: 3, background: colour }} />
             </div>
           </div>
         );
@@ -271,8 +277,9 @@ const Board: React.FC<{ s: ReturnType<typeof frameState>; lang: Lang; top: numbe
               zIndex: c.rising ? 20 : 10,
             }}
           >
-            <div style={{ flex: 1, fontSize: cardH > 125 ? 52 : 46, fontWeight: 800, letterSpacing: '-0.01em' }}>{c.name}</div>
-            <div style={{ position: 'relative', display: 'flex', gap: 14, marginRight: 100 }}>
+            <Robot colour={c.robot} size={cardH - 14} style={{ marginLeft: -14 }} />
+            <div style={{ flex: 1, fontSize: cardH > 125 ? 46 : 42, fontWeight: 800, letterSpacing: '-0.01em' }}>{c.name}</div>
+            <div style={{ position: 'relative', display: 'flex', gap: 12, marginRight: 92 }}>
               <div style={{ display: 'flex', gap: 14, opacity: 1 - Math.min(1, c.showBoth * 2) }}>
                 {counter(tr('fixed', lang), `${c.fixed}/${RUNS}`, c.fixed / RUNS, GRADIENT)}
                 {counter(tr('first', lang), `${c.testsFirst}/${c.fixed}`, c.testsFirst / Math.max(1, c.fixed), TEAL, 1 - c.dim)}
@@ -339,16 +346,19 @@ const FocusCard: React.FC<{ f: NonNullable<ReturnType<typeof frameState>['focus'
         transform: `translateY(${50 * (1 - f.appear)}px) scale(${0.94 + 0.06 * f.appear})`,
       }}
     >
-      <div style={{ fontSize: 112, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>{f.name}</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginTop: -12 }}>
+        <Robot colour={f.robot} size={140} style={{ margin: '-14px 0 -14px -14px' }} />
+        <div style={{ fontSize: 112, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>{f.name}</div>
+      </div>
       {bar(tr('fixedLong', lang), `${f.fixed}/${RUNS}`, f.fixed / RUNS, f.growFixed, GRADIENT)}
       {bar(tr('firstLong', lang), `${f.testsFirst}/${f.fixed}`, f.testsFirst / Math.max(1, f.fixed), f.growTests, TEAL)}
       <WordStamp
         text={f.verdict === 'pass' ? tr('pass', lang) : tr('fail', lang)}
         colour={colour}
         pop={f.pop}
-        size={92}
+        size={80}
         rotate={f.verdict === 'pass' ? -7 : 7}
-        style={{ left: '72%', top: 84 }}
+        style={{ left: '80%', top: -6 }}
       />
     </div>
   );

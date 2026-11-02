@@ -17,6 +17,8 @@ export type ModelRow = {
   both: number | null;
   /** Verdict stamped on the card once the rules are applied. */
   verdict: Verdict;
+  /** Cast robot drawn on the card (public/cast/robot-<colour>.png), the same in every scene. */
+  robot: string;
 };
 
 /** Out of how many each model's "fixed" counter is. */
@@ -29,12 +31,12 @@ export const RUNS = 30;
  * "Opus 1 of 29, Sonnet 0 of 30".
  */
 export const MODELS: ModelRow[] = [
-  { name: 'Sonnet', fixed: 30, testsFirst: 0, both: 0, verdict: 'fail' },
-  { name: 'Opus', fixed: 29, testsFirst: 1, both: 1, verdict: 'fail' },
-  { name: 'Sol', fixed: 29, testsFirst: 28, both: null, verdict: 'none' },
-  { name: 'Haiku', fixed: 25, testsFirst: 7, both: null, verdict: 'none' },
-  { name: 'Luna', fixed: 22, testsFirst: 3, both: null, verdict: 'none' },
-  { name: 'Qwen', fixed: 22, testsFirst: 19, both: 18, verdict: 'pass' },
+  { name: 'Sonnet', fixed: 30, testsFirst: 0, both: 0, verdict: 'fail', robot: 'violet' },
+  { name: 'Opus', fixed: 29, testsFirst: 1, both: 1, verdict: 'fail', robot: 'amber' },
+  { name: 'Sol', fixed: 29, testsFirst: 28, both: null, verdict: 'none', robot: 'teal' },
+  { name: 'Haiku', fixed: 25, testsFirst: 7, both: null, verdict: 'none', robot: 'sky' },
+  { name: 'Luna', fixed: 22, testsFirst: 3, both: null, verdict: 'none', robot: 'rose' },
+  { name: 'Qwen', fixed: 22, testsFirst: 19, both: 18, verdict: 'pass', robot: 'graphite' },
 ];
 
 export type LeaderboardFlipProps = {
@@ -89,6 +91,7 @@ export function frameState(p: LeaderboardFlipProps, time: number, beats: number[
     const dimTarget = mode === 'flip' && m.verdict === 'none' ? 1 : 0;
     return {
       name: m.name,
+      robot: m.robot,
       fixed: m.fixed,
       testsFirst: m.testsFirst,
       both: m.both,
@@ -134,6 +137,7 @@ export function frameState(p: LeaderboardFlipProps, time: number, beats: number[
     mode === 'focus'
       ? {
           name: target.name,
+          robot: target.robot,
           fixed: target.fixed,
           testsFirst: target.testsFirst,
           verdict: target.verdict === 'none' ? ('fail' as Verdict) : target.verdict,

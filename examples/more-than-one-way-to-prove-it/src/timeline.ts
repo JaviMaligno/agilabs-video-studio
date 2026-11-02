@@ -18,6 +18,8 @@ const build = (): Cuts => ({
       'setup',
       'StatGrid',
       {
+        // Role cameo: the author handing out the bugs.
+        cameos: [{ pose: 'pointing', at: [0, 'gave'], dur: 2.4 }],
         stats: [
           { value: '6', label: L('models', 'modelos') },
           // Pinned to the words: "ten" (EN 1.7 s) and the second line, "three times each" (EN 3.93 s).
@@ -44,7 +46,7 @@ const build = (): Cuts => ({
     anim(
       'sonnet',
       'LeaderboardFlip',
-      { mode: 'focus', focus: 'Sonnet' },
+      { mode: 'focus', focus: 'Sonnet', cameos: [{ pose: 'sceptical', at: [1, 'zero'], dur: 2.0 }] },
       [
         say(0.2, 'Sonnet fixed all thirty bugs.', 'Sonnet arregló los treinta bugs.'),
         say(0, 'It ran the tests first zero times.', 'Ejecutó los tests primero cero veces.'),
@@ -80,10 +82,10 @@ const build = (): Cuts => ({
     anim(
       'flip',
       'LeaderboardFlip',
-      { mode: 'flip' },
+      { mode: 'flip', cameos: [{ pose: 'amazed', at: [1, 'flips'], dur: 2.2 }] },
       [
         say(0.3, "Add a second sensible rule, don't edit the tests,", 'Añade otra regla sensata, no tocar los tests,'),
-        say(0, 'and the ranking flips.', 'y el ranking se da la vuelta.', undefined, { emotion: 'surprised' }),
+        say(0, 'and the ranking flips.', 'y el ranking se da la vuelta.', undefined, { emotion: 'amazed' }),
       ],
       // Room after the flip for the stamps and the "passes both rules" figures to be read.
       { min: 7.5 },
@@ -94,7 +96,7 @@ const build = (): Cuts => ({
       { mode: 'opinion' },
       [
         say(0.3, 'A rule about how to work is an opinion about method.', 'Una regla sobre cómo trabajar es una opinión sobre el método.', undefined, { emotion: 'confident' }),
-        say(0, 'Here it graded the habit, not the result.', 'Aquí puntuó la costumbre, no el resultado.', undefined, { emotion: 'confident' }),
+        say(0, 'Here it graded the habit, not the result.', 'Aquí puntuó la costumbre, no el resultado.', undefined, { emotion: 'confident', speed: 1.05 }),
       ],
     ),
     outro('outro', [say(0.15, 'More at javieraguilar.ai.', 'Más en javieraguilar.ai.', { en: 'More at javier aguilar dot A I.', es: 'Más en javier aguilar punto A I.' })]),

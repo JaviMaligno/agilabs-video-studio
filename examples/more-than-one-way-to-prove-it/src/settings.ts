@@ -31,5 +31,5 @@ export const SETTINGS: Settings = {
   // The flipped leaderboard, stamps landed: the video's picture.
   poster: { scene: 'flip', second: 6.8 },
   articleTitle: { en: 'More Than One Way to Prove It', es: 'Más de una forma de demostrarlo' },
-  avatar: null,
+  avatar: 'avatar/avatar-profile.png',
 };

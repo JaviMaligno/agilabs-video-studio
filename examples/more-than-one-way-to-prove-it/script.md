@@ -35,3 +35,13 @@ green or red. The video opens on the flip and closes on it.
   the card shows the tie honestly (Luna also 22).
 - Spoken forms: "javieraguilar.ai" → "javier aguilar dot A I".
 - Visuals are illustrative; narration and numbers stay faithful to the article.
+
+## Build notes (house style pass, 2026-11-02)
+
+- **Cast:** each model card carries a cast robot, one colour per model in every scene: Sonnet
+  violet, Opus amber, Sol teal, Haiku sky, Luna rose, Qwen graphite (`public/cast/`).
+- **Tones:** default `excited`; "It was measuring habit." `confident`; "and the ranking flips."
+  `amazed`; "A rule about how to work is an opinion about method." `confident`; "Here it graded
+  the habit, not the result." `confident` at 1.05.
+- **Cameos:** `pointing` on "I gave six models…" (role), `sceptical` on "zero times",
+  `amazed` on "flips". Avatar on the outro card. Narration text and numbers unchanged.
