@@ -808,7 +808,7 @@ export const PullBack: React.FC<AnimProps & PullBackProps> = ({ t, beats, dur, v
             <stop offset="1" stopColor={C.hot} />
           </linearGradient>
           <clipPath id="pbVp">
-            <rect x={vp.x} y={vp.y} width={vp.w} height={vp.h} rx={24} />
+            <rect x={s.clip.x} y={s.clip.y} width={s.clip.w} height={s.clip.h} rx={24} />
           </clipPath>
         </defs>
         <g clipPath="url(#pbVp)" opacity={1 - 0.9 * s.worldDim}>

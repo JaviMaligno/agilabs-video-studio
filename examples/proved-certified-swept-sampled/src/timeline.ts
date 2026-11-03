@@ -16,15 +16,16 @@ const build = (): Cuts => ({
     anim(
       'hook',
       'CoverageTiles',
-      // Word cues of the second line (starts at 0.15 + 2.40 + 0.35 = 2.90): the cards light one
+      // Word cues of the second line (starts at 0.10 + 2.40 + 0.35 = 2.85): the cards light one
       // after another from "four" to "whole domain", the ticks beat on "holds".
-      { mode: 'same', titleLine: true, cue: { four: 2.9 + 0.44, holds: 2.9 + 1.8, whole: 2.9 + 2.52 } },
+      // Cold open (2026-11-02): the rings in the pan fill the frame from frame 0 under the full title.
+      { mode: 'same', titleLine: true, cue: { four: 2.85 + 0.44, holds: 2.85 + 1.8, whole: 2.85 + 2.52 } },
       [
-        say(0.15, 'These four claims print the same way.', ''),
+        say(0.1, 'These four claims print the same way.', ''),
         // Added 2026-10-21: the voice reads the card, so nobody needs a silent pause to read it.
         say(0, 'All four say the inequality holds on the whole domain.', ''),
       ],
-      // Speech ends at 2.9 + 3.24 = 6.14; the dip out starts 0.6 s before the end: 1.16 s held.
+      // Speech ends at 2.85 + 3.24 = 6.09; the dip out starts 0.6 s before the end: 1.21 s held.
       { min: 7.9 },
     ),
     // The story (added 2026-10-21): where the four claims come from, before the four kinds.

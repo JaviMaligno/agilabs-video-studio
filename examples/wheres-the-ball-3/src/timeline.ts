@@ -69,12 +69,13 @@ const BLEND_TAIL = 0.6;
 
 const build = (): Cuts => ({
   main: finish([
-    // 1. Cold open: the box's guess, a tight bright cloud; the real ball far away.
+    // 1. Cold open: the box's guess, a tight bright cloud; the real ball far away. The players are
+    // moving from the first frame with the whole hook over them (HookOverlay), voice from 0.1 s.
     anim(
       'hook',
       'ConfidenceCloud',
-      { mode: 'hook', layout: 'open', run: OPEN, marks: [[0, 'sure'], [0, 'wrong']] },
-      [say(0.4, "My little ball-finding AI is most sure of itself exactly where it's most wrong.", '')],
+      { mode: 'hook', layout: 'open', run: OPEN, hookOverlay: true, marks: [[0, 'sure'], [0, 'wrong']] },
+      [say(0.1, "My little ball-finding AI is most sure of itself exactly where it's most wrong.", '')],
       // Hold the stamp before the hand-over.
       { tail: 1.9 },
     ),

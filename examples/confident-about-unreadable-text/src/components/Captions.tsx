@@ -18,16 +18,18 @@ const LANDSCAPE_STYLE = { ...CAPTION.landscape, width: 1500, bottom: LANDSCAPE_C
  * colour. Times are scene seconds, so this must sit inside the scene's Sequence.
  */
 /** `until`: scene second where the hand-over to the next scene starts; held cues stop there. */
-export const Captions: React.FC<{ lines: Line[]; lang: Lang; vertical: boolean; until?: number }> = ({ lines, lang, vertical, until }) => {
+/** `fromStart`: cold open; the first cue is already on screen (no fade) from frame 0. */
+export const Captions: React.FC<{ lines: Line[]; lang: Lang; vertical: boolean; until?: number; fromStart?: boolean }> = ({ lines, lang, vertical, until, fromStart }) => {
   const frame = useCurrentFrame();
   const { fps, height } = useVideoConfig();
   const t = frame / fps;
   const maxChars = vertical ? ROW_CHARS.vertical : ROW_CHARS.landscape;
   const cues = useMemo(() => cuesOfLines(lines, lang, maxChars, until), [lines, lang, maxChars, until]);
-  const cue = cues.find((c) => t >= c.start && t < c.end);
+  const lead = fromStart && cues[0] !== undefined && t < cues[0].end;
+  const cue = lead ? cues[0] : cues.find((c) => t >= c.start && t < c.end);
   if (!cue) return null;
   const st = vertical ? VERTICAL_STYLE : LANDSCAPE_STYLE;
-  const fadeIn = interpolate(t - cue.start, [0, 0.12], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const fadeIn = lead ? 1 : interpolate(t - cue.start, [0, 0.12], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
   const rows = cueRowTokens(cue, maxChars);
   const word = (tok: Token, i: number) => {
     const active = t >= tok.start && t < tok.end;

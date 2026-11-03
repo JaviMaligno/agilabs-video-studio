@@ -12,7 +12,8 @@ const build = (): Cuts => ({
       'hook',
       'CipherCard',
       // hitAt: the masked card shatters on the wall as "refuse to play" is spoken.
-      { mode: 'scramble', hitAt: 2.0 },
+      // openBurst (cold open, 2026-11-02): frame 0 already shows the masked card bursting on the wall.
+      { mode: 'scramble', hitAt: 2.0, openBurst: true },
       [say(0.1, 'Two of my five models refuse to play before any decoding happens.', '')],
     ),
     anim(

@@ -7,21 +7,23 @@ import { L, anim, outro, say, videos } from './narrate.ts';
 
 const build = (): Cuts => ({
   main: [
-    // Cold open: two lanes, same shelf. Tied-hand Opus checks; free-hand Haiku walks past.
+    // Cold open (2026-11-02): the fenced-in agent, its hand tied, is the picture from frame 0, the
+    // whole hook over it in the HookOverlay panel, the voice from 0.1 s. On the second line a report
+    // slides out of the pen with its "true?". Was: ShelfLanes 'hook' (two lanes building from an
+    // almost empty shelf, no hook text until the first caption).
     anim(
       'hook',
-      'ShelfLanes',
-      { mode: 'hook' },
+      'StoryFence',
+      { hook: true, hookOverlay: true },
       [say(0.1, "Tying my agent's hands cost a little.", ''), say(0, 'A weaker model gave me false reports.', '')],
-      // Hold the cracked stamp ~0.5 s: it is the thumbnail.
-      { min: 6.9 },
     ),
     // Added 2026-10-21: story. Where this comes from, before anything technical: my earlier
     // article's claim about fenced-in agents, admitted as a guess, and a reader asking to measure it.
     anim(
       'story',
       'StoryFence',
-      { cameos: [{ pose: 'laughing', at: [1, 'guessing'] }] },
+      // `built`: the pen is already up from the cold open; the article card builds over it.
+      { built: true, cameos: [{ pose: 'laughing', at: [1, 'guessing'] }] },
       [
         say(0.15, 'I wrote that an agent with no shell or network needs more checking.', ''),
         // At 4.55 s, not right after line 1: its last cue ("checking.") stays on screen 0.8 s.

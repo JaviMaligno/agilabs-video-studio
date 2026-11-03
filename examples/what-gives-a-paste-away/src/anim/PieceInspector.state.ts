@@ -121,7 +121,8 @@ export function frameState(p: PIProps, t0: number, beats: number[], dur: number,
 
   switch (p.mode) {
     case 'hook': {
-      s.user.opacity = at(0, 0.3);
+      // Cold open: the user's message is already there on the first frame.
+      s.user.opacity = 1;
       // Glaring: hovering, pulsing amber, until it drops in at the end of the first line.
       s.glow.opacity = clamp01(0.55 + 0.45 * Math.sin(t * 7)) * (1 - progress(t, b1 + 0.6, 0.6));
       seatAndRepaint(Math.max(1.2, b1 - 0.55), b1 + 0.35);

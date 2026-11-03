@@ -249,6 +249,20 @@ test('VerdictStamp filter: stamp lands at stampAt, inside the first 3 s; reveal 
   assert.equal(end.stamp.pop, 1);
 });
 
+test('VerdictStamp filter cold open: frame 0 is already the stamped card at the gate', () => {
+  const beats = [0.1, 4.2, 8.4];
+  const s0 = verdict.frameState({ mode: 'filter', stampAt: 2.3, coldOpen: true }, 0, beats, 14) as verdict.FilterState;
+  assert.equal(s0.card.slide, 1);
+  assert.equal(s0.stamp.pop, 1);
+  assert.equal(s0.stamp.opacity, 1);
+  assert.equal(s0.gate.appear, 1);
+  assert.equal(s0.window.appear, 1);
+  assert.equal(s0.reveal, 0);
+  // The spoken "medium self-harm" still lands on the stamp: a pulse at stampAt.
+  const hit = verdict.frameState({ mode: 'filter', stampAt: 2.3, coldOpen: true }, 2.3, beats, 14) as verdict.FilterState;
+  assert.equal(hit.stamp.pulse, 1);
+});
+
 test('VerdictStamp lineup and hollow: three stamps land; the ink drains to the outline', () => {
   const l = verdict.frameState({ mode: 'lineup' }, 6, [0.15], 6) as verdict.LineupState;
   assert.ok(l.stations.every((s) => s.stamp.pop === 1));

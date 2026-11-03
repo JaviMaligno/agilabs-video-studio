@@ -305,14 +305,15 @@ export function frameState(p: ReachProps, t: number, beats: number[], dur: numbe
   const b0 = beatAt(beats, 0);
   const split = p.mode === 'split';
   const worlds = split ? splitWorlds(T, beats, d) : null;
-  // Hook headline over the meter's place: revealed by a sweeping gradient, one phrase per beat,
-  // until the meter drops in on the third beat.
+  // Hook headline over the meter's place, one phrase per beat, until the meter drops in on the
+  // third beat. Cold open: the first phrase is fully legible from frame 0 (no sweep); the second
+  // is still revealed by the sweeping gradient.
   const b1 = beatAt(beats, 1);
   const b2 = beatAt(beats, 2);
   const headline =
     p.mode === 'hook'
       ? [
-          { text: 'A whole region: wrong', reveal: clamp01(0.35 + T / 0.7), opacity: 1 - progress(T, fit(b1, 0.3, d), 0.3) },
+          { text: 'A whole region: wrong', reveal: 1, opacity: 1 - progress(T, fit(b1, 0.3, d), 0.3) },
           { text: 'No test can catch it', reveal: progress(T, fit(b1, 0.7, d), 0.7), opacity: 1 - progress(T, fit(b2, 0.3, d), 0.3) },
         ]
       : [];

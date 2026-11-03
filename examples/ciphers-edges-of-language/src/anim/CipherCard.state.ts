@@ -15,6 +15,11 @@ export type CipherProps = {
   mode: CipherMode;
   /** scramble: scene second the masked card hits the wall (fitted into the scene). */
   hitAt?: number;
+  /**
+   * scramble: cold open. The first frame already shows a masked card bursting on the wall (letters
+   * mid-flight); the card re-forms in under a second and the hit at `hitAt` happens as before.
+   */
+  openBurst?: boolean;
 };
 
 /** Ten ladder rows, in the article's order, with their on-screen names. */
@@ -118,18 +123,26 @@ export function frameState(props: CipherProps, t0: number, beats: number[], dur:
     const back = easeOutCubic(progress(t, hit + 0.75, 0.45));
     const glyphs = morph(plain, keyed, scr, t, 0.55, 1);
     const n = [...keyed].length;
-    const fragments: Fragment[] = [...keyed].map((ch, i) => {
+    const shard = (ch: string, i: number, p: number, opacity: number): Fragment => {
       const a = (hash(i, 7) - 0.5) * Math.PI * 0.9 - Math.PI / 2; // mostly upwards, back off the wall
       const sp = 260 + hash(i, 11) * 360;
-      const s = easeOutCubic(shatter);
+      const s = easeOutCubic(p);
       return {
         ch: ch === ' ' ? '·' : ch,
         dx: (i - (n - 1) / 2) * 19 + Math.cos(a) * sp * s,
-        dy: Math.sin(a) * sp * s + 220 * shatter * shatter,
+        dy: Math.sin(a) * sp * s + 220 * p * p,
         rot: (hash(i, 3) - 0.5) * 540 * s,
-        opacity: t >= hit ? clamp01(1 - shatter) : 0,
+        opacity,
       };
-    });
+    };
+    // Cold open: a burst already a third of the way through on frame 0, gone by ~0.6 s.
+    const open = props.openBurst ? progress(t, -0.3, 0.9) : 1;
+    const opening = props.openBurst === true && t < hit && open < 1;
+    const fragments: Fragment[] = [...keyed].map((ch, i) =>
+      t >= hit ? shard(ch, i, shatter, clamp01(1 - shatter)) : shard(ch, i, open, opening ? clamp01(1 - open * open) : 0),
+    );
+    // The card hidden by the opening burst re-forms at its spot before the flight.
+    const reform = props.openBurst ? easeOutCubic(progress(t, 0.35, 0.45)) : 1;
     // After the shatter the masked card re-forms at its own spot (full size), not stuck on the wall.
     const at = t >= hit ? 0 : fly;
     return {
@@ -137,9 +150,12 @@ export function frameState(props: CipherProps, t0: number, beats: number[], dur:
       glyphs,
       fly: at,
       scale: lerp(1, 0.55, at),
-      opacity: t < hit ? 1 : back,
+      opacity: t < hit ? reform : back,
       back,
-      wall: { appear: easeOutCubic(progress(t, 0.15, 0.5)), flash: t >= hit ? clamp01(1 - progress(t, hit, 0.6)) : 0 },
+      wall: {
+        appear: props.openBurst ? 1 : easeOutCubic(progress(t, 0.15, 0.5)),
+        flash: t >= hit ? clamp01(1 - progress(t, hit, 0.6)) : opening ? clamp01(1 - progress(t, -0.15, 0.6)) : 0,
+      },
       fragments,
       chips: { appear: easeOutCubic(progress(t, 0, 0.4)), refused: easeOutCubic(progress(t, hit + 0.15, 0.4)) },
     };

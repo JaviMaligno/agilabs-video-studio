@@ -66,6 +66,52 @@ export const Intro: React.FC<{ hook?: Line; lang: Lang; vertical: boolean }> = (
   );
 };
 
+/**
+ * Cold-open hook: the whole hook is on screen from the first frame, in a dark panel over the
+ * scene's animation, and each word turns to the accent while it is spoken.
+ */
+export const HookOverlay: React.FC<{ hook?: Line; lang: Lang; vertical: boolean }> = ({ hook, lang, vertical }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+  const tokens = useMemo(() => (hook ? tokensOf(hook, lang) : []), [hook, lang]);
+  const text = hook?.text[lang] ?? '';
+  const size = hookSize(text.length, vertical) - 8;
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: vertical ? SAFE.side : 200,
+        right: vertical ? SAFE.side : 200,
+        // Vertical: just under the pitch-sized stage content, over the (empty) caption rows.
+        top: vertical ? V.stageBottom - 110 : undefined,
+        bottom: vertical ? undefined : 120,
+        padding: '28px 36px',
+        borderRadius: 28,
+        background: 'rgba(8, 8, 18, 0.96)',
+        boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+        fontFamily,
+        fontSize: size,
+        fontWeight: 800,
+        lineHeight: 1.12,
+        letterSpacing: '-0.02em',
+        textAlign: 'center',
+        color: C.text,
+      }}
+    >
+      {tokens.map((tok, i) => {
+        const active = t >= tok.start && t < tok.end;
+        return (
+          <React.Fragment key={i}>
+            {i > 0 ? ' ' : null}
+            <span style={{ color: active ? C.accentText : C.text }}>{tok.text}</span>
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+};
+
 /** Closing card: AGILabs badge, the site address and the article's title. */
 export const Outro: React.FC<{ lang: Lang; vertical: boolean }> = ({ lang, vertical }) => {
   const frame = useCurrentFrame();

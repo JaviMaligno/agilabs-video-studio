@@ -68,6 +68,58 @@ export const Intro: React.FC<{ hook?: Line; lang: Lang; vertical: boolean }> = (
   );
 };
 
+/**
+ * Cold-open hook (ported from wheres-the-ball-2, 2026-11-02): the hook is on screen in full from
+ * the first frame, in a dark panel over the scene's animation, and each word turns to the accent
+ * while it is spoken. With several hook lines, the panel shows the line being spoken (the first
+ * one until the second starts), so it doubles as the caption.
+ */
+export const HookOverlay: React.FC<{ lines: Line[]; lang: Lang; vertical: boolean }> = ({ lines, lang, vertical }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+  const idx = Math.max(0, lines.reduce((acc, l, i) => (t >= l.start ? i : acc), 0));
+  const hook = lines[idx];
+  const tokens = useMemo(() => (hook ? tokensOf(hook, lang) : []), [hook, lang]);
+  const longest = Math.max(0, ...lines.map((l) => (l.text[lang] ?? '').length));
+  // One size for every hook line, so the panel does not jump between them.
+  const size = hookSize(longest, vertical) - 8;
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: vertical ? SAFE.side : 200,
+        right: vertical ? SAFE.side : 200,
+        // Vertical: over the bottom of the stage and the (empty) caption rows.
+        top: vertical ? V.stageBottom - 110 : undefined,
+        bottom: vertical ? undefined : 120,
+        padding: '28px 36px',
+        borderRadius: 28,
+        background: 'rgba(8, 8, 18, 0.96)',
+        boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+        fontFamily,
+        fontSize: size,
+        fontWeight: 800,
+        lineHeight: 1.12,
+        letterSpacing: '-0.02em',
+        textAlign: 'center',
+        color: C.text,
+        zIndex: 20,
+      }}
+    >
+      {tokens.map((tok, i) => {
+        const active = t >= tok.start && t < tok.end;
+        return (
+          <React.Fragment key={i}>
+            {i > 0 ? ' ' : null}
+            <span style={{ color: active ? C.accentText : C.text }}>{tok.text}</span>
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+};
+
 /** Closing card: AGILabs badge, the site address and the article's title. */
 export const Outro: React.FC<{ lang: Lang; vertical: boolean }> = ({ lang, vertical }) => {
   const frame = useCurrentFrame();

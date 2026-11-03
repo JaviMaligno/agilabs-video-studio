@@ -226,9 +226,10 @@ function world(p: DepthProps, mode: Mode, T: number, beats: number[], d: number)
       // Already falling on the first frame (a strong first frame): the rays run 0.7 s ahead.
       // This is the rule-blind model on a rose floor that "passed at 100%": only the sampled games
       // that never reached the floor (as in gate2), or a ray landing on the rule would contradict it.
-      w.rays = raysOf(MISSED, T + 0.7, 0, 0.07, Math.min(d, Math.max(3.4, b1)), true);
-      const stampAt = fit(b0 + 2.85, 0.4, d);
-      w.stamp = { text: 'CHECK PASSED · 100%', sub: '', pop: easeOutCubic(progress(T, stampAt, 0.35)), opacity: progress(T, stampAt, 0.12), tone: 'ok' };
+      // Cold open (2026-11-02): the frame-0 thumbnail is the striking state — rays well under way and
+      // the CHECK PASSED stamp already landed — so the stamp no longer waits for "100%".
+      w.rays = raysOf(MISSED, T + 1.6, 0, 0.07, Math.min(d, Math.max(3.4, b1)), true);
+      w.stamp = { text: 'CHECK PASSED · 100%', sub: '', pop: 1, opacity: 1, tone: 'ok' };
       // The glow starts pouring just before "It still lost" and reaches the floor on "lost": the
       // floor flushes red and the needle drops to 0.404 on that word, then holds.
       const pourAt = fit(b1 - 0.3, 1.4, d);

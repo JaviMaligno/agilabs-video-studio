@@ -42,6 +42,11 @@ export type PullBackProps = {
   emphasis?: string[];
   /** Read by Video.tsx: the scene draws its first line itself, as the hook title. */
   titleLine?: boolean;
+  /**
+   * Teaser cold open: the first frame shows the widest shot (conveyor, dashboard, the app inside),
+   * and the camera dives into the line of code as "code" is spoken, then pulls back as before.
+   */
+  wide?: boolean;
   /** Read by Video.tsx: cross-blend from the previous scene instead of dipping through black. */
   blend?: boolean;
 };
@@ -56,6 +61,8 @@ export type Rect = { x: number; y: number; w: number; h: number };
 export const VP_FULL: Rect = { x: 0, y: 0, w: 704, h: 1090 };
 /** Teaser: the whole width, below the hook title. */
 export const VP_TEASER: Rect = { x: 0, y: 330, w: 960, h: 760 };
+/** Teaser cold open: how far the clip reaches below the viewport while the wide shot shows. */
+export const WIDE_CLIP_EXTRA = 520;
 
 /** Every level's local box. */
 export const BOX = { w: 744, h: 1090 } as const;
@@ -325,6 +332,11 @@ export function frameState(p: PullBackProps, time: number, beats: number[], dur:
 
   const pulls = [0, 1, 2].map((i) => cue(i, [0.6, 1.9, 2.9][i]));
 
+  // Cold open: 1 = the widest shot at the first frame, 0 once the dive has landed on the code.
+  const diveEnd = Math.max(0.45, pulls[0] - 0.05);
+  const diveStart = Math.max(0.15, diveEnd - 0.55);
+  const wide = mode === 'teaser' && p.wide ? 1 - easeInOut(P(diveStart, diveEnd - diveStart)) : 0;
+
   let cam: Cam;
   let alt: number; // altitude 1..4, drives what is revealed in the teaser
   switch (mode) {
@@ -336,6 +348,14 @@ export function frameState(p: PullBackProps, time: number, beats: number[], dur:
       const f1 = { ...F1, z: F1.z * push };
       cam = b > 0 ? dolly(F2, F3W, b) : dolly(f1, F2, a);
       alt = 1 + a + b;
+      if (wide > 0) {
+        // Closer than the full level-4 framing, top edge kept under the title, so the world
+        // fills the frame (the space below is free: the hook draws no captions; the clip grows
+        // into it while wide, see `clip`).
+        const K = 1.6;
+        cam = dolly(f1, { cx: F4.cx, cy: F4.cy / K, z: F4.z * K }, wide);
+        alt = Math.max(alt, 1 + 3 * wide);
+      }
       break;
     }
     case 'ladder':
@@ -479,8 +499,10 @@ export function frameState(p: PullBackProps, time: number, beats: number[], dur:
 
   // ------------------------------------------------ level 4: conveyor, dashboard, contract
   // The belt fades in once the camera is most of the way out, so it never looms large.
-  const conveyor = mode === 'conveyor' ? E(b0 + 1.05, 0.7) : past('conveyor') ? 1 : 0;
-  const start = mode === 'conveyor' ? E(cue(2, b0 + 0.72 * S0), 0.5) : past('conveyor') ? 1 : 0;
+  // The teaser's cold open shows level 4 until the dive leaves it.
+  const wide4 = mode === 'teaser' ? clamp01((alt - 3.2) / 0.5) : 0;
+  const conveyor = mode === 'conveyor' ? E(b0 + 1.05, 0.7) : past('conveyor') ? 1 : wide4;
+  const start = mode === 'conveyor' ? E(cue(2, b0 + 0.72 * S0), 0.5) : past('conveyor') ? 1 : wide4;
   const base = { conveyor: 0, dashboard: 7, contract: 14, quote: 22 } as Record<string, number>;
   const clock = (Number.isFinite(p.clock0) ? (p.clock0 as number) : (base[mode] ?? 0)) + clockT;
   const lc = Number.isFinite(b1) ? b1 : b0 + S0 + 0.35;
@@ -494,7 +516,7 @@ export function frameState(p: PullBackProps, time: number, beats: number[], dur:
         : clock;
   const clocks = [frozenA, clock, clock];
 
-  const D = (start: number, len: number) => (mode === 'dashboard' ? E(start, len) : past('dashboard') ? 1 : 0);
+  const D = (start: number, len: number) => (mode === 'dashboard' ? E(start, len) : past('dashboard') ? 1 : wide4);
   const dash = D(cue(0, b0 + 0.25 * S0) - 0.6, 0.5);
   const gauges = [0, 1, 2].map((i) => D(cue(i + 1, b0 + (0.5 + 0.16 * i) * S0) - 0.1, 0.4));
   const queue = D(cue(3, b0 + 0.85 * S0) + 0.5, 0.4);
@@ -516,9 +538,14 @@ export function frameState(p: PullBackProps, time: number, beats: number[], dur:
 
   const busy = [0, 1, 2].map((li) => working(clocks[li], li) * clamp01(conveyor));
 
+  // The world's clip: the viewport, stretched down over the free space below while the cold
+  // open shows the wide shot (the hook has no captions), back to the viewport as the dive lands.
+  const clip: Rect = { ...vp, h: vp.h + WIDE_CLIP_EXTRA * wide };
+
   return {
     mode,
     vp,
+    clip,
     cam,
     alt,
     title,

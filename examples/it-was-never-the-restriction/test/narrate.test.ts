@@ -79,7 +79,7 @@ test('settings and the timeline of this video', () => {
   assert.equal(SETTINGS.targetSeconds, 90);
   assert.deepEqual(SETTINGS.music, { src: 'music/bed.wav', volume: 0.2, duck: 0.3 });
   assert.equal(TIMELINE.at(-1)?.kind, 'outro');
-  assert.equal(TIMELINE[0].anim?.name, 'ShelfLanes');
+  assert.equal(TIMELINE[0].anim?.name, 'StoryFence');
   assert.equal(VIDEOS.en.main, TIMELINE);
 });
 

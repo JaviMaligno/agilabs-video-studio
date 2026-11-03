@@ -79,7 +79,8 @@ const Cameos: React.FC<{ scene: Scene; vertical: boolean }> = ({ scene, vertical
   );
 };
 
-const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p }) => {
+/** `first`: the video's opening scene — its hook caption is held from frame 0 (cold open). */
+const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps; first?: boolean }> = ({ scene, p, first }) => {
   // The intro shows its first line as the big hook, so the captions start from the second line.
   const captioned = scene.kind === 'intro' ? scene.lines.slice(1) : scene.lines;
   return (
@@ -95,7 +96,7 @@ const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p 
           {!p.noSubs && <Cameos scene={scene} vertical={p.vertical} />}
         </>
       )}
-      {!p.noSubs && <Captions lines={captioned} lang={p.subs} vertical={p.vertical} until={handOverAt(scene)} />}
+      {!p.noSubs && <Captions lines={captioned} lang={p.subs} vertical={p.vertical} until={handOverAt(scene)} holdFirst={first && scene.kind === 'anim'} />}
       {/* Before the TTS script has run there is no audio: the scene plays silent on estimated timing. */}
       {scene.lines
         .filter((l) => AUDIO[l.voice]?.[l.key] !== undefined)
@@ -134,7 +135,7 @@ export const ArticleVideo: React.FC<ArticleVideoProps> = (p) => {
         {scenes.map((scene, i) => (
           <React.Fragment key={scene.id}>
             <TransitionSeries.Sequence durationInFrames={sceneFrames(scene)}>
-              <SceneView scene={scene} p={p} />
+              <SceneView scene={scene} p={p} first={i === 0} />
             </TransitionSeries.Sequence>
             {i < scenes.length - 1 && (
               <TransitionSeries.Transition presentation={continuous(scene, scenes[i + 1]) ? blend() : dip()} timing={linearTiming({ durationInFrames: SCENE_TRANSITION })} />

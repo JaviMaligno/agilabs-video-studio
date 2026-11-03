@@ -67,19 +67,28 @@ function hook(t: number, beats: number[], dur: number) {
   const b1 = beat(beats, 1, b0 + 3.6);
   const span = Math.max(0.6, b1 - 0.35 - b0);
   const words = HOOK_TITLE.split(' ');
+  const wordAt = (i: number) => b0 + (i / words.length) * span * 0.95;
+  // Cold open: frame 0 is already the thumbnail, the agent standing at the open 0.4.0 box with
+  // "old code" risen out of it, the brief's paragraph glowing and the whole hook lit. Line 1 only
+  // marks its words as they are spoken and flashes the box's contents on "check".
   return {
     view: 'hook' as const,
-    title: words.map((text, i) => ({ text, key: /^(paragraph|check)$/i.test(text), lit: P(b0 + (i / words.length) * span * 0.95, 0.2) })),
-    titleKey: E(b0 + 0.9 * span, 0.3),
-    brief: E(b0, 0.35),
-    paraGlow: E(b0 + 0.25, 0.4),
+    title: words.map((text, i) => ({
+      text,
+      key: /^(paragraph|check)$/i.test(text),
+      lit: 1,
+      spoken: t >= wordAt(i) && t < wordAt(i + 1),
+    })),
+    titleKey: 1,
+    brief: 1,
+    paraGlow: 1,
     chip: 1,
     tickets: 1,
-    /** The chip walks out from under its tickets, down the dotted path to the box. */
-    walk: P(b0 + 1.1, 1.1),
-    lid: E(b0 + 2.25, 0.35),
-    rise: E(b0 + 2.45, 0.45),
-    insideFlash: Pu(b0 + 2.9, 0.6),
+    /** The agent has already walked out from under its tickets, down the dotted path to the box. */
+    walk: 1,
+    lid: 1,
+    rise: 1,
+    insideFlash: Pu(b0 + 0.55 * span, 0.7),
     /** Line 2: a searchlight sweeps the paragraph for "where", finds nothing. */
     sweep: P(b1 + 0.05, 1.0),
     lens: E(b1, 0.2) * (1 - E(b1 + 1.1, 0.3)),

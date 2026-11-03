@@ -272,12 +272,13 @@ test('ReportDesk fact: 4 / 791, and none of the adoptions through the subagent',
   assert.equal(s.quotes[0], 1);
 });
 
-test('ReportDesk slam: hook title from the first frame, VERIFIED printed on an unbroken seal', () => {
+test('ReportDesk slam: cold open, hook title and VERIFIED on an unbroken seal from the first frame', () => {
   const first = desk.frameState({ mode: 'slam' }, 0, [0.1], 3.4);
   assert.equal(first.view, 'hook');
   if (first.view !== 'hook') return;
   assert.ok(first.title.length > 5);
-  assert.equal(first.env.print, 0);
+  assert.equal(first.env.print, 1);
+  assert.equal(first.env.crack, 0);
   const after = desk.frameState({ mode: 'slam' }, 2, [0.1], 3.4);
   if (after.view !== 'hook') return;
   assert.equal(after.env.print, 1);

@@ -4,7 +4,7 @@
 // over. Act II (A2): what happens after you tell it. Visuals are illustrative; every number on
 // screen is the articles' (see factcheck.md).
 import type { Cuts } from './types.ts';
-import { L, anim, outro, say, videos } from './narrate.ts';
+import { L, anim, intro, outro, say, videos } from './narrate.ts';
 
 const USER = 'We move to Valencia on 12 June.';
 const CLASH = ['Moving day:', 'Seville, 3 July'];
@@ -21,13 +21,12 @@ const PASTE = { before: '…and for the ', names: 'upholstery quotes', after: ' 
 const build = (): Cuts => ({
   main: [
     // 1. Cold open: the most glaring paste, and the glove repaints around it.
-    anim(
-      'hook',
-      'PieceInspector',
-      { mode: 'hook', user: USER, clash: CLASH, stamp: { value: '0 / 95', label: 'suspected a mistake' } },
-      [say(0.1, 'I made a wrong paste as obvious as I could.', ''), say(0, 'Not one reply questioned it.', '')],
-      { min: 6.0 },
-    ),
+    // Cold open (2026-11-02): the glowing piece and the clashing message are on screen from frame
+    // 0, with the hook line over them.
+    intro('hook', [say(0.1, 'I made a wrong paste as obvious as I could.', ''), say(0, 'Not one reply questioned it.', '')], 6.0, {
+      name: 'PieceInspector',
+      props: { mode: 'hook', user: USER, clash: CLASH, stamp: { value: '0 / 95', label: 'suspected a mistake' } },
+    }),
     // 2. Teaser of Act II.
     anim(
       'teaser',

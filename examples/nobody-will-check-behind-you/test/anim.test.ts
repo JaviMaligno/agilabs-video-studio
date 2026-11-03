@@ -205,16 +205,20 @@ test('StatGrid: tiles pop in per beat and lay out in a grid', () => {
 
 // ---------------------------------------------------------------- this video's components
 
-test('OwnerShelf hook: the chip walks to the box and the lid opens on old code; the "who" tag lands on line 2', () => {
+test('OwnerShelf hook: cold open on the agent at the open box (old code); the "who" tag lands on line 2', () => {
   const beats = [0.15, 3.78];
   const s0 = shelf.frameState({ mode: 'hook' }, 0, beats, 7);
   assert.equal(s0.view, 'hook');
   if (s0.view !== 'hook') return;
-  assert.equal(s0.walk, 0);
-  assert.equal(s0.lid, 0);
+  // Frame 0 is the thumbnail: the chip already at the box, lid open, old code risen, brief on.
+  assert.equal(s0.walk, 1);
+  assert.equal(s0.lid, 1);
+  assert.equal(s0.rise, 1);
+  assert.equal(s0.brief, 1);
   assert.equal(s0.keyTag, 0);
-  // The hook title is on screen from the first frame (its words light as they are spoken).
+  // The whole hook title is readable from the first frame.
   assert.equal(s0.title.map((w) => w.text).join(' '), shelf.HOOK_TITLE);
+  assert.ok(s0.title.every((w) => w.lit === 1));
   const mid = shelf.frameState({ mode: 'hook' }, 3.7, beats, 7);
   if (mid.view !== 'hook') return;
   assert.equal(mid.walk, 1);

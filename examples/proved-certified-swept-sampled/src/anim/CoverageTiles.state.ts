@@ -41,6 +41,10 @@ export const GRID: Rect[] = [
 /** The box-certified region, zoomed in. */
 export const BIG: Rect = { x: 60, y: 430, w: 840, h: 570 };
 export const PAN = { cx: 190, cy: 205, R: 150 };
+/** Cold open (2026-11-02): the rings in the pan, big, over the card area from the first frame. */
+export const HERO = { cx: W / 2, cy: 615, R: 350 };
+/** Seconds the cold-open pan holds before it gives way to the four cards. */
+export const HERO_HOLD = 1.3;
 export const NX = 8;
 export const NY = 6;
 export const LATTICE = { nx: 7, ny: 5 };
@@ -112,6 +116,7 @@ export type TilesState = {
   regionLabel: null | { text: string; appear: number };
   tally: null | { value: number; appear: number; pulse: number };
   pan: null | { appear: number; wobble: number };
+  hero: null | { appear: number; scale: number; spin: number };
   reviewer: null | { appear: number; card: number; cardAppear: number; arrow: number; dim: number };
   refuted: null | { pop: number };
   chips: Chip[];
@@ -143,6 +148,7 @@ export function frameState(p: TilesProps, time: number, beats: number[], dur: nu
     regionLabel: null,
     tally: null,
     pan: null,
+    hero: null,
     reviewer: null,
     refuted: null,
     chips: [],
@@ -157,7 +163,9 @@ export function frameState(p: TilesProps, time: number, beats: number[], dur: nu
     // The title lights over its own line; with a second line (the card read out) it is done
     // just before that line starts.
     const end = beats.length > 1 ? Math.max(b0 + 0.6, beat(beats, 1, d) - 0.35) : Math.max(b0 + 0.6, d - 0.9);
-    s.title = { appear: E(t, 0, 0.4), words: words.map((text, i) => ({ text, lit: progress(t, b0 + (i / words.length) * (end - b0), 0.2) })) };
+    // Cold open: the title is on screen in full from frame 0 (no fade-in), over the rings in the
+    // pan; the pan holds HERO_HOLD s and gives way to the cards.
+    s.title = { appear: 1, words: words.map((text, i) => ({ text, lit: progress(t, b0 + (i / words.length) * (end - b0), 0.2) })) };
     // The card read out: each sentence lights and sways once, one card after another from "four"
     // to "whole domain"; the four ticks beat together on "holds".
     const read = cueOf(p, 'four', Number.MAX_SAFE_INTEGER / 2);
@@ -166,8 +174,10 @@ export function frameState(p: TilesProps, time: number, beats: number[], dur: nu
     // A half-sine bump that is exactly 0 outside its window (sin(π) is not quite 0).
     const bump = (q: number) => (q <= 0 || q >= 1 ? 0 : Math.sin(Math.PI * q));
     const tickBeat = bump(progress(t, holds, 0.6));
+    const away = E(t, HERO_HOLD, 0.5);
+    s.hero = { appear: 1 - away, scale: 1 - 0.15 * away, spin: t };
     tiles.forEach((tl, i) => {
-      const at = 0.25 + 0.32 * i;
+      const at = HERO_HOLD + 0.1 + 0.2 * i;
       tl.opacity = E(t, at, 0.4);
       tl.tick.appear = E(t, at + 0.25, 0.3);
       tl.rect = { ...tl.rect, y: tl.rect.y + 40 * (1 - tl.opacity) };

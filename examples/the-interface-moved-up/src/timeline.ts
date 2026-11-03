@@ -52,8 +52,10 @@ const chainClocks = (scenes: Scene[]): Scene[] => {
 
 const build = (): Cuts => ({
   main: chainClocks([
-    // Cold open: the hook is drawn by the scene itself over a 3-s teaser of the whole shot.
-    cued(anim('hook', 'PullBack', { mode: 'teaser', titleLine: true }, [say(0.1, 'First the code. Then the diff. Then the result.', '')], { min: 3.6 }), (s) => [
+    // Cold open: the hook is drawn by the scene itself over a 3-s teaser of the whole shot. The
+    // first frame is the widest shot (conveyor, dashboard, the app inside); the camera dives into
+    // the line of code on "code", then pulls back as the hook names each stage.
+    cued(anim('hook', 'PullBack', { mode: 'teaser', titleLine: true, wide: true }, [say(0.1, 'First the code. Then the diff. Then the result.', '')], { min: 3.6 }), (s) => [
       at(s, 0, 'code'),
       at(s, 0, 'diff'),
       at(s, 0, 'result'),

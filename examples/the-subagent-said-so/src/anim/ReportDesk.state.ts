@@ -250,22 +250,16 @@ export function frameState(p: DeskProps, time: number, beats: number[], dur: num
     const T = fit(cue('slam', 0.5), 0.6, dur);
     const words = TITLE.split(' ');
     const span = Math.max(0.6, end - b0);
-    // Where the envelope lands and is stamped (stage px).
+    // Where the envelope sits and is stamped (stage px).
     const target = { x: 480, y: 840 };
-    const out = 0.32 + 0.68 * easeOutCubic(progress(t, 0, Math.max(0.05, T - 0.05)));
-    // Before the slam the stamp hovers to the right, already raised (drawn from the first frame).
-    const hover = { x: 800, y: target.y - 40 };
-    const st: Stamp =
-      t < T - 0.2
-        ? { x: hover.x, y: hover.y, opacity: 1, glow: 0, down: 0 }
-        : t < T
-          ? { x: lerp(hover.x, target.x, progress(t, T - 0.2, 0.2)), y: lerp(hover.y, target.y, easeOutCubic(progress(t, T - 0.2, 0.2)) ** 2), opacity: 1, glow: 0, down: 0 }
-          : slam(t, T, target.x, target.y);
+    // Cold open: frame 0 already shows the striking state (the envelope on the desk with VERIFIED
+    // printed on its unbroken seal, the stamp at rest beside it); the stamp then comes down again at T.
+    const st: Stamp = slam(t, T, target.x, target.y);
     return {
       view: 'hook' as const,
       title: words.map((text, i) => ({ text, key: TITLE_KEY.includes(text), lit: progress(t, b0 + (i / words.length) * span * 0.85, 0.2) })),
       titleKey: E(T, 0.3),
-      env: { ...env({ x: target.x, y: lerp(470, target.y, out), scale: 1.4, label: false }), print: ink(t, T) },
+      env: { ...env({ x: target.x, y: target.y, scale: 1.4, label: false }), print: 1 },
       stamp: st,
       stampScale: 1.3,
       flash: pulse(t, T, 0.25),

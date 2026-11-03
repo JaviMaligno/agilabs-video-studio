@@ -68,7 +68,7 @@ const HookView: React.FC<{ s: HookState; t: number }> = ({ s, t: _t }) => {
   const lensY = 410;
   return (
     <>
-      {/* Hook title: on screen from the first frame, words lighting as they are spoken. */}
+      {/* Hook title: fully lit from the first frame (cold open), each word marked as it is spoken. */}
       <div
         style={{
           position: 'absolute',
@@ -93,7 +93,7 @@ const HookView: React.FC<{ s: HookState; t: number }> = ({ s, t: _t }) => {
         }}
       >
         {s.title.map((w, i) => (
-          <span key={i} style={{ color: w.key && s.titleKey > 0.5 ? undefined : C.text, ...(w.key && s.titleKey > 0.5 ? gradientText : {}), opacity: 0.55 + 0.45 * w.lit }}>
+          <span key={i} style={{ color: w.spoken ? C.accentText : w.key && s.titleKey > 0.5 ? undefined : C.text, ...(w.key && s.titleKey > 0.5 && !w.spoken ? gradientText : {}), opacity: 0.55 + 0.45 * w.lit }}>
             {w.text}
           </span>
         ))}

@@ -151,11 +151,14 @@ const Bubble: React.FC<{ appear: number }> = ({ appear }) => {
 
 export const StoryFence: React.FC<AnimProps & StoryFenceProps> = ({ t, beats, dur, vertical, ...props }) => {
   const s = frameState(props as StoryFenceProps, t, beats, dur);
+  const hook = (props as StoryFenceProps).hook === true;
   const { cx, top, h } = SF.pen;
   const rep = clamp01(s.report);
   const q = clamp01(s.query);
   return (
     <Stage vertical={vertical} fill>
+      {/* Cold open: no article card, so the pen moves up and in to fill the frame over the hook panel. */}
+      <div style={{ position: 'absolute', inset: 0, ...(hook ? { transform: 'translateY(-210px) scale(1.12)', transformOrigin: '480px 560px' } : {}) }}>
       <ArticleCard appear={s.card} sentence={s.sentence} guess={s.guess} />
       <Pen fence={s.fence} posts={s.posts} />
       {/* My agent, drawn (cast robot), inside the pen; its hand beside it gets tied. */}
@@ -198,6 +201,7 @@ export const StoryFence: React.FC<AnimProps & StoryFenceProps> = ({ t, beats, du
           <div style={{ fontSize: 26, fontWeight: 700, color: C.text }}>true?</div>
         </div>
       )}
+      </div>
     </Stage>
   );
 };

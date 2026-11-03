@@ -79,7 +79,10 @@ test('settings and timeline of this video', () => {
   assert.equal(SETTINGS.targetSeconds, 83);
   assert.deepEqual(SETTINGS.music, { src: 'music/bed.wav', volume: 0.2, duck: 0.3 });
   assert.equal(TIMELINE.at(-1)?.kind, 'outro');
-  assert.ok(TIMELINE.slice(0, -1).every((s) => s.kind === 'anim'));
+  // Cold open: an intro over the hook animation, then anim scenes.
+  assert.equal(TIMELINE[0].kind, 'intro');
+  assert.equal(TIMELINE[0].anim?.name, 'PieceInspector');
+  assert.ok(TIMELINE.slice(1, -1).every((s) => s.kind === 'anim'));
   assert.ok(TIMELINE.some((s) => s.id === SETTINGS.poster?.scene));
   assert.equal(VIDEOS.en.main, TIMELINE);
 });

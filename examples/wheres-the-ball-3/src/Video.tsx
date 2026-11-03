@@ -12,7 +12,7 @@ import { C } from './brand.ts';
 import { fontFamily, V } from './theme.ts';
 import { ANIMS } from './anim/index.ts';
 import { Background } from './components/Background.tsx';
-import { Intro, Outro } from './components/Cards.tsx';
+import { HookOverlay, Intro, Outro } from './components/Cards.tsx';
 import { Captions } from './components/Captions.tsx';
 import { Cameo, type CameoSpec } from './components/Cameo.tsx';
 import { Badge } from './components/Brand.tsx';
@@ -76,8 +76,10 @@ const Cameos: React.FC<{ scene: Scene; vertical: boolean }> = ({ scene, vertical
 };
 
 const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p }) => {
-  // The intro shows its first line as the big hook, so the captions start from the second line.
-  const captioned = scene.kind === 'intro' ? scene.lines.slice(1) : scene.lines;
+  // The intro shows its first line as the big hook, and so does a cold-open anim scene
+  // (`hookOverlay` prop: the hook sits over the moving picture), so captions start from line 2.
+  const coldOpen = scene.kind === 'anim' && !!(scene.anim?.props as { hookOverlay?: boolean } | undefined)?.hookOverlay;
+  const captioned = scene.kind === 'intro' || coldOpen ? scene.lines.slice(1) : scene.lines;
   return (
     <AbsoluteFill>
       {scene.kind === 'intro' && <Intro hook={scene.lines[0]} lang={p.subs} vertical={p.vertical} />}
@@ -89,6 +91,7 @@ const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p 
             <Badge size={p.vertical ? 1.1 : 0.9} />
           </div>
           {!p.noSubs && <Cameos scene={scene} vertical={p.vertical} />}
+          {coldOpen && <HookOverlay hook={scene.lines[0]} lang={p.subs} vertical={p.vertical} />}
         </>
       )}
       {!p.noSubs && <Captions lines={captioned} lang={p.subs} vertical={p.vertical} until={handOverAt(scene)} />}

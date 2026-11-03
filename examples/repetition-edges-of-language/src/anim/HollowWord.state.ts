@@ -3,7 +3,14 @@
 // ticks 1 → count. Illustrative of semantic satiation. No Remotion or React here.
 import { clamp01, easeOutCubic, progress, sceneTime } from './steps.ts';
 
-export type HollowWordProps = { word?: string; count?: number; /** Seconds the copies take to appear. */ span?: number };
+export type HollowWordProps = {
+  word?: string;
+  count?: number;
+  /** Seconds the copies take to appear. */
+  span?: number;
+  /** Copies already stacked at the first frame (cold open: the wall is the opening picture). */
+  pre?: number;
+};
 
 export const ROW = 128;
 export const BASE_SIZE = 116;
@@ -23,12 +30,16 @@ export const frameState = (p: HollowWordProps, t0: number, _beats: number[], dur
   const t = sceneTime(t0, dur);
   const count = Math.max(1, Math.round(p.count ?? 30));
   const span = Math.max(0.1, Math.min(p.span ?? 3.8, Math.max(0.1, dur - 0.6)));
-  // The first copy is on screen from frame 0: the hook.
-  const appeared = Array.from({ length: count }, (_, i) => (i === 0 ? 1 : progress(t, appearAt(i, count, span), 0.18)));
+  // The first `pre` copies (at least one) are on screen from frame 0: the hook. The rest arrive
+  // over `span` on the same cadence.
+  const pre = Math.min(count, Math.max(1, Math.round(p.pre ?? 1)));
+  const appeared = Array.from({ length: count }, (_, i) =>
+    i < pre ? 1 : progress(t, appearAt(i - pre + 1, count - pre + 1, span), 0.18),
+  );
   // Continuous number of copies, for a smooth scroll.
   const shown = appeared.reduce((a, b) => a + b, 0);
   const scroll = Math.max(0, (shown - 1) * ROW - (FOCUS_Y - FIRST_Y));
-  const firstPop = 1 + 0.55 * (1 - easeOutCubic(progress(t, 0.15, 0.45)));
+  const firstPop = pre > 1 ? 1 : 1 + 0.55 * (1 - easeOutCubic(progress(t, 0.15, 0.45)));
   const copies: Copy[] = appeared.map((a, i) => {
     const y = FIRST_Y + i * ROW - scroll;
     const edge = clamp01((y - 70) / 170) * clamp01((1075 - y) / 110);

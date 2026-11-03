@@ -16,6 +16,9 @@ export type VerdictProps = {
   mode: VerdictMode;
   /** filter: scene second the stamp lands (on "medium self-harm"); fitted into the scene. */
   stampAt?: number;
+  /** filter: cold open. Frame 0 already shows the stamped card at the gate (the thumbnail); at
+   * stampAt the stamp pulses and the card shudders instead of the stamp slamming in. */
+  coldOpen?: boolean;
 };
 
 export type FilterState = {
@@ -71,20 +74,21 @@ export function frameState(props: VerdictProps, t0: number, beats: number[], dur
     const slide = easeInOut(progress(t, -0.1, hit + 0.1));
     const b1 = fit(beatOr(beats, 1, stampAt + 2.2), 1.6, dur);
     const b2 = fit(beatOr(beats, 2, b1 + 3.2), 1.8, dur);
-    const s = t >= stampAt ? slam(t, stampAt) : NO_SLAM;
+    const cold = props.coldOpen === true;
+    const s = cold ? { ...slam(t, -1), shake: slam(t, stampAt).shake } : t >= stampAt ? slam(t, stampAt) : NO_SLAM;
     const ghostIn = easeOutCubic(progress(t, b2 + 0.05, 0.3));
     return {
       mode: 'filter',
-      card: { slide, shake: s.shake + (t >= hit ? Math.sin(progress(t, hit, 0.3) * 20) * (1 - progress(t, hit, 0.3)) * 0.5 : 0) },
-      gate: { appear: easeOutCubic(progress(t, 0, 0.35)), flash: t >= hit ? clamp01(1 - progress(t, hit, 0.5)) : 0 },
-      window: { appear: easeOutCubic(progress(t, hit + 0.1, 0.4)) },
-      stamp: { ...s, pulse: pulse(t, b2 + 1.5, 0.3) },
-      http: { pop: easeOutCubic(progress(t, stampAt + 0.3, 0.3)) },
+      card: { slide: cold ? 1 : slide, shake: s.shake + (t >= hit ? Math.sin(progress(t, hit, 0.3) * 20) * (1 - progress(t, hit, 0.3)) * 0.5 : 0) },
+      gate: { appear: cold ? 1 : easeOutCubic(progress(t, 0, 0.35)), flash: cold ? pulse(t, stampAt, 0.3) : t >= hit ? clamp01(1 - progress(t, hit, 0.5)) : 0 },
+      window: { appear: cold ? 1 : easeOutCubic(progress(t, hit + 0.1, 0.4)) },
+      stamp: { ...s, pulse: Math.max(pulse(t, b2 + 1.5, 0.3), cold ? pulse(t, stampAt, 0.3) : 0) },
+      http: { pop: cold ? 1 : easeOutCubic(progress(t, stampAt + 0.3, 0.3)) },
       reveal: progress(t, b1 + 0.1, 1.1),
       banana: { pop: easeOutCubic(progress(t, b1 + 1.1, 0.35)) },
       ghost: { appear: ghostIn, opacity: ghostIn * clamp01(1 - progress(t, b2 + 1.3, 0.5)) },
       panel: { appear: easeOutCubic(progress(t, b2 + 1.6, 0.45)) },
-      chip: { appear: easeOutCubic(progress(t, 0.1, 0.4)) },
+      chip: { appear: cold ? 1 : easeOutCubic(progress(t, 0.1, 0.4)) },
     };
   }
 

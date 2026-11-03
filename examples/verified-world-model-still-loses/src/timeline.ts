@@ -18,7 +18,7 @@ const build = (): Cuts => ({
       'DepthWell',
       { mode: 'hook' },
       [
-        say(0.15, 'An AI-written world model passed its check at 100%.', '', { en: 'An AI-written world model passed its check at a hundred percent.' }),
+        say(0.1, 'An AI-written world model passed its check at 100%.', '', { en: 'An AI-written world model passed its check at a hundred percent.' }),
         say(0, 'It still lost.', ''),
       ],
       { tail: 1.6 },

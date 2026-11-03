@@ -11,8 +11,9 @@ const V040 = 'oh point four point oh';
 
 const build = (): Cuts => ({
   main: [
-    // 1-2 · Cold open: the brief, the chip walks to the shelf and lifts the lid; then the search
-    // for "where" in the paragraph finds nothing. The hook line is drawn by the scene as its title.
+    // 1-2 · Cold open: from frame 0 the agent stands at the open 0.4.0 box with old code risen out
+    // of it, the brief glowing; then the search for "where" in the paragraph finds nothing. The hook
+    // line is drawn by the scene as its title.
     anim(
       'hook',
       'OwnerShelf',

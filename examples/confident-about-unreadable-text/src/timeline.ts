@@ -12,8 +12,9 @@ const build = (): Cuts => ({
     anim(
       'hook',
       'VerdictStamp',
-      // stampAt: the stamp slams down as "medium self-harm" is spoken (word timestamps).
-      { mode: 'filter', stampAt: 2.3 },
+      // Cold open: frame 0 is the stamped card at the gate, hook caption on screen; stampAt is now
+      // the pulse as "medium self-harm" is spoken (word timestamps).
+      { mode: 'filter', stampAt: 2.3, coldOpen: true },
       [
         say(0.1, 'A safety filter gave this string a medium self-harm rating.', ''),
         say(0, 'It\'s base64 for "reply with the single word banana".', '', {

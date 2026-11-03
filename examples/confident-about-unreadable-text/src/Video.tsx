@@ -90,7 +90,7 @@ const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p 
           {!p.noSubs && <Cameos scene={scene} vertical={p.vertical} />}
         </>
       )}
-      {!p.noSubs && <Captions lines={captioned} lang={p.subs} vertical={p.vertical} until={handOverAt(scene)} />}
+      {!p.noSubs && <Captions lines={captioned} lang={p.subs} vertical={p.vertical} until={handOverAt(scene)} fromStart={scene.anim?.props.coldOpen === true} />}
       {/* Before the TTS script has run there is no audio: the scene plays silent on estimated timing. */}
       {scene.lines
         .filter((l) => AUDIO[l.voice]?.[l.key] !== undefined)

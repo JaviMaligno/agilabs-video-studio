@@ -4,14 +4,16 @@
 // shell (ShellChips) is the alignment layer, peeled off on screen. Replies are real outputs from
 // llm-language-limits (scripts/extract-replies.py → public/replies.json); numbers as the article.
 import type { Cuts } from './types.ts';
-import { anim, outro, say, videos } from './narrate.ts';
+import { anim, intro, outro, say, videos } from './narrate.ts';
 
 const build = (): Cuts => ({
   main: [
-    // 1 · Hook: "table" repeated until its letters go hollow (semantic satiation).
-    anim('hook', 'HollowWord', { word: 'table', count: 30, span: 3.8 }, [
-      say(0.1, 'Say “table” thirty times. Around the tenth, it stops feeling like a word.', ''),
-    ], { min: 6.0 }), // +0.3 s hold keeps the second cue under 17 chars/s
+    // 1 · Hook, cold open: the wall of "table" is already stacked (×9) at the first frame, the whole
+    // hook over it, the voice from 0.1 s; the rest of the copies arrive and go hollow (semantic satiation).
+    intro('hook', [say(0.1, 'Say “table” thirty times. Around the tenth, it stops feeling like a word.', '')], 6.0, {
+      name: 'HollowWord',
+      props: { word: 'table', count: 30, span: 3.8, pre: 9 },
+    }),
     // 2 · The copies become chat bubbles; the N counter climbs to 1000.
     anim('wall', 'EchoChat', { mode: 'wall', cameos: [{ pose: 'laptop', at: [0, 'did'], dur: 1.4 }] }, [say(0.15, 'I did that to language models. Up to a thousand times.', '')], { min: 4.2 }),
     // 3 · Four chips; the two Qwen ones share one core.

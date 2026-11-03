@@ -12,7 +12,7 @@ import { C } from './brand.ts';
 import { fontFamily, V } from './theme.ts';
 import { ANIMS } from './anim/index.ts';
 import { Background } from './components/Background.tsx';
-import { Intro, Outro } from './components/Cards.tsx';
+import { HookOverlay, Intro, Outro } from './components/Cards.tsx';
 import { Captions } from './components/Captions.tsx';
 import { Cameo, type CameoSpec } from './components/Cameo.tsx';
 import { Badge } from './components/Brand.tsx';
@@ -83,7 +83,16 @@ const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p 
   const captioned = scene.kind === 'intro' ? scene.lines.slice(1) : scene.lines;
   return (
     <AbsoluteFill>
-      {scene.kind === 'intro' && <Intro hook={scene.lines[0]} lang={p.subs} vertical={p.vertical} />}
+      {scene.kind === 'intro' && !scene.anim && <Intro hook={scene.lines[0]} lang={p.subs} vertical={p.vertical} />}
+      {scene.kind === 'intro' && scene.anim && (
+        <>
+          <AnimView scene={scene} p={p} />
+          <div style={{ position: 'absolute', top: p.vertical ? V.badgeTop : 48, left: 0, right: 0, display: 'flex', justifyContent: 'center' }}>
+            <Badge size={p.vertical ? 1.1 : 0.9} />
+          </div>
+          <HookOverlay hook={scene.lines[0]} lang={p.subs} vertical={p.vertical} />
+        </>
+      )}
       {scene.kind === 'outro' && <Outro lang={p.subs} vertical={p.vertical} />}
       {scene.kind === 'anim' && (
         <>

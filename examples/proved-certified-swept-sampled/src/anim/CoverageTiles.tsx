@@ -10,6 +10,7 @@ import {
   LATTICE,
   NX,
   NY,
+  HERO,
   PAN,
   SCATTER_N,
   W,
@@ -416,7 +417,7 @@ export const CoverageTiles: React.FC<AnimProps & TilesProps> = ({ t, beats, dur,
         {s.title && (
           <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 190, display: 'flex', flexWrap: 'wrap', alignContent: 'center', justifyContent: 'center', columnGap: 22, fontSize: 80, fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.02em', opacity: s.title.appear }}>
             {s.title.words.map((w, i) => (
-              <span key={i} style={{ opacity: 0.3 + 0.7 * w.lit, ...(w.text === 'same' && w.lit > 0.5 ? gradientText : { color: C.text }) }}>
+              <span key={i} style={{ opacity: 0.55 + 0.45 * w.lit, ...(w.text === 'same' && w.lit > 0.5 ? gradientText : { color: C.text }) }}>
                 {w.text}
               </span>
             ))}
@@ -447,6 +448,13 @@ export const CoverageTiles: React.FC<AnimProps & TilesProps> = ({ t, beats, dur,
               </span>
             ))}
           </div>
+        )}
+        {s.hero && s.hero.appear > 0 && (
+          <svg style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }} width={W} height={H}>
+            <g opacity={s.hero.appear} transform={`translate(${HERO.cx} ${HERO.cy}) scale(${s.hero.scale}) rotate(${s.hero.spin * 6}) translate(${-HERO.cx} ${-HERO.cy})`}>
+              <PanRings cx={HERO.cx} cy={HERO.cy} R={HERO.R} spread={1} glint={1} id="hero" />
+            </g>
+          </svg>
         )}
         {s.pan && s.pan.appear > 0 && (
           <svg style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }} width={W} height={H}>
