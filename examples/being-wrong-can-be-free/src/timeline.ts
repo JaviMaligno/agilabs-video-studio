@@ -17,9 +17,10 @@ const build = (): Cuts => ({
       'ReachMap',
       { mode: 'hook', chip: M1, meter: { from: '0', show: 2 } },
       [
-        say(0.1, 'An AI-written world model got a whole region wrong.', ''),
-        say(0, 'No test can catch it.', ''),
-        say(0, 'Cost: exactly nothing.', ''),
+        // Hook as a concrete question (test 2026-11-04, after far-points; control: reel 16).
+        say(0.1, 'Can an AI-written world model get a whole region wrong,', ''),
+        say(0, 'pass every test you can write,', ''),
+        say(0, 'and cost you exactly nothing?', ''),
       ],
       BLEND,
     ),
