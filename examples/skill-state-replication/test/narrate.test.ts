@@ -7,7 +7,7 @@ import { VIDEOS, TIMELINE } from '../src/timeline.ts';
 
 /** Narration lines 1-20 of script.md, as written. */
 const SCRIPT = [
-  'Give an agent a notepad instead of a memory. It stops forgetting. It starts misremembering.',
+  "Can a small notepad replace an AI agent's whole memory?",
   'Agents usually reread their whole conversation at every step, and it keeps growing.',
   'A paper called SKILL.state swaps that for a small notepad of current facts, rewritten each step.',
   'It promises steadier accuracy and a far smaller prompt. I rebuilt their test to check.',

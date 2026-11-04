@@ -53,8 +53,9 @@ const build = (): Cuts => ({
     anim(
       'hook',
       'ScrollVsNotepad',
-      { mode: 'hook', marks: [[0, 'notepad'], [0, 'forgetting'], [0, 'misremembering']] },
-      [say(0.4, 'Give an agent a notepad instead of a memory. It stops forgetting. It starts misremembering.', '')],
+      { mode: 'hook', marks: [[0, 'notepad'], [0, 'replace'], [0, 'memory']] },
+      // Hook as a concrete question (test 2026-11-04, after far-points): the answer comes in the verdict.
+      [say(0.4, "Can a small notepad replace an AI agent's whole memory?", '')],
       { tail: 1.0 },
     ),
     // 2-4. The story: the growing transcript, the notepad that replaces it, the two promises.
