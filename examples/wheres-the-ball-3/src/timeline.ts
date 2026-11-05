@@ -74,8 +74,8 @@ const build = (): Cuts => ({
     anim(
       'hook',
       'ConfidenceCloud',
-      { mode: 'hook', layout: 'open', run: OPEN, hookOverlay: true, marks: [[0, 'sure'], [0, 'wrong']] },
-      [say(0.1, "My little ball-finding AI is most sure of itself exactly where it's most wrong.", '')],
+      { mode: 'hook', layout: 'open', run: OPEN, marks: [[0, 'sure'], [0, 'wrong']] },
+      [say(0.4, "My little ball-finding AI is most sure of itself exactly where it's most wrong.", '')],
       // Hold the stamp before the hand-over.
       { tail: 1.9 },
     ),
