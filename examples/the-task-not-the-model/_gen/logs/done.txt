@@ -1,0 +1,6 @@
+exit 0 answer-key
+exit 0 folder
+exit 0 blind-judge
+exit 0 desk-messy
+exit 0 sticky-pile
+ALLDONE
