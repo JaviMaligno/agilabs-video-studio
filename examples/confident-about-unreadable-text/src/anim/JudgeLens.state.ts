@@ -6,7 +6,8 @@
 import { clamp01, easeOutCubic, fit, progress, sceneTime } from './steps.ts';
 import { NO_SLAM, beatOr, slam, type Slam } from './stamp.ts';
 
-export type LensProps = Record<string, never> | { [k: string]: unknown };
+/** startBeat: beat on which the first pass starts (default 0); the funnel and grader show from beat 0. */
+export type LensProps = { startBeat?: number };
 
 export type LensPass = {
   /** Reply bar entering at the top. */
@@ -30,7 +31,8 @@ const GAP = 0.12;
 export function frameState(_props: LensProps, t0: number, beats: number[], dur: number): LensState {
   const t = sceneTime(t0, dur);
   const total = PASS_LEN.reduce((a, b) => a + b, 0) + GAP * 2 + 0.6;
-  const start = fit(beatOr(beats, 0, 0) + 0.1, total, dur);
+  const start = fit(beatOr(beats, _props.startBeat ?? 0, beatOr(beats, 0, 0)) + 0.1, total, dur);
+  const b0 = beatOr(beats, 0, 0);
   let at = start;
   const starts: number[] = [];
   for (const L of PASS_LEN) {
@@ -54,8 +56,8 @@ export function frameState(_props: LensProps, t0: number, beats: number[], dur: 
   const glow = Math.max(0, ...passes.map((p) => (p.drop > 0 && p.emerge < 1 ? 1 - Math.abs(p.drop - p.emerge) : 0)));
   return {
     passes,
-    funnel: { appear: easeOutCubic(progress(t, start - 0.3, 0.35)), glow: clamp01(glow) },
-    judge: { appear: easeOutCubic(progress(t, start - 0.2, 0.35)) },
+    funnel: { appear: easeOutCubic(progress(t, Math.min(start - 0.3, b0 + 0.3), 0.35)), glow: clamp01(glow) },
+    judge: { appear: easeOutCubic(progress(t, Math.min(start - 0.2, b0 + 0.1), 0.35)) },
     tally: passes.map((_, i) => ({ pop: easeOutCubic(progress(t, starts[i] + 0.72 * PASS_LEN[i] + 0.1, 0.25)) })),
     tag: { pop: easeOutCubic(progress(t, starts[2] + PASS_LEN[2] + 0.1, 0.4)) },
   };

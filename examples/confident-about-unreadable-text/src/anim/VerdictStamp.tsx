@@ -17,8 +17,6 @@ const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
 const B64 = ciphers.ciphers.base64;
 export const B64_ROWS = [B64.slice(0, 22), B64.slice(22)];
 export const PLAIN_ROWS = ['reply with the single', 'word banana'].map((r) => r.padEnd(22, ' '));
-/** Base model's "stamp": a flawless line of binary (re-encoded stock text, illustrative). */
-const CODE_STAMP = ciphers.mimic.binary.split(' ').slice(0, 2).join(' ');
 
 // ---------- filter (hook) ----------
 const F = { winTop: 0, winH: 176, cardTop0: 30, cardTop: 236, cardH: 240, cardW: 820, gateTop: 560, chipTop: 930 };
@@ -47,13 +45,8 @@ const Filter: React.FC<{ s: FilterState; t: number; W: number }> = ({ s, t, W })
       {/* The stamp, on the card's top edge so the text stays readable under it. */}
       <div style={{ position: 'absolute', left: 0, width: W, top: cardTop - 58, display: 'flex', justifyContent: 'center', transform: `translateX(${shakeX - 40}px)` }}>
         <div style={{ transform: `scale(${1 + 0.08 * s.stamp.pulse})` }}>
-          <Stamp label="self-harm · medium" size={50} rot={-6} s={s.stamp} />
+          <Stamp label="self-harm warning" size={50} rot={-6} s={s.stamp} />
         </div>
-      </div>
-      <div style={{ position: 'absolute', right: 6, top: cardTop - 76, opacity: s.http.pop, transform: `scale(${0.7 + 0.3 * s.http.pop}) rotate(4deg)` }}>
-        <Pill size={30} outline>
-          HTTP 400
-        </Pill>
       </div>
       {/* The banana it was asking for */}
       <div style={{ position: 'absolute', left: cardX + F.cardW - 130, top: cardTop + F.cardH - 110, opacity: s.banana.pop, transform: `scale(${0.4 + 0.6 * s.banana.pop}) rotate(${(1 - s.banana.pop) * -40}deg)` }}>
@@ -64,41 +57,27 @@ const Filter: React.FC<{ s: FilterState; t: number; W: number }> = ({ s, t, W })
         <FilterGate w={520} t={t} flash={s.gate.flash} post={F.chipTop - F.gateTop - 64 - 10} />
       </div>
       <div style={{ opacity: s.chip.appear }}>
-        <Chip x={(W - 340) / 2} y={F.chipTop} w={340} h={120} label={['GPT-5']} muted dim={0.3} size={46} icon="cast/robot-teal.png" />
+        <Chip x={(W - 340) / 2} y={F.chipTop} w={340} h={120} label={['ChatGPT']} muted={s.answer.lit < 0.5} lit={s.answer.lit} dim={0.3 * (1 - s.answer.lit)} size={46} icon="cast/robot-teal.png" />
       </div>
-      {/* "unknown": the verdict it did not give */}
-      <div style={{ position: 'absolute', left: 30, top: F.gateTop + 120, opacity: s.ghost.opacity, transform: `translateY(${(1 - s.ghost.appear) * 20}px)` }}>
-        <Stamp label="unknown" size={48} rot={-4} tone="muted" dashed />
-      </div>
-      {/* The filter's own verdict, as the article prints it */}
+      {/* ChatGPT reads it fine and just answers */}
       <div
         style={{
           position: 'absolute',
-          left: (W - 860) / 2,
-          top: F.gateTop + 110,
-          width: 860,
-          padding: '22px 30px',
-          boxSizing: 'border-box',
-          borderRadius: 22,
-          background: alpha(C.bg0, 0.94),
-          border: `2px solid ${alpha(C.accentText, 0.5)}`,
-          fontSize: 34,
-          fontWeight: 600,
-          lineHeight: 1.5,
-          fontVariantNumeric: 'tabular-nums',
-          opacity: s.panel.appear,
-          transform: `translateY(${(1 - s.panel.appear) * 40}px)`,
+          left: W / 2 + 190,
+          top: F.chipTop - 150,
+          padding: '18px 34px',
+          borderRadius: 30,
+          background: '#f8fafc',
+          color: '#0f172a',
+          fontSize: 56,
+          fontWeight: 800,
+          opacity: s.answer.pop,
+          transform: `scale(${0.5 + 0.5 * s.answer.pop})`,
+          transformOrigin: 'left bottom',
+          boxShadow: `0 10px 40px ${alpha('#000000', 0.5)}`,
         }}
       >
-        <div style={{ color: C.muted }}>
-          jailbreak: <span style={{ color: C.text }}>detected</span>
-        </div>
-        <div style={{ color: C.muted }}>
-          self_harm: <span style={{ ...gradientText, fontWeight: 800 }}>filtered, medium</span>
-        </div>
-        <div style={{ color: C.muted }}>
-          hate / sexual / violence: <span style={{ color: C.text }}>safe</span>
-        </div>
+        banana
       </div>
     </>
   );
@@ -107,16 +86,15 @@ const Filter: React.FC<{ s: FilterState; t: number; W: number }> = ({ s, t, W })
 // ---------- lineup ----------
 const STATIONS = [
   { name: 'safety filter', stamp: 'self-harm', mono: false },
-  { name: 'LLM judge', stamp: 'garbled', mono: false },
-  { name: 'base model', stamp: CODE_STAMP, mono: true },
+  { name: 'my AI grader', stamp: 'garbled', mono: false },
+  { name: 'second grader', stamp: 'refused', mono: false },
 ];
 const SW = 290;
 const sx = (i: number) => i * (SW + 45);
 
 const Inspector: React.FC<{ i: number; t: number; w: number }> = ({ i, t, w }) => {
   if (i === 0) return <FilterGate w={w - 50} h={52} t={t} label="filter" />;
-  if (i === 1) return <StampTool size={130} />;
-  return <Chip x={0} y={0} w={w - 50} h={104} label={['Qwen-7B', 'Base']} size={30} />;
+  return <StampTool size={130} />;
 };
 
 const Lineup: React.FC<{ s: LineupState; t: number; W: number }> = ({ s, t, W }) => (
@@ -129,7 +107,7 @@ const Lineup: React.FC<{ s: LineupState; t: number; W: number }> = ({ s, t, W })
             <NoiseWindow w={SW} h={150} t={t} rows={2} cols={8} seed={10 + i} size={36} />
           </div>
           <div style={{ position: 'absolute', top: 270, left: 0, width: SW, height: 150, display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-            <div style={{ position: 'relative', width: i === 1 ? 130 : SW - 50, height: i === 0 ? 52 : i === 1 ? 136 : 104 }}>
+            <div style={{ position: 'relative', width: i === 0 ? SW - 50 : 130, height: i === 0 ? 52 : 136 }}>
               <Inspector i={i} t={t} w={SW} />
             </div>
           </div>

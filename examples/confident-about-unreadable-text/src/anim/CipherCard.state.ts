@@ -11,7 +11,7 @@ import { clamp01, easeOutCubic, fit, progress, sceneTime } from './steps.ts';
 import { clip, morph, type Glyph } from './glyphs.ts';
 import { NO_SLAM, beatOr, slam, type Slam } from './stamp.ts';
 
-export type CipherMode = 'ladder' | 'mimic';
+export type CipherMode = 'ladder' | 'mimic' | 'parrot';
 export type CipherProps = { mode: CipherMode };
 
 export type VideoCipherData = {
@@ -60,7 +60,16 @@ export type MimicState = {
   tag: { pop: number };
 };
 
-export type CipherState = LadderState | MimicState;
+/** parrot (reel 2026-11-06): the three rows on beat 0, an empty banana on beat 1, the parrot on beat 2. */
+export type ParrotState = {
+  mode: 'parrot';
+  rows: { appear: number; tick: number; zero: number }[];
+  banana: { pop: number; cross: number };
+  parrot: { pop: number };
+  dim: number;
+};
+
+export type CipherState = LadderState | MimicState | ParrotState;
 
 export const sameLength = (a: string, b: string) => [...a].length === [...b].length;
 
@@ -91,6 +100,26 @@ export function frameState(props: CipherProps, t0: number, beats: number[], dur:
       counter: { appear: easeOutCubic(progress(t, start - 0.15, 0.3)), value: Math.round(CONVERSATIONS * cp) },
       sub: { appear: easeOutCubic(progress(t, start + 1.0, 0.4)) },
       rows,
+    };
+  }
+
+  if (props.mode === 'parrot') {
+    const p1 = fit(beatOr(beats, 1, b0 + 4), 1.2, dur);
+    const p2 = fit(beatOr(beats, 2, p1 + 1.5), 1.5, dur);
+    const span = Math.max(1.8, p1 - b0);
+    return {
+      mode: 'parrot',
+      rows: MIMIC_ROWS.map((_, i) => {
+        const at = b0 + 0.1 + i * 0.3;
+        return {
+          appear: easeOutCubic(progress(t, at, 0.35)),
+          tick: easeOutCubic(progress(t, at + 0.35, 0.3)),
+          zero: easeOutCubic(progress(t, b0 + 0.6 * span + i * 0.15, 0.3)),
+        };
+      }),
+      banana: { pop: easeOutCubic(progress(t, p1 + 0.05, 0.35)), cross: easeOutCubic(progress(t, p1 + 0.45, 0.3)) },
+      parrot: { pop: easeOutCubic(progress(t, p2 + 0.1, 0.45)) },
+      dim: easeOutCubic(progress(t, p2, 0.4)),
     };
   }
 

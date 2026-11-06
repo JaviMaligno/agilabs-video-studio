@@ -37,10 +37,10 @@ export const JudgeLens: React.FC<AnimProps & LensProps> = ({ t, beats, dur, vert
           strokeLinejoin="round"
         />
         <text x={CX} y={Y.funnel + 92} textAnchor="middle" fontSize={56} fontWeight={800} fill={C.text} fontFamily="Inter">
-          cipher
+          code
         </text>
         <text x={CX} y={Y.funnel + 140} textAnchor="middle" fontSize={28} fontWeight={600} fill={alpha(C.text, 0.8)} fontFamily="Inter">
-          run back through
+          turned back into
         </text>
       </svg>
       {s.passes.map((p, i) =>
@@ -58,7 +58,7 @@ export const JudgeLens: React.FC<AnimProps & LensProps> = ({ t, beats, dur, vert
                   transformOrigin: 'center top',
                 }}
               >
-                <RedactedBar w={BW} h={200} lines={3} label="refusal, in plain English" />
+                <RedactedBar w={BW} h={200} lines={3} label="a clear “no”, in plain English" />
               </div>
             )}
             {/* what comes out: noise */}
@@ -75,11 +75,11 @@ export const JudgeLens: React.FC<AnimProps & LensProps> = ({ t, beats, dur, vert
       )}
       {/* the judge */}
       <div style={{ position: 'absolute', left: CX - BW / 2, top: Y.win, opacity: s.judge.appear }}>
-        <NoiseWindow w={BW} h={120} t={t} label="what the judge sees" rows={1} cols={14} seed={9} size={40} glow={reading} />
+        <NoiseWindow w={BW} h={120} t={t} label="what my grader sees" rows={1} cols={14} seed={9} size={40} glow={reading} />
       </div>
       <div style={{ position: 'absolute', left: CX - 150, top: Y.tool, width: 300, display: 'flex', alignItems: 'center', gap: 22, opacity: s.judge.appear }}>
         <StampTool size={110} press={press} lit={press} />
-        <div style={{ fontSize: 40, fontWeight: 800, whiteSpace: 'nowrap' }}>LLM judge</div>
+        <div style={{ fontSize: 40, fontWeight: 800, whiteSpace: 'nowrap' }}>my AI grader</div>
       </div>
       {/* tally: every pass ends the same way */}
       <div style={{ position: 'absolute', left: 690, top: 250, width: 270, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 34 }}>
@@ -91,7 +91,7 @@ export const JudgeLens: React.FC<AnimProps & LensProps> = ({ t, beats, dur, vert
         <div style={{ fontSize: 60, fontWeight: 800, color: C.muted, opacity: s.tally[2].pop }}>×3</div>
       </div>
       <div style={{ position: 'absolute', left: 0, width: W, top: 1010, display: 'flex', justifyContent: 'center', opacity: s.tag.pop, transform: `scale(${0.8 + 0.2 * s.tag.pop})` }}>
-        <Pill size={40}>garbled by construction</Pill>
+        <Pill size={40}>every clear “no” → garbled</Pill>
       </div>
     </Stage>
   );

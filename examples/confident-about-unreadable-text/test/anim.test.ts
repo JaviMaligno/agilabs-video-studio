@@ -231,8 +231,8 @@ test('slam: lands from 1.5x to 1x and the shake decays to 0', () => {
   assert.ok(slam(1.3, 1).shake !== 0);
 });
 
-test('VerdictStamp filter: stamp lands at stampAt, inside the first 3 s; reveal on beat 1; panel on beat 2', () => {
-  const beats = [0.1, 4.2, 8.4];
+test('VerdictStamp filter: stamp lands at stampAt, inside the first 3 s; reveal on beat 1; ChatGPT answers on beat 2', () => {
+  const beats = [0.1, 4.2, 8.4, 11];
   const before = verdict.frameState({ mode: 'filter', stampAt: 2.3 }, 2.2, beats, 14) as verdict.FilterState;
   assert.equal(before.stamp.opacity, 0);
   const landed = verdict.frameState({ mode: 'filter', stampAt: 2.3 }, 2.6, beats, 14) as verdict.FilterState;
@@ -242,10 +242,9 @@ test('VerdictStamp filter: stamp lands at stampAt, inside the first 3 s; reveal 
   assert.ok((verdict.frameState({ mode: 'filter', stampAt: 2.3 }, 0.2, beats, 14) as verdict.FilterState).card.slide > 0);
   const rev = verdict.frameState({ mode: 'filter', stampAt: 2.3 }, 6, beats, 14) as verdict.FilterState;
   assert.equal(rev.reveal, 1);
-  assert.equal(rev.panel.appear, 0);
+  assert.equal(rev.answer.pop, 0);
   const end = verdict.frameState({ mode: 'filter', stampAt: 2.3 }, 14, beats, 14) as verdict.FilterState;
-  assert.equal(end.panel.appear, 1);
-  assert.equal(end.ghost.opacity, 0);
+  assert.equal(end.answer.pop, 1);
   assert.equal(end.stamp.pop, 1);
 });
 
@@ -256,7 +255,9 @@ test('VerdictStamp filter cold open: frame 0 is already the stamped card at the 
   assert.equal(s0.stamp.pop, 1);
   assert.equal(s0.stamp.opacity, 1);
   assert.equal(s0.gate.appear, 1);
-  assert.equal(s0.window.appear, 1);
+  // Only the stamped note and the filter at frame 0 (2026-11-06): no noise window, no chatbot yet.
+  assert.equal(s0.window.appear, 0);
+  assert.equal(s0.chip.appear, 0);
   assert.equal(s0.reveal, 0);
   // The spoken "medium self-harm" still lands on the stamp: a pulse at stampAt.
   const hit = verdict.frameState({ mode: 'filter', stampAt: 2.3, coldOpen: true }, 2.3, beats, 14) as verdict.FilterState;

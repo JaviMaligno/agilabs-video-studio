@@ -11,7 +11,12 @@
 import { clamp01, easeOutCubic, fit, progress, sceneTime } from './steps.ts';
 import { NO_SLAM, beatOr, slam, type Slam } from './stamp.ts';
 
-export type StoryProps = Record<string, never> | { [k: string]: unknown };
+export type StoryProps = {
+  /** Beat on which the grader appears (default 2). With 1, the base64 settle lands late in beat 0. */
+  graderBeat?: number;
+  /** false: the grader only looks (its stamp comes later in the video). Default true. */
+  graderStamps?: boolean;
+};
 
 /** Codes the card cycles through on beat 0 (keys of src/data/ciphers.json), then base64. */
 export const STORY_CODES = ['rot13', 'morse', 'binary', 'reverse_all', 'cyrillic_homoglyph'] as const;
@@ -35,8 +40,9 @@ export type StoryState = {
 export function frameState(_props: StoryProps, t0: number, beats: number[], dur: number): StoryState {
   const t = sceneTime(t0, dur);
   const b0 = beatOr(beats, 0, 0);
-  const b1 = fit(beatOr(beats, 1, b0 + 4), 1.6, dur);
-  const b2 = fit(beatOr(beats, 2, b1 + 2.6), 2.8, dur);
+  const gb = _props.graderBeat ?? 2;
+  const b2 = gb === 1 ? fit(beatOr(beats, 1, b0 + 4), 2.8, dur) : fit(beatOr(beats, 2, beatOr(beats, 1, b0 + 4) + 2.6), 2.8, dur);
+  const b1 = gb === 1 ? b0 + 0.7 * (b2 - b0) : fit(beatOr(beats, 1, b0 + 4), 1.6, dur);
 
   // Cycling codes from just after the card lands until beat 1, then base64.
   const cycleStart = b0 + 0.75;
@@ -54,7 +60,7 @@ export function frameState(_props: StoryProps, t0: number, beats: number[], dur:
   }
 
   const echoAt = fit(b1 + 0.9, 0.6, dur);
-  const stampAt = fit(b2 + 1.2, 0.6, dur);
+  const stampAt = _props.graderStamps === false ? Infinity : fit(b2 + 1.2, 0.6, dur);
   const dimDown = easeOutCubic(progress(t, b2 - 0.1, 0.4));
   return {
     laptop: { appear: easeOutCubic(progress(t, 0, 0.35)), dim: dimDown },

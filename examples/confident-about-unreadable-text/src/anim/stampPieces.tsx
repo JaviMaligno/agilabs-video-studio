@@ -241,13 +241,13 @@ export const Banana: React.FC<{ size: number; style?: React.CSSProperties }> = (
   <svg width={size} height={size * 0.8} viewBox="0 0 100 80" style={{ overflow: 'visible', ...style }}>
     <defs>
       <linearGradient id="banana-g" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor={C.accentText} />
-        <stop offset="1" stopColor={C.accent2} />
+        <stop offset="0" stopColor="#fde047" />
+        <stop offset="1" stopColor="#facc15" />
       </linearGradient>
     </defs>
     <path d="M8 22 C 18 62, 70 74, 94 40 C 80 52, 36 54, 20 18 Z" fill="url(#banana-g)" stroke={C.text} strokeWidth="3.5" strokeLinejoin="round" />
-    <path d="M8 22 L 4 12 L 14 10 L 20 18" fill={C.card} stroke={C.text} strokeWidth="3.5" strokeLinejoin="round" />
-    <path d="M30 40 C 44 52, 64 54, 82 46" fill="none" stroke={alpha(C.text, 0.5)} strokeWidth="2.5" strokeLinecap="round" />
+    <path d="M8 22 L 4 12 L 14 10 L 20 18" fill="#65a30d" stroke={C.text} strokeWidth="3.5" strokeLinejoin="round" />
+    <path d="M30 40 C 44 52, 64 54, 82 46" fill="none" stroke="#ca8a04" strokeWidth="2.5" strokeLinecap="round" />
   </svg>
 );
 

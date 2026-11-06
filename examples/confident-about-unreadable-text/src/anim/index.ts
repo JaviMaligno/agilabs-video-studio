@@ -11,6 +11,7 @@ import { CipherCard } from './CipherCard.tsx';
 import { JudgeLens } from './JudgeLens.tsx';
 import { RefusalGate } from './RefusalGate.tsx';
 import { StoryBench } from './StoryBench.tsx';
+import { TwoAIs } from './TwoAIs.tsx';
 import { TwoJudges } from './TwoJudges.tsx';
 import { VerdictStamp } from './VerdictStamp.tsx';
 
@@ -27,6 +28,7 @@ export const ANIMS: Record<string, React.FC<AnimProps & any>> = {
   JudgeLens,
   RefusalGate,
   StoryBench,
+  TwoAIs,
   TwoJudges,
   VerdictStamp,
 };
