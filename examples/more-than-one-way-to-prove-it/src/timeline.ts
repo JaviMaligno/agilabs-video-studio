@@ -66,7 +66,8 @@ const build = (): Cuts => ({
       { mode: 'focus', focus: 'Qwen' },
       [
         say(0.2, 'Qwen, a small model, fixed the fewest,', 'Qwen, un modelo pequeño, arregló de los que menos,', { en: 'Kwen, a small model, fixed the fewest,' }),
-        say(0, 'and ran them first almost every time.', 'y los ejecutó primero casi siempre.'),
+        // A touch slower: at the default speed the caption read at 17.1 chars/s.
+        say(0, 'and ran them first more than half the time.', 'y los ejecutó primero más de la mitad de las veces.', undefined, { speed: 0.95 }),
       ],
       { min: 4.6 },
     ),

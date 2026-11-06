@@ -201,7 +201,7 @@ test('StatGrid: tiles pop in per beat and lay out in a grid', () => {
 test('LeaderboardFlip: the article figures, ranked by bugs fixed', () => {
   assert.deepEqual(
     board.MODELS.map((m) => `${m.name} ${m.fixed} ${m.testsFirst} ${m.both}`),
-    ['Sonnet 30 0 0', 'Opus 29 1 1', 'Sol 29 28 null', 'Haiku 25 7 null', 'Luna 22 3 null', 'Qwen 22 19 18'],
+    ['Sonnet 30 0 0', 'Opus 29 1 1', 'Sol 29 28 null', 'Haiku 25 7 null', 'Luna 22 3 null', 'Qwen 22 13 13'],
   );
   for (let i = 1; i < board.MODELS.length; i++) assert.ok(board.MODELS[i - 1].fixed >= board.MODELS[i].fixed);
   // One cast robot per model, all different, carried into every card and the focus card.

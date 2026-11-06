@@ -27,7 +27,7 @@ export const RUNS = 30;
 /**
  * The leaderboard by bugs fixed, top to bottom (ties kept in the article's order of mention).
  * fixed: "Sonnet fixed all 30 bugs", "Opus fixed 29", "Sol fixed 29", figure 4 denominators for
- * Haiku 25, Luna 22, Qwen 22. testsFirst: figure 4. both: "Qwen, with 18 of its 22 fixes",
+ * Haiku 25, Luna 22, Qwen 22. testsFirst: figure 4. both: "Qwen, with 13 of its 22 fixes",
  * "Opus 1 of 29, Sonnet 0 of 30".
  */
 export const MODELS: ModelRow[] = [
@@ -36,7 +36,7 @@ export const MODELS: ModelRow[] = [
   { name: 'Sol', fixed: 29, testsFirst: 28, both: null, verdict: 'none', robot: 'teal' },
   { name: 'Haiku', fixed: 25, testsFirst: 7, both: null, verdict: 'none', robot: 'sky' },
   { name: 'Luna', fixed: 22, testsFirst: 3, both: null, verdict: 'none', robot: 'rose' },
-  { name: 'Qwen', fixed: 22, testsFirst: 19, both: 18, verdict: 'pass', robot: 'graphite' },
+  { name: 'Qwen', fixed: 22, testsFirst: 13, both: 13, verdict: 'pass', robot: 'graphite' },
 ];
 
 export type LeaderboardFlipProps = {
