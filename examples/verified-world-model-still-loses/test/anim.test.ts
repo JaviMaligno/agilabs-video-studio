@@ -236,8 +236,8 @@ test('DepthWell: the hook meter rests on the article values, never an in-between
   const early = well.frameState({ mode: 'hook' }, 1, beats, 6.5).world.top.meter;
   assert.equal(early.opacity, 0);
   const end = well.frameState({ mode: 'hook' }, 6.5, beats, 6.5).world.top.meter;
-  assert.equal(end.text, '0.404');
-  for (let t = 0; t <= 6.5; t += 0.05) assert.ok(['0.495', '0.404'].includes(well.frameState({ mode: 'hook' }, t, beats, 6.5).world.top.meter.text));
+  assert.equal(end.text, '1 in 3');
+  for (let t = 0; t <= 6.5; t += 0.05) assert.ok(['1 in 2', '1 in 3'].includes(well.frameState({ mode: 'hook' }, t, beats, 6.5).world.top.meter.text));
   assert.equal(well.frameState({ mode: 'hook' }, 6.5, beats, 6.5).world.floor.red, 1);
 });
 
@@ -277,8 +277,8 @@ test('QuestionCard and WinRateMeter end states', () => {
   assert.equal(v.stamp.pop, 1);
   assert.equal(qcard.frameState({ mode: 'ask' }, 5, [0.2], 5).stamp.opacity, 0);
   const m = wrm.frameState({}, 9, [0.3, 3], 9);
-  assert.deepEqual(m.rows.map((r) => r.text), ['0.495', '0.404']);
-  assert.equal(m.gap.text, '0.091');
+  assert.deepEqual(m.rows.map((r) => r.text), ['1 in 2', '1 in 3']);
+  assert.equal(m.gap.text, '');
   assert.ok(m.rows.every((r) => r.appear === 1));
   assert.equal(m.footnote, 1);
   assert.equal(wrm.frameState({}, 0.1, [0.3, 3], 9).rows[1].appear, 0);

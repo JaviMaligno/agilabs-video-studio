@@ -6,79 +6,50 @@
 import type { Cuts } from './types.ts';
 import { L, anim, outro, say, videos } from './narrate.ts';
 
-const TRUTH = L('truth', 'realidad');
-const MODEL = L('model · rule left out', 'modelo · sin la regla');
+const TRUTH = L('real rules', 'reglas reales');
+const MODEL = L("AI's rulebook · rule missing", 'reglamento de la IA · sin la regla');
 /** Shorter hold after the last line where the next scene continues on the same shaft (blend). */
 const BLEND = { tail: 0.55 };
 
 const build = (): Cuts => ({
   main: [
-    anim(
-      'hook',
-      'DepthWell',
-      { mode: 'hook' },
-      [
-        // 2026-11-06: no jargon ("world model" -> "the rules of a game"); statement form kept (control of reel 15).
-        say(0.1, 'An AI wrote the rules of a game. It passed every check.', ''),
-        say(0, 'It still lost.', ''),
-      ],
-      { tail: 1.6 },
-    ),
-    // added 2026-10-21: story — where this comes from, before anything technical.
+    // 2026-11-06 v2: hook C ("learn a game's rules by watching"), opened on the board/rulebook
+    // scene instead of the shaft; lines trimmed to the house pace (voice speed is a fixed standard).
     anim(
       'story',
       'StoryGate',
-      { cameos: [{ pose: 'laptop', at: [0, 'reproducing'] }] },
+      { cameos: [{ pose: 'laptop', at: [1, 'gave'] }] },
       [
-        say(0.2, "I was reproducing a DeepMind result: AI writes a game's rules as code, a world model.", ''),
-        say(0, 'A planner trusts that code once it passes a check.', ''),
-        say(0, "But does passing the check mean it's right?", '', undefined, { emotion: 'curious' }),
+        say(0.1, "Can you learn a game's rules just by watching people play?", '', undefined, { emotion: 'curious' }),
+        say(0.5, 'I gave an AI the rules of a mini chess game, all but one,', ''),
+        say(0, 'and asked it to write the rulebook for a computer player.', ''),
       ],
-      { tail: 1.0 },
+      { tail: 0.6 },
     ),
+    anim('rule', 'DepthWell', { mode: 'rule', chip: TRUTH, chipIn: true }, [say(0.8, 'And the missing one...', '', undefined, { emotion: 'curious' })], { min: 3.0, ...BLEND }),
+    anim('ruleCap', 'DepthWell', { mode: 'ruleCap', chip: TRUTH }, [
+      say(0.15, 'at the move limit, whoever has more pieces wins.', ''),
+      say(0, 'Could it work that one out?', '', undefined, { emotion: 'curious' }),
+    ], { min: 4.0, ...BLEND }),
     anim(
-      'setup',
-      'FlowDiagram',
-      {
-        layout: 'vertical',
-        nodes: [
-          { id: 'rules', label: 'game rules, in words' },
-          { id: 'code', label: 'the rules, as code' },
-          // The planner and the AI that writes the code are drawn (public/cast/robots), not lettered.
-          { id: 'plan', label: 'planner searches the code', icon: 'cast/robots/robot-graphite.png' },
-        ],
-        edges: [
-          { from: 'rules', to: 'code', label: 'AI writes', icon: 'cast/robots/robot-teal.png' },
-          { from: 'code', to: 'plan', label: 'plays on' },
-        ],
-      },
-      [say(0.2, "AI writes the game's rules as code.", ''), say(0, 'A planner searches that code.', '')],
-    ),
-    anim(
-      'gate',
+      'gate2',
       'DepthWell',
-      { mode: 'gate', chip: TRUTH, chipIn: true, stamp: { text: 'GATE · 100%', sub: 'next state · legal moves · outcome', beat: 1, delay: 1.75 } },
+      { mode: 'gate', sample: 'missed', floor: 'model', chip: MODEL, chipIn: true, stamp: { text: 'ALL MOVES MATCH', sub: 'random games', beat: 1, delay: 0.9 } },
       [
-        say(0.2, 'First, a check: replay random games.', '', undefined, { emotion: 'contemplative' }),
-        say(0, 'Every move must match: 100%.', '', { en: 'Every move must match: a hundred percent.' }),
+        say(0.2, 'First, I played random games with its rulebook: two players moving without thinking.', ''),
+        say(0, 'Every move matched the real game.', ''),
       ],
+      BLEND,
     ),
-    anim('question', 'QuestionCard', { mode: 'ask' }, [say(0.3, 'Does passing it make the model good enough to plan with?', '', undefined, { emotion: 'curious' })], { min: 4.2, ...BLEND }),
-    anim('null', 'QuestionCard', { mode: 'yes', stampDelay: 2.15 }, [say(0.2, 'On small games with complete rules, yes.', '')], { min: 3.6 }),
-    anim('rule', 'DepthWell', { mode: 'rule', chip: TRUTH, chipIn: true, cameos: [{ pose: 'pointing', at: [0, 'gave'], dur: 2.0 }] }, [say(0.2, 'So I gave a small chess game one extra rule.', '')], { min: 3.4, ...BLEND }),
-    anim('ruleCap', 'DepthWell', { mode: 'ruleCap', chip: TRUTH }, [say(0.15, 'At the move limit, the side with more pieces wins.', '')], { min: 4.4, ...BLEND }),
     anim(
       'random',
       'DepthWell',
       {
         mode: 'random',
         chip: TRUTH,
-        counter: { to: 2.5, decimals: 1, suffix: '%', text: '2.5%', label: 'random games the rule decides', beat: 1, delay: 1.4 },
+        counter: { to: 40, decimals: 0, prefix: '1 in ', text: 'almost never', label: 'random games that reach the limit', beat: 1, delay: 1.0 },
       },
-      [
-        say(0.2, 'Random games blunder early.', ''),
-        say(0, 'The rule decides just 2.5% of them.', '', { en: 'The rule decides just two and a half percent of them.' }),
-      ],
+      [say(0.2, 'But random games end fast: kings fall in a few clumsy moves.', ''), say(0, 'They almost never reach the move limit.', '')],
       BLEND,
     ),
     anim(
@@ -87,45 +58,35 @@ const build = (): Cuts => ({
       {
         mode: 'competent',
         chip: TRUTH,
-        counter: { to: 50, decimals: 0, prefix: '~', suffix: '%', text: '~50%', label: 'competent games the rule decides', beat: 1, delay: 1.3 },
+        counter: { to: 50, decimals: 0, prefix: '~', suffix: '%', text: 'about half', label: 'good games it decides', beat: 1, delay: 1.0 },
       },
-      [say(0.2, 'Good play survives to the limit.', ''), say(0, 'There the rule decides about half.', '')],
+      [say(0.2, 'Good games do.', ''), say(0, 'There, that rule decides about half of them.', '')],
       BLEND,
-    ),
-    anim('omit', 'DepthWell', { mode: 'omit', chip: MODEL, chipIn: true }, [say(0.2, 'Then I left that rule out of the spec.', '')], { min: 3.4, ...BLEND }),
-    anim(
-      'gate2',
-      'DepthWell',
-      { mode: 'gate', sample: 'missed', floor: 'model', chip: MODEL, stamp: { text: 'CHECK PASSED · 100%', sub: 'when no sampled game reached the rule', beat: 0, delay: 2.6 } },
-      [say(0.15, 'When the random games missed it, it still passed at 100%,', '', { en: 'When the random games missed it, it still passed at a hundred percent,' }, { emotion: 'surprised' })],
-      BLEND,
-    ),
-    anim(
-      'accuracy',
-      'DepthWell',
-      { mode: 'accuracy', chip: MODEL },
-      [say(0.15, 'and was at least 98% right on positions the planner visits.', '', { en: 'and was at least ninety-eight percent right on positions the planner visits.' })],
-      { min: 4 },
     ),
     anim(
       'meter',
       'WinRateMeter',
-      { delays: { model: 0.8, fair: 1.5 }, cameos: [{ pose: 'sceptical', at: [0, 'lost'] }] },
-      [
-        say(0.3, 'At play it lost: win rate 0.404;', '', { en: 'At play it lost: win rate point four oh four;' }),
-        say(0, 'a fair baseline gets 0.495.', '', { en: 'a fair baseline gets point four nine five.' }),
-      ],
-      { tail: 3.1 },
+      { delays: { model: 0.8, fair: 1.5 }, cameos: [{ pose: 'sceptical', at: [0, 'third'] }] },
+      [say(0.3, 'Against a player who knew every rule, it won about a third.', ''), say(0, 'Equal players win half.', '')],
+      { tail: 4.0 },
     ),
-    anim('mechanism', 'DepthWell', { mode: 'mechanism', chip: MODEL }, [say(0.2, 'The few positions it gets wrong are the ones that decide games.', '')], { min: 4.4 }),
-    anim('verdict', 'QuestionCard', { mode: 'verdict', stampDelay: 2.45 }, [say(0.25, "Verdict: it passed the check, yet wasn't good enough to plan with.", '', undefined, { emotion: 'confident', speed: 1.05 })], { tail: 1.25 }),
-    anim('repair', 'DepthWell', { mode: 'repair', chip: MODEL }, [say(0.2, 'Even with the rule in its examples, it stayed blind to it.', '')], { min: 4.9, ...BLEND }),
-    anim('lesson', 'DepthWell', { mode: 'lesson', chip: MODEL }, [say(0.2, "A check vouches for a model where you sample, not where it's used.", '', { en: "A check vouches for a model, where you sample, not where it's used." }, { emotion: 'confident' })], { tail: 1.0 }),
+    anim(
+      'repair',
+      'DepthWell',
+      { mode: 'repair', chip: MODEL },
+      [
+        say(0.2, 'Then I showed the AI games decided by that rule.', ''),
+        say(0, 'It still never wrote it down.', '', undefined, { emotion: 'surprised' }),
+        say(0.2, 'It writes the rules you give it.', ''),
+        say(0, "It doesn't learn the ones it only watches.", '', undefined, { emotion: 'confident' }),
+      ],
+      { min: 4.9 },
+    ),
     anim(
       'fix',
       'DepthWell',
       { mode: 'fix', chip: MODEL, chipTo: TRUTH },
-      [say(0.2, "So test where it's used,", ''), say(0, 'and put the rule in the spec.', '')],
+      [say(0.2, 'So write down the rules that matter,', ''), say(0, 'and try them where the real games happen.', '', undefined, { emotion: 'confident' })],
       { tail: 1.4 },
     ),
     outro('outro', [say(0.15, 'More at javieraguilar.ai', '', { en: 'More at javier aguilar dot A I.' })]),

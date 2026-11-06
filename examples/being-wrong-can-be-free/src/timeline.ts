@@ -5,8 +5,8 @@
 import type { Cuts } from './types.ts';
 import { L, anim, outro, say, videos } from './narrate.ts';
 
-const M1 = L('model 1 · filled disc', 'modelo 1 · disco lleno');
-const M2 = L('model 2 · no fence', 'modelo 2 · sin valla');
+const M1 = L('map 1 · solid disc', 'mapa 1 · disco lleno');
+const M2 = L('map 2 · no fence', 'mapa 2 · sin valla');
 /** Shorter hold after the last line where the next scene continues on the same map (blend). */
 const BLEND = { tail: 0.55 };
 
@@ -25,48 +25,48 @@ const build = (): Cuts => ({
       ],
       BLEND,
     ),
-    anim('setup', 'ReachMap', { mode: 'setup', chip: L('truth', 'realidad'), chipIn: true }, [
-      // Spoken comma: a breath after "spot" keeps the first caption cue under 17 chars/s with the cloned voice.
-      say(0.2, 'A robot wants a high-value spot inside a fence that stops it on contact.', '', { en: 'A robot wants a high-value spot, inside a fence that stops it on contact.' }),
+    anim('setup', 'ReachMap', { mode: 'setup', chip: L('real', 'realidad'), chipIn: true }, [
+      // 2026-11-06 everyday rewrite: treasure/map instead of high-value spot/model (Javier).
+      say(0.2, 'A robot wants a treasure inside a fence that stops it the moment it touches.', '', { en: 'A robot wants a treasure, inside a fence that stops it the moment it touches.' }),
     ], { min: 4.4, ...BLEND }),
     anim('gauge', 'ReachMap', { mode: 'gauge', chip: M1, chipIn: true }, [
-      say(0.2, 'The model wrote a filled disc.', ''),
-      say(0, 'Wrong shape, but no run from outside gets in.', ''),
+      say(0.2, "An AI drew the robot's map as a solid disc.", ''),
+      say(0, 'Wrong shape, but no test from outside can ever get in.', ''),
     ], BLEND),
     // "No test can tell." is cut (script v1.2: the next cut when the voiced video runs long; the
     // hook already says it and the overlapping trails carry it on screen).
-    anim('twin', 'ReachMap', { mode: 'twin', chip: M1, meter: { from: '0' } }, [say(0.2, 'The planner acts identically.', '')], { min: 3.4 }),
+    anim('twin', 'ReachMap', { mode: 'twin', chip: M1, meter: { from: '0' } }, [say(0.2, 'The robot moves exactly the same.', '')], { min: 3.4 }),
     anim('blind', 'ReachMap', { mode: 'blind', chip: M2, meter: { from: '0', steps: [{ to: '1.116', beat: 1, delay: 0.1 }] }, cameos: [{ pose: 'sceptical', at: [1, 'worse'], dur: 1.5 }] }, [
-      say(0.2, 'A second model omits the fence:', ''),
-      say(0, '1.116, worse than acting at random.', '', { en: 'one point one one six, worse than acting at random.' }),
+      say(0.2, 'A second map forgets the fence:', ''),
+      say(0, 'it crashes again and again, worse than moving at random.', ''),
     ], BLEND),
     anim(
       'doorFront',
       'ReachMap',
       { mode: 'doorFront', chip: M2, gap: { from: 0, to: 0.1, beat: 0, delay: 0.2 }, meter: { from: '1.116', steps: [{ to: '0.348', beat: 1, delay: 0.9 }] } },
-      [say(0.2, 'Open a door on its route.', ''), say(0, 'At a tenth of a radian, danger collapses.', '', undefined, { emotion: 'amazed' })],
+      [say(0.2, 'Open a door on its route.', ''), say(0, 'Barely wide enough, and the damage collapses.', '', undefined, { emotion: 'amazed' })],
       { min: 5.6, ...BLEND },
     ),
     anim(
       'doorWide',
       'ReachMap',
       { mode: 'doorFront', chip: M2, gap: { from: 0.1, to: 0.6, beat: 0 }, meter: { from: '0.348', steps: [{ to: '0.029', beat: 0, delay: 0.5 }] } },
-      [say(0.2, 'Wide open: 0.029.', '', { en: 'Wide open: zero point zero two nine.' })],
+      [say(0.2, 'Wide open: almost free.', '')],
       { min: 3.4, ...BLEND },
     ),
     anim(
       'doorBack',
       'ReachMap',
-      { mode: 'doorBack', chip: M2, gap: { from: 0.6, to: 0.6 }, meter: { from: '0.029', steps: [{ to: '1.116', beat: 1, roll: true }] }, cameos: [{ pose: 'amazed', at: [1, 'one'], dur: 2 }] },
+      { mode: 'doorBack', chip: M2, gap: { from: 0.6, to: 0.6 }, meter: { from: '0.029', steps: [{ to: '1.116', beat: 1, roll: true }] }, cameos: [{ pose: 'amazed', at: [1, 'random'], dur: 2 }] },
       [
-        say(0.2, 'Rotate that same door behind the goal:', ''),
-        say(0, '1.116 again.', '', { en: 'one point one one six again.' }, { emotion: 'surprised' }),
+        say(0.2, 'Turn that same door round behind the treasure:', ''),
+        say(0, 'worse than random again.', '', undefined, { emotion: 'surprised' }),
       ],
       { min: 5.4 },
     ),
     anim('split', 'ReachMap', { mode: 'split', chip: M2 }, [
       say(0.2, 'Same mistake, same shape of hole.', ''),
-      say(0, 'Only reach changed.', '', undefined, { emotion: 'confident', speed: 1.05 }),
+      say(0, "Only the robot's route changed.", '', undefined, { emotion: 'confident', speed: 1.05 }),
     ], { min: 4.4 }),
     anim(
       'torus',
@@ -78,15 +78,15 @@ const build = (): Cuts => ({
         meter: { from: '0', show: 1, steps: [{ to: '0.019', beat: 2, delay: 0.1 }, { to: '0.898', beat: 3, delay: 1.45 }] },
       },
       [
-        say(0.25, 'In 3D you can go around.', '', { en: 'In three D you can go around.' }),
-        say(0, "Route through the doughnut's hole:", '', undefined, { emotion: 'contemplative' }),
-        say(0, '0.019.', '', { en: 'zero point zero one nine.' }),
-        say(0, 'Into its tube: 0.898.', '', { en: 'Into its tube: zero point eight nine eight.' }),
+        say(0.25, 'In real space you could just go around.', ''),
+        say(0, "Fly straight through a doughnut's hole:", '', undefined, { emotion: 'contemplative' }),
+        say(0, 'almost free.', ''),
+        say(0, 'Into the dough itself: nearly as bad as random.', ''),
         say(0, 'Being on the path is what costs you.', ''),
       ],
     ),
-    anim('zoomOut', 'ReachMap', { mode: 'zoomOut', cameos: [{ pose: 'thinking', at: [0, 'model'] }] }, [
-      say(0.2, 'Does a plan cross where my model is wrong?', '', undefined, { emotion: 'curious' }),
+    anim('zoomOut', 'ReachMap', { mode: 'zoomOut', cameos: [{ pose: 'thinking', at: [0, 'map'] }] }, [
+      say(0.2, 'Does your route cross where your map is wrong?', '', undefined, { emotion: 'curious' }),
       say(0, 'That decides the cost.', '', undefined, { emotion: 'confident', speed: 1.05 }),
     ], BLEND),
     anim('newGoal', 'ReachMap', { mode: 'zoomOut', newGoal: true }, [

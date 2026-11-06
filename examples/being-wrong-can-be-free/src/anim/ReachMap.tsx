@@ -205,7 +205,7 @@ const MapSvg: React.FC<{ w: World; box: Box; id: string; t: number; labelScale?:
           )}
           {w.never.opacity > 0 && (
             <text x={0} y={-1.45} textAnchor="middle" fontFamily={fontFamily} fontWeight={700} fontSize={fs(48)} fill={C.text} opacity={w.never.opacity * (0.55 + 0.45 * w.never.breathe)}>
-              never sampled
+              nobody gets in
             </text>
           )}
 
@@ -215,7 +215,7 @@ const MapSvg: React.FC<{ w: World; box: Box; id: string; t: number; labelScale?:
               <line x1={START.x} y1={0} x2={START.x + (0 - START.x) * w.promised.draw} y2={0} stroke={C.cyan} strokeWidth={px * 6} strokeDasharray={`${px * 20} ${px * 14}`} strokeLinecap="round" />
               {w.promised.draw > 0.95 && (
                 <text x={-6.75} y={-0.7} textAnchor="middle" fontFamily={fontFamily} fontWeight={700} fontSize={fs(38)} fill={C.cyan}>
-                  promised route
+                  map says: clear
                 </text>
               )}
             </g>
@@ -272,7 +272,7 @@ const MapSvg: React.FC<{ w: World; box: Box; id: string; t: number; labelScale?:
                   fill={r.kind === 'truth' ? C.text : C.roseText}
                   opacity={r.label}
                 >
-                  {r.kind}
+                  {r.kind === 'truth' ? 'real' : 'map'}
                 </text>
               )}
             </g>
@@ -319,7 +319,7 @@ export const ReachMap: React.FC<AnimProps & ReachProps> = (p) => {
     const mapW = 600;
     const topBox: Box = { left: left + 24, top: st.top, w: mapW, h: mapH };
     const botBox: Box = { left: left + 24, top: st.top + mapH + rowH, w: mapW, h: mapH };
-    const words = ['same model', 'same mistake', 'same hole'];
+    const words = ['same map', 'same mistake', 'same hole'];
     const value = (txt: string, color: string, box: Box, lit: boolean) => (
       <div style={{ position: 'absolute', left: box.left + box.w - 10, width: W - box.w - 50, top: box.top, height: box.h, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', fontFamily }}>
         <div style={{ fontSize: 34, fontWeight: 600, color: C.muted }}>cost</div>

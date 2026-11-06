@@ -11,6 +11,8 @@ export type { StoryGateProps };
 
 // Frame-pixel layout (1080x1920), inside the vertical stage (y 236-1326).
 const BOARD = { cx: 250, cy: 565, cell: 50 };
+/** Order in which the board's pieces move (alternating sides) and the loop length, in seconds. */
+const MOVE_ORDER = [1, 6, 3, 9, 0, 7, 2, 5, 4, 8];
 const CARD = { x: 575, y: 425, w: 430, h: 280 };
 const GATE = { x: 610, y: 830, w: 360, h: 90 };
 const TREE_TOP = 995;
@@ -88,7 +90,7 @@ export const StoryGate: React.FC<AnimProps & StoryGateProps> = (p) => {
             whiteSpace: 'nowrap',
           }}
         >
-          reproducing a DeepMind result
+          a mini chess game
         </div>
       </div>
 
@@ -101,9 +103,23 @@ export const StoryGate: React.FC<AnimProps & StoryGateProps> = (p) => {
             const r = Math.floor(i / 5);
             return <rect key={i} x={bx + c * BOARD.cell} y={by + r * BOARD.cell} width={BOARD.cell} height={BOARD.cell} fill={(c + r) % 2 ? alpha(C.muted, 0.1) : alpha(C.muted, 0.2)} />;
           })}
-          {PIECES.map((pc, i) => (
-            <Glyph key={i} kind={pc.kind} side={pc.side} x={bx + (pc.start[0] + 0.5) * BOARD.cell} y={by + (pc.start[1] + 0.5) * BOARD.cell} cell={BOARD.cell} />
-          ))}
+          {PIECES.map((pc, i) => {
+            // 2026-11-06: pieces move from frame 0 (a game being played while the hook asks about
+            // watching people play): one move at a time, alternating sides, one game over the scene.
+            const k = MOVE_ORDER.indexOf(i);
+            const tt = p.t;
+            const m = Math.min(1, Math.max(0, (tt - 0.2 - k * 0.7) / 0.35));
+            const e = m * m * (3 - 2 * m);
+            const to = pc.cap ?? pc.start;
+            const x = pc.start[0] + (to[0] - pc.start[0]) * e;
+            const y = pc.start[1] + (to[1] - pc.start[1]) * e;
+            const gone = pc.cap === null ? Math.min(1, Math.max(0, (tt - 0.2 - k * 0.7) / 0.35)) : 0;
+            return (
+              <g key={i} opacity={1 - gone}>
+                <Glyph kind={pc.kind} side={pc.side} x={bx + (x + 0.5) * BOARD.cell} y={by + (y + 0.5) * BOARD.cell} cell={BOARD.cell} />
+              </g>
+            );
+          })}
         </g>
 
         {/* AI writes the rules as code. */}
@@ -163,7 +179,7 @@ export const StoryGate: React.FC<AnimProps & StoryGateProps> = (p) => {
           boxSizing: 'border-box',
         }}
       >
-        <div style={{ fontSize: 44, fontWeight: 800, color: C.text, letterSpacing: '-0.01em' }}>world model</div>
+        <div style={{ fontSize: 44, fontWeight: 800, color: C.text, letterSpacing: '-0.01em' }}>rulebook</div>
         <div style={{ height: 3, background: alpha(C.muted, 0.25), margin: '16px 0 14px' }} />
         {CODE_LINES.map((l, i) => (
           <div key={l} style={{ fontSize: 36, fontWeight: 600, color: C.accentText, lineHeight: 1.4, opacity: s.card.lines[i].opacity }}>
@@ -256,7 +272,7 @@ export const StoryGate: React.FC<AnimProps & StoryGateProps> = (p) => {
         />
       )}
       <div style={{ position: 'absolute', left: TREE_X - 200, width: 400, top: LEVEL_Y[2] + 34, textAlign: 'center', fontSize: 34, fontWeight: 700, color: C.accentText, opacity: s.tree.label.opacity }}>
-        planner plays on it
+        player plays by it
       </div>
 
       {/* The question this video answers. */}

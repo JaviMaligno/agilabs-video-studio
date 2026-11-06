@@ -196,10 +196,10 @@ const WellSvg: React.FC<{ w: World; t: number }> = ({ w, t }) => {
         <line x1={G.x0 - 24} y1={bandY} x2={G.x1 + 24} y2={bandY} stroke={C.text} strokeWidth={5} />
         <rect x={G.x0} y={bandY} width={W} height={bandH} fill={alpha(C.card, 0.9)} />
         <text x={G.x0 - 26} y={bandY - 6} textAnchor="end" fontFamily={fontFamily} fontSize={28} fontWeight={600} fill={C.muted}>
-          move limit
+          move
         </text>
         <text x={G.x0 - 26} y={bandY + 34} textAnchor="end" fontFamily={fontFamily} fontSize={40} fontWeight={800} fill={C.text}>
-          100
+          limit
         </text>
         {w.floor.truth > 0 && (
           <g opacity={w.floor.truth}>
@@ -343,15 +343,15 @@ const Overlays: React.FC<{ w: World; lang: Lang }> = ({ w }) => {
       {top.meter.opacity > 0 && (
         <div style={{ ...card, opacity: top.meter.opacity, transform: `translateY(${(1 - top.meter.opacity) * -30}px)`, padding: '18px 44px' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 36, fontWeight: 600, color: C.muted }}>win rate vs the true game</span>
+            <span style={{ fontSize: 36, fontWeight: 600, color: C.muted }}>games won</span>
             <span style={{ fontSize: 76, fontWeight: 800, lineHeight: 1, color: top.meter.rose > 0.5 ? C.roseText : C.accentText, fontVariantNumeric: 'tabular-nums' }}>{top.meter.text}</span>
           </div>
           <div style={{ position: 'relative', marginTop: 22, height: 70 }}>
             <div style={{ position: 'absolute', left: 0, right: 0, top: 6, height: 12, borderRadius: 6, background: alpha(C.muted, 0.22) }} />
-            {[0.35, 0.45, 0.55].map((v) => (
+            {[0.3, 0.55].map((v) => (
               <React.Fragment key={v}>
-                <div style={{ position: 'absolute', left: `${((v - 0.35) / 0.2) * 100}%`, top: -4, width: 4, height: 32, marginLeft: -2, background: alpha(C.text, 0.6), borderRadius: 2 }} />
-                <div style={{ position: 'absolute', left: `${((v - 0.35) / 0.2) * 100}%`, top: 32, transform: `translateX(${v === 0.35 ? '0' : v === 0.55 ? '-100%' : '-50%'})`, fontSize: 30, fontWeight: 600, color: C.muted }}>{v.toFixed(2)}</div>
+                <div style={{ position: 'absolute', left: `${((v - 0.3) / 0.25) * 100}%`, top: -4, width: 4, height: 32, marginLeft: -2, background: alpha(C.text, 0.6), borderRadius: 2 }} />
+                <div style={{ position: 'absolute', left: `${((v - 0.3) / 0.25) * 100}%`, top: 32, transform: `translateX(${v === 0.3 ? '0' : '-100%'})`, fontSize: 30, fontWeight: 600, color: C.muted }}>{v === 0.3 ? 'worse' : 'even'}</div>
               </React.Fragment>
             ))}
             <div
@@ -379,7 +379,7 @@ const Overlays: React.FC<{ w: World; lang: Lang }> = ({ w }) => {
           <div style={{ fontSize: 37, fontWeight: 700, marginTop: 4 }}>capture the enemy general → win</div>
           <div style={{ position: 'relative', marginTop: 4, height: 92 }}>
             {top.spec.typed < 1 && (
-              <div style={{ position: 'absolute', top: 6, fontSize: 38, fontWeight: 800, color: C.accentText, opacity: top.spec.extra * (1 - Math.min(1, top.spec.typed * 25)) }}>+ one extra rule</div>
+              <div style={{ position: 'absolute', top: 6, fontSize: 38, fontWeight: 800, color: C.accentText, opacity: top.spec.extra * (1 - Math.min(1, top.spec.typed * 25)) }}>+ one more rule</div>
             )}
             <SpecLines typed={top.spec.typed} strike={top.spec.strike} back={top.spec.retype} />
           </div>
@@ -444,8 +444,8 @@ const Overlays: React.FC<{ w: World; lang: Lang }> = ({ w }) => {
       {/* Top slot: accuracy where the planner goes. */}
       {top.tile.opacity > 0 && (
         <div style={{ ...card, opacity: top.tile.opacity, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: `3px solid ${alpha(C.ok, 0.6)}` }}>
-          <div style={{ fontSize: 96, fontWeight: 800, lineHeight: 1, color: C.ok, transform: `scale(${0.8 + 0.2 * top.tile.pop})` }}>≥98% right</div>
-          <div style={{ fontSize: 40, fontWeight: 600, color: C.text, marginTop: 12 }}>where the planner goes</div>
+          <div style={{ fontSize: 96, fontWeight: 800, lineHeight: 1, color: C.ok, transform: `scale(${0.8 + 0.2 * top.tile.pop})` }}>almost all right</div>
+          <div style={{ fontSize: 40, fontWeight: 600, color: C.text, marginTop: 12 }}>in real games</div>
         </div>
       )}
 
@@ -453,13 +453,13 @@ const Overlays: React.FC<{ w: World; lang: Lang }> = ({ w }) => {
       {top.code.opacity > 0 && (
         <div style={{ ...card, opacity: top.code.opacity, padding: '18px 36px', border: `3px solid ${alpha(C.accentText, 0.5)}` }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <span style={{ fontSize: 30, fontWeight: 700, color: C.muted, letterSpacing: '0.06em', textTransform: 'uppercase' }}>model code</span>
+            <span style={{ fontSize: 30, fontWeight: 700, color: C.muted, letterSpacing: '0.06em', textTransform: 'uppercase' }}>AI's rulebook</span>
             <span style={{ fontSize: 36, fontWeight: 700, color: C.text }}>
-              refinement passes: <span style={{ color: C.accentText, fontSize: 48, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{top.code.passes}</span>
+              fixes tried: <span style={{ color: C.accentText, fontSize: 48, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{top.code.passes}</span>
             </span>
           </div>
           <div style={{ marginTop: 18, height: 66, borderRadius: 12, background: alpha(C.rose, 0.3), border: `3px solid ${C.roseText}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 38, fontWeight: 800, color: C.roseText }}>
-            move 100 → draw
+            move limit → draw
           </div>
         </div>
       )}
@@ -498,8 +498,8 @@ const Overlays: React.FC<{ w: World; lang: Lang }> = ({ w }) => {
 };
 
 /** The added rule, typed in, struck out when it is left out of the spec, back in the fix. */
-const SPEC_2 = 'at move 100, both generals alive:';
-const SPEC_3 = 'more pieces wins (not a draw)';
+const SPEC_2 = 'move limit, both generals standing:';
+const SPEC_3 = 'more pieces wins';
 const SpecLines: React.FC<{ typed: number; strike: number; back: number }> = ({ typed, strike, back }) => {
   if (typed <= 0) return null;
   const total = SPEC_2.length + SPEC_3.length;
