@@ -18,9 +18,10 @@ const build = (): Cuts => ({
       { mode: 'hook', chip: M1, meter: { from: '0', show: 2 } },
       [
         // Hook as a concrete question (test 2026-11-04, after far-points; control: reel 16).
-        say(0.1, 'Can an AI-written world model get a whole region wrong,', ''),
-        say(0, 'pass every test you can write,', ''),
-        say(0, 'and cost you exactly nothing?', ''),
+        // 2026-11-06: no jargon ("world model" -> "map"), same question form; reel 16 changed alike.
+        say(0.1, 'Can a map be totally wrong,', ''),
+        say(0, 'pass every test,', ''),
+        say(0, 'and never cost you a thing?', ''),
       ],
       BLEND,
     ),

@@ -18,7 +18,8 @@ const build = (): Cuts => ({
       'DepthWell',
       { mode: 'hook' },
       [
-        say(0.1, 'An AI-written world model passed its check at 100%.', '', { en: 'An AI-written world model passed its check at a hundred percent.' }),
+        // 2026-11-06: no jargon ("world model" -> "the rules of a game"); statement form kept (control of reel 15).
+        say(0.1, 'An AI wrote the rules of a game. It passed every check.', ''),
         say(0, 'It still lost.', ''),
       ],
       { tail: 1.6 },

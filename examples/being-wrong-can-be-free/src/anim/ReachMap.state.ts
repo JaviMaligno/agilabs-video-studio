@@ -313,7 +313,7 @@ export function frameState(p: ReachProps, t: number, beats: number[], dur: numbe
   const headline =
     p.mode === 'hook'
       ? [
-          { text: 'A whole region wrong?', reveal: 1, opacity: 1 - progress(T, fit(b1, 0.3, d), 0.3) },
+          { text: 'A totally wrong map?', reveal: 1, opacity: 1 - progress(T, fit(b1, 0.3, d), 0.3) },
           { text: 'And no test catches it?', reveal: progress(T, fit(b1, 0.7, d), 0.7), opacity: 1 - progress(T, fit(b2, 0.3, d), 0.3) },
         ]
       : [];
