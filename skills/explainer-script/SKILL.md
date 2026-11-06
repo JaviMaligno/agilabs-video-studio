@@ -156,6 +156,19 @@ Read them as signals, not votes: one viewer run varies. Iterate until the viewer
 - **Real examples beat invented ones**, but pick one that reads as an error: an AI "correcting" a
   message with a true fact reads as clever unless the script says what it broke.
 
+- **Keep what is surprising, and say it early.** Find the one non-obvious result before writing
+  a line ("the big models kept the message, the small ones broke it, one by cutting the why, one
+  by losing the who"). If the cold-read viewer "saw it coming", the script lost it.
+- **Fair comparisons.** If the lineup is unbalanced (two models from one company, one from the
+  other), balance it before telling it, or the story becomes a brand fight it is not.
+- **Name the models** by their real names, and once say which is big and which is small; viewers
+  trust names and get lost in "the big one".
+- **One example, start to finish.** A second example that appears out of nowhere ("the key under
+  the flowerpot" in a video about a dinner message) loses the viewer. Totals go on screen, not in
+  the voice ("18 chains per AI" as a caption, "I ran it many times" spoken).
+- **When an AI's "fix" is factually right** (red wine has sulphites too), the script says what it
+  broke ("nobody asked it to decide, and the instruction was gone"), or viewers side with the AI.
+
 ## Script format
 
 Write `script.md` as a table, one row per narration line:

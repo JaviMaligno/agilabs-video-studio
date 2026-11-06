@@ -28,6 +28,11 @@ narration says them, 4-5 hashtags, no claims stronger than the article.
 
 ## 2. Calendar
 
+- **Never before its article.** A reel whose caption sends people to an article ("link in bio",
+  the URL on Facebook) goes out on or after the day that article is live. Check the site's publish
+  schedule, not the calendar from memory: an article that moved takes its reels with it. If the
+  article publishes the same day through a scheduled job that can run hours late, schedule the
+  reel late in the evening (it has happened that the job only ran after 18:00 UK).
 - **A new article's reel goes out the day the article does**, and its part 2 the next day (two
   reels on one day compete). The rest of the calendar runs one reel every two days at a fixed
   evening hour (18:00 local). Check the blog publish schedule and the LinkedIn schedule first: a
