@@ -43,7 +43,8 @@ when installed as a plugin; next to `skills/` in the plugin repo).
    moves. Let the person choose.
 2. **Write the script** with `explainer-script`: the narration lines (EN, ES optional), a visual
    idea per scene mapped to a library component or flagged "bespoke", and the source sentence
-   for every number.
+   for every number. Run the cold read (`reel-viewer` + `reel-expert`, see `explainer-script`)
+   and fix the script before showing it.
 3. **Overview of the route.** Show the overview (see above) and continue. When the author answers
    with changes, apply them and keep building.
 4. **Create the video folder.** Copy the template without its generated files:

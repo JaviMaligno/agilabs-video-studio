@@ -126,6 +126,36 @@ did ("I trained…", "I labelled…"), or a *reaction* at a reveal (amazed), a f
 claim (sceptical), a self-deprecating line (laughing). Vary the poses and the moments between
 videos; the same formula every time stops reading as personal.
 
+## Cold read before the author sees it
+
+Every draft and every rewrite of a script goes through two subagents in parallel before it is
+shown to the author, and the author sees the script already fixed, with a one-paragraph summary of
+what they said:
+
+- `reel-viewer`: a generic Reels viewer. Give it **only** the numbered narration with the visuals
+  in brackets. It returns its retelling, the lines it lost, the obvious questions, the line where
+  it would scroll away, whether anything surprised it, and its best line.
+- `reel-expert`: an expert in the field. Give it the script **and** a factual summary of the
+  experiment (setup, numbers, what was and was not measured). It flags only errors that change the
+  conclusion; narrative rounding is fine.
+
+Read them as signals, not votes: one viewer run varies. Iterate until the viewer stays to the end
+(or close) and names something non-obvious as its takeaway. Lessons that came out of these reads:
+
+- **A friendly hook over a technical body does not hold.** The whole video tells one everyday
+  story from hook to verdict; the real context (agents, code) can be named once.
+- **Do not simplify the finding away.** If the plain version becomes obvious ("the map had no
+  fence, so the robot hit the fence"), the script has lost what was surprising. Keep the
+  non-obvious part and put it early.
+- **Words that draw a picture beat software words**: "the rules of a game", "played games",
+  "every move matched" rather than "checks", "tests", "spec", "world model", "planner".
+- **Pace is fixed.** Voice speed is a house standard; when a script runs fast, cut words, never
+  slow the voice. Leave room for the last on-screen text of a scene to be read.
+- **Answer the obvious question in the script** (why does the robot go straight? against whom did
+  it lose?) before the viewer asks it.
+- **Real examples beat invented ones**, but pick one that reads as an error: an AI "correcting" a
+  message with a true fact reads as clever unless the script says what it broke.
+
 ## Script format
 
 Write `script.md` as a table, one row per narration line:
