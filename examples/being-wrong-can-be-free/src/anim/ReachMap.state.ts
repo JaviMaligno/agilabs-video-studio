@@ -114,7 +114,8 @@ const gapLabelAt = (angle: number): { x: number; y: number } =>
   // Clear of the rim on either side (the right side has less room before the frame edge).
   Math.cos(angle) < 0 ? { x: -6.3, y: -2.4 } : { x: 4.9, y: -3.4 };
 
-const fmtGap = (g: number, rad: boolean) => `γ = ${(Math.round(g * 10) / 10).toFixed(1)}${rad ? ' rad' : ''}`;
+// 2026-11-06 everyday labels instead of γ in radians.
+const fmtGap = (g: number, _rad: boolean) => (g < 0.05 ? 'closed' : g < 0.35 ? 'just fits' : 'wide open');
 
 /** Gap ring path (world units, centred on the star): annulus minus a wedge of `gap` radians at `angle`. */
 export function annulusPath(ri: number, ro: number, angle: number, gap: number): string {
@@ -313,7 +314,7 @@ export function frameState(p: ReachProps, t: number, beats: number[], dur: numbe
   const headline =
     p.mode === 'hook'
       ? [
-          { text: 'A whole region wrong?', reveal: 1, opacity: 1 - progress(T, fit(b1, 0.3, d), 0.3) },
+          { text: 'A totally wrong map?', reveal: 1, opacity: 1 - progress(T, fit(b1, 0.3, d), 0.3) },
           { text: 'And no test catches it?', reveal: progress(T, fit(b1, 0.7, d), 0.7), opacity: 1 - progress(T, fit(b2, 0.3, d), 0.3) },
         ]
       : [];

@@ -205,7 +205,7 @@ const base = (): World => ({
 });
 
 /** Win-rate HUD: needle position on a 0.35..0.55 scale. */
-export const meterPos = (v: number): number => clamp01((v - 0.35) / 0.2);
+export const meterPos = (v: number): number => clamp01((v - 0.3) / 0.25);
 
 const floorOf = (p: DepthProps, mode: Mode): FloorKind =>
   p.floor ?? (mode === 'gate' || mode === 'rule' || mode === 'ruleCap' ? 'none' : mode === 'random' || mode === 'competent' ? 'truth' : 'model');
@@ -229,7 +229,7 @@ function world(p: DepthProps, mode: Mode, T: number, beats: number[], d: number)
       // Cold open (2026-11-02): the frame-0 thumbnail is the striking state — rays well under way and
       // the CHECK PASSED stamp already landed — so the stamp no longer waits for "100%".
       w.rays = raysOf(MISSED, T + 1.6, 0, 0.07, Math.min(d, Math.max(3.4, b1)), true);
-      w.stamp = { text: 'CHECK PASSED · 100%', sub: '', pop: 1, opacity: 1, tone: 'ok' };
+      w.stamp = { text: 'TEST PASSED', sub: '', pop: 1, opacity: 1, tone: 'ok' };
       // The glow starts pouring just before "It still lost" and reaches the floor on "lost": the
       // floor flushes red and the needle drops to 0.404 on that word, then holds.
       const pourAt = fit(b1 - 0.3, 1.4, d);
@@ -244,8 +244,8 @@ function world(p: DepthProps, mode: Mode, T: number, beats: number[], d: number)
       const dp = easeInOut(progress(T, dropAt, 0.5));
       w.top.meter = {
         opacity: progress(T, showAt, 0.35),
-        text: dp >= 0.5 ? '0.404' : '0.495',
-        needle: meterPos(lerp(0.495, 0.404, dp)),
+        text: dp >= 0.5 ? '1 in 3' : '1 in 2',
+        needle: meterPos(lerp(0.495, 0.345, dp)),
         rose: dp,
       };
       break;
@@ -254,7 +254,7 @@ function world(p: DepthProps, mode: Mode, T: number, beats: number[], d: number)
       const missed = p.sample === 'missed';
       const set = missed ? MISSED : RANDOM;
       w.rays = raysOf(set, T, b0 + 0.15, 0.085, d, true);
-      const st = p.stamp ?? { text: 'GATE · 100%' };
+      const st = p.stamp ?? { text: 'CHECK PASSED' };
       const at = fit(beatAt(beats, st.beat ?? 1) + (st.delay ?? 1.0), 0.45, d);
       w.stamp = { text: st.text, sub: st.sub ?? '', pop: easeOutCubic(progress(T, at, 0.35)), opacity: progress(T, at, 0.12), tone: 'ok' };
       const in0 = Math.max(b0, missed ? AFTER_BLEND : 0);
@@ -348,8 +348,8 @@ function world(p: DepthProps, mode: Mode, T: number, beats: number[], d: number)
         };
       });
       w.top.code.passes = passes;
-      w.marks.push({ id: 'tagData', text: 'rule in the data ✓', x: 540, y: depthY(30), size: 46, tone: 'ok', opacity: progress(T, fit(s0 + 5 * 0.3 + 0.62, 0.3, d), 0.3) });
-      w.marks.push({ id: 'tagCode', text: 'rule in the code ✗', x: 540, y: depthY(48), size: 46, tone: 'rose', opacity: progress(T, fit(s0 + 5 * 0.3 + 0.95, 0.3, d), 0.3) });
+      w.marks.push({ id: 'tagData', text: 'rule in the examples ✓', x: 540, y: depthY(30), size: 46, tone: 'ok', opacity: progress(T, fit(s0 + 5 * 0.3 + 0.62, 0.3, d), 0.3) });
+      w.marks.push({ id: 'tagCode', text: 'rule in the rulebook ✗', x: 540, y: depthY(48), size: 46, tone: 'rose', opacity: progress(T, fit(s0 + 5 * 0.3 + 0.95, 0.3, d), 0.3) });
       break;
     }
     case 'lesson': {
@@ -358,7 +358,7 @@ function world(p: DepthProps, mode: Mode, T: number, beats: number[], d: number)
       w.floor.squares = w.floor.squares.map(() => 1);
       w.bands.sample = progress(T, fit(b0 + 1.3, 0.5, d), 0.5);
       w.bands.used = progress(T, fit(b0 + 3.0, 0.5, d), 0.5);
-      w.marks.push({ id: 'sample', text: 'where you ', accent: 'sample', x: 540, y: depthY(26), size: 58, tone: 'text', opacity: w.bands.sample });
+      w.marks.push({ id: 'sample', text: 'where you ', accent: 'test', x: 540, y: depthY(26), size: 58, tone: 'text', opacity: w.bands.sample });
       w.marks.push({ id: 'used', text: "where it's ", accent: 'used', x: 540, y: G.floor - 60, size: 58, tone: 'text', opacity: w.bands.used });
       break;
     }

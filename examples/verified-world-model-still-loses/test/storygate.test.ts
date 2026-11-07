@@ -28,23 +28,18 @@ test('StoryGate is total over [0, sceneEnd]', () => {
   }
 });
 
-test('StoryGate: nothing before its beats, everything by the end', () => {
+test('StoryGate: board on screen from frame 0 (cold open), player tree on beat 2, no check gate', () => {
   const beats = [0.2, 6.5, 10];
   const early = frameState({}, 0, beats, 13);
-  assert.equal(early.board.opacity, 0);
-  assert.equal(early.card.opacity, 0);
-  // The check and the question wait for their own lines.
+  assert.equal(early.board.opacity, 1);
+  assert.equal(early.chip.opacity, 1);
   const mid = frameState({}, 6, beats, 13);
   assert.equal(mid.card.opacity, 1);
-  assert.equal(mid.gate.opacity, 0);
-  assert.equal(mid.question.pop, 0);
-  const beforeQ = frameState({}, 9.9, beats, 13);
-  assert.equal(beforeQ.gate.tick.pop, 1);
-  assert.equal(beforeQ.question.pop, 0);
+  assert.ok(mid.tree.nodes.every((n) => n.pop === 0));
   for (const { beats: b, dur } of SCENARIOS) {
     const end = frameState({}, dur, b, dur);
-    assert.equal(end.question.pop, 1);
-    assert.equal(end.gate.tick.pop, 1);
+    assert.equal(end.question.pop, 0);
+    assert.equal(end.gate.opacity, 0);
     assert.ok(end.tree.nodes.every((n) => n.pop === 1));
     assert.ok(end.card.lines.every((l) => l.opacity === 1));
   }

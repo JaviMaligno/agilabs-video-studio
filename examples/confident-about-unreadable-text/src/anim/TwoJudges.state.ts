@@ -15,8 +15,8 @@ export type TwoJudgesProps = { mode: TwoJudgesMode };
 /** Inter-judge agreement (Cohen's kappa), as written in the article's figure. */
 export const KAPPA = [
   { model: ['GPT-5'], plain: 1.0, cipher: 0.35, plainText: '1.00', cipherText: '0.35' },
-  { model: ['Qwen-7B', 'Instruct'], plain: 0.66, cipher: -0.17, plainText: '0.66', cipherText: '−0.17' },
-  { model: ['Qwen-7B', 'Base'], plain: 0.74, cipher: -0.05, plainText: '0.74', cipherText: '−0.05' },
+  { model: ['small AI 1'], plain: 0.66, cipher: -0.17, plainText: '0.66', cipherText: '−0.17' },
+  { model: ['small AI 2'], plain: 0.74, cipher: -0.05, plainText: '0.74', cipherText: '−0.05' },
 ] as const;
 
 export type AgreeState = {

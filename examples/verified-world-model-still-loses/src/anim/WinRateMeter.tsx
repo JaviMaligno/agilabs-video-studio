@@ -23,8 +23,7 @@ export const WinRateMeter: React.FC<AnimProps & WinRateProps> = (p) => {
   return (
     <div style={{ position: 'absolute', inset: 0, fontFamily, color: C.text }}>
       <div style={{ position: 'absolute', left: 0, right: 0, top: 268, textAlign: 'center', opacity: s.axis }}>
-        <div style={{ fontSize: 50, fontWeight: 800 }}>win rate vs the true game</div>
-        <div style={{ fontSize: 34, fontWeight: 600, color: C.muted, marginTop: 6 }}>at play · dot = win rate · bar = 95% interval</div>
+        <div style={{ fontSize: 50, fontWeight: 800 }}>games won</div>
       </div>
       <svg width={1080} height={1920} viewBox="0 0 1080 1920" style={{ position: 'absolute', inset: 0 }}>
         {/* Axis. */}
@@ -35,7 +34,7 @@ export const WinRateMeter: React.FC<AnimProps & WinRateProps> = (p) => {
               <line x1={xOf(axisPos(v))} y1={AXIS_Y} x2={xOf(axisPos(v))} y2={AXIS_Y + 16} stroke={alpha(C.text, 0.7)} strokeWidth={4} />
               <line x1={xOf(axisPos(v))} y1={430} x2={xOf(axisPos(v))} y2={AXIS_Y} stroke={alpha(C.muted, 0.12)} strokeWidth={2} />
               <text x={xOf(axisPos(v))} y={AXIS_Y + 58} textAnchor="middle" fontFamily={fontFamily} fontSize={36} fontWeight={600} fill={C.muted}>
-                {v.toFixed(2)}
+                {`${Math.round(v * 100)}%`}
               </text>
             </g>
           ))}
@@ -97,15 +96,11 @@ export const WinRateMeter: React.FC<AnimProps & WinRateProps> = (p) => {
           textShadow: `0 0 14px ${C.bg0}`,
         }}
       >
-        play cost {s.gap.text}
+        {s.gap.text}
       </div>
       {/* Footnote. */}
       <div style={{ position: 'absolute', left: 60, right: 60, top: 1110, textAlign: 'center', opacity: s.footnote, fontSize: 31, fontWeight: 500, color: C.muted, lineHeight: 1.4 }}>
-        95% intervals don’t overlap · draws count as half a win
-        <br />
-        0.404: hand-written stand-in; the real synthesis
-        <br />
-        pipeline lost more (0.345)
+        share of games won · draws count as half
       </div>
     </div>
   );

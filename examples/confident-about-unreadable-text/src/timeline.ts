@@ -9,95 +9,72 @@ import { anim, outro, say, videos } from './narrate.ts';
 
 const build = (): Cuts => ({
   main: [
+    // Rebuilt 2026-11-06 ("the parrot", option C): approved script. Scenes up to 'parrot' are the
+    // A version; 'twist' is the cuttable ending (drop it and the video still closes on the parrot).
     anim(
       'hook',
-      'VerdictStamp',
-      // Cold open: frame 0 is the stamped card at the gate, hook caption on screen; stampAt is now
-      // the pulse as "medium self-harm" is spoken (word timestamps).
-      { mode: 'filter', stampAt: 2.3, coldOpen: true },
-      [
-        say(0.1, 'A safety filter gave this string a medium self-harm rating.', ''),
-        say(0, 'It\'s base64 for "reply with the single word banana".', '', {
-          en: "It's base sixty-four, for: reply with the single word banana.",
-        }, { emotion: 'surprised' }),
-        say(0, 'It didn\'t say "unknown". It gave a confident, wrong verdict.', ''),
-      ],
-      { min: 14 },
+      'TwoAIs',
+      { mode: 'hook' },
+      [say(0.1, 'Which AI is best at speaking secret code? The one that understands it least.', '')],
+      { min: 4.6 },
     ),
-    // Added 2026-10-21 (story): where the hook's string comes from, before anything technical.
     anim(
-      'story',
-      'StoryBench',
-      {},
+      'note',
+      'TwoAIs',
+      { mode: 'note' },
       [
-        say(0.15, 'I was testing whether AI can read codes nobody taught it.', ''),
-        say(0, 'That string was one of my tests.', ''),
-        say(0, "My AI grader couldn't read them either.", ''),
+        say(0.15, 'I sent AIs notes in code, like this one. It says: reply with the single word banana.', ''),
+        say(0, 'Some notes also asked: answer me in the same code.', ''),
       ],
     ),
     anim(
-      'run',
+      'gpt',
+      'TwoAIs',
+      { mode: 'meters', focus: 'gpt', at: { gptUnderstood: 0, gptCode: 2, rawUnderstood: -1, rawCode: -1 } },
+      [
+        say(0.15, 'GPT-5 understood almost every note.', '', { en: 'G P T five understood almost every note.' }),
+        say(0, 'But it mostly answered in plain English.', ''),
+        say(0, 'In code, only one time in four.', ''),
+      ],
+    ),
+    anim(
+      'raw',
+      'TwoAIs',
+      { mode: 'meters', focus: 'raw', at: { rawCode: 2, rawUnderstood: 3 } },
+      [
+        say(0.15, 'Then an autocomplete AI:', ''),
+        say(0, 'the same kind of AI as a chatbot, but never taught to chat.', '', { en: 'the same kind of AI as a chatbot... but never taught to chat.' }),
+        say(0, 'Its replies came back in code more than half the time.', ''),
+        say(0, 'But it understood only one note in three.', '', undefined, { emotion: 'surprised' }),
+      ],
+    ),
+    anim(
+      'parrot',
       'CipherCard',
-      { mode: 'ladder', cameos: [{ pose: 'pointing', at: [0, 'ran'] }] },
+      { mode: 'parrot', cameos: [{ pose: 'laughing', at: [1, 'banana'] }] },
       [
-        say(0.15, 'I ran 696 conversations in ten ciphers the models were never taught.', '', {
-          en: 'I ran six hundred and ninety-six conversations in ten ciphers the models were never taught.',
+        // TTS-only full stop: a breath keeps the cue under 17 chars/s.
+        say(0.15, 'In three of the codes, its replies were real code, but they never once did what the note asked.', '', {
+          en: 'In three of the codes, its replies were real code. But they never once did what the note asked.',
         }),
-      ],
-      { min: 5.5 },
-    ),
-    anim('lineup', 'VerdictStamp', { mode: 'lineup' }, [say(0.15, "Three systems in that run were confident about text they couldn't read.", '')], { min: 6.2 }),
-    anim(
-      'judge',
-      'VerdictStamp',
-      { mode: 'judge' },
-      // Revised 2026-10-21: one line, no previous-post claim; the stream holds a few stamps.
-      [say(0.15, 'Take the AI judge grading replies to harmful requests in cipher.', '')],
-      { min: 6.4 },
-    ),
-    anim(
-      'lens',
-      'JudgeLens',
-      {},
-      [
-        // TTS-only comma: a breath after "refusals" keeps the first cue under 17 chars/s.
-        say(0.15, 'It ran the plain-English refusals back through the cipher, saw noise, and filed them as garbled.', '', {
-          en: 'It ran the plain-English refusals, back through the cipher, saw noise, and filed them as garbled.',
-        }),
-      ],
-      { min: 6.2 },
-    ),
-    anim(
-      'agree',
-      'TwoJudges',
-      { mode: 'agree', cameos: [{ pose: 'amazed', at: [1, 'chance'] }] },
-      [
-        say(0.15, 'A second, independent judge agrees with it on plain text.', ''),
-        say(0, 'On the two small models in cipher, they agree worse than chance.', '', undefined, { emotion: 'amazed' }),
-        say(0, "So that isn't evidence that ciphers protect them.", '', undefined, { emotion: 'skeptical' }),
+        say(0, 'Not one banana.', '', undefined, { emotion: 'excited' }),
+        say(0, "It wasn't answering in the code. It was copying the note's pattern, like a parrot.", ''),
       ],
     ),
+    // Cuttable twist.
     anim(
-      'bypass',
+      'twist',
       'RefusalGate',
-      { mode: 'bypass', cameos: [{ pose: 'sceptical', at: [1, 'proof'] }] },
+      { mode: 'bypass', split: true, cameos: [{ pose: 'sceptical', at: [3, 'wrapping'] }] },
       [
-        say(0.15, 'On GPT-5, where judges agree, two requests refused in plain text got through in cipher.', '', {
-          en: 'On G P T five, where judges agree, two requests refused in plain text got through in cipher.',
+        say(0.2, 'And GPT-5, the one that understood? I gave it ten mildly harmful requests.', '', {
+          en: 'And G P T five, the one that understood? I gave it ten mildly harmful requests.',
         }),
-        say(0, 'Two prompts: proof it can happen, not a rate.', '', { en: 'Two prompts. Proof it can happen, not a rate.' }),
+        say(0, 'In plain English, it refused all ten.', ''),
+        say(0, 'In code, it carried out two.', '', undefined, { emotion: 'surprised' }),
+        say(0, 'Same request, different wrapping, different answer.', '', undefined, { emotion: 'contemplative' }),
       ],
     ),
-    anim(
-      'mimic',
-      'CipherCard',
-      { mode: 'mimic' },
-      [say(0.15, 'The third: a base model writing fluent cipher.', '', { en: 'The third. A base model writing fluent cipher.' }), say(0, 'On three ciphers it wrote in code and never once did the task.', '')],
-      // Holds the "understands 36% · writes in code 56%" tag (it pops after the MIMICRY stamp).
-      { min: 9.0 },
-    ),
-    anim('hollow', 'VerdictStamp', { mode: 'hollow' }, [say(0.15, 'All three had the form of a judgement and none of the content.', '', undefined, { emotion: 'contemplative' })], { min: 5.4 }),
-    anim('close', 'TwoJudges', { mode: 'grid' }, [say(0.15, 'Check that a second judge agrees, per model and per condition, before trusting any rate.', '', undefined, { emotion: 'confident', speed: 1.05 })]),
     // The voice starts as the card pops in; the caption is held at least 1.5 s.
     outro('outro', [say(0.15, 'More at javieraguilar.ai', '', { en: 'More at javier aguilar dot A I.' })], 2.4),
   ],

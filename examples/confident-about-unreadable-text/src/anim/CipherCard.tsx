@@ -1,11 +1,12 @@
 import React from 'react';
+import { Img, staticFile } from 'remotion';
 import { C, alpha } from '../brand.ts';
 import type { AnimProps } from './types.ts';
-import { frameState, MIMIC_ROWS, type CipherProps, type LadderState, type MimicState, type VideoCipherData } from './CipherCard.state.ts';
+import { frameState, MIMIC_ROWS, type CipherProps, type LadderState, type MimicState, type ParrotState, type VideoCipherData } from './CipherCard.state.ts';
 import { Stage, gradientText, stageOf } from './Stage.tsx';
 import { Card, Chip, GlyphLine, Pill } from './pieces.tsx';
 import { clip } from './glyphs.ts';
-import { Stamp } from './stampPieces.tsx';
+import { Banana, Stamp } from './stampPieces.tsx';
 import ciphers from '../data/ciphers.json';
 
 export { frameState };
@@ -157,6 +158,54 @@ const Mimic: React.FC<{ s: MimicState; W: number }> = ({ s, W }) => {
   );
 };
 
+const Parrot: React.FC<{ s: ParrotState; W: number }> = ({ s, W }) => (
+  <>
+    <div style={{ position: 'absolute', inset: 0, opacity: 1 - 0.85 * s.dim }}>
+      <div style={{ position: 'absolute', left: 0, top: 0, width: W, textAlign: 'center', fontSize: 36, fontWeight: 800, color: C.muted, opacity: s.rows[0].appear }}>the autocomplete AI, in three codes</div>
+      {MIMIC_ROWS.map((r, i) => {
+        const x = s.rows[i];
+        return (
+          <div key={r.key} style={{ position: 'absolute', left: 0, top: 70 + i * 225, opacity: x.appear, transform: `translateX(${(1 - x.appear) * 60}px)` }}>
+            <Card w={W} h={205} style={{ flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', padding: '0 26px', boxSizing: 'border-box', gap: 12 }}>
+              <div style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 36, fontWeight: 800, color: C.accentText }}>{r.name}</span>
+                <span style={{ display: 'flex', gap: 14 }}>
+                  <span style={{ opacity: x.tick, transform: `scale(${0.7 + 0.3 * x.tick})` }}>
+                    <Pill size={28}>real code ✓</Pill>
+                  </span>
+                  <span style={{ opacity: x.zero, transform: `scale(${0.7 + 0.3 * x.zero})` }}>
+                    <Pill size={28} outline>
+                      did what it asked: 0
+                    </Pill>
+                  </span>
+                </span>
+              </div>
+              <div style={{ fontSize: 34, fontWeight: 600, whiteSpace: 'pre', color: alpha(C.text, 0.85) }}>{clip(DATA.mimic[r.key] ?? '', 40)}</div>
+            </Card>
+          </div>
+        );
+      })}
+    </div>
+    {/* not one banana */}
+    <div style={{ position: 'absolute', left: W / 2 - 160, top: 720, width: 320, height: 260, opacity: s.banana.pop * (1 - s.dim), transform: `scale(${0.5 + 0.5 * s.banana.pop})` }}>
+      <div style={{ opacity: 0.35 }}>
+        <Banana size={300} />
+      </div>
+      <svg width={320} height={260} style={{ position: 'absolute', left: 0, top: 0 }}>
+        <path d={`M40 30 L ${40 + 240 * s.banana.cross} ${30 + 200 * s.banana.cross}`} stroke="#fb7185" strokeWidth={22} strokeLinecap="round" />
+        <path d={`M280 30 L ${280 - 240 * s.banana.cross} ${30 + 200 * s.banana.cross}`} stroke="#fb7185" strokeWidth={22} strokeLinecap="round" />
+      </svg>
+    </div>
+    {/* the parrot */}
+    <div style={{ position: 'absolute', left: W / 2 - 380, top: 60, width: 760, height: 760, opacity: s.parrot.pop, transform: `scale(${0.6 + 0.4 * s.parrot.pop}) rotate(${(1 - s.parrot.pop) * -12}deg)` }}>
+      <Img src={staticFile('cast/parrot.png')} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+    </div>
+    <div style={{ position: 'absolute', left: 0, width: W, top: 860, textAlign: 'center', fontSize: 66, fontWeight: 800, opacity: s.parrot.pop, ...gradientText }}>
+      copying the pattern
+    </div>
+  </>
+);
+
 export const CipherCard: React.FC<AnimProps & CipherProps> = ({ t, beats, dur, vertical, ...props }) => {
   const s = frameState(props, t, beats, dur, DATA);
   const { w: W, h: H } = stageOf(vertical);
@@ -164,6 +213,7 @@ export const CipherCard: React.FC<AnimProps & CipherProps> = ({ t, beats, dur, v
     <Stage vertical={vertical} fill>
       {s.mode === 'ladder' && <Ladder s={s} W={W} H={H} />}
       {s.mode === 'mimic' && <Mimic s={s} W={W} />}
+      {s.mode === 'parrot' && <Parrot s={s} W={W} />}
     </Stage>
   );
 };

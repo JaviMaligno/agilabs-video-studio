@@ -180,7 +180,7 @@ export const TorusStage: React.FC<AnimProps & TorusProps> = (p) => {
       {/* Pose labels. */}
       {[
         { text: 'through the hole', o: s.labels.thread, color: C.accentText },
-        { text: 'into the tube', o: s.labels.tube, color: C.roseText },
+        { text: 'into the dough', o: s.labels.tube, color: C.roseText },
       ].map((l) =>
         l.o > 0 ? (
           <div key={l.text} style={{ position: 'absolute', left: 0, right: 0, top: mapTop + 16, display: 'flex', justifyContent: 'center', opacity: l.o }}>

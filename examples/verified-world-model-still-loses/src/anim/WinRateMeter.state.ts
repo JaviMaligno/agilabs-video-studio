@@ -6,11 +6,11 @@ import { beatAt, easeOutCubic, fit, progress, sceneTime } from './steps.ts';
 export type Row = { id: 'fair' | 'model'; label: string; value: number; text: string; lo: number; hi: number };
 
 export const ROWS: Row[] = [
-  { id: 'fair', label: 'fair baseline', value: 0.495, text: '0.495', lo: 0.475, hi: 0.515 },
-  { id: 'model', label: 'this model', value: 0.404, text: '0.404', lo: 0.384, hi: 0.424 },
+  { id: 'fair', label: 'fair match', value: 0.495, text: '1 in 2', lo: 0.475, hi: 0.515 },
+  { id: 'model', label: "AI's rulebook", value: 0.345, text: '1 in 3', lo: 0.325, hi: 0.365 },
 ];
-export const AXIS = { min: 0.35, max: 0.55, ticks: [0.35, 0.4, 0.45, 0.5, 0.55] } as const;
-export const GAP_TEXT = '0.091';
+export const AXIS = { min: 0.3, max: 0.55, ticks: [0.3, 0.4, 0.5] } as const;
+export const GAP_TEXT = '';
 
 export type WinRateProps = {
   /** Seconds after each row's beat at which it lands (the number is spoken near the line end). */

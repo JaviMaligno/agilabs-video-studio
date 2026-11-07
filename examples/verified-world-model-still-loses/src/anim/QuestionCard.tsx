@@ -73,7 +73,7 @@ export const QuestionCard: React.FC<AnimProps & QuestionCardProps> = (p) => {
         >
           good enough
           <br />
-          to plan with<span style={{ color: C.accentText, display: 'inline-block', transform: `scale(${1 + 0.12 * s.pulse})` }}>?</span>
+          to play with<span style={{ color: C.accentText, display: 'inline-block', transform: `scale(${1 + 0.12 * s.pulse})` }}>?</span>
         </div>
       </div>
 

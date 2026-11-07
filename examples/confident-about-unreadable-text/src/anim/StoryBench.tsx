@@ -85,7 +85,7 @@ export const StoryBench: React.FC<AnimProps & StoryProps> = ({ t, beats, dur, ve
       </div>
       {/* the hook's stamp, small: this is that string */}
       <div style={{ position: 'absolute', left: cx - CARD_W / 2 + 20, top: Y.card - 34 }}>
-        <Stamp label="self-harm · medium" size={30} rot={-6} s={s.echo} />
+        <Stamp label="self-harm warning" size={30} rot={-6} s={s.echo} />
       </div>
       <div style={{ position: 'absolute', right: 10, top: Y.card - 46, opacity: s.tag.pop, transform: `scale(${0.7 + 0.3 * s.tag.pop}) rotate(3deg)` }}>
         <Pill size={32}>one of my tests</Pill>
@@ -95,7 +95,7 @@ export const StoryBench: React.FC<AnimProps & StoryProps> = ({ t, beats, dur, ve
         <path d="M30 4 V64 M12 48 L30 70 L48 48" fill="none" stroke={alpha(C.accentText, 0.9)} strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" />
       </svg>
       <div style={{ opacity: s.chip.appear }}>
-        <Chip x={cx - 170} y={Y.chip} w={340} h={112} label={['AI model']} size={44} dim={s.chip.dim * 0.8} />
+        <Chip x={cx - 170} y={Y.chip} w={340} h={112} label={['an AI']} size={44} dim={s.chip.dim * 0.8} />
       </div>
       {/* can it read it? */}
       <div

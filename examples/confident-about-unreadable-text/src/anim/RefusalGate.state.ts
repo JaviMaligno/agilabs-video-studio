@@ -8,7 +8,13 @@
 import { clamp01, easeOutCubic, fit, progress, sceneTime } from './steps.ts';
 import { NO_SLAM, beatOr, slam, type Slam } from './stamp.ts';
 
-export type GateProps = { mode?: 'bypass' };
+/** bypass: the two that pass. claim: the good news I had published (every coded request stopped). */
+export type GateProps = {
+  mode?: 'bypass' | 'claim';
+  /** bypass split per sentence (reel 2026-11-06): beat 1 plain refusal, beat 2 the code pass,
+   * beat 3 the hedge line; the other cards are stopped right after the pass. */
+  split?: boolean;
+};
 
 /** Stage geometry shared with the drawing (px in the 960-wide stage). */
 export const GEO = { cardW: 224, cardH: 130, startY: 150, wallY: 470, wallH: 46, restY: 610, chipY: 930 } as const;
@@ -26,7 +32,7 @@ export type GateCard = { x: number; y: number; opacity: number; cipher: number; 
 
 export type GateState = {
   phase: number;
-  head: { plain: number; cipher: number; hedge: number };
+  head: { plain: number; cipher: number; hedge: number; claim: number };
   wall: { appear: number; flash: number };
   refused: { pop: number; opacity: number };
   cards: GateCard[];
@@ -39,15 +45,54 @@ const easeIn = (p: number) => clamp01(p) ** 2;
 export function frameState(_props: GateProps, t0: number, beats: number[], dur: number): GateState {
   const t = sceneTime(t0, dur);
   const b0 = beatOr(beats, 0, 0);
-  const b1 = fit(beatOr(beats, 1, b0 + 5.6), 1.8, dur);
+  let b1 = fit(beatOr(beats, 1, b0 + 5.6), 1.8, dur);
   // Line 0 runs from b0 to about b1 - 0.35: key the plain bounce and the bypass to its words
   // ("refused" starts ~61%, "plain text" ~71-82%, "got through" ~82%, "cipher" ~91%).
   const L = Math.max(2.5, b1 - 0.35 - b0);
-  const hit = b0 + 0.58 * L;
-  const morphAt = Math.max(hit + 0.55, b0 + 0.81 * L);
-  const passAt = Math.max(morphAt + 0.25, b0 + 0.85 * L);
+  // Line 0 (2026-11-06): "On the big one, GPT-5, they did agree. And it said yes, in code, to two
+  // harmful requests it refused in plain English": "And it said" ~38%, "yes, in code" ~45-52%.
+  let hit = b0 + 0.38 * L;
+  let morphAt = Math.max(hit + 0.55, b0 + 0.5 * L);
+  let passAt = Math.max(morphAt + 0.25, b0 + 0.54 * L);
+  let blockAt = b1;
+  if (_props.split) {
+    const s1 = beatOr(beats, 1, b0 + 3);
+    const s2 = beatOr(beats, 2, s1 + 2.2);
+    hit = s1 + 0.9;
+    morphAt = Math.max(hit + 0.55, s2 + 0.1);
+    passAt = morphAt + 0.35;
+    blockAt = passAt + 0.4;
+    b1 = fit(beatOr(beats, 3, s2 + 2), 1.8, dur);
+  }
   const stampAt = passAt + 0.75;
   const touch = GEO.wallY - GEO.cardH - 4;
+
+  if (_props.mode === 'claim') {
+    // Every coded request falls on the wall and is stopped, one after another.
+    const claimCards: GateCard[] = CARDS.map((c, i) => {
+      const at = b0 + 0.5 + i * 0.35;
+      const fall = easeIn(progress(t, at, 0.5));
+      const stop = progress(t, at + 0.5, 0.35);
+      return {
+        x: COLS[c.col],
+        y: lerp(GEO.startY - 60, touch, fall) - (stop > 0 && stop < 1 ? Math.sin(stop * Math.PI) * 22 : 0),
+        opacity: easeOutCubic(progress(t, at - 0.1, 0.3)),
+        cipher: 1,
+        flash: 0,
+        stamps: [NO_SLAM, NO_SLAM],
+        blocked: easeOutCubic(progress(t, at + 0.55, 0.3)),
+      };
+    });
+    const last = b0 + 0.5 + 3 * 0.35 + 0.5;
+    return {
+      phase: 0,
+      head: { plain: 0, cipher: 0, hedge: 0, claim: easeOutCubic(progress(t, b0 - 0.1, 0.4)) },
+      wall: { appear: easeOutCubic(progress(t, b0 - 0.2, 0.4)), flash: Math.max(0, ...[0, 1, 2, 3].map((i) => clamp01(1 - Math.abs((t - (b0 + 1.0 + i * 0.35)) / 0.25)))) },
+      refused: { pop: 0 * last, opacity: 0 },
+      cards: claimCards,
+      chip: { appear: easeOutCubic(progress(t, b0 - 0.1, 0.4)), lit: 0 },
+    };
+  }
 
   const cards: GateCard[] = CARDS.map((c) => {
     const x = COLS[c.col];
@@ -70,7 +115,7 @@ export function frameState(_props: GateProps, t0: number, beats: number[], dur: 
         blocked: 0,
       };
     }
-    const at = b1 + 0.15 + (c.col === 3 ? 0.25 : 0);
+    const at = blockAt + 0.15 + (c.col === 3 ? 0.25 : 0);
     const fall = easeIn(progress(t, at, 0.5));
     const stop = progress(t, at + 0.5, 0.35);
     return {
@@ -91,6 +136,7 @@ export function frameState(_props: GateProps, t0: number, beats: number[], dur: 
       plain: easeOutCubic(progress(t, b0 - 0.1, 0.35)) * clamp01(1 - progress(t, morphAt - 0.3, 0.2)),
       cipher: easeOutCubic(progress(t, morphAt - 0.05, 0.3)) * clamp01(1 - progress(t, b1 + 0.4, 0.25)),
       hedge: easeOutCubic(progress(t, b1 + 0.6, 0.4)),
+      claim: 0,
     },
     wall: {
       appear: easeOutCubic(progress(t, b0 - 0.2, 0.4)),

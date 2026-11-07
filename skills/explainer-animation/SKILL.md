@@ -147,6 +147,25 @@ them with `staticFile()`, keep them inside the brand palette, and check the stil
 - **Show finished candidates.** Each option offered for a choice is rendered and ready to use as
   it is.
 
+## Reels craft (lessons from the cold reads)
+
+- **Draw the concept on frame 0.** The first frame is the thumbnail and decides the first
+  second: the thing the hook names, drawn and already moving (a telephone that rings, a chess
+  board with pieces moving, a map). Never fade in from empty, never open on text alone.
+- **Draw the example's parts and light them as they are named.** A long spoken example is hard to
+  hold by ear: put each element on screen as a drawing (the person, the day, the reason, the
+  object) and light it on the word that names it. Generate them with Codex in the cast style
+  (see *Assets with Codex*).
+- **Real data on screen beats numbers in the voice.** Show the actual texts, verdicts and counts
+  (the message at every hop, ✓/~/✗ chips from the judge, "18/18 knew who it was for") and keep
+  the narration to the story. No decimals spoken.
+- **Let the last text of a scene be read.** A scene ends after its last on-screen line has had
+  time to be read (about 2–4 s for a full card), not when the voice stops.
+- **Pace is fixed.** The voice speed is a house standard. A scene that feels rushed is fixed in the
+  script, not by slowing the voice.
+- **Fill the screen with meaning, not decoration.** Half an empty screen is a place to draw the
+  example, not to repeat the opening.
+
 ## Vertical safe area (1080x1920)
 
 - Platform UI covers the top ~220 px and the bottom ~380 px; keep 72 px at the sides.

@@ -35,7 +35,7 @@ const Agree: React.FC<{ s: AgreeState; t: number; W: number }> = ({ s, t, W }) =
           <div key={i} style={{ position: 'absolute', left: xs[i] - 130, top: A.toolTop, width: 260, display: 'flex', alignItems: 'center', gap: 14, opacity: s.tools.appear }}>
             <StampTool size={84} press={s.stamps[i].pop > 0 && s.stamps[i].pop < 1 ? 1 : 0} lit={i === 1 ? 1 : 0.4} />
             <div style={{ fontSize: 32, fontWeight: 800, lineHeight: 1.1 }}>
-              judge {i + 1}
+              grader {i + 1}
               {i === 1 && <div style={{ fontSize: 24, fontWeight: 600, color: C.accentText }}>independent</div>}
             </div>
           </div>
@@ -43,11 +43,11 @@ const Agree: React.FC<{ s: AgreeState; t: number; W: number }> = ({ s, t, W }) =
         <div style={{ position: 'absolute', left: cardX, top: A.cardTop }}>
           <div style={{ position: 'relative', width: cardW, height: A.cardH }}>
             <div style={{ position: 'absolute', inset: 0, opacity: 1 - s.card.cipher }}>
-              <RedactedBar w={cardW} h={A.cardH} lines={4} label="reply · plain text" />
+              <RedactedBar w={cardW} h={A.cardH} lines={4} label="answer · plain English" />
             </div>
             <div style={{ position: 'absolute', inset: 0, opacity: s.card.cipher }}>
               <NoiseBar w={cardW} h={A.cardH} t={t} seed={61} cols={22} rows={3} size={44} />
-              <div style={{ position: 'absolute', left: 22, top: 12, fontSize: 26, fontWeight: 700, color: C.accentText }}>reply · in cipher</div>
+              <div style={{ position: 'absolute', left: 22, top: 12, fontSize: 26, fontWeight: 700, color: C.accentText }}>answer · in code</div>
             </div>
           </div>
         </div>
@@ -104,25 +104,17 @@ const Agree: React.FC<{ s: AgreeState; t: number; W: number }> = ({ s, t, W }) =
 
       {/* ---- verdict: the base model's drop is not evidence ---- */}
       <div style={{ position: 'absolute', left: 0, top: 20, width: W, opacity: s.verdict.appear, transform: `translateY(${(1 - s.verdict.appear) * 24}px)` }}>
-        <div style={{ textAlign: 'center', fontSize: 34, fontWeight: 700, color: C.muted }}>Qwen-7B Base · compliance</div>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 26, marginTop: 10, flexWrap: 'nowrap' }}>
-          <span style={{ fontSize: 112, fontWeight: 800, lineHeight: 1, whiteSpace: 'nowrap' }}>80%</span>
-          <svg width={120} height={96} viewBox="0 0 150 120" style={{ overflow: 'visible', flexShrink: 0 }}>
-            <path d={`M 10 20 L ${10 + 120 * s.verdict.arrow} ${20 + 70 * s.verdict.arrow}`} stroke={C.muted} strokeWidth={12} strokeLinecap="round" />
-            {s.verdict.arrow > 0.95 && <path d="M 100 100 L 132 92 L 118 62" fill="none" stroke={C.muted} strokeWidth={12} strokeLinecap="round" strokeLinejoin="round" />}
-          </svg>
-          <span style={{ fontSize: 112, fontWeight: 800, lineHeight: 1, whiteSpace: 'nowrap', color: alpha(C.text, 0.4 + 0.6 * s.verdict.arrow) }}>0–20%</span>
-        </div>
-        <div style={{ textAlign: 'center', fontSize: 30, fontWeight: 600, color: C.muted, marginTop: 6 }}>plain text → under every cipher</div>
+        <div style={{ textAlign: 'center', fontSize: 34, fontWeight: 700, color: C.muted }}>my good news</div>
+        <div style={{ textAlign: 'center', fontSize: 76, fontWeight: 800, lineHeight: 1.1, marginTop: 10, color: alpha(C.text, 0.4 + 0.6 * s.verdict.arrow) }}>hidden in code → refused</div>
         {/* Below the figures, never over them: the numbers stay readable under the verdict. */}
         <div style={{ position: 'absolute', left: 0, top: 255, width: W, display: 'flex', justifyContent: 'center' }}>
-          <Stamp label="not evidence" size={60} rot={-7} s={s.verdict.stamp} tone="muted" style={{ background: alpha(C.bg0, 0.92), borderWidth: 9 }} />
+          <Stamp label="can't conclude" size={60} rot={-7} s={s.verdict.stamp} tone="muted" style={{ background: alpha(C.bg0, 0.92), borderWidth: 9 }} />
         </div>
       </div>
 
       {/* ---- kappa chart ---- */}
       <div style={{ position: 'absolute', left: 0, top: A.chartTop, width: W, textAlign: 'center', fontSize: 32, fontWeight: 700, color: C.muted, opacity: s.tools.appear }}>
-        agreement between the judges <span style={{ color: C.accentText }}>(kappa)</span>
+        how much the two graders agree
       </div>
       <div
         style={{
@@ -136,10 +128,10 @@ const Agree: React.FC<{ s: AgreeState; t: number; W: number }> = ({ s, t, W }) =
           opacity: s.zone.appear,
         }}
       >
-        <div style={{ position: 'absolute', left: 16, top: 26, fontSize: 30, fontWeight: 800, color: C.text }}>worse than chance</div>
+        <div style={{ position: 'absolute', left: 16, top: 26, fontSize: 30, fontWeight: 800, color: C.text }}>no better than a coin toss</div>
       </div>
       <div style={{ position: 'absolute', left: 0, top: A.zero - 2, width: W, height: 4, background: alpha(C.text, 0.7), opacity: s.tools.appear }} />
-      <div style={{ position: 'absolute', right: 0, top: A.zero - 40, fontSize: 26, fontWeight: 700, color: C.muted, opacity: s.tools.appear }}>0</div>
+      <div style={{ position: 'absolute', right: 0, top: A.zero - 40, fontSize: 26, fontWeight: 700, color: C.muted, opacity: s.tools.appear }}>coin toss</div>
       {KAPPA.map((k, g) => {
         const dim = g === 2 ? 0 : s.verdict.focus * 0.6;
         return (
@@ -174,13 +166,13 @@ const Agree: React.FC<{ s: AgreeState; t: number; W: number }> = ({ s, t, W }) =
                       fontSize: k[cond] >= 0 ? 36 : 32,
                       fontWeight: 800,
                       color: cond === 'cipher' && k[cond] < 0 ? C.accentText : C.text,
-                      opacity: grown > 0.6 ? 1 : 0,
+                      opacity: 0 * grown, // no numbers on screen (2026-11-06 reel)
                     }}
                   >
                     {text}
                   </div>
                   <div style={{ position: 'absolute', left: x - 10, width: BAR_W + 20, top: A.labels, textAlign: 'center', fontSize: 24, fontWeight: 700, color: C.muted, opacity: s.tools.appear }}>
-                    {cond}
+                    {cond === 'plain' ? 'plain' : 'in code'}
                   </div>
                 </React.Fragment>
               );
@@ -196,7 +188,7 @@ const Agree: React.FC<{ s: AgreeState; t: number; W: number }> = ({ s, t, W }) =
 };
 
 // ---------- grid (the procedure) ----------
-const MODELS = ['GPT-5', 'Qwen-7B Instruct', 'Qwen-7B Base'];
+const MODELS = ['GPT-5', 'small AI 1', 'small AI 2'];
 const G = { top: 420, rowH: 175, nameW: 300, cellW: 300, gap: 20 };
 
 const Grid: React.FC<{ s: GridState; W: number }> = ({ s, W }) => (
@@ -210,7 +202,7 @@ const Grid: React.FC<{ s: GridState; W: number }> = ({ s, W }) => (
       <div style={{ fontSize: 60, marginTop: 6 }}>agrees</div>
     </div>
     <div style={{ position: 'absolute', left: G.nameW, top: G.top - 64, width: 2 * G.cellW + G.gap, display: 'flex', gap: G.gap, opacity: s.axes.appear }}>
-      {['plain', 'cipher'].map((c) => (
+      {['plain', 'in code'].map((c) => (
         <div key={c} style={{ width: G.cellW, textAlign: 'center', fontSize: 34, fontWeight: 800, color: C.accentText }}>
           {c}
         </div>
@@ -235,7 +227,7 @@ const Grid: React.FC<{ s: GridState; W: number }> = ({ s, W }) => (
       );
     })}
     <div style={{ position: 'absolute', left: 0, top: G.top + 3 * G.rowH + 4, width: W, textAlign: 'center', fontSize: 32, fontWeight: 700, color: C.muted, opacity: s.axes.appear }}>
-      per model · per condition · before any rate
+      every AI · plain and in code
     </div>
   </>
 );

@@ -31,7 +31,7 @@ export function frameState(p: QuestionCardProps, t: number, beats: number[], dur
       pop: stamp,
       opacity: p.mode === 'ask' ? 0 : progress(T, stampAt, 0.12),
       text: p.mode === 'yes' ? 'YES' : 'NOT ENOUGH ✗',
-      sub: p.mode === 'yes' ? 'small games, complete rules' : 'on this game',
+      sub: p.mode === 'yes' ? 'small games, every rule written' : 'on this game',
       tone: p.mode === 'yes' ? ('ok' as const) : ('rose' as const),
     },
     /** Pulse on the question mark while it waits for an answer. */

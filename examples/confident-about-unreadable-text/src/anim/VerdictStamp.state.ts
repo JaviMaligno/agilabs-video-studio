@@ -28,12 +28,11 @@ export type FilterState = {
   gate: { appear: number; flash: number };
   window: { appear: number };
   stamp: Slam & { pulse: number };
-  http: { pop: number };
+  /** beat 2: the chatbot lights up and answers "banana" in a speech bubble. */
+  answer: { pop: number; lit: number };
   /** 0..1 morph of the card from base64 to the decoded plain text. */
   reveal: number;
   banana: { pop: number };
-  ghost: { appear: number; opacity: number };
-  panel: { appear: number };
   chip: { appear: number };
 };
 
@@ -76,19 +75,20 @@ export function frameState(props: VerdictProps, t0: number, beats: number[], dur
     const b2 = fit(beatOr(beats, 2, b1 + 3.2), 1.8, dur);
     const cold = props.coldOpen === true;
     const s = cold ? { ...slam(t, -1), shake: slam(t, stampAt).shake } : t >= stampAt ? slam(t, stampAt) : NO_SLAM;
-    const ghostIn = easeOutCubic(progress(t, b2 + 0.05, 0.3));
+    // beat 3 ("The filter couldn't read it, and stamped it anyway"): the stamp pulses again.
+    const b3 = fit(beatOr(beats, 3, b2 + 2.4), 1.6, dur);
     return {
       mode: 'filter',
       card: { slide: cold ? 1 : slide, shake: s.shake + (t >= hit ? Math.sin(progress(t, hit, 0.3) * 20) * (1 - progress(t, hit, 0.3)) * 0.5 : 0) },
-      gate: { appear: cold ? 1 : easeOutCubic(progress(t, 0, 0.35)), flash: cold ? pulse(t, stampAt, 0.3) : t >= hit ? clamp01(1 - progress(t, hit, 0.5)) : 0 },
-      window: { appear: cold ? 1 : easeOutCubic(progress(t, hit + 0.1, 0.4)) },
-      stamp: { ...s, pulse: Math.max(pulse(t, b2 + 1.5, 0.3), cold ? pulse(t, stampAt, 0.3) : 0) },
-      http: { pop: cold ? 1 : easeOutCubic(progress(t, stampAt + 0.3, 0.3)) },
+      gate: { appear: cold ? 1 : easeOutCubic(progress(t, 0, 0.35)), flash: Math.max(cold ? pulse(t, stampAt, 0.3) : t >= hit ? clamp01(1 - progress(t, hit, 0.5)) : 0, pulse(t, b3 + 0.4, 0.3)) },
+      // 2026-11-06: frame 0 shows only the stamped note and the filter; the noise window arrives
+      // with "couldn't read it" (beat 3) and ChatGPT with beat 2.
+      window: { appear: easeOutCubic(progress(t, b3 + 0.3, 0.4)) },
+      stamp: { ...s, pulse: Math.max(pulse(t, b3 + 1.6, 0.35), cold ? pulse(t, stampAt, 0.3) : 0) },
+      answer: { pop: easeOutCubic(progress(t, b2 + 1.0, 0.35)), lit: easeOutCubic(progress(t, b2 + 0.1, 0.4)) },
       reveal: progress(t, b1 + 0.1, 1.1),
       banana: { pop: easeOutCubic(progress(t, b1 + 1.1, 0.35)) },
-      ghost: { appear: ghostIn, opacity: ghostIn * clamp01(1 - progress(t, b2 + 1.3, 0.5)) },
-      panel: { appear: easeOutCubic(progress(t, b2 + 1.6, 0.45)) },
-      chip: { appear: cold ? 1 : easeOutCubic(progress(t, 0.1, 0.4)) },
+      chip: { appear: easeOutCubic(progress(t, b2 - 0.1, 0.4)) },
     };
   }
 

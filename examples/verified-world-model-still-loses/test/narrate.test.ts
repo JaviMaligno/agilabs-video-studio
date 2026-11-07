@@ -76,9 +76,9 @@ test('sceneStarts overlaps scenes by the transition', () => {
 test('settings and timeline of this video', () => {
   assert.deepEqual(SETTINGS.voices, ['en']);
   assert.deepEqual(SETTINGS.subtitles, ['en']);
-  assert.equal(SETTINGS.targetSeconds, 82);
+  assert.equal(SETTINGS.targetSeconds, 60);
   assert.deepEqual(SETTINGS.music, { src: 'music/bed.wav', volume: 0.2, duck: 0.3 });
-  assert.equal(TIMELINE[0].anim?.name, 'DepthWell');
+  assert.equal(TIMELINE[0].anim?.name, 'StoryGate');
   assert.equal(TIMELINE.at(-1)?.kind, 'outro');
   assert.equal(VIDEOS.en.main, TIMELINE);
 });
