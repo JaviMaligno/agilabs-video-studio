@@ -243,7 +243,7 @@ test('ShellChips: the two Qwen chips share a core; the peel ends on the Base chi
   assert.equal(r.link, 1);
   const pe = shell.frameState({ mode: 'peel' }, 4.6, [0.15, 2], 4.6);
   assert.equal(pe.chips[0].peel, 1);
-  assert.equal(pe.chips[0].label, 'Qwen 7B Base');
+  assert.equal(pe.chips[0].label, 'Qwen · no assistant');
   assert.ok(pe.streamWords > 0);
 });
 

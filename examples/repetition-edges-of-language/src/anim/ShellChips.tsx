@@ -40,7 +40,7 @@ export const ShellChips: React.FC<AnimProps & ShellChipsProps> = ({ t, beats, du
           </div>
           <SpiralText words={words.map((w) => ({ ...w, y: w.y }))} opacity={0.32 + 0.38 * c.spiral} color={C.accentText} />
           <div style={{ position: 'absolute', left: 0, right: 0, top: 960, opacity: 0.5 + 0.5 * c.spiral }}>
-            <Label text="raw statistics" size={36} color={C.muted} />
+            <Label text="autocomplete" size={36} color={C.muted} />
           </div>
           {/* The shell: a hair-thin shimmering film over the whole core. */}
           <div
@@ -89,16 +89,16 @@ export const ShellChips: React.FC<AnimProps & ShellChipsProps> = ({ t, beats, du
           >
             <CoreChip size={c.size} seed={c.seed} shell={c.shell} glow={i >= 2 ? s.link : 0} />
             <Label text={c.label} size={36} />
-            <div style={{ fontSize: 28, fontWeight: 600, color: c.shell ? C.accentText : C.muted }}>{c.shell ? 'aligned' : 'no alignment'}</div>
+            <div style={{ fontSize: 28, fontWeight: 600, color: c.shell ? C.accentText : C.muted }}>{c.shell ? 'assistant' : 'no assistant'}</div>
           </div>
         ))}
-        {/* "same weights": a bracket under the two Qwen chips. */}
+        {/* "same brain": a bracket under the two Qwen chips. */}
         <svg style={{ position: 'absolute', left: 0, top: 0, opacity: s.link }} width={960} height={1090}>
           <path d="M 250 958 L 250 985 L 710 985 L 710 958" stroke={C.accentText} strokeWidth={4} fill="none" strokeDasharray="6 10" strokeLinecap="round" />
         </svg>
         <div style={{ position: 'absolute', left: 0, right: 0, top: 1000, display: 'flex', justifyContent: 'center', opacity: s.link }}>
           <div style={{ padding: '8px 26px', borderRadius: 999, border: `2px dashed ${C.accentText}`, fontSize: 36, fontWeight: 700, color: C.accentText, background: alpha(C.bg0, 0.8) }}>
-            same weights
+            same brain
           </div>
         </div>
       </Stage>
@@ -122,10 +122,10 @@ export const ShellChips: React.FC<AnimProps & ShellChipsProps> = ({ t, beats, du
         <CoreChip size={c.size} seed={c.seed} shell={c.shell} peel={c.peel} flapFall={s.flapFall} />
         <div style={{ position: 'relative', height: 50, width: 420 }}>
           <div style={{ position: 'absolute', inset: 0, opacity: 1 - s.rename }}>
-            <Label text="Qwen 7B Instruct" size={c.size > 300 ? 42 : 30} />
+            <Label text="Qwen · assistant" size={c.size > 300 ? 42 : 30} />
           </div>
           <div style={{ position: 'absolute', inset: 0, opacity: s.rename }}>
-            <Label text="Qwen 7B Base" size={c.size > 300 ? 42 : 30} color={C.text} />
+            <Label text="Qwen · no assistant" size={c.size > 300 ? 42 : 30} color={C.text} />
           </div>
         </div>
       </div>

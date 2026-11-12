@@ -1,6 +1,6 @@
 // ShellChips: each model is a chip with a "core" (a token-grid glyph); the aligned ones wear a thin
 // glossy shell. Qwen Instruct and Qwen Base share the same core. Modes:
-// - roster: four chips drop in; the two Qwen chips slide together, "same weights";
+// - roster: four chips drop in; the two Qwen chips slide together, "same brain";
 // - peel: the shell on Qwen Instruct peels off, revealing the Base chip; a wall of "table"
 //   bubbles comes down on it and its reply opens and never closes;
 // - cutaway: the chip cut open edge-on: a hair-thin film over a core where a spiral already turns.
@@ -61,8 +61,8 @@ export const frameState = (p: ShellChipsProps, t0: number, beats: number[], dur:
     const specs = [
       { label: 'Claude Opus', seed: SEED.opus, shell: 1, col: 0, row: 0 },
       { label: 'Claude Sonnet', seed: SEED.sonnet, shell: 1, col: 1, row: 0 },
-      { label: 'Qwen 7B Instruct', seed: SEED.qwen, shell: 1, col: 0, row: 1 },
-      { label: 'Qwen 7B Base', seed: SEED.qwen, shell: 0, col: 1, row: 1 },
+      { label: 'Qwen', seed: SEED.qwen, shell: 1, col: 0, row: 1 },
+      { label: 'Qwen', seed: SEED.qwen, shell: 0, col: 1, row: 1 },
     ];
     const chips = specs.map((s, i) => {
       const appear = easeOutCubic(progress(t, fit(b0 + i * 0.22, 0.45, dur), 0.45));
@@ -80,7 +80,7 @@ export const frameState = (p: ShellChipsProps, t0: number, beats: number[], dur:
     const peel = q * q * (3 - 2 * q);
     const move = easeOutCubic(progress(t, fit(b1 - 0.1, 0.6, dur), 0.6));
     const chip: Chip = {
-      label: peel > 0.6 ? 'Qwen 7B Base' : 'Qwen 7B Instruct',
+      label: peel > 0.6 ? 'Qwen · no assistant' : 'Qwen · assistant',
       x: 480 - 360 * move,
       y: 440 + 300 * move,
       size: 400 - 250 * move,
