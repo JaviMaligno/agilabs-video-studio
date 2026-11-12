@@ -10,7 +10,7 @@ detail; load them at the step that needs them:
 
 - `explainer-script`: writing the script and picking a visual per scene.
 - `explainer-animation`: the component catalogue, the timeline, bespoke components, stills.
-- `narration`: TTS (Cartesia, Kokoro fallback), pronunciation, audio QA.
+- `narration`: TTS (Cartesia, Kokoro only on request), pronunciation, audio QA.
 
 The Remotion project lives in the plugin's `template/` folder (`${CLAUDE_PLUGIN_ROOT}/template`
 when installed as a plugin; next to `skills/` in the plugin repo).

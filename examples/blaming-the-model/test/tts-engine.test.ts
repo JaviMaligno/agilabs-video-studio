@@ -4,19 +4,12 @@ import { createHash } from 'node:crypto';
 import { chooseEngine, postChain, lineHash, colonsAsStops } from '../scripts/tts-engine.mjs';
 import config, { JAVIER_POST } from '../video.config.mjs';
 
-test('auto falls back per language', () => {
-  const noKey = chooseEngine('auto', false);
-  assert.equal(noKey.engine, 'kokoro');
-  assert.match(noKey.warning ?? '', /CARTESIA_API_KEY/);
-
-  const down = chooseEngine('auto', true, 'HTTP 402');
-  assert.equal(down.engine, 'kokoro');
-  assert.match(down.warning ?? '', /HTTP 402/);
-
+test('auto never switches voice: a Cartesia failure is an error', () => {
+  assert.throws(() => chooseEngine('auto', false), /CARTESIA_API_KEY/);
+  assert.throws(() => chooseEngine('auto', true, 'HTTP 402'), /HTTP 402/);
   const ok = chooseEngine('auto', true);
   assert.equal(ok.engine, 'cartesia');
   assert.equal(ok.warning, undefined);
-
   assert.throws(() => chooseEngine('cartesia', false), /CARTESIA_API_KEY/);
 });
 

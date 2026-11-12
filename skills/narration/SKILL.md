@@ -1,6 +1,6 @@
 ---
 name: narration
-description: Voice the narration of an article explainer video - Cartesia TTS with word timestamps (key lookup, voice ids, model), the local Kokoro fallback, pronunciation tips for numbers and symbols, choosing a Spanish voice, and the audio QA thresholds (clipping, garbled lines, -16 LUFS). Use when running or debugging npm run tts / npm run audio-qa, or when the narration sounds wrong.
+description: Voice the narration of an article explainer video - Cartesia TTS with word timestamps (key lookup, voice ids, model), the optional local Kokoro voice, pronunciation tips for numbers and symbols, choosing a Spanish voice, and the audio QA thresholds (clipping, garbled lines, -16 LUFS). Use when running or debugging npm run tts / npm run audio-qa, or when the narration sounds wrong.
 ---
 
 # Narration
@@ -44,20 +44,17 @@ Javier's mic is weak, so his clone uses the approved "version B" chain (`JAVIER_
 - No `loudnorm` needed: audio-qa normalises every line and the mix lands at -16 LUFS.
 - To change voice: set `id` (and `post`, or drop it for a stock voice) and run `npm run tts`.
 
-## Engines and the Kokoro fallback
+## Engines (no automatic fallback)
 
 `tts.engine` in `video.config.mjs`:
 
-- `auto` (default): Cartesia when a key is found and the service answers; otherwise the whole
-  language is voiced with Kokoro (local, free) and a warning is printed. A language is never a
-  mix of two voices: if Cartesia drops out half way, the whole language is redone with Kokoro,
-  and the next run with Cartesia back redoes it again.
-- `cartesia`: fail instead of falling back.
-- `kokoro`: stay offline. Voices: `af_bella` (EN), `ef_dora` (ES). Kokoro gives no word
-  timestamps, so captions are timed proportionally.
-
-A warning about Kokoro in the output means the video does not have the Cartesia voice: say so
-when handing the video over.
+- `auto` (default) and `cartesia`: Cartesia only. If the key is missing or Cartesia cannot serve
+  (402 quota, 401/403, 429, 5xx), `npm run tts` stops with the error and re-voices nothing: lines
+  already voiced keep their Cartesia audio. Fix the account (credits, key) and run again. Never
+  switch engines without asking Javier: a 402 once re-voiced a finished reel with Kokoro and
+  overwrote its Cartesia lines (2026-11-12).
+- `kokoro`: local voice, only when chosen on purpose. Voices: `af_bella` (EN), `ef_dora` (ES).
+  Kokoro gives no word timestamps, so captions are timed proportionally.
 
 ## Spanish voice
 
