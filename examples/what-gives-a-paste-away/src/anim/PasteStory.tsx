@@ -8,7 +8,8 @@ import { tx } from '../types.ts';
 import type { AnimProps } from './types.ts';
 import { frameState, type PSProps } from './PasteStory.state.ts';
 import { OK, WARN } from './palette.ts';
-import { Bubble, Glove, Piece, Puzzle, Stamp, Window, holeCentre, type Face } from './Pieces.tsx';
+import { Bubble, Glove, MONO, Piece, Puzzle, Stamp, Window, holeCentre, type Face } from './Pieces.tsx';
+import type { Topic } from './Pictures.tsx';
 
 export { frameState };
 export type { PSProps };
@@ -25,7 +26,6 @@ const CLIP = { x: 540, y: 330, cell: 70 } as const;
 /** Where the piece is lifted to once the story steps back. */
 const LIFT = { x: 540, y: 650, cell: 230 } as const;
 
-const PASTE_FACE: Face = { tone: 'warn', topic: 'recipe' };
 const PASTE_BACK: Face = { tone: 'blank', lines: ['?'], textScale: 3.2 };
 
 const Clipboard: React.FC<{ opacity: number }> = ({ opacity }) => (
@@ -55,6 +55,8 @@ export const PasteStory: React.FC<AnimProps & PSProps> = (p) => {
   const titles = p.titles ?? ['', ''];
   const under = p.under ?? ['', ''];
   const q = p.questions ?? ['', ''];
+  const topics = (p.topics ?? ['recipe', 'bill']) as [Topic, Topic];
+  const PASTE_FACE: Face = { tone: 'warn', topic: (p.pasteTopic ?? 'recipe') as Topic };
   const meantFor = { x: WIN.xs[0] + WIN.w / 2, y: WIN.y - 8 };
   return (
     <div style={{ position: 'absolute', inset: 0, fontFamily, color: C.text }}>
@@ -63,7 +65,7 @@ export const PasteStory: React.FC<AnimProps & PSProps> = (p) => {
           {[0, 1].map((i) => (
             <g key={i}>
               <Window x={WIN.xs[i]} y={WIN.y} w={WIN.w} h={WIN_H} header={WIN.header} title={tx(titles[i], p.lang)} />
-              <Puzzle id={`ps${i}`} x={px(i)} y={PY} size={PUZ} topic={i === 0 ? 'recipe' : 'bill'} />
+              <Puzzle id={`ps${i}`} x={px(i)} y={PY} size={PUZ} topic={topics[i]} />
             </g>
           ))}
           {/* The wrong chat lights amber once the piece is in. */}
@@ -125,10 +127,17 @@ export const PasteStory: React.FC<AnimProps & PSProps> = (p) => {
         </div>
       )}
       {/* The model's reply: it just answers. */}
-      <Bubble x={60} y={1040} w={960} skeleton={3} fontSize={40} typed={s.bubble.typed} opacity={s.bubble.appear} />
+      {!p.snippet && <Bubble x={60} y={1040} w={960} skeleton={3} fontSize={40} typed={s.bubble.typed} opacity={s.bubble.appear} />}
+      {p.snippet && (
+        <div style={{ position: 'absolute', top: 1060, left: 70, width: 940, padding: '26px 34px', boxSizing: 'border-box', borderRadius: 24, background: alpha(C.card, 0.9), border: `3px dashed ${alpha(WARN.base, 0.8)}`, fontFamily: MONO, fontSize: 44, fontWeight: 600, lineHeight: 1.3, color: C.muted, textAlign: 'center', opacity: s.snippet.appear, transform: `translateY(${(1 - s.snippet.appear) * 30}px)` }}>
+          {p.snippet.before}
+          <span style={{ color: s.snippet.glow > 0.2 ? WARN.text : C.text, background: alpha(WARN.base, 0.25 * s.snippet.glow), borderRadius: 8, padding: '0 6px', textShadow: `0 0 ${20 * s.snippet.glow}px ${alpha(WARN.base, 0.9)}` }}>{p.snippet.names}</span>
+          {p.snippet.after}
+        </div>
+      )}
       {p.reply && <Stamp value={tx(p.reply, p.lang)} x={520} y={1080} w={480} pop={s.bubble.stamp} size={62} rot={-6} />}
       {/* The two questions the video answers. */}
-      {q.map((text, i) => (
+      {p.questions && q.map((text, i) => (
         <div
           key={i}
           style={{

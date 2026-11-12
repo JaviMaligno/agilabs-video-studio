@@ -19,8 +19,8 @@ const BAR = { x: 300, w: 260, h: 26, max: 25 } as const;
 // Chips sit inside the row card (x 60-1020) with room for '−10.8 points'.
 const CHIP_X = 755;
 
-const pasteFace = (lines: string[]): Face => ({ tone: 'warn', lines, mono: true, textScale: 0.82 });
-const PIECE_LINES = ['…and for the', 'upholstery', 'quotes', 'always use', 'this format…'];
+// Reel 12 (2026-11-12): the stray piece shows a drawn sofa, not text.
+const SOFA: Face = { tone: 'warn', topic: 'sofa' };
 
 const segsOf = (x?: { before: string; names: string; after: string }): Seg[] => (x ? [{ text: x.before }, { text: x.names, warn: true }, { text: x.after }] : []);
 
@@ -29,7 +29,7 @@ const Table: React.FC<{ id: string; y: number; opacity: number }> = ({ id, y, op
   <g opacity={opacity}>
     <rect x={60} y={y} width={960} height={ROW.h} rx={26} fill={alpha(C.card, 0.75)} stroke={alpha(C.text, 0.1)} strokeWidth={2} />
     <Puzzle id={`${id}-pz`} x={84} y={y + 22} size={156} topic="run" />
-    <Piece id={`${id}-pc`} cx={226} cy={y + 214} cell={60} rot={14} face={{ tone: 'warn', lines: ['…uphol-', 'stery…'], mono: true, textScale: 1 }} torn />
+    <Piece id={`${id}-pc`} cx={226} cy={y + 214} cell={60} rot={14} face={SOFA} torn />
     <rect x={84} y={y + 196} width={110} height={16} rx={8} fill={alpha(C.muted, 0.35)} />
     <rect x={84} y={y + 224} width={80} height={16} rx={8} fill={alpha(C.muted, 0.35)} />
   </g>
@@ -121,7 +121,7 @@ const Teaser: React.FC<{ p: AnimProps & RFProps; s: RFState }> = ({ p, s }) => (
     <svg width={1080} height={1920} style={{ position: 'absolute', inset: 0 }}>
       <rect x={60} y={300} width={960} height={420} rx={30} fill={alpha(C.card, 0.6)} />
       <Puzzle id="tz" x={110} y={340} size={340} topic="run" />
-      <Piece id="tzp" cx={720} cy={560} cell={150} rot={12} face={pasteFace(PIECE_LINES)} torn />
+      <Piece id="tzp" cx={720} cy={560} cell={150} rot={12} face={SOFA} torn />
       <text x={720} y={690} textAnchor="middle" fontFamily={fontFamily} fontSize={30} fontWeight={600} fill={C.muted}>
         {p.lang === 'es' ? 'apartada' : 'set aside'}
       </text>
@@ -139,7 +139,7 @@ const Teaser: React.FC<{ p: AnimProps & RFProps; s: RFState }> = ({ p, s }) => (
 const Measure: React.FC<{ p: AnimProps & RFProps; s: RFState }> = ({ p, s }) => (
   <>
     <svg width={1080} height={1920} style={{ position: 'absolute', inset: 0 }}>
-      <Piece id="mp" cx={540} cy={interpolate(s.piece.rise, [0, 1], [760, 680])} cell={270} rot={-5} face={pasteFace(PIECE_LINES)} torn glow={s.piece.glow} opacity={s.piece.rise} />
+      <Piece id="mp" cx={540} cy={interpolate(s.piece.rise, [0, 1], [760, 680])} cell={270} rot={-5} face={SOFA} torn glow={s.piece.glow} opacity={s.piece.rise} />
     </svg>
     {p.question && <QuestionCard text={tx(p.question, p.lang)} top={262} pop={s.card.pop} />}
     {p.paste && (
@@ -169,7 +169,7 @@ const Hold: React.FC<{ p: AnimProps & RFProps; s: RFState }> = ({ p, s }) => {
     <>
       <svg width={1080} height={1920} style={{ position: 'absolute', inset: 0 }}>
         <circle cx={540} cy={560} r={260 * r} fill={alpha(WARN.base, 0.1 * r)} />
-        <Piece id="hp" cx={540 - 40 * r} cy={cy} cell={250} rot={interpolate(r, [0, 1], [10, -6])} face={pasteFace(PIECE_LINES)} torn glow={s.piece.glow} />
+        <Piece id="hp" cx={540 - 40 * r} cy={cy} cell={250} rot={interpolate(r, [0, 1], [10, -6])} face={SOFA} torn glow={s.piece.glow} />
         <Glove x={540 - 40 * r} y={cy + 225} size={1.3} rot={-6} />
       </svg>
       <div style={{ position: 'absolute', left: 60, width: 960, top: 930, height: 360, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -220,31 +220,48 @@ const Turns: React.FC<{ p: AnimProps & RFProps; s: RFState }> = ({ p, s }) => {
 const Verdict: React.FC<{ p: AnimProps & RFProps; s: RFState }> = ({ p, s }) => {
   const v = p.verdict;
   if (!v) return null;
+  // Spoken order (reel 12): carry on ✓ · back to the race plan ✓ · not just "ignore that" ✗.
   const [a0, a1, a2] = s.verdict.appear;
   return (
     <>
-      <div style={{ position: 'absolute', top: 300, left: 60, width: 960, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 24, opacity: a0 }}>
+      <div style={{ position: 'absolute', top: 330, left: 60, width: 960, display: 'flex', justifyContent: 'center', gap: 20, alignItems: 'center', opacity: a0, transform: `translateY(${(1 - a0) * 24}px)`, fontSize: 52, fontWeight: 800, color: OK.text }}>
+        <span>✓</span>
+        <span>{tx(v.also, p.lang)}</span>
+      </div>
+      <div style={{ position: 'absolute', top: 480, left: 60, width: 960, display: 'flex', justifyContent: 'center', opacity: a1, transform: `scale(${interpolate(a1, [0, 1], [0.9, 1])})` }}>
+        <div style={{ display: 'flex', gap: 22, alignItems: 'flex-start', padding: '30px 36px', borderRadius: 28, background: C.card, border: `4px solid ${C.accentText}`, boxShadow: `0 0 60px ${alpha(C.accent, 0.5)}` }}>
+          <span style={{ flex: 'none', width: 76, height: 76, borderRadius: 38, background: GRADIENT, display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: 50, fontWeight: 800 }}>✓</span>
+          <span style={{ fontSize: 56, fontWeight: 800, lineHeight: 1.15 }}>{tx(v.yes, p.lang)}</span>
+        </div>
+      </div>
+      <div style={{ position: 'absolute', top: 880, left: 60, width: 960, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 24, opacity: a2 }}>
         <span style={{ fontSize: 80, fontWeight: 800, color: WARN.text }}>✗</span>
         <span style={{ position: 'relative', fontSize: 80, fontWeight: 800, color: C.text, opacity: 1 - 0.4 * s.verdict.strike }}>
           {tx(v.no, p.lang)}
           <span style={{ position: 'absolute', left: -8, top: '52%', height: 10, borderRadius: 5, width: `${s.verdict.strike * 106}%`, background: WARN.base }} />
         </span>
       </div>
-      <div style={{ position: 'absolute', top: 440, left: 0, width: 1080, textAlign: 'center', fontSize: 70, color: C.muted, opacity: a1 }}>↓</div>
-      <div style={{ position: 'absolute', top: 560, left: 60, width: 960, display: 'flex', justifyContent: 'center', opacity: a1, transform: `scale(${interpolate(a1, [0, 1], [0.9, 1])})` }}>
-        <div style={{ display: 'flex', gap: 22, alignItems: 'flex-start', padding: '30px 36px', borderRadius: 28, background: C.card, border: `4px solid ${C.accentText}`, boxShadow: `0 0 60px ${alpha(C.accent, 0.5)}` }}>
-          <span style={{ flex: 'none', width: 76, height: 76, borderRadius: 38, background: GRADIENT, display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: 50, fontWeight: 800 }}>✓</span>
-          <span style={{ fontSize: 56, fontWeight: 800, lineHeight: 1.15 }}>{tx(v.yes, p.lang)}</span>
-        </div>
-      </div>
-      <Stamp value={tx(v.stamp, p.lang)} x={0} y={890} w={1080} pop={s.verdict.stamp} size={72} tone="accent" rot={-3} />
-      <div style={{ position: 'absolute', top: 1120, left: 60, width: 960, display: 'flex', justifyContent: 'center', gap: 18, alignItems: 'center', opacity: a2, fontSize: 44, fontWeight: 700, color: OK.text }}>
-        <span>✓</span>
-        <span>{tx(v.also, p.lang)}</span>
-      </div>
+      {v.stamp && <Stamp value={tx(v.stamp, p.lang)} x={0} y={1090} w={1080} pop={s.verdict.stamp} size={72} tone="accent" rot={-3} />}
     </>
   );
 };
+
+/** Why "ignore that" brings it back: it asks which thing you mean, or promises to drop it by name. */
+const Ask: React.FC<{ p: AnimProps & RFProps; s: RFState }> = ({ p, s }) => (
+  <>
+    {p.arms && <Bubble x={60} y={290} w={960} user segs={[{ text: tx(p.arms[1].user, p.lang) }]} fontSize={48} opacity={s.user.appear[1]} />}
+    {s.reply.typed[0] > 0 && <Bubble x={60} y={410} w={920} segs={segsOf(p.ask)} fontSize={42} typed={s.reply.typed[0]} glow={s.reply.glow[0]} />}
+    {p.tag && <Chip text={tx(p.tag, p.lang)} top={640} opacity={s.chip.opacity} fontSize={28} />}
+    {s.reply.typed[1] > 0 && (
+      <>
+        <div style={{ position: 'absolute', top: 730, left: 0, width: 1080, textAlign: 'center', fontSize: 40, fontWeight: 700, color: C.muted, opacity: Math.min(1, s.reply.typed[1] * 4) }}>{p.lang === 'es' ? 'o' : 'or'}</div>
+        <Bubble x={60} y={800} w={920} segs={segsOf(p.reply)} fontSize={42} typed={s.reply.typed[1]} glow={s.reply.glow[1]} />
+      </>
+    )}
+    {p.real && <Chip text={tx(p.real, p.lang)} top={1010} opacity={s.tags.appear[0]} fontSize={28} />}
+    {p.card && <QuestionCard text={tx(p.card, p.lang)} top={1110} pop={s.card.pop} />}
+  </>
+);
 
 /** Act II: what happens after you tell it. */
 export const RepairFork: React.FC<AnimProps & RFProps> = (p) => {
@@ -255,6 +272,7 @@ export const RepairFork: React.FC<AnimProps & RFProps> = (p) => {
   else if (p.mode === 'measure') body = <Measure p={p} s={s} />;
   else if (p.mode === 'hold') body = <Hold p={p} s={s} />;
   else if (p.mode === 'turns') body = <Turns p={p} s={s} />;
+  else if (p.mode === 'ask') body = <Ask p={p} s={s} />;
   else if (p.mode === 'verdict') body = <Verdict p={p} s={s} />;
   return <div style={{ position: 'absolute', inset: 0, fontFamily, color: C.text }}>{body}</div>;
 };

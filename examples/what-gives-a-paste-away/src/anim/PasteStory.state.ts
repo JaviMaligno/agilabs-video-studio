@@ -18,6 +18,12 @@ export type PSProps = {
   reply?: Label;
   /** The two questions, one per beat (third and fourth lines). */
   questions?: [Label, Label];
+  /** Picture topics of the two chats (default recipe / bill) and of the pasted piece. */
+  topics?: [string, string];
+  pasteTopic?: string;
+  /** Short form (reel 12, 2026-11-12): on the second line, the pasted text itself, its stray
+   * names glowing; no reply, no lift, no questions. */
+  snippet?: { before: string; names: string; after: string };
 };
 
 export type PSState = {
@@ -33,6 +39,7 @@ export type PSState = {
   lift: { progress: number; flip: number };
   back: { draw: number };
   cards: { pop: number[] };
+  snippet: { appear: number; glow: number };
 };
 
 export function frameState(p: PSProps, t0: number, beats: number[], dur: number): PSState {
@@ -48,8 +55,10 @@ export function frameState(p: PSProps, t0: number, beats: number[], dur: number)
   const flyAt = fit(b0 + 0.75, 1.0, D);
   const fly = easeInOut(progress(t, flyAt, 1.0));
   // Beat 2: the story steps back; the piece is lifted and turned over.
-  const away = at(b2, 0.4);
-  return {
+  const short = !!p.snippet;
+  const away = short ? 0 : at(b2, 0.4);
+  const pulse = Math.min(1, Math.max(0, 0.6 + 0.4 * Math.sin(t * 6)));
+  const story = {
     windows: { appear: easeOutCubic(at(0, 0.5)), dim: 0.6 * away },
     clip: { appear: easeOutCubic(at(0.1, 0.4)) * (1 - 0.6 * away), tag: easeOutCubic(at(b1 + 0.05, 0.3)) * (1 - away) },
     fly: { progress: fly },
@@ -64,5 +73,15 @@ export function frameState(p: PSProps, t0: number, beats: number[], dur: number)
     lift: { progress: easeInOut(at(b2 + 0.2, 0.7)), flip: turn(t, fit(b2 + 0.9, 0.6, D), 0.6) },
     back: { draw: easeInOut(at(b3 + 0.5, 0.6)) },
     cards: { pop: [easeOutCubic(at(b2 + 0.3, 0.4)), easeOutCubic(at(b3 + 0.05, 0.4))] },
+    snippet: { appear: 0, glow: 0 },
+  };
+  if (!short) return story;
+  return {
+    ...story,
+    bubble: { appear: 0, typed: 0, stamp: 0 },
+    lift: { progress: 0, flip: 1 },
+    back: { draw: 0 },
+    cards: { pop: [0, 0] },
+    snippet: { appear: easeOutCubic(at(b1 + 0.05, 0.4)), glow: at(b1 + 0.9, 0.3) * pulse },
   };
 }

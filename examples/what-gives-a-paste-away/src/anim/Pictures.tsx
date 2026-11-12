@@ -4,7 +4,7 @@
 import React from 'react';
 import { C, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
-export type Topic = 'garden' | 'bill' | 'run' | 'camera' | 'bread' | 'move' | 'school' | 'japan' | 'recipe';
+export type Topic = 'garden' | 'bill' | 'run' | 'camera' | 'bread' | 'move' | 'school' | 'japan' | 'recipe' | 'sofa';
 
 /** Where the finish flag of the 10K route sits (picture units): one end of the invented thread. */
 export const FLAG = { x: 84, y: 14 } as const;
@@ -63,19 +63,25 @@ const Bill = () => (
   </g>
 );
 
+// Reel 12 (2026-11-12): the 10K and the sofa get their own backdrop and colours (Javier: too much
+// purple, too little contrast). Amber stays reserved for the paste.
+const PARK = { sky: '#1e3a5f', hill: '#166534', grass: '#22c55e', road: '#e2e8f0', flag: '#ef4444' } as const;
 const Run = () => (
   <g>
-    <path d="M6 92 C 30 86, 18 64, 42 60 S 70 52, 56 36 S 72 18, 84 16" fill="none" stroke={alpha(ink, 0.35)} strokeWidth={9} strokeLinecap="round" />
-    <path d="M6 92 C 30 86, 18 64, 42 60 S 70 52, 56 36 S 72 18, 84 16" fill="none" stroke={ink} strokeWidth={1.8} strokeDasharray="4 3" strokeLinecap="round" />
+    <rect x={0} y={0} width={100} height={100} fill={PARK.sky} />
+    <path d="M0 40 Q 25 28 50 38 T 100 34 V100 H0 Z" fill={PARK.hill} />
+    <path d="M0 58 Q 30 48 60 56 T 100 52 V100 H0 Z" fill={alpha(PARK.grass, 0.55)} />
+    <path d="M6 92 C 30 86, 18 64, 42 60 S 70 52, 56 36 S 72 18, 84 16" fill="none" stroke={PARK.road} strokeWidth={8} strokeLinecap="round" />
+    <path d="M6 92 C 30 86, 18 64, 42 60 S 70 52, 56 36 S 72 18, 84 16" fill="none" stroke={alpha(C.bg0, 0.7)} strokeWidth={1.6} strokeDasharray="4 3" strokeLinecap="round" />
     {[
       [22, 76],
       [44, 60],
       [60, 38],
     ].map(([x, y], i) => (
-      <circle key={i} cx={x} cy={y} r={3.2} fill={C.bg1} stroke={violet} strokeWidth={1.5} />
+      <circle key={i} cx={x} cy={y} r={3.4} fill={C.text} stroke={C.bg0} strokeWidth={1.2} />
     ))}
     <rect x={FLAG.x - 0.8} y={FLAG.y - 12} width={1.6} height={14} fill={C.text} />
-    <polygon points={`${FLAG.x + 0.8},${FLAG.y - 12} ${FLAG.x + 12},${FLAG.y - 8} ${FLAG.x + 0.8},${FLAG.y - 4}`} fill={violet} />
+    <polygon points={`${FLAG.x + 0.8},${FLAG.y - 12} ${FLAG.x + 12},${FLAG.y - 8} ${FLAG.x + 0.8},${FLAG.y - 4}`} fill={PARK.flag} />
   </g>
 );
 
@@ -161,7 +167,27 @@ const Recipe = () => (
   </g>
 );
 
-const DRAW: Record<Topic, React.FC> = { garden: Garden, bill: Bill, run: Run, camera: Camera, bread: Bread, move: Move, school: School, japan: Japan, recipe: Recipe };
+
+const ROOM = { wall: '#334155', floor: '#a16207', sofa: '#fb7185', cushion: '#fda4af', deep: '#be123c' } as const;
+/** A two-seat sofa with a torn cushion (the repair quote's subject), in a plain room. */
+const Sofa = () => (
+  <g>
+    <rect x={0} y={0} width={100} height={100} fill={ROOM.wall} />
+    <rect x={0} y={84} width={100} height={16} fill={ROOM.floor} />
+    <rect x={14} y={30} width={72} height={32} rx={8} fill={ROOM.sofa} />
+    <rect x={20} y={52} width={29} height={18} rx={5} fill={ROOM.cushion} />
+    <rect x={51} y={52} width={29} height={18} rx={5} fill={ROOM.cushion} />
+    <rect x={6} y={44} width={16} height={34} rx={7} fill={ROOM.deep} />
+    <rect x={78} y={44} width={16} height={34} rx={7} fill={ROOM.deep} />
+    <rect x={14} y={68} width={72} height={10} rx={3} fill={ROOM.deep} />
+    <rect x={14} y={78} width={5} height={8} rx={1.5} fill={C.bg0} />
+    <rect x={81} y={78} width={5} height={8} rx={1.5} fill={C.bg0} />
+    {/* the tear */}
+    <path d="M58 56 l5 5 l-4 3 l6 4" fill="none" stroke={C.bg0} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
+  </g>
+);
+
+const DRAW: Record<Topic, React.FC> = { garden: Garden, bill: Bill, run: Run, camera: Camera, bread: Bread, move: Move, school: School, japan: Japan, recipe: Recipe, sofa: Sofa };
 
 /** Valencia: a long white dome and two slim towers. Seville: the Giralda and the cathedral. */
 const Skyline: React.FC<{ city: 'valencia' | 'seville' }> = ({ city }) =>

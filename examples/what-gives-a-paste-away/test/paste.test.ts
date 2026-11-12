@@ -20,7 +20,7 @@ const SCENARIOS = [
   { beats: [0], dur: 0.5 },
 ];
 const PI_MODES: pi.PIMode[] = ['hook', 'recap', 'lift', 'levels', 'rule', 'meters', 'repaint', 'quote', 'verdict'];
-const RF_MODES: rf.RFMode[] = ['teaser', 'fork', 'arms', 'measure', 'bars', 'hold', 'turns', 'verdict'];
+const RF_MODES: rf.RFMode[] = ['teaser', 'fork', 'arms', 'measure', 'bars', 'hold', 'turns', 'ask', 'verdict'];
 const QUOTE = { rows: ['A b c.', 'D e f.'] as [string, string], emphasis: ['e f'] };
 
 test('PieceInspector and RepairFork are total over [0, sceneEnd] in every mode', () => {
