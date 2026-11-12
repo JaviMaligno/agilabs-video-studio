@@ -40,7 +40,7 @@ export const LoopSpiral: React.FC<AnimProps & LoopSpiralProps> = ({ t, beats, du
       {p.mode === 'seeds' && (
         <div style={{ position: 'absolute', left: 0, right: 0, top: 860, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16 }}>
           <CoreChip size={70} seed={SEED.qwen} shell={0} />
-          <div style={{ fontSize: 30, fontWeight: 600, color: C.muted }}>Qwen 7B Base</div>
+          <div style={{ fontSize: 30, fontWeight: 600, color: C.muted }}>Qwen · no assistant</div>
         </div>
       )}
 
@@ -49,9 +49,9 @@ export const LoopSpiral: React.FC<AnimProps & LoopSpiralProps> = ({ t, beats, du
           <div style={{ position: 'absolute', left: 0, top: 0, display: 'flex', alignItems: 'center', gap: 16 }}>
             <CoreChip size={96} seed={SEED.qwen} shell={0} />
             <div style={{ fontSize: 28, fontWeight: 600, color: C.muted, lineHeight: 1.15 }}>
-              Qwen 7B
+              Qwen ·
               <br />
-              Base
+              no assistant
             </div>
           </div>
           <div style={{ position: 'absolute', left: 0, top: 130 }}>
@@ -78,7 +78,7 @@ export const LoopSpiral: React.FC<AnimProps & LoopSpiralProps> = ({ t, beats, du
           </div>
           <div style={{ position: 'absolute', left: 0, top: 290, display: 'flex', alignItems: 'center', gap: 12 }}>
             <CoreChip size={56} seed={SEED.qwen} shell={0} />
-            <div style={{ fontSize: 28, fontWeight: 600, color: C.muted }}>Qwen 7B Base</div>
+            <div style={{ fontSize: 28, fontWeight: 600, color: C.muted }}>Qwen · no assistant</div>
           </div>
           {/* right: 80 keeps the payoff number clear of the platform action rail (frame x > 940). */}
           <div style={{ position: 'absolute', right: 80, top: 820 }}>

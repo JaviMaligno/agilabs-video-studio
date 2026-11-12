@@ -97,7 +97,7 @@ export const EchoChat: React.FC<AnimProps & EchoChatProps> = ({ t, beats, dur, v
         <div style={{ position: 'absolute', left: 520, top: 440 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <CoreChip size={80} seed={SEED.qwen} shell={0} />
-            <div style={{ fontSize: 28, fontWeight: 600, color: C.muted }}>Qwen 7B Base</div>
+            <div style={{ fontSize: 28, fontWeight: 600, color: C.muted }}>Qwen · no assistant</div>
           </div>
         </div>
         <SpiralText words={words} />
