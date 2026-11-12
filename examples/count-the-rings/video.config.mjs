@@ -5,8 +5,8 @@ export const JAVIER_POST =
   'highshelf=f=8500:g=4,acompressor=threshold=-24dB:ratio=3.5:attack=6:release=100:makeup=3';
 export default {
   tts: {
-    // 'auto': Cartesia when a key is available and the service answers, else the local Kokoro
-    // voice for the whole language. 'cartesia' fails instead of switching; 'kokoro' stays offline.
+    // 'auto' and 'cartesia': Cartesia only; a missing key or an unavailable service stops
+    // `npm run tts` with the error (no automatic switch to Kokoro). 'kokoro': local voice on purpose.
     engine: 'auto',
     model: 'sonic-3.6-2026-08-27',
     speed: 1,

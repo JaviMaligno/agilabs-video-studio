@@ -1,8 +1,8 @@
 import { createHash } from 'node:crypto';
 
 // Which TTS engine voices a language. Pure, so the fallback rules are testable.
-// A language is always voiced by one engine end to end: when Cartesia fails half way through,
-// the caller asks again with the error and re-voices every line of that language with Kokoro.
+// A language is always voiced by one engine end to end. A Cartesia failure is always an error:
+// no engine switch, no re-voicing (lines already voiced by Cartesia are kept).
 
 /**
  * @param {'cartesia'|'kokoro'|'auto'} engine requested engine
@@ -18,8 +18,10 @@ export function chooseEngine(engine, hasKey, cartesiaError) {
     return { engine: 'cartesia' };
   }
   if (engine !== 'auto') throw new Error(`unknown tts.engine "${engine}" (cartesia, kokoro or auto)`);
-  if (!hasKey) return { engine: 'kokoro', warning: 'no CARTESIA_API_KEY found: voicing with Kokoro (local)' };
-  if (cartesiaError) return { engine: 'kokoro', warning: `Cartesia unavailable (${cartesiaError}): voicing with Kokoro (local)` };
+  // Never switch voice on its own (Javier, 2026-11-12: a quota error once re-voiced a finished reel
+  // with Kokoro and overwrote its Cartesia lines). Kokoro only when asked for with engine: 'kokoro'.
+  if (!hasKey) throw new Error('no CARTESIA_API_KEY found (env, template/.env or ~/Documents/repos/.env); nothing was re-voiced. Set tts.engine to "kokoro" to voice locally on purpose');
+  if (cartesiaError) throw new Error(`Cartesia unavailable (${cartesiaError}); nothing was re-voiced with another engine. Fix the account (credits, key) and run again, or set tts.engine to "kokoro" on purpose`);
   return { engine: 'cartesia' };
 }
 
