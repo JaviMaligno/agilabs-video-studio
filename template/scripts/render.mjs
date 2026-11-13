@@ -5,17 +5,20 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import { at, ffmpegReport, loudness, probe, LOUDNESS, remotion } from './lib.mjs';
-import { makeMusicBed } from './music.mjs';
+import { ensureMusicBed } from './music.mjs';
 
 const args = process.argv.slice(2);
 const voice = args.includes('--es') ? 'es' : 'en';
 const format = args.includes('--landscape') ? 'landscape' : 'vertical';
 const { SETTINGS } = await import('../src/settings.ts');
 const { VIDEOS } = await import('../src/timeline.ts');
+const { FPS, sceneStarts } = await import('../src/timing.ts');
 const { writeSrt } = await import('./srt.ts');
 
 if (!SETTINGS.voices.includes(voice)) throw new Error(`"${voice}" is not in SETTINGS.voices`);
-if (SETTINGS.music && !fs.existsSync(at('public', SETTINGS.music.src))) makeMusicBed();
+const frames = Math.max(1, sceneStarts(VIDEOS[voice].main).total);
+// The bed covers the whole video: made when missing, remade when shorter than this cut.
+if (SETTINGS.music) ensureMusicBed(frames / FPS, at('public', SETTINGS.music.src));
 
 const id = `Main-${voice.toUpperCase()}-${format}`;
 const name = `main-${voice}-${format}`;
