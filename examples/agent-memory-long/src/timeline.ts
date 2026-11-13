@@ -224,7 +224,7 @@ const build = (): Cuts => ({
     anim(
       'combine',
       'MemoryOffice',
-      { mode: 'verdict', marks: [[0, 'job'], [0, 'best'], [1, 'desk']] },
+      { mode: 'verdict', marks: [[0, 'job'], [0, 'best'], [1, 'desk'], [1, 'summary'], [1, 'notebook'], [1, 'form'], [1, 'Training'], [2, 'life']] },
       [
         say(0.3, 'So which memory is best? For what happens on the job, none of them on its own.', '', undefined, CONFIDENT),
         say(0, "Training can't take today's news. The desk fills up. A summary is only as good as its writer. The notebook only helps if you know to look. And the form holds only what has a box, and can be sure and wrong.", ''),
@@ -232,7 +232,7 @@ const build = (): Cuts => ({
       ],
       { chapter: 'What to combine' },
     ),
-    anim('recipe', 'MemoryOffice', { mode: 'advice', marks: [[0, 'tests'], [0, 'summary'], [0, 'notebook'], [1, 'box']] }, [
+    anim('recipe', 'MemoryOffice', { mode: 'advice', marks: [[0, 'tests'], [0, 'summary'], [0, 'notebook'], [1, 'box'], [1, 'record']] }, [
       say(0.2, "For agents, my tests point the same way. First, when the desk fills up, keep a summary, or the agent's own lines, instead of clearing it. A notebook to search is a bonus on top, not a replacement.", ''),
       say(0, "Second, for facts you know will matter, a box with their name on it. And on some models, the day's record beside the form, to catch it when it's wrong.", '', undefined, { ...CONFIDENT, speed: 1.05 }),
     ]),

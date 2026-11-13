@@ -1,7 +1,7 @@
 // Behaviour of the bespoke memory-office components (the totality sweep is in anim.test.ts).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ADVICE_LINE, OFFICE_MODES, frameState as office } from '../src/anim/MemoryOffice.state.ts';
+import { ADVICE_LINE, OFFICE_MODES, RECIPE, frameState as office } from '../src/anim/MemoryOffice.state.ts';
 import { BAYS, HERE_TEXT, LANDING_BAY, NOON, ROBOT_PATH, TWO, WAREHOUSE_MODES, frameState as warehouse } from '../src/anim/WarehouseShelves.state.ts';
 import { SLIP_PATH, frameState as head } from '../src/anim/HeadShelf.state.ts';
 import { CARD_TEXT, CROWDED_PAGES, DESK_MODES, FORK, MAX_PAGES, ONE_IN_TEXT, WORK_PAGES, frameState as desk } from '../src/anim/MemoryDesk.state.ts';
@@ -15,7 +15,7 @@ const UNIT = new Set([
   'question', 'books', 'cap', 'lock', 'bounce', 'desk', 'deskLit', 'cover', 'spill', 'gauge', 'amber', 'squeeze', 'write', 'fade',
   'move', 'tick', 'pile', 'sweep', 'inDrawer', 'drawers', 'clean', 'found', 'peek', 'cross', 'boxes', 'shelfRow', 'rowLit', 'strike',
   'prog', 'fly', 'erase', 'eraser', 'scribble', 'zero', 'fill', 'full', 'inset',
-  'rules', 'top', 'one', 'other', 'label', 'needed', 'fork', 'here', 'stream', 'doors', 'back', 'fall', 'into', 'tags', 'stat', 'ghost', 'glow', 'second', 'dim', 'record', 'mismatch', 'follow',
+  'rules', 'top', 'one', 'other', 'label', 'needed', 'fork', 'here', 'stream', 'doors', 'back', 'fall', 'into', 'tags', 'stat', 'ghost', 'glow', 'second', 'dim', 'record', 'mismatch', 'follow', 'human', 'recipe',
 ]);
 
 const walk = (v: unknown, path: string, key = '') => {
@@ -454,5 +454,39 @@ test('FilingCabinet miss: tags on the drawers it searches, "1 search in 40", a s
     assert.equal(end.stat, 1);
     assert.equal(end.line, 1);
     assert.deepEqual(end.drawers, [0, 0, 0]);
+  }
+});
+
+test('MemoryOffice verdict: each object lights and cracks on its own name, in order; then the human version', () => {
+  const marks = [1, 2, 9, 10.5, 12.5, 14.5, 7.5, 22];
+  const at = (t: number) => office({ mode: 'verdict', marks }, t, [1.3, 7, 21.5], 33);
+  const s8 = at(8);
+  assert.ok(s8.lit[0] > 0.99, 'the head shelf lights on "training"');
+  assert.deepEqual(s8.crack, [0, 0, 0, 0, 0]);
+  const names = [9, 10.5, 12.5, 14.5];
+  names.forEach((n, k) => {
+    assert.equal(at(n - 0.2).crack[k + 1], 0, `object ${k + 1} before its name`);
+    assert.ok(at(n + 0.5).crack[k + 1] > 0.99, `object ${k + 1} after its name`);
+    assert.ok(at(n + 0.5).lit[k + 1] > 0.99);
+  });
+  assert.equal(at(20).crack[0], 0, 'the head shelf never cracks');
+  assert.deepEqual(at(21.8).human, [0, 0, 0]);
+  assert.ok(at(22.6).human[0] > 0.99 && at(22.6).human[1] === 0);
+  assert.deepEqual(at(40).human, [1, 1, 1]);
+});
+
+test('MemoryOffice advice: the recipe builds item by item; the record comes in with the third', () => {
+  assert.deepEqual([...RECIPE], ['SUMMARY (+ NOTEBOOK)', 'FORM with a named box', '+ the record (some models)']);
+  const marks = [1.2, 5.6, 9.9, 17, 21];
+  const at = (t: number) => office({ mode: 'advice', marks }, t, [0.2, 14], 25);
+  assert.deepEqual(at(5).recipe, [0, 0, 0]);
+  assert.ok(at(6.2).recipe[0] > 0.99 && at(6.2).recipe[1] === 0);
+  assert.ok(at(17.5).recipe[1] > 0.99 && at(17.5).recipe[2] === 0);
+  assert.equal(at(20.8).record, 0);
+  assert.ok(at(21.6).record > 0.99 && at(21.6).recipe[2] > 0.99);
+  for (const { beats, dur } of SCENES) {
+    const end = office({ mode: 'advice' }, dur, beats, dur);
+    assert.deepEqual(end.recipe, [1, 1, 1]);
+    assert.equal(end.record, 1);
   }
 });
