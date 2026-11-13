@@ -223,7 +223,7 @@ const build = (): Cuts => ({
       say(0.2, "For agents, my tests point the same way. First, when the desk fills up, keep a summary, or the agent's own lines, instead of clearing it. A notebook to search is a bonus on top, not a replacement.", ''),
       say(0, "Second, for facts you know will matter, a box with their name on it. And on some models, the day's record beside the form, to catch it when it's wrong.", '', undefined, { ...CONFIDENT, speed: 1.05 }),
     ]),
-    anim('close', 'MemoryMap', {}, [
+    anim('close', 'MemoryMap', { recipe: true }, [
       say(0.2, 'Every agent forgets. The question is what it forgets, and whether anything notices. Which of these would your agent lose first?', ''),
     ]),
     outro('outro', [say(0.15, 'More at javieraguilar.ai.', '', { en: 'More at javier aguilar dot A I.' })]),

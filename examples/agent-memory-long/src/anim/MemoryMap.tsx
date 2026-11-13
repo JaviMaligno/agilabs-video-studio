@@ -9,6 +9,7 @@ import { CARD_TEXT } from './MemoryDesk.state.ts';
 import { SHELF0 } from './memory.ts';
 import { MAP_TITLE, TILES, frameState, type MemoryMapProps, type TileKind } from './MemoryMap.state.ts';
 import { place } from './canvas.ts';
+import { RECIPE } from './MemoryOffice.state.ts';
 import { Badge, BookShelf, Cabinet, Desk, Frame, Lens, MiniClipboard, Notecard, Page, Robot, Slip, glow } from './office.tsx';
 
 export { frameState };
@@ -49,6 +50,33 @@ const LAYOUT = {
     robot: { x: 870, y: 562, s: 0.5 },
     slip: { x: 1040, y: 660, w: 220, rot: -5 },
     title: { x: 960, y: 200, size: 60 },
+  },
+};
+
+/**
+ * Layout with the recipe beside the map (closing scene).
+ * - landscape: the map shrunk into the left two thirds, the recipe in a column at the right;
+ * - vertical: the title raised a little, the recipe in three short lines under it.
+ */
+const LAYOUT_RECIPE = {
+  v: {
+    ...LAYOUT.v,
+    title: { x: 540, y: 1148, size: 56 },
+    recipe: { x: 150, y: 1196, gap: 42, size: 28, head: null as null | { y: number } },
+  },
+  l: {
+    k: 0.7,
+    tiles: [
+      { x: 190, y: 236 },
+      { x: 536, y: 236 },
+      { x: 882, y: 236 },
+      { x: 190, y: 497 },
+      { x: 882, y: 497 },
+    ],
+    robot: { x: 640, y: 520, s: 0.4 },
+    slip: { x: 790, y: 670, w: 160, rot: -5 },
+    title: { x: 697, y: 196, size: 56 },
+    recipe: { x: 1250, y: 330, gap: 84, size: 27, head: { y: 270 } as null | { y: number } },
   },
 };
 
@@ -109,7 +137,8 @@ const Picture: React.FC<{ kind: TileKind }> = ({ kind }) => {
 
 export const MemoryMap: React.FC<AnimProps & MemoryMapProps> = (p) => {
   const s = frameState(p, p.t, p.beats, p.dur);
-  const L = place(p.vertical, LAYOUT);
+  const L = p.recipe ? place(p.vertical, LAYOUT_RECIPE) : { ...place(p.vertical, LAYOUT), recipe: null };
+  const R = L.recipe;
   return (
     <AbsoluteFill style={{ fontFamily }}>
       <Frame vertical={p.vertical} design="both">
@@ -156,6 +185,31 @@ export const MemoryMap: React.FC<AnimProps & MemoryMapProps> = (p) => {
           <text x={L.title.x} y={L.title.y} textAnchor="middle" fontSize={L.title.size} fontWeight={800} fill={C.text} opacity={s.title} letterSpacing={0.5}>
             {MAP_TITLE}
           </text>
+        )}
+        {/* the recipe from chapter 7, small, beside the map */}
+        {R && s.recipe > 0 && (
+          <g opacity={s.recipe}>
+            {R.head && (
+              <text x={R.x} y={R.head.y} fontSize={28} fontWeight={700} fill={C.muted}>
+                what my tests point to
+              </text>
+            )}
+            {RECIPE.map((item, i) => {
+              const y = R.y + i * R.gap;
+              const r = R.size * 0.62;
+              return (
+                <g key={item}>
+                  <circle cx={R.x + r} cy={y - R.size * 0.34} r={r} fill={i === 2 ? alpha(C.ok, 0.5) : C.ok} />
+                  <text x={R.x + r} y={y - R.size * 0.34 + R.size * 0.3} textAnchor="middle" fontSize={R.size * 0.8} fontWeight={800} fill={C.bg0}>
+                    {i + 1}
+                  </text>
+                  <text x={R.x + 2 * r + 12} y={y} fontSize={R.size} fontWeight={800} fill={i === 2 ? alpha(C.text, 0.8) : C.text}>
+                    {item}
+                  </text>
+                </g>
+              );
+            })}
+          </g>
         )}
       </Frame>
     </AbsoluteFill>

@@ -424,3 +424,8 @@ test('CorrectionReplay: 12/12 vs 3/12, the replay of the pallet leaving, then 12
   assert.equal(end.slip.tick, 1);
   assert.equal(end.fixedTag, 1);
 });
+
+test('MemoryMap recipe: the recipe stays on from frame 0 only when asked for', () => {
+  assert.equal(map.frameState({}, 0, [0.2], 6).recipe, 0);
+  for (const t of [-1, 0, 3, 6, 9]) assert.equal(map.frameState({ recipe: true }, t, [0.2], 6).recipe, 1);
+});

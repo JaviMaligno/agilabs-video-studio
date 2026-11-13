@@ -5,13 +5,15 @@
 // - reveal (scene 3): the empty frames of the map draw in on the first beat; each tile is drawn as
 //   it is named (marks 0-4) with a pulse, then stays on at the hold glow; the title comes in on
 //   mark 5. Marks: [training, desk, summary, notebook, form, title].
+// - `recipe: true` (the closing scene): the recipe from chapter 7 stays on screen, small, beside
+//   the map (from frame 0, since it carries over from the scene before).
 // No Remotion or React here.
 import { beatOr, blinkAt, bump, ease, loopTime, mark, pickMode } from './memory.ts';
 import { clamp01, sceneTime } from './steps.ts';
 
 export const MAP_MODES = ['all', 'reveal'] as const;
 export type MapMode = (typeof MAP_MODES)[number];
-export type MemoryMapProps = { mode?: MapMode; marks?: number[] };
+export type MemoryMapProps = { mode?: MapMode; marks?: number[]; recipe?: boolean };
 
 /** The five tiles, in the order the script names them. */
 export const TILES = [
@@ -44,6 +46,8 @@ export type MapState = {
   title: number;
   robot: { bob: number; blink: number };
   slip: { glow: number };
+  /** The small recipe beside the map (closing scene), 0..1. */
+  recipe: number;
 };
 
 export function frameState(props: MemoryMapProps, t: number, beats: number[], dur: number): MapState {
@@ -55,6 +59,7 @@ export function frameState(props: MemoryMapProps, t: number, beats: number[], du
     float: TILES.map((_, i) => 4 * Math.sin(tm * 1.6 + i * 1.7)),
     robot: { bob: Math.sin(tm * 2.4), blink: blinkAt(tm, 2.6) },
     slip: { glow: 0.45 + 0.35 * Math.sin(tm * 3) },
+    recipe: props.recipe === true ? 1 : 0,
   };
 
   if (mode === 'all') {
