@@ -3,7 +3,9 @@
 // (scene "margin") plus the "SHELF 0" labels.
 // One world throughout: a small robot running a warehouse, the red slip "SHELF 0: EMPTY", and an
 // office whose objects are the kinds of memory. The same slip is followed into each object:
-// - MemoryOffice (1, 4, 13, 14): the whole office: cold open, the layers, the verdict, the advice;
+// - MemoryMap (1): the cold open: the robot with the slip amid four tiles, each kind of memory with
+//   its human name and how it fails, all on screen from frame 0;
+// - MemoryOffice (4, 13, 14): the whole office: the layers, the verdict, the advice;
 // - WarehouseShelves (2-3): the test; the slip arrives, hours pass;
 // - HeadShelf (5): the bookshelf in its head (training); the slip bounces off the closed doors;
 // - MemoryDesk (6-7): the desk (working memory) overflows; the summary notecard keeps the slip;
@@ -30,8 +32,8 @@ const finish = (scenes: Scene[]): Scene[] => {
 const build = (): Cuts => ({
   main: finish([
     intro('hook', [say(0.1, 'An AI agent forgets the way you do. It just has more places to do it in.', '')], 3, {
-      name: 'MemoryOffice',
-      props: { mode: 'cold' },
+      name: 'MemoryMap',
+      props: { marks: [[0, 'forgets'], [0, 'more'], [0, 'places']] },
     }),
     anim('warehouse', 'WarehouseShelves', { mode: 'day', marks: [[1, 'told'], [1, 'empty']] }, [
       say(0.3, 'Here is my test. An agent runs a warehouse all day.', ''),

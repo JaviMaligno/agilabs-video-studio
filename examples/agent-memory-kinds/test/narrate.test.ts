@@ -79,9 +79,9 @@ test('settings and timeline of this video (EN only, 15 rows of script v3)', () =
   assert.equal(SETTINGS.targetSeconds, 120);
   assert.deepEqual(SETTINGS.articleTitle, { en: 'How an AI agent forgets', es: '' });
   assert.deepEqual(SETTINGS.music, { src: 'music/bed.wav', volume: 0.2, duck: 0.3 });
-  assert.equal(SETTINGS.poster, null);
+  assert.deepEqual(SETTINGS.poster, { scene: 'hook', second: 5.7 });
   assert.equal(TIMELINE[0].kind, 'intro');
-  assert.equal(TIMELINE[0].anim?.name, 'MemoryOffice');
+  assert.equal(TIMELINE[0].anim?.name, 'MemoryMap');
   assert.equal(TIMELINE.at(-1)?.kind, 'outro');
   assert.equal(TIMELINE.length, 15);
   // Every mark is resolved to a finite scene second.

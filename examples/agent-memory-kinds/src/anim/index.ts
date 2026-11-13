@@ -8,6 +8,7 @@ import { FlowDiagram } from './FlowDiagram.tsx';
 import { KeyQuote } from './KeyQuote.tsx';
 import { StatGrid } from './StatGrid.tsx';
 import { MemoryOffice } from './MemoryOffice.tsx';
+import { MemoryMap } from './MemoryMap.tsx';
 import { WarehouseShelves } from './WarehouseShelves.tsx';
 import { HeadShelf } from './HeadShelf.tsx';
 import { MemoryDesk } from './MemoryDesk.tsx';
@@ -24,6 +25,7 @@ export const ANIMS: Record<string, React.FC<AnimProps & any>> = {
   KeyQuote,
   StatGrid,
   MemoryOffice,
+  MemoryMap,
   WarehouseShelves,
   HeadShelf,
   MemoryDesk,

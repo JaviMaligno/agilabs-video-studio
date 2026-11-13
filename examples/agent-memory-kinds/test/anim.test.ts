@@ -6,6 +6,7 @@ import * as flow from '../src/anim/FlowDiagram.state.ts';
 import * as quote from '../src/anim/KeyQuote.state.ts';
 import * as grid from '../src/anim/StatGrid.state.ts';
 import * as office from '../src/anim/MemoryOffice.state.ts';
+import * as map from '../src/anim/MemoryMap.state.ts';
 import * as warehouse from '../src/anim/WarehouseShelves.state.ts';
 import * as head from '../src/anim/HeadShelf.state.ts';
 import * as desk from '../src/anim/MemoryDesk.state.ts';
@@ -64,6 +65,9 @@ const CASES: Case[] = [
     { name: `MemoryOffice ${mode}`, state: (t: number, b: number[], d: number) => office.frameState({ mode }, t, b, d) },
     { name: `MemoryOffice ${mode} (marks)`, state: (t: number, b: number[], d: number) => office.frameState({ mode, marks: [0.5, 1, Number.NaN, 2.5, 9] }, t, b, d) },
   ]),
+  { name: 'MemoryMap', state: (t, b, d) => map.frameState({}, t, b, d) },
+  { name: 'MemoryMap (marks, one broken)', state: (t, b, d) => map.frameState({ marks: [0.9, Number.NaN, 4] }, t, b, d) },
+  { name: 'MemoryMap (marks out of order)', state: (t, b, d) => map.frameState({ marks: [3, 1, 0.5] }, t, b, d) },
   ...warehouse.WAREHOUSE_MODES.flatMap((mode) => [
     { name: `WarehouseShelves ${mode}`, state: (t: number, b: number[], d: number) => warehouse.frameState({ mode }, t, b, d) },
     { name: `WarehouseShelves ${mode} (marks)`, state: (t: number, b: number[], d: number) => warehouse.frameState({ mode, marks: [3, 0.2] }, t, b, d) },
@@ -218,4 +222,24 @@ test('StatGrid: tiles pop in per beat and lay out in a grid', () => {
   assert.deepEqual(grid.gridShape(4, true), { cols: 2, rows: 2 });
   assert.deepEqual(grid.gridShape(3, true), { cols: 1, rows: 3 });
   assert.deepEqual(grid.gridShape(3, false), { cols: 3, rows: 1 });
+});
+
+test('MemoryMap shows all four tiles from frame 0 and sweeps them in order', () => {
+  const marks = [1, 3.7, 4];
+  const at = (t: number) => map.frameState({ marks }, t, [0.1], 5.6);
+  // First second: every tile already on screen, labels and failures in place.
+  assert.deepEqual(at(0).opacity, [1, 1, 1, 1]);
+  assert.equal(map.TILES.length, 4);
+  for (const tile of map.TILES) assert.ok(tile.label.length > 0 && tile.fail.length > 0);
+  // The sweep: tile i peaks before tile i + 1, the last one on the second mark ("more").
+  const peaks = [0, 1, 2, 3].map((i) => {
+    let best = 0;
+    for (let t = 0; t <= 5.6; t += 0.01) if (at(t).emphasis[i] > at(best).emphasis[i]) best = t;
+    return best;
+  });
+  for (let i = 1; i < 4; i++) assert.ok(peaks[i] > peaks[i - 1], `tile ${i} peaks at ${peaks[i]}, after ${peaks[i - 1]}`);
+  assert.ok(Math.abs(peaks[3] - 3.7) < 0.05, `last peak at ${peaks[3]}`);
+  // After the hold: all four alike.
+  const end = at(5).emphasis;
+  for (const e of end) assert.ok(Math.abs(e - map.HOLD) < 1e-6);
 });
