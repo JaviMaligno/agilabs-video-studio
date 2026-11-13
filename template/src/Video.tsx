@@ -16,7 +16,7 @@ import { HookOverlay, Intro, Outro } from './components/Cards.tsx';
 import { Captions } from './components/Captions.tsx';
 import { Cameo, type CameoSpec } from './components/Cameo.tsx';
 import { Badge } from './components/Brand.tsx';
-import { dip } from './components/Dip.tsx';
+import { dip, fade } from './components/Dip.tsx';
 import type { Lang, Scene } from './types.ts';
 
 /** noSubs: no captions (poster frames and thumbnails). */
@@ -128,6 +128,9 @@ const Music: React.FC<{ scenes: Scene[] }> = ({ scenes }) => {
   );
 };
 
+/** Consecutive scenes drawn by the same animation continue one picture: no dip between them. */
+const sameWorld = (a: Scene, b: Scene | undefined): boolean => !!b && !!a.anim && !!b.anim && a.anim.name === b.anim.name;
+
 export const ArticleVideo: React.FC<ArticleVideoProps> = (p) => {
   const scenes = scenesFor(p.voice);
   return (
@@ -141,7 +144,7 @@ export const ArticleVideo: React.FC<ArticleVideoProps> = (p) => {
               <SceneView scene={scene} p={p} />
             </TransitionSeries.Sequence>
             {i < scenes.length - 1 && (
-              <TransitionSeries.Transition presentation={dip()} timing={linearTiming({ durationInFrames: SCENE_TRANSITION })} />
+              <TransitionSeries.Transition presentation={sameWorld(scene, scenes[i + 1]) ? fade() : dip()} timing={linearTiming({ durationInFrames: SCENE_TRANSITION })} />
             )}
           </React.Fragment>
         ))}
