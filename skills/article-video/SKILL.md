@@ -82,8 +82,9 @@ when installed as a plugin; next to `skills/` in the plugin repo).
    captions matching the beat on screen. A clean build is not proof that a frame looks right.
 10. **Render:** `npm run render` (vertical EN). `-- --es` for the Spanish cut, `-- --landscape`
     for 1920x1080. Then `npm run audio-qa` again to measure the mix (-16 LUFS integrated).
-11. **Deliver:** `npm run deliver` writes the poster PNG, the SRT and `out/manifest.json`. Look
-    at the poster. Hand over the MP4 path and the poster; publishing is a separate step.
+11. **Deliver:** `npm run deliver` writes the poster PNG, the SRT and `out/manifest.json`. The
+    cover is designed with the cold open, not taken from a default frame (see "Cover (poster)" in
+    `explainer-animation`): look at it at full size and at thumbnail size before handing it over. Hand over the MP4 path and the poster; publishing is a separate step.
 
 ## Re-rendering an existing video
 

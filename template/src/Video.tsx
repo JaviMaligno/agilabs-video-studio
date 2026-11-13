@@ -12,7 +12,7 @@ import { C } from './brand.ts';
 import { fontFamily, V } from './theme.ts';
 import { ANIMS } from './anim/index.ts';
 import { Background } from './components/Background.tsx';
-import { HookOverlay, Intro, Outro } from './components/Cards.tsx';
+import { HookOverlay, Intro, Outro, PosterTitle } from './components/Cards.tsx';
 import { Captions } from './components/Captions.tsx';
 import { Cameo, type CameoSpec } from './components/Cameo.tsx';
 import { Badge } from './components/Brand.tsx';
@@ -86,7 +86,8 @@ const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p 
           <div style={{ position: 'absolute', top: p.vertical ? V.badgeTop : 48, left: 0, right: 0, display: 'flex', justifyContent: 'center' }}>
             <Badge size={p.vertical ? 1.1 : 0.9} />
           </div>
-          <HookOverlay hook={scene.lines[0]} lang={p.subs} vertical={p.vertical} />
+          {/* noSubs is the poster render (deliver.mjs): the short title instead of the spoken hook */}
+          {p.noSubs ? <PosterTitle lang={p.subs} vertical={p.vertical} /> : <HookOverlay hook={scene.lines[0]} lang={p.subs} vertical={p.vertical} />}
         </>
       )}
       {scene.kind === 'outro' && <Outro lang={p.subs} vertical={p.vertical} />}
