@@ -167,7 +167,7 @@ const build = (): Cuts => ({
     anim(
       'form',
       'ClipboardForm',
-      { mode: 'replace', marks: [[0, 'form'], [0, 'boxes'], [0, 'shelf'], [1, 'empty'], [1, 'old']] },
+      { mode: 'replace', marks: [[0, 'form'], [0, 'boxes'], [0, 'shelf'], [1, 'empty'], [1, 'old'], [2, 'ten'], [2, 'hundred']] },
       [
         say(0.3, "The last memory is the strictest: a form. Fixed boxes, like what's on each shelf. Each step, the agent updates the boxes, and everything else is thrown away.", ''),
         say(0, `Like a patient's chart. When the message arrives, "empty" goes into shelf zero's box, and the old value is gone.`, ''),
@@ -175,12 +175,12 @@ const build = (): Cuts => ({
       ],
       { chapter: 'The form', min: 26.8 }, // time to read the last cue, "two hundred."
     ),
-    anim('nobox', 'ClipboardForm', { mode: 'margin', marks: [[0, 'jotted'], [0, 'wipes'], [1, 'named'], [1, 'every']] }, [
+    anim('nobox', 'ClipboardForm', { mode: 'margin', marks: [[0, 'jotted'], [0, 'wipes'], [1, 'named'], [1, 'every'], [2, 'notes'], [2, 'say']] }, [
       say(0.2, 'But a form only holds what it has a box for. A fact with no box gets jotted next to the last entry, and the next entry wipes it.', ''),
       say(0, 'With no box for it, none of twenty-four runs kept the fact. With a box named after it, one model kept it every time, and others most of the time.', ''),
       say(0, 'A general box for notes helped much less. The box has to say what goes in it.', ''),
     ]),
-    anim('wrong', 'ClipboardForm', { mode: 'wrong', marks: [[0, 'misremembers'], [1, 'wrong'], [1, 'mistakes'], [1, 'box']] }, [
+    anim('wrong', 'ClipboardForm', { mode: 'wrong', marks: [[0, 'misremembers'], [1, 'wrong'], [1, 'correctly'], [1, 'box'], [1, 'mistakes'], [2, 'record'], [2, 'followed']] }, [
       say(0.2, "And then a stranger failure. A form doesn't forget. It misremembers.", '', undefined, { emotion: 'skeptical' }),
       say(0, 'On one model, the agent moved a pallet correctly, then wrote the wrong pallet into the box. In one run, about twenty-five mistakes followed, all from that one box.', ''),
       say(0, "Nothing checks that a box matches reality. When that model also kept the day's record beside the form, those slips did no harm: where the two disagreed, it followed the record.", ''),

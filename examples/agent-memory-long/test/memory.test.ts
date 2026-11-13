@@ -6,7 +6,7 @@ import { BAYS, HERE_TEXT, LANDING_BAY, NOON, ROBOT_PATH, TWO, WAREHOUSE_MODES, f
 import { SLIP_PATH, frameState as head } from '../src/anim/HeadShelf.state.ts';
 import { CARD_TEXT, CROWDED_PAGES, DESK_MODES, FORK, MAX_PAGES, ONE_IN_TEXT, WORK_PAGES, frameState as desk } from '../src/anim/MemoryDesk.state.ts';
 import { CABINET_MODES, DRAWER_TAGS, LINE_TEXT, STAT_TEXT, frameState as cabinet } from '../src/anim/FilingCabinet.state.ts';
-import { FORM_MODES, FULL_TEXT, MARGIN_TEXT, RUNS, ZERO_TEXT, frameState as form } from '../src/anim/ClipboardForm.state.ts';
+import { CASCADE, FORM_MODES, FULL_TEXT, MARGIN_TEXT, NAMED_LABEL, NAMED_VALUE, NOTES_TEXT, RUNS, SECOND_TEXT, STEPS, ZERO_TEXT, frameState as form } from '../src/anim/ClipboardForm.state.ts';
 import { SHELF0, SLIP_TEXT } from '../src/anim/memory.ts';
 
 /** Fields that are opacities or progress and must stay within [0, 1] in these components. */
@@ -15,7 +15,7 @@ const UNIT = new Set([
   'question', 'books', 'cap', 'lock', 'bounce', 'desk', 'deskLit', 'cover', 'spill', 'gauge', 'amber', 'squeeze', 'write', 'fade',
   'move', 'tick', 'pile', 'sweep', 'inDrawer', 'drawers', 'clean', 'found', 'peek', 'cross', 'boxes', 'shelfRow', 'rowLit', 'strike',
   'prog', 'fly', 'erase', 'eraser', 'scribble', 'zero', 'fill', 'full', 'inset',
-  'rules', 'top', 'one', 'other', 'label', 'needed', 'fork', 'here', 'stream', 'doors', 'back', 'fall', 'into', 'tags', 'stat',
+  'rules', 'top', 'one', 'other', 'label', 'needed', 'fork', 'here', 'stream', 'doors', 'back', 'fall', 'into', 'tags', 'stat', 'ghost', 'glow', 'second', 'dim', 'record', 'mismatch', 'follow',
 ]);
 
 const walk = (v: unknown, path: string, key = '') => {
@@ -60,7 +60,7 @@ test('on-screen texts are exactly the agreed ones', () => {
   assert.equal(RUNS, 24);
   assert.equal(ADVICE_LINE, 'what my tests point to');
   assert.equal(CARD_TEXT, 'shelf 0: empty');
-  assert.equal(MARGIN_TEXT, 'shelf 0: empty');
+  assert.equal(MARGIN_TEXT, 'shelf 4: quarantine');
 });
 
 test('the cold open carries the slip from the very first frame', () => {
@@ -251,18 +251,92 @@ test('ClipboardForm: replace rewrites the box; margin erases, then 24 ticks; wro
     assert.equal(r.slip.opacity, 0);
     const m = form({ mode: 'margin' }, dur, beats, dur);
     assert.equal(m.margin.erase, 1);
-    assert.equal(m.zero, 0); // 0/24 leaves once the named box is back
+    assert.equal(m.zero, 1); // 0/24 stays as the first row of the results
     assert.equal(m.ticks, RUNS);
     assert.equal(m.full, 1);
     assert.equal(m.shelfRow, 1);
+    assert.deepEqual(m.named, { opacity: 1, write: 1, glow: 1 });
+    assert.equal(m.second, 1);
+    assert.equal(m.notes.fill, 0.5, 'the notes box is half-filled');
+    assert.equal(m.notes.dim, 1);
     const w = form({ mode: 'wrong' }, dur, beats, dur);
     assert.equal(w.value.next, 'full');
     assert.equal(w.value.write, 1);
     assert.equal(w.tick, 1);
-    assert.equal(w.pages, 0);
+    assert.equal(w.cascade, CASCADE);
+    assert.equal(w.record, 1);
+    assert.equal(w.pages, 1, 'the record is back beside the form');
+    assert.equal(w.follow, 1);
   }
-  // The margin scene opens on a form without the SHELF 0 box.
-  assert.ok(form({ mode: 'margin' }, 1, [0.2, 4], 9).shelfRow < 0.05);
+  // The SHELF 0 box stays on the form throughout the margin scene: the missing box is another one.
+  for (let t = 0; t <= 9; t += 0.25) assert.equal(form({ mode: 'margin' }, t, [0.2, 4], 9).shelfRow, 1);
+});
+
+test('ClipboardForm figures and labels are the agreed ones', () => {
+  assert.deepEqual([ZERO_TEXT, FULL_TEXT, SECOND_TEXT, NOTES_TEXT], ['0/24', '24/24', '16/24', '10/24']);
+  assert.equal(NAMED_LABEL, 'QUARANTINED');
+  assert.equal(NAMED_VALUE, 'shelf 4');
+  assert.deepEqual(STEPS, { from: 10, to: 200 });
+  assert.equal(CASCADE, 25);
+});
+
+test('ClipboardForm replace: the counter runs 10 to 200 after the rewrite; the ghost stack grows, the form does not', () => {
+  const marks = [3.8, 4.6, 6.5, 16, 19, 23, 25];
+  const at = (t: number) => form({ mode: 'replace', marks }, t, [1.3, 12.5, 20.6], 27);
+  assert.equal(at(22).counter.opacity, 0);
+  assert.equal(at(22).ghost, 0);
+  assert.equal(at(23).counter.step, STEPS.from);
+  let prev = 0;
+  for (let t = 22; t <= 27; t += 0.1) {
+    const s = at(t);
+    assert.ok(Number.isInteger(s.counter.step) && s.counter.step >= prev && s.counter.step <= STEPS.to);
+    prev = s.counter.step;
+  }
+  assert.equal(at(26).counter.step, STEPS.to);
+  assert.equal(at(26).ghost, 1);
+  // A counter mark before the rewrite is pushed after it.
+  const odd = (t: number) => form({ mode: 'replace', marks: [1, 2, 3, 6, 7, 2, 3] }, t, [0.3, 5], 12);
+  assert.equal(odd(7.3).counter.opacity, 0);
+});
+
+test('ClipboardForm margin: jotted, wiped (0/24), named box with 24/24 and 16/24, notes half-filled then dimmed', () => {
+  const marks = [5, 8.4, 14, 16.6, 21, 24];
+  const at = (t: number) => form({ mode: 'margin', marks }, t, [0.2, 9.4, 19.7], 26);
+  assert.ok(at(4.8).margin.write > 0);
+  assert.equal(at(8).margin.erase, 0);
+  assert.ok(at(9.2).margin.erase > 0.99);
+  assert.ok(at(9.4).zero > 0.99);
+  assert.equal(at(13.7).named.opacity, 0);
+  assert.equal(at(13.7).ticks, 0);
+  assert.ok(at(14.5).named.opacity > 0.99);
+  assert.equal(at(16).ticks, RUNS);
+  assert.equal(at(16.8).second, 0);
+  assert.ok(at(17.4).second > 0.99);
+  assert.equal(at(20.7).notes.opacity, 0);
+  assert.ok(Math.abs(at(22).notes.fill - 0.5) < 1e-9);
+  assert.equal(at(23.7).notes.dim, 0);
+  assert.equal(at(23.7).named.glow, 0);
+  assert.ok(at(24.6).notes.dim > 0.99 && at(24.6).named.glow > 0.99);
+});
+
+test('ClipboardForm wrong: tick on the wrong value, then 25 mistakes, then the record comes back and is followed', () => {
+  const marks = [4, 7, 6.4, 9.7, 13.6, 20, 27];
+  const at = (t: number) => form({ mode: 'wrong', marks }, t, [0.2, 5.2, 16.8], 30);
+  assert.equal(at(9.6).tick, 0);
+  assert.ok(at(10.2).tick > 0.99);
+  assert.equal(at(13.5).cascade, 0);
+  let prev = 0;
+  for (let t = 13; t <= 16; t += 0.05) {
+    const c = at(t).cascade;
+    assert.ok(Number.isInteger(c) && c >= prev && c <= CASCADE);
+    prev = c;
+  }
+  assert.equal(at(15.5).cascade, CASCADE);
+  assert.ok(at(12).pages < 0.05, 'the record is gone while the form misremembers');
+  assert.ok(at(20.6).record > 0.99);
+  assert.ok(at(20.9).mismatch > 0);
+  assert.equal(at(26.9).follow, 0);
+  assert.ok(at(27.5).follow > 0.99);
 });
 
 test('MemoryDesk work: the record piles under the slip, which stays on top; the pallet goes to shelf 0', () => {
