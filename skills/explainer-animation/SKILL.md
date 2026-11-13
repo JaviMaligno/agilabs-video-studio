@@ -200,6 +200,39 @@ picture, so the cover and the first second promise the same thing.
   (above the two caption rows), 936 px wide. `Stage` / `stageOf()` give you that box.
 - Captions sit below the stage, at most two rows of ~32 characters, within ~900 px.
 
+## Landscape and both formats
+
+Every video has a landscape composition too (`Main-EN-landscape`, 1920x1080; the long YouTube
+format lives there). The landscape stage runs from y = 140 to y = 830 and x = 160 to x = 1760;
+the captions take the band under it. A drawing laid out for 1080x1920 does not fit there.
+
+- **Design each scene for its format.** Not a squeezed copy: a vertical scene stacks things, a
+  landscape one sets them side by side. Draw the parts once and give each format its own layout.
+- **`<Canvas vertical={p.vertical}>`** (`src/anim/Canvas.tsx`) is the full-frame SVG in the
+  format's own pixels; `place()`, `stageBox()`, `inStage()` and `fitInto()` (`src/anim/canvas.ts`)
+  give positions per format:
+
+  ```tsx
+  const L = place(p.vertical, {
+    v: { robot: { x: 830, y: 560, s: 0.9 }, desk: { x: 140, y: 1000, w: 800 } },
+    l: { robot: { x: 1500, y: 260, s: 0.8 }, desk: { x: 420, y: 620, w: 900 } },
+  });
+  return (
+    <Canvas vertical={p.vertical}>
+      <Desk {...L.desk} />
+      <Robot {...L.robot} />
+    </Canvas>
+  );
+  ```
+
+  `frameState` stays format-free (it returns progress, not pixels), so one state test covers both.
+- **Stopgap:** `<Canvas vertical={p.vertical} design="vertical">` fits a vertical-only drawing
+  into the landscape stage, scaled down. Nothing overflows, but it is small; port the scene before
+  the final render.
+- **Keep the captions zone clear** in both formats: nothing below the stage bottom.
+- **Check stills in both formats** (`Main-EN-vertical` and `Main-EN-landscape`) for every scene
+  you port, and Read them.
+
 ## Stills: look at them
 
 Render stills and **Read every PNG** before rendering the video. A clean lint or build does not
