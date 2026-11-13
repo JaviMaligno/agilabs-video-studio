@@ -68,8 +68,7 @@ const build = (): Cuts => ({
       ],
       { min: 19 }, // the label "10% old reading → ~73% of the loss recovered" needs time to be read
     ),
-    // placeholder for TwoJobs (rows 11-12)
-    anim('habit', 'KeyQuote', { text: "B doesn't depend on A", emphasis: ["doesn't"] }, [
+    anim('habit', 'TwoJobs', { marks: [[0, 'independent'], [0, 'said'], [0, 'first'], [0, 'won'], [1, 'lands']] }, [
       say(0.3, 'Old habits also push back against the facts in front of it. In another test, models read that two jobs were independent, said so, and still put one first, as if habit won.', ''),
       // a breath after "as if habit won." (also keeps its last cue on screen long enough)
       say(12.9, 'So the message from noon has to live somewhere it can actually be read. It lands on the desk.', ''),

@@ -13,6 +13,7 @@ import * as desk from '../src/anim/MemoryDesk.state.ts';
 import * as cabinet from '../src/anim/FilingCabinet.state.ts';
 import * as form from '../src/anim/ClipboardForm.state.ts';
 import * as replay from '../src/anim/ReplayBars.state.ts';
+import * as jobs from '../src/anim/TwoJobs.state.ts';
 
 // Fields that are animation progress and must stay within [0, 1].
 const PROGRESS = new Set(['progress', 'appear', 'grow', 'fill', 'draw', 'pop', 'opacity', 'emphasis']);
@@ -91,6 +92,8 @@ const CASES: Case[] = [
   ]),
   { name: 'ReplayBars', state: (t, b, d) => replay.frameState({}, t, b, d) },
   { name: 'ReplayBars (marks out of order, one broken)', state: (t, b, d) => replay.frameState({ marks: [3, 1, Number.NaN, 0.5, 0.2] }, t, b, d) },
+  { name: 'TwoJobs', state: (t, b, d) => jobs.frameState({}, t, b, d) },
+  { name: 'TwoJobs (marks out of order, one broken)', state: (t, b, d) => jobs.frameState({ marks: [4, 1, Number.NaN, 0.2, 0.1] }, t, b, d) },
 ];
 
 const SCENARIOS = [
@@ -302,4 +305,29 @@ test('ReplayBars: the terminal bar rises and the general bars sink, then replay 
   });
   assert.equal(end.labelWon, 1);
   assert.equal(replay.LABEL_MIX + ' ' + replay.LABEL_WON, '10% old reading → ~73% of the loss recovered');
+});
+
+test('TwoJobs: the plan is read and repeated, the arrow is drawn anyway, then the slip lands on the desk', () => {
+  const marks = [6, 7.4, 9, 10.5, 16];
+  const at = (t: number) => jobs.frameState({ marks }, t, [0.3, 12.9], 19);
+  const early = at(1);
+  assert.ok(early.plan.opacity > 0.99);
+  assert.equal(early.plan.lit, 0);
+  assert.equal(early.bubble.opacity, 0);
+  assert.equal(early.arrow.draw, 0);
+  assert.equal(early.desk, 0);
+  assert.equal(early.slip.opacity, 0);
+  // The bubble repeats the plan before the arrow is drawn.
+  assert.ok(at(8.5).bubble.opacity > 0.99);
+  assert.equal(at(8.5).arrow.draw, 0);
+  assert.ok(at(10.2).arrow.draw > 0.99);
+  assert.ok(at(11).arrow.tag > 0.99);
+  // Line 1: everything clears for the desk; the slip is on it by "lands".
+  const end = at(19);
+  assert.equal(end.clear, 1);
+  assert.equal(end.plan.opacity, 0);
+  assert.equal(end.desk, 1);
+  assert.equal(end.slip.drop, 1);
+  assert.ok(at(16.5).slip.drop > 0.99);
+  assert.ok(at(14).slip.drop < 0.9);
 });
