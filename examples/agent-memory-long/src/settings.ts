@@ -31,9 +31,9 @@ export const SETTINGS: Settings = {
   music: { src: 'music/bed.wav', volume: 0.2, duck: 0.3 },
   // The long YouTube version (landscape, 7 chapters): script.md counts ~9.5 min.
   targetSeconds: 570,
-  // Placeholder until the scenes are built: the memory map with its tiles glowing.
-  poster: { scene: 'map', second: 8 },
-  thumbnail: { scene: 'map', second: 8 },
+  // The memory map once all five tiles and the title are on (scene 'map', after "Each one forgets").
+  poster: { scene: 'map', second: 19 },
+  thumbnail: { scene: 'map', second: 19 },
   articleTitle: { en: 'How an AI agent forgets', es: '' },
   avatar: null,
 };

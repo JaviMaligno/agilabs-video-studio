@@ -1,6 +1,5 @@
-// The memory map, the cold open (scene 1): the robot with the red slip in the middle, four tiles
-// around it (the desk, the gist, the notebook, the form), each a one-word human name over a
-// drawing of how it fails. See MemoryMap.state.ts.
+// The memory map: the robot with the red slip and five tiles (training, the desk, the summary, the
+// notebook, the form), each a one-word name over a drawing of how it fails. See MemoryMap.state.ts.
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import { C, alpha } from '../brand.ts';
@@ -8,41 +7,62 @@ import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
 import { CARD_TEXT } from './MemoryDesk.state.ts';
 import { SHELF0 } from './memory.ts';
-import { TILES, frameState, type MemoryMapProps, type TileKind } from './MemoryMap.state.ts';
+import { MAP_TITLE, TILES, frameState, type MemoryMapProps, type TileKind } from './MemoryMap.state.ts';
 import { place } from './canvas.ts';
-import { Badge, Cabinet, Desk, Frame, Lens, MiniClipboard, Notecard, Page, Robot, Slip, glow } from './office.tsx';
+import { Badge, BookShelf, Cabinet, Desk, Frame, Lens, MiniClipboard, Notecard, Page, Robot, Slip, glow } from './office.tsx';
 
 export { frameState };
 export type { MemoryMapProps };
 
+/** Tile pictures are drawn in a 460 x 339 box and scaled by `k` per format. */
+const TILE = { w: 460, h: 339 } as const;
+
 /**
- * Layout (frame pixels), per format; tiles keep their size (460 x 339) so the pictures are shared.
- * - vertical: two rows of tiles with the robot's band between them, all inside the stage and
- *   above the hook panel the intro lays at y = 1216 (V.stageBottom - 110);
- * - landscape: two tiles on each side of the stage (x 160-1760, y 140-830), the robot and its
- *   slip in the middle column.
+ * Layout (frame pixels), per format, tiles in TILES order.
+ * - landscape (stage x 160-1760, y 140-830): the title across the top, three tiles in a row, then
+ *   NOTEBOOK and FORM with the robot and its slip between them;
+ * - vertical (stage y 236-1326): two columns, FORM beside the robot on the third row, the title under.
  */
 const LAYOUT = {
   v: {
-    cols: [72, 548],
-    rows: [236, 865],
-    w: 460,
-    h: 339,
-    robot: { x: 330, y: 617, s: 0.5 },
-    slip: { x: 600, y: 702, w: 400, rot: -5 },
+    k: 0.8,
+    tiles: [
+      { x: 142, y: 236 },
+      { x: 570, y: 236 },
+      { x: 142, y: 527 },
+      { x: 570, y: 527 },
+      { x: 142, y: 818 },
+    ],
+    robot: { x: 690, y: 836, s: 0.5 },
+    slip: { x: 850, y: 948, w: 210, rot: -5 },
+    title: { x: 540, y: 1180, size: 64 },
   },
   l: {
-    cols: [170, 1290],
-    rows: [146, 485],
-    w: 460,
-    h: 339,
-    robot: { x: 800, y: 360, s: 0.6 },
-    slip: { x: 1070, y: 460, w: 400, rot: -5 },
+    k: 0.835,
+    tiles: [
+      { x: 344, y: 238 },
+      { x: 768, y: 238 },
+      { x: 1192, y: 238 },
+      { x: 344, y: 545 },
+      { x: 1192, y: 545 },
+    ],
+    robot: { x: 870, y: 562, s: 0.5 },
+    slip: { x: 1040, y: 660, w: 220, rot: -5 },
+    title: { x: 960, y: 200, size: 60 },
   },
 };
 
 /** The picture of each memory and its failure, in tile coordinates (460 x 339, under the label). */
 const Picture: React.FC<{ kind: TileKind }> = ({ kind }) => {
+  if (kind === 'training')
+    return (
+      // the shelf of what it learned, behind closed glass; today's slip bounces off
+      <g>
+        <BookShelf x={50} y={128} w={270} h={170} lit={1} doors={1} />
+        <path d="M 330 150 Q 360 120 392 170" fill="none" stroke={alpha(C.marker, 0.8)} strokeWidth={5} strokeDasharray="10 8" />
+        <Slip x={392} y={222} w={120} rot={24} />
+      </g>
+    );
   if (kind === 'desk')
     return (
       // the desk with its pile, pages spilling off the edge
@@ -55,8 +75,8 @@ const Picture: React.FC<{ kind: TileKind }> = ({ kind }) => {
         <Page x={485} y={150} w={130} rot={62} />
       </g>
     );
-  if (kind === 'gist')
-    // the gist on a card, the exact words blurred below it
+  if (kind === 'summary')
+    // the summary on a card, the exact words blurred below it
     return <Notecard x={230} y={218} w={340} text={CARD_TEXT} write={1} blur={1} />;
   if (kind === 'notebook')
     return (
@@ -94,25 +114,49 @@ export const MemoryMap: React.FC<AnimProps & MemoryMapProps> = (p) => {
     <AbsoluteFill style={{ fontFamily }}>
       <Frame vertical={p.vertical} design="both">
         {TILES.map((tile, i) => {
-          const x = L.cols[i % 2];
-          const y = L.rows[Math.floor(i / 2)] + s.float[i];
+          const { x, y: y0 } = L.tiles[i];
+          const y = y0 + s.float[i];
           const e = s.emphasis[i];
-          const k = 1 + 0.02 * e;
+          const op = s.opacity[i];
+          const k = L.k * (1 + 0.02 * e);
           return (
-            <g key={tile.kind} opacity={s.opacity[i]} transform={`translate(${x + L.w / 2} ${y + L.h / 2}) scale(${k}) translate(${-L.w / 2} ${-L.h / 2})`}>
-              <g style={glow(C.accentText, e)}>
-                <rect x={0} y={0} width={L.w} height={L.h} rx={28} fill={C.card} stroke={alpha(C.accentText, 0.45 + 0.55 * e)} strokeWidth={4 + 2 * e} />
-              </g>
-              <text x={L.w / 2} y={80} textAnchor="middle" fontSize={64} fontWeight={800} fill={C.text} letterSpacing={1}>
-                {tile.label}
-              </text>
-              <Picture kind={tile.kind} />
+            <g key={tile.kind} transform={`translate(${x + (TILE.w * L.k) / 2} ${y + (TILE.h * L.k) / 2}) scale(${k}) translate(${-TILE.w / 2} ${-TILE.h / 2})`}>
+              {/* the empty frame, drawn in before the tile is named */}
+              {op < 1 && s.frames > 0 && (
+                <rect
+                  x={0}
+                  y={0}
+                  width={TILE.w}
+                  height={TILE.h}
+                  rx={28}
+                  fill="none"
+                  stroke={alpha(C.accentText, 0.5 * s.frames * (1 - op))}
+                  strokeWidth={4}
+                  strokeDasharray="18 14"
+                />
+              )}
+              {op > 0 && (
+                <g opacity={op}>
+                  <g style={glow(C.accentText, e)}>
+                    <rect x={0} y={0} width={TILE.w} height={TILE.h} rx={28} fill={C.card} stroke={alpha(C.accentText, 0.45 + 0.55 * e)} strokeWidth={4 + 2 * e} />
+                  </g>
+                  <text x={TILE.w / 2} y={80} textAnchor="middle" fontSize={64} fontWeight={800} fill={C.text} letterSpacing={1}>
+                    {tile.label}
+                  </text>
+                  <Picture kind={tile.kind} />
+                </g>
+              )}
             </g>
           );
         })}
-        {/* the middle: the robot holding up the message every tile is about */}
+        {/* the robot holding up the message every tile is about */}
         <Slip x={L.slip.x} y={L.slip.y + s.robot.bob * 3} w={L.slip.w} rot={L.slip.rot} glowA={s.slip.glow} />
         <Robot x={L.robot.x} y={L.robot.y + s.robot.bob * 3} s={L.robot.s} face={-1} armUp={1} shelf={0.6} blink={s.robot.blink} />
+        {s.title > 0 && (
+          <text x={L.title.x} y={L.title.y} textAnchor="middle" fontSize={L.title.size} fontWeight={800} fill={C.text} opacity={s.title} letterSpacing={0.5}>
+            {MAP_TITLE}
+          </text>
+        )}
       </Frame>
     </AbsoluteFill>
   );

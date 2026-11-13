@@ -38,7 +38,7 @@ const build = (): Cuts => ({
     anim(
       'map',
       'MemoryMap',
-      { marks: [[1, 'training'], [1, 'desk'], [1, 'summary'], [1, 'notebook'], [1, 'form'], [2, 'Each']] },
+      { mode: 'reveal', marks: [[1, 'training'], [1, 'desk'], [1, 'summary'], [1, 'notebook'], [1, 'form'], [2, 'Each']] },
       [
         say(0.2, "It didn't ignore the message. It forgot it. And how it forgot says a lot about how these systems remember.", ''),
         say(0, 'An agent has several memories, a bit like you. What it learned in training. Its desk. A summary. A notebook. And a form.', ''),

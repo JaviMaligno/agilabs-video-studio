@@ -66,6 +66,8 @@ const CASES: Case[] = [
     { name: `MemoryOffice ${mode} (marks)`, state: (t: number, b: number[], d: number) => office.frameState({ mode, marks: [0.5, 1, Number.NaN, 2.5, 9] }, t, b, d) },
   ]),
   { name: 'MemoryMap', state: (t, b, d) => map.frameState({}, t, b, d) },
+  { name: 'MemoryMap reveal', state: (t, b, d) => map.frameState({ mode: 'reveal' }, t, b, d) },
+  { name: 'MemoryMap reveal (marks)', state: (t, b, d) => map.frameState({ mode: 'reveal', marks: [1, 2, 3, 4, 5, 6] }, t, b, d) },
   { name: 'MemoryMap (marks, one broken)', state: (t, b, d) => map.frameState({ marks: [0.9, Number.NaN, 4] }, t, b, d) },
   { name: 'MemoryMap (marks out of order)', state: (t, b, d) => map.frameState({ marks: [3, 1, 0.5] }, t, b, d) },
   ...warehouse.WAREHOUSE_MODES.flatMap((mode) => [
@@ -224,22 +226,49 @@ test('StatGrid: tiles pop in per beat and lay out in a grid', () => {
   assert.deepEqual(grid.gridShape(3, false), { cols: 3, rows: 1 });
 });
 
-test('MemoryMap shows all four tiles from frame 0 and sweeps them in order', () => {
-  const marks = [1, 3.7, 4];
-  const at = (t: number) => map.frameState({ marks }, t, [0.1], 5.6);
-  // First second: every tile already on screen, one word each (the drawings carry the failures).
-  assert.deepEqual(at(0).opacity, [1, 1, 1, 1]);
-  assert.equal(map.TILES.length, 4);
-  assert.deepEqual(map.TILES.map((x) => x.label), ['DESK', 'GIST', 'NOTEBOOK', 'FORM']);
-  // The sweep: tile i peaks before tile i + 1, the last one on the second mark ("more").
-  const peaks = [0, 1, 2, 3].map((i) => {
-    let best = 0;
-    for (let t = 0; t <= 5.6; t += 0.01) if (at(t).emphasis[i] > at(best).emphasis[i]) best = t;
-    return best;
-  });
-  for (let i = 1; i < 4; i++) assert.ok(peaks[i] > peaks[i - 1], `tile ${i} peaks at ${peaks[i]}, after ${peaks[i - 1]}`);
-  assert.ok(Math.abs(peaks[3] - 3.7) < 0.05, `last peak at ${peaks[3]}`);
-  // After the hold: all four alike.
-  const end = at(5).emphasis;
-  for (const e of end) assert.ok(Math.abs(e - map.HOLD) < 1e-6);
+test('MemoryMap: five tiles named TRAINING, DESK, SUMMARY, NOTEBOOK, FORM', () => {
+  assert.deepEqual(map.TILES.map((x) => x.label), ['TRAINING', 'DESK', 'SUMMARY', 'NOTEBOOK', 'FORM']);
+  assert.equal(map.MAP_TITLE, 'How an AI agent forgets');
+});
+
+test('MemoryMap all: every tile and the title on screen from frame 0', () => {
+  const s = map.frameState({}, 0, [0.2], 6);
+  assert.deepEqual(s.opacity, [1, 1, 1, 1, 1]);
+  assert.equal(s.title, 1);
+  assert.ok(s.emphasis.every((e) => e === map.HOLD));
+});
+
+test('MemoryMap reveal: each tile is drawn on its mark and stays on; the title comes last', () => {
+  const marks = [10, 11, 12, 13, 14, 16];
+  const at = (t: number) => map.frameState({ mode: 'reveal', marks }, t, [0.2, 8, 16], 22);
+  // Before the first name: only the empty frames, no tile, no title.
+  const early = at(5);
+  assert.ok(early.frames > 0.99);
+  assert.deepEqual(early.opacity, [0, 0, 0, 0, 0]);
+  assert.equal(early.title, 0);
+  // Each tile appears on its own mark, after the previous one, and does not leave.
+  for (let i = 0; i < 5; i++) {
+    assert.equal(at(marks[i] - 0.3).opacity[i], 0, `tile ${i} before its mark`);
+    assert.ok(at(marks[i] + 0.4).opacity[i] > 0.95, `tile ${i} after its mark`);
+    if (i < 4) assert.equal(at(marks[i] + 0.4).opacity[i + 1], 0, `tile ${i + 1} waits`);
+  }
+  for (const t of [14.6, 18, 21.9]) assert.ok(at(t).opacity.every((o) => o > 0.99), `all on at ${t}`);
+  // The pulse peaks on the name, then settles to the hold glow.
+  assert.ok(at(10.3).emphasis[0] > 0.9);
+  assert.ok(Math.abs(at(20).emphasis[0] - map.HOLD) < 1e-6);
+  assert.equal(at(15.5).title, 0);
+  assert.ok(at(17).title > 0.99);
+  // Past the end: the finished map.
+  const end = at(30);
+  assert.deepEqual(end.opacity, [1, 1, 1, 1, 1]);
+  assert.equal(end.title, 1);
+});
+
+test('MemoryMap reveal: marks out of order or missing never show a tile before the previous one', () => {
+  const s = (t: number) => map.frameState({ mode: 'reveal', marks: [5, 3, Number.NaN, 4] }, t, [0.2, 2], 12);
+  for (let t = 0; t < 12; t += 0.1) {
+    const o = s(t).opacity;
+    for (let i = 1; i < 5; i++) assert.ok(o[i] <= o[i - 1] + 1e-9, `tile ${i} ahead of ${i - 1} at ${t}`);
+  }
+  assert.deepEqual(s(12).opacity, [1, 1, 1, 1, 1]);
 });
