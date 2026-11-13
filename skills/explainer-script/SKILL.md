@@ -69,6 +69,28 @@ context window is not human working memory). Give the reel-expert a factual summ
 article the video draws on, and ask it to check the analogies as well as the numbers. Length
 follows the story: about 80 s to 2 min for a short.
 
+## Long format (YouTube)
+
+A long video (landscape, ~9-10 min) is a concept video with room for the evidence. Same rules,
+plus:
+
+- **Chapters, one idea each.** Each opens with a chapter card ("2 · The desk", `chapter` on its
+  first scene) and the same titles, in the same order, become the YouTube chapters in the
+  description (`npm run deliver` writes them). At least three, each at least 10 s.
+- **Cold open with an open loop.** Show the failure first (the agent that ignores the message)
+  and hold back why; pay it off later in a named chapter, and pay the opening promise ("by the
+  end you'll know which to combine") at the end.
+- **End every chapter on a new question or a surprise**, so the next chapter has a reason to be
+  watched.
+- **At most two spoken figures per chapter**, each with what it counts ("one decision in six
+  hundred", not "one in six hundred"). The rest go on screen.
+- **Five fixed names** for the recurring concepts, chosen once and never swapped for synonyms
+  ("the summary", never "the gist" or "the notes" for the same thing). List them at the top of
+  the script; on screen they are the same labels.
+- **The recipe or verdict on screen**, built item by item as it is spoken, and left up long
+  enough to be read or paused on.
+- **About 1200-1400 EN words for ~9-10 min** (the voice plus breaths and the chapter cards).
+
 ## Voice
 
 - First person, as the article is written: "I gave the planner...", "What I found...".

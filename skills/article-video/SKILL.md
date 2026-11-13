@@ -45,6 +45,9 @@ when installed as a plugin; next to `skills/` in the plugin repo).
    author than concept videos, so concept is the default; choose experiment when the setup
    itself is fun or striking to watch. If the author asked for a concept video, never fall back
    to a video of the latest article. `explainer-script` has a section for each format.
+   Decide the length too: a short (vertical, 45 s to 2 min) or a **long YouTube video**
+   (landscape 1920x1080, ~9-10 min, with chapters; see "Long format" in `explainer-script` and
+   "Landscape and both formats" in `explainer-animation`).
 1. **Pick the article.** Use the one named. For a concept video, pick every article that
    carries the idea and treat them all as sources. If none is named, read the published articles and
    propose 2-3 candidates, each with its title, a hook line, the visual idea and the key number
@@ -81,10 +84,15 @@ when installed as a plugin; next to `skills/` in the plugin repo).
    PNG. Check the brand, the safe areas, nothing overflowing, numbers equal to the article, and
    captions matching the beat on screen. A clean build is not proof that a frame looks right.
 10. **Render:** `npm run render` (vertical EN). `-- --es` for the Spanish cut, `-- --landscape`
-    for 1920x1080. Then `npm run audio-qa` again to measure the mix (-16 LUFS integrated).
+    for 1920x1080 (the long format renders only this one). Then `npm run audio-qa` again to
+    measure the mix (-16 LUFS integrated). Videos over 3 min render in chunks joined without
+    re-encoding (`CHUNK_SECONDS` to tune), and the music bed is made as long as the video.
 11. **Deliver:** `npm run deliver` writes the poster PNG, the SRT and `out/manifest.json`. The
     cover is designed with the cold open, not taken from a default frame (see "Cover (poster)" in
     `explainer-animation`): look at it at full size and at thumbnail size before handing it over. Hand over the MP4 path and the poster; publishing is a separate step.
+    When the landscape cut exists it also writes `out/youtube-chapters-<voice>.txt` (paste into
+    the description; fix any warning: YouTube needs at least 3 chapters of 10 s or more) and
+    `out/thumbnail-<voice>.png` (1280x720, from `SETTINGS.thumbnail`, else the poster frame).
 
 ## Re-rendering an existing video
 
