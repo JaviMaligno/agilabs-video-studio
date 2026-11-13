@@ -107,3 +107,28 @@ export const cartesiaHeaders = (key, json = true) => ({
  */
 export const remotion = (args) =>
   execFileSync(process.execPath, [at('node_modules', '@remotion', 'cli', 'remotion-cli.js'), ...args], { stdio: 'inherit', cwd: at() });
+
+/**
+ * Frame ranges for a chunked render, inclusive like Remotion's `--frames=a-b`: consecutive,
+ * covering 0..frames-1 once, each at most `chunkFrames` long.
+ */
+export const chunkRanges = (frames, chunkFrames) => {
+  if (!(frames >= 1) || !(chunkFrames >= 1)) throw new Error(`chunkRanges: need frames and chunk size >= 1 (got ${frames}, ${chunkFrames})`);
+  const out = [];
+  for (let a = 0; a < frames; a += chunkFrames) out.push([a, Math.min(frames, a + chunkFrames) - 1]);
+  return out;
+};
+
+/** An ffmpeg concat-demuxer list for `files` (forward slashes, single quotes escaped). */
+export const concatList = (files) => files.map((f) => `file '${f.replace(/\\/g, '/').replace(/'/g, "'\\''")}'\n`).join('');
+
+/** Joins same-codec parts into `out` without re-encoding (ffmpeg concat demuxer, stream copy). */
+export const concatParts = (files, out) => {
+  const list = `${out}.txt`;
+  fs.writeFileSync(list, concatList(files));
+  try {
+    ffmpegReport(['-y', '-f', 'concat', '-safe', '0', '-i', list, '-c', 'copy', out]);
+  } finally {
+    fs.rmSync(list, { force: true });
+  }
+};
