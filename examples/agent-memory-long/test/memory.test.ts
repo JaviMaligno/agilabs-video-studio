@@ -5,7 +5,7 @@ import { ADVICE_LINE, OFFICE_MODES, frameState as office } from '../src/anim/Mem
 import { BAYS, HERE_TEXT, LANDING_BAY, NOON, ROBOT_PATH, TWO, WAREHOUSE_MODES, frameState as warehouse } from '../src/anim/WarehouseShelves.state.ts';
 import { SLIP_PATH, frameState as head } from '../src/anim/HeadShelf.state.ts';
 import { CARD_TEXT, CROWDED_PAGES, DESK_MODES, FORK, MAX_PAGES, ONE_IN_TEXT, WORK_PAGES, frameState as desk } from '../src/anim/MemoryDesk.state.ts';
-import { CABINET_MODES, frameState as cabinet } from '../src/anim/FilingCabinet.state.ts';
+import { CABINET_MODES, DRAWER_TAGS, LINE_TEXT, STAT_TEXT, frameState as cabinet } from '../src/anim/FilingCabinet.state.ts';
 import { FORM_MODES, FULL_TEXT, MARGIN_TEXT, RUNS, ZERO_TEXT, frameState as form } from '../src/anim/ClipboardForm.state.ts';
 import { SHELF0, SLIP_TEXT } from '../src/anim/memory.ts';
 
@@ -15,7 +15,7 @@ const UNIT = new Set([
   'question', 'books', 'cap', 'lock', 'bounce', 'desk', 'deskLit', 'cover', 'spill', 'gauge', 'amber', 'squeeze', 'write', 'fade',
   'move', 'tick', 'pile', 'sweep', 'inDrawer', 'drawers', 'clean', 'found', 'peek', 'cross', 'boxes', 'shelfRow', 'rowLit', 'strike',
   'prog', 'fly', 'erase', 'eraser', 'scribble', 'zero', 'fill', 'full', 'inset',
-  'rules', 'top', 'one', 'other', 'label', 'needed', 'fork', 'here', 'stream', 'doors', 'back', 'fall',
+  'rules', 'top', 'one', 'other', 'label', 'needed', 'fork', 'here', 'stream', 'doors', 'back', 'fall', 'into', 'tags', 'stat',
 ]);
 
 const walk = (v: unknown, path: string, key = '') => {
@@ -331,4 +331,54 @@ test('MemoryDesk full: the fork to SUMMARY / NOTEBOOK comes after the pages tip 
   // The fork never comes before the pages go, whatever the marks.
   const early = (t: number) => desk({ mode: 'full', marks: [0.5, 1, 2, 5, 1] }, t, [0.2], 9);
   assert.equal(early(5.2).fork, 0);
+});
+
+test('FilingCabinet file: inbox folds in, then the cold open comes back with the pallet passing shelf 0', () => {
+  const marks = [3, 10, 16, 17, 13, 24];
+  const at = (t: number) => cabinet({ mode: 'file', marks }, t, [1.3, 11.9, 18], 27);
+  assert.equal(at(12.7).inbox.opacity, 0);
+  assert.ok(at(13.4).inbox.opacity > 0.99);
+  assert.equal(at(13.4).inbox.into, 0);
+  assert.ok(at(16.5).inbox.into > 0.99);
+  assert.equal(at(23.6).callback.opacity, 0);
+  const mid = at(24.9);
+  assert.ok(mid.callback.opacity > 0.99 && mid.callback.move > 0 && mid.callback.move < 1);
+  assert.equal(mid.callback.cross, 0);
+  assert.ok(at(26.5).callback.cross > 0.99);
+  for (const { beats, dur } of SCENES) {
+    const end = cabinet({ mode: 'file' }, dur, beats, dur);
+    assert.deepEqual(end.callback, { opacity: 1, move: 1, cross: 1 });
+    assert.equal(end.inbox.into, 1);
+  }
+  // The callback never comes before the question, whatever the marks.
+  const odd = (t: number) => cabinet({ mode: 'file', marks: [1, 2, 3, 6, 2, 1] }, t, [0.3], 12);
+  assert.equal(odd(6.2).callback.opacity, 0);
+});
+
+test('FilingCabinet miss: tags on the drawers it searches, "1 search in 40", a second pass, then the line', () => {
+  assert.deepEqual([...DRAWER_TAGS], ['shelf 1', '', 'shelf 2']);
+  assert.equal(STAT_TEXT, '1 search in 40');
+  assert.equal(LINE_TEXT, 'A plain search only helps if you know what to look for.');
+  const marks = [2, 8, 13, 14, 19, 23, 30];
+  const at = (t: number) => cabinet({ mode: 'miss', marks }, t, [0.2, 10.7, 21.5], 33);
+  assert.equal(at(7.5).tags, 0);
+  assert.ok(at(8.2).tags > 0.99);
+  assert.equal(at(18.8).stat, 0);
+  assert.ok(at(19.5).stat > 0.99);
+  // The second pass opens the searched drawers again, never the slip's.
+  let reopened = 0;
+  for (let t = 23; t < 30; t += 0.05) {
+    const s = at(t);
+    reopened = Math.max(reopened, s.drawers[0], s.drawers[2]);
+    assert.equal(s.drawers[1], 0);
+  }
+  assert.ok(reopened > 0.5);
+  assert.equal(at(29.8).line, 0);
+  assert.ok(at(30.6).line > 0.99);
+  for (const { beats, dur } of SCENES) {
+    const end = cabinet({ mode: 'miss' }, dur, beats, dur);
+    assert.equal(end.stat, 1);
+    assert.equal(end.line, 1);
+    assert.deepEqual(end.drawers, [0, 0, 0]);
+  }
 });

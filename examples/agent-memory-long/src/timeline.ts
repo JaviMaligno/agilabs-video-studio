@@ -129,7 +129,7 @@ const build = (): Cuts => ({
     anim(
       'notebook',
       'FilingCabinet',
-      { mode: 'file', marks: [[0, 'Clear'], [0, 'Nothing'], [1, 'know'], [1, 'find']] },
+      { mode: 'file', marks: [[0, 'Clear'], [0, 'Nothing'], [1, 'know'], [1, 'find'], [1, 'email'], [2, 'failed']] },
       [
         say(0.3, 'The second way sounds safer. Clear the desk completely, and keep the whole day in a notebook the agent can search by keyword. Nothing is thrown away.', ''),
         say(0, "It's what you do with your email. You don't remember it; you know where to find it.", ''),
@@ -137,7 +137,7 @@ const build = (): Cuts => ({
       ],
       { chapter: 'The notebook' },
     ),
-    anim('search', 'FilingCabinet', { mode: 'miss', marks: [[0, 'nothing'], [0, 'searching'], [1, 'Never'], [1, 'forty']] }, [
+    anim('search', 'FilingCabinet', { mode: 'miss', marks: [[0, 'nothing'], [0, 'searching'], [1, 'Never'], [1, 'nothing'], [1, 'forty'], [2, 'sharper'], [2, 'plain']] }, [
       say(0.2, "After the clean-up, its desk says nothing about any message. So when a pallet arrives, it works out what's on each shelf by searching the notebook.", ''),
       say(0, 'It searches for shelves and pallets. Never for a correction, because nothing tells it there was one. About one search in forty brought the message back.', ''),
       say(0, "Giving it tips on how to search made its searches sharper, but it still didn't find the message. A plain search only helps if you know what to look for.", ''),
