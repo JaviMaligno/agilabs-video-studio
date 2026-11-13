@@ -12,6 +12,7 @@ import * as head from '../src/anim/HeadShelf.state.ts';
 import * as desk from '../src/anim/MemoryDesk.state.ts';
 import * as cabinet from '../src/anim/FilingCabinet.state.ts';
 import * as form from '../src/anim/ClipboardForm.state.ts';
+import * as replay from '../src/anim/ReplayBars.state.ts';
 
 // Fields that are animation progress and must stay within [0, 1].
 const PROGRESS = new Set(['progress', 'appear', 'grow', 'fill', 'draw', 'pop', 'opacity', 'emphasis']);
@@ -88,6 +89,8 @@ const CASES: Case[] = [
     { name: `ClipboardForm ${mode}`, state: (t: number, b: number[], d: number) => form.frameState({ mode }, t, b, d) },
     { name: `ClipboardForm ${mode} (marks)`, state: (t: number, b: number[], d: number) => form.frameState({ mode, marks: [0.3, 0.3, 0.3, 0.3, 0.3] }, t, b, d) },
   ]),
+  { name: 'ReplayBars', state: (t, b, d) => replay.frameState({}, t, b, d) },
+  { name: 'ReplayBars (marks out of order, one broken)', state: (t, b, d) => replay.frameState({ marks: [3, 1, Number.NaN, 0.5, 0.2] }, t, b, d) },
 ];
 
 const SCENARIOS = [
@@ -271,4 +274,32 @@ test('MemoryMap reveal: marks out of order or missing never show a tile before t
     for (let i = 1; i < 5; i++) assert.ok(o[i] <= o[i - 1] + 1e-9, `tile ${i} ahead of ${i - 1} at ${t}`);
   }
   assert.deepEqual(s(12).opacity, [1, 1, 1, 1, 1]);
+});
+
+test('ReplayBars: the terminal bar rises and the general bars sink, then replay wins ~73% back', () => {
+  const marks = [3, 6, 7.5, 10.5, 13];
+  const at = (t: number) => replay.frameState({ marks }, t, [0.3, 10.3], 18);
+  const start = at(0.5);
+  assert.equal(start.bars.terminal, replay.TERMINAL.before);
+  assert.deepEqual(start.bars.general, [...replay.GENERAL_BASE]);
+  assert.equal(start.stream.old, 0);
+  assert.equal(start.labelMix, 0);
+  // After "worse": the terminal task learned, everything else sunk by its full drop.
+  const sunk = at(10);
+  assert.ok(Math.abs(sunk.bars.terminal - replay.TERMINAL.after) < 1e-9);
+  sunk.bars.general.forEach((g, i) => assert.ok(Math.abs(g - (replay.GENERAL_BASE[i] - replay.GENERAL_DROP[i])) < 1e-9, `bar ${i} sunk`));
+  assert.equal(sunk.labelWon, 0);
+  // Old reading mixes in on "mixing"; the label's first half comes with it, the second on "won".
+  assert.ok(at(11.5).stream.old > 0.99);
+  assert.ok(at(11.5).labelMix > 0.99);
+  assert.equal(at(12.9).labelWon, 0);
+  // End: each bar has won back RECOVERED of its loss; the terminal task kept.
+  const end = at(18);
+  assert.ok(Math.abs(end.bars.terminal - replay.TERMINAL.after) < 1e-9);
+  end.bars.general.forEach((g, i) => {
+    const lost = replay.GENERAL_BASE[i] - g;
+    assert.ok(Math.abs(lost - replay.GENERAL_DROP[i] * (1 - replay.RECOVERED)) < 1e-9, `bar ${i} recovered`);
+  });
+  assert.equal(end.labelWon, 1);
+  assert.equal(replay.LABEL_MIX + ' ' + replay.LABEL_WON, '10% old reading → ~73% of the loss recovered');
 });

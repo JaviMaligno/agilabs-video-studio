@@ -58,14 +58,16 @@ const build = (): Cuts => ({
       ],
       { chapter: 'Training' },
     ),
-    // placeholder for ReplayBars (row 9)
-    anim('terminal', 'KeyQuote', { text: 'It learned it, and got worse at almost everything else.', emphasis: ['worse'] }, [
-      say(0.3, 'I trained a small model to do one narrow thing: pretend to be a computer terminal. It learned it, and got worse at almost everything else.', ''),
-    ]),
-    // placeholder for ReplayBars (row 10): the Visual column's label
-    anim('replay', 'StatGrid', { stats: [{ value: '~73%', label: 'of the loss recovered with 10% old reading' }] }, [
-      say(0.3, 'Mixing a little of its old reading back in, like revising for an exam, won most of it back.', ''),
-    ]),
+    anim(
+      'terminal',
+      'ReplayBars',
+      { marks: [[0, 'terminal'], [0, 'learned'], [0, 'worse'], [1, 'Mixing'], [1, 'won']] },
+      [
+        say(0.3, 'I trained a small model to do one narrow thing: pretend to be a computer terminal. It learned it, and got worse at almost everything else.', ''),
+        say(0, 'Mixing a little of its old reading back in, like revising for an exam, won most of it back.', ''),
+      ],
+      { min: 19 }, // the label "10% old reading → ~73% of the loss recovered" needs time to be read
+    ),
     // placeholder for TwoJobs (rows 11-12)
     anim('habit', 'KeyQuote', { text: "B doesn't depend on A", emphasis: ["doesn't"] }, [
       say(0.3, 'Old habits also push back against the facts in front of it. In another test, models read that two jobs were independent, said so, and still put one first, as if habit won.', ''),

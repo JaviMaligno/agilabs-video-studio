@@ -14,6 +14,7 @@ import { HeadShelf } from './HeadShelf.tsx';
 import { MemoryDesk } from './MemoryDesk.tsx';
 import { FilingCabinet } from './FilingCabinet.tsx';
 import { ClipboardForm } from './ClipboardForm.tsx';
+import { ReplayBars } from './ReplayBars.tsx';
 
 export type { AnimProps };
 
@@ -31,4 +32,5 @@ export const ANIMS: Record<string, React.FC<AnimProps & any>> = {
   MemoryDesk,
   FilingCabinet,
   ClipboardForm,
+  ReplayBars,
 };
