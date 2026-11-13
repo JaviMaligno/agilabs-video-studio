@@ -15,6 +15,7 @@ import * as form from '../src/anim/ClipboardForm.state.ts';
 import * as replay from '../src/anim/ReplayBars.state.ts';
 import * as jobs from '../src/anim/TwoJobs.state.ts';
 import * as restart from '../src/anim/RestartIterate.state.ts';
+import * as reader from '../src/anim/AskReader.state.ts';
 
 // Fields that are animation progress and must stay within [0, 1].
 const PROGRESS = new Set(['progress', 'appear', 'grow', 'fill', 'draw', 'pop', 'opacity', 'emphasis']);
@@ -97,6 +98,8 @@ const CASES: Case[] = [
   { name: 'TwoJobs (marks out of order, one broken)', state: (t, b, d) => jobs.frameState({ marks: [4, 1, Number.NaN, 0.2, 0.1] }, t, b, d) },
   { name: 'RestartIterate', state: (t, b, d) => restart.frameState({}, t, b, d) },
   { name: 'RestartIterate (marks out of order, one broken)', state: (t, b, d) => restart.frameState({ marks: [5, 1, Number.NaN, 0.2, 9, 0.1] }, t, b, d) },
+  { name: 'AskReader', state: (t, b, d) => reader.frameState({}, t, b, d) },
+  { name: 'AskReader (marks out of order, one broken)', state: (t, b, d) => reader.frameState({ marks: [9, 1, Number.NaN, 0.2, 3, 0.1, 2, 8, 1, 0.5, 4, 0.3] }, t, b, d) },
 ];
 
 const SCENARIOS = [
@@ -357,4 +360,36 @@ test('RestartIterate: sweep and patch on their words, bars 86% vs 69%, the swept
   assert.equal(end.blocks, restart.SLOTS);
   assert.equal(end.tick, 1);
   assert.equal(end.gone, 1);
+});
+
+test('AskReader: ask, read down to the slip, pass it to the desk, the figures, then the long day splits', () => {
+  const marks = [4, 6, 8, 12, 16, 17.5, 18.5, 23, 26, 31, 32.5, 34.5];
+  const at = (t: number) => reader.frameState({ marks }, t, [0.3, 11, 21.5], 38);
+  assert.deepEqual(reader.TABLE_ROWS.map((r) => r.join(' ')), ['detail 10/11 3/8', 'correction 4/6 2/6']);
+  assert.deepEqual(reader.TABLE_HEAD.slice(1), ['ask a reader', 'keyword search']);
+  const early = at(2);
+  assert.equal(early.bubble.opacity, 0);
+  assert.equal(early.reader.opacity, 0);
+  assert.equal(early.slip.opacity, 0);
+  assert.equal(early.table.opacity, 0);
+  // The scan runs down from the top and stops on the slip at "ran".
+  assert.ok(at(9).scan.index > reader.SLIP_INDEX);
+  assert.equal(at(16.5).scan.index, reader.SLIP_INDEX);
+  assert.ok(at(16.6).stack.found > 0.9);
+  // The slip reaches the desk, the table comes in after it.
+  assert.equal(at(17).slip.fly, 0);
+  assert.equal(at(19).slip.fly, 1);
+  assert.equal(at(18).table.opacity, 0);
+  assert.ok(at(20).table.rows.every((r) => r === 1));
+  // The long day passes the reader's capacity before it splits.
+  assert.equal(at(25).stack.pages, reader.PAGES);
+  assert.ok(at(30.5).stack.pages > reader.CAPACITY);
+  assert.equal(at(30.5).split, 0);
+  const end = at(38);
+  assert.equal(end.split, 1);
+  assert.equal(end.reader.opacity, 0);
+  assert.equal(end.card, 1);
+  assert.equal(end.question, 1);
+  assert.equal(end.slip.tick, 1);
+  assert.equal(end.table.opacity, 1);
 });

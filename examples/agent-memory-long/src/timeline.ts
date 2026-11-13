@@ -136,26 +136,22 @@ const build = (): Cuts => ({
       say(0, 'It searches for shelves and pallets. Never for a correction, because nothing tells it there was one. About one search in forty brought the message back.', ''),
       say(0, "Giving it tips on how to search made its searches sharper, but it still didn't find the message. A plain search only helps if you know what to look for.", ''),
     ]),
-    // placeholders for AskReader (rows 33-35)
-    anim('reader', 'KeyQuote', { text: 'The agent asks a question. Another model, one that reads the whole day, answers it.', emphasis: ['asks', 'whole day'] }, [
-      say(0.3, 'A smarter notebook changes that. Instead of searching by keyword, the agent asks a question, and another model, one that reads the whole day, answers it.', ''),
-    ]),
     anim(
-      'unasked',
-      'StatGrid',
+      'reader',
+      'AskReader',
       {
-        stats: [
-          { value: '10/11', label: 'detail · ask a reader' },
-          { value: '3/8', label: 'detail · keyword search' },
-          { value: '4/6', label: 'correction · ask a reader' },
-          { value: '2/6', label: 'correction · keyword search' },
+        marks: [
+          [0, 'asks'], [0, 'another'], [0, 'reads'],
+          [1, 'never'], [1, 'ran'], [1, 'passed'], [1, 'almost'],
+          [2, 'whole'], [2, 'long'], [2, 'pieces'], [2, 'summarise'], [2, 'guessing'],
         ],
       },
-      [say(0.3, "The agent still never asked about a correction. But the reader, working out what's on each shelf, ran into the message and passed it on, almost every time.", '')],
+      [
+        say(0.3, 'A smarter notebook changes that. Instead of searching by keyword, the agent asks a question, and another model, one that reads the whole day, answers it.', ''),
+        say(0, "The agent still never asked about a correction. But the reader, working out what's on each shelf, ran into the message and passed it on, almost every time.", ''),
+        say(0, "There's a catch. The reader goes through the whole day for every question. On a day long enough to need clearing, it fills up too, and then it has to cut the day into pieces or summarise it. We're back to guessing what matters.", ''),
+      ],
     ),
-    anim('catch', 'KeyQuote', { text: "We're back to guessing what matters.", emphasis: ['guessing'] }, [
-      say(0.3, "There's a catch. The reader goes through the whole day for every question. On a day long enough to need clearing, it fills up too, and then it has to cut the day into pieces or summarise it. We're back to guessing what matters.", ''),
-    ]),
 
     // 5 · The form
     anim(
