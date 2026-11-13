@@ -1,9 +1,8 @@
 // How an AI agent forgets — the long YouTube version (EN, landscape, 7 chapters). Narration from
 // script.md v3, rows 1-55, one line per row, in order.
-// PLACEHOLDER VISUALS: the rows whose bespoke component is not built yet (ReplayBars, TwoJobs,
-// RestartIterate, AskReader, CorrectionReplay) stand in as KeyQuote / StatGrid with the line's key
-// words or the figures of the script's Visual column; each placeholder is its own scene so it lands
-// on its line. Marks ([line, word]) are estimated from the text until real TTS exists.
+// Every row has its own drawn component; consecutive rows of one component share a scene (one line
+// per row). Only `check` (row 48) is a KeyQuote: the sentence, large, as the script asks.
+// Marks ([line, word]) are estimated from the text until real TTS exists.
 // Chapters: `chapter` on the first scene of each one draws the chapter card and becomes a YouTube
 // chapter (npm run deliver -> out/youtube-chapters-en.txt).
 import type { Cuts, Scene } from './types.ts';
