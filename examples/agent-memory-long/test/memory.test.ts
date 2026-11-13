@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { ADVICE_LINE, OFFICE_MODES, frameState as office } from '../src/anim/MemoryOffice.state.ts';
 import { ROBOT_PATH, WAREHOUSE_MODES, frameState as warehouse } from '../src/anim/WarehouseShelves.state.ts';
 import { SLIP_PATH, frameState as head } from '../src/anim/HeadShelf.state.ts';
-import { CARD_TEXT, DESK_MODES, MAX_PAGES, frameState as desk } from '../src/anim/MemoryDesk.state.ts';
+import { CARD_TEXT, CROWDED_PAGES, DESK_MODES, FORK, MAX_PAGES, ONE_IN_TEXT, WORK_PAGES, frameState as desk } from '../src/anim/MemoryDesk.state.ts';
 import { CABINET_MODES, frameState as cabinet } from '../src/anim/FilingCabinet.state.ts';
 import { FORM_MODES, FULL_TEXT, MARGIN_TEXT, RUNS, ZERO_TEXT, frameState as form } from '../src/anim/ClipboardForm.state.ts';
 import { SHELF0, SLIP_TEXT } from '../src/anim/memory.ts';
@@ -15,6 +15,7 @@ const UNIT = new Set([
   'question', 'books', 'cap', 'lock', 'bounce', 'desk', 'deskLit', 'cover', 'spill', 'gauge', 'amber', 'squeeze', 'write', 'fade',
   'move', 'tick', 'pile', 'sweep', 'inDrawer', 'drawers', 'clean', 'found', 'peek', 'cross', 'boxes', 'shelfRow', 'rowLit', 'strike',
   'prog', 'fly', 'erase', 'eraser', 'scribble', 'zero', 'fill', 'full', 'inset',
+  'rules', 'top', 'one', 'other', 'label', 'needed', 'fork',
 ]);
 
 const walk = (v: unknown, path: string, key = '') => {
@@ -194,4 +195,72 @@ test('ClipboardForm: replace rewrites the box; margin erases, then 24 ticks; wro
   }
   // The margin scene opens on a form without the SHELF 0 box.
   assert.ok(form({ mode: 'margin' }, 1, [0.2, 4], 9).shelfRow < 0.05);
+});
+
+test('MemoryDesk work: the record piles under the slip, which stays on top; the pallet goes to shelf 0', () => {
+  const marks = [1.5, 4, 12, 14];
+  const at = (t: number) => desk({ mode: 'work', marks }, t, [1.3, 11.8], 18);
+  assert.equal(at(-1).pages, 0);
+  assert.equal(at(1).rules, 0);
+  assert.equal(at(3.9).pages, 0);
+  assert.ok(at(5.5).pages > 0 && at(5.5).pages < WORK_PAGES);
+  assert.equal(at(10).pages, WORK_PAGES);
+  for (let t = 0; t <= 18; t += 0.25) {
+    const s = at(t);
+    assert.equal(s.slip.top, 1);
+    assert.equal(s.slip.cover, 0, 'nothing covers the slip while it is used');
+    assert.equal(s.spill, 0);
+  }
+  assert.equal(at(11).inset.opacity, 0);
+  assert.equal(at(13).inset.tick, 0);
+  assert.ok(at(14.8).inset.tick > 0.99);
+  for (const { beats, dur } of SCENES) {
+    const end = desk({ mode: 'work' }, dur, beats, dur);
+    assert.equal(end.rules, 1);
+    assert.equal(end.pages, WORK_PAGES);
+    assert.equal(end.inset.move, 1);
+    assert.equal(end.inset.tick, 1);
+  }
+  // A late shelf mark never moves the pallet before the "uses" beat.
+  const late = (t: number) => desk({ mode: 'work', marks: [1, 2, 9, 3] }, t, [0.3, 8], 14);
+  assert.equal(late(8.6).inset.move, 0);
+});
+
+test('MemoryDesk crowded: a tall pile buries the slip; ~600 decisions with one miss, a second strip; the needed page glows', () => {
+  const marks = [0.6, 5, 10, 14];
+  const at = (t: number) => desk({ mode: 'crowded', marks }, t, [0.2, 12.3], 18);
+  assert.equal(at(0).pages, WORK_PAGES, 'starts where the work scene ended');
+  assert.equal(at(0).slip.cover, 0);
+  assert.equal(at(4).pages, CROWDED_PAGES);
+  assert.equal(at(4).slip.cover, 1);
+  assert.equal(at(4).strips.opacity, 0);
+  assert.ok(at(5.8).strips.one > 0 && at(5.8).strips.one < 1);
+  assert.equal(at(7).strips.one, 1);
+  assert.equal(at(9.9).strips.other, 0);
+  assert.equal(at(12).strips.other, 1);
+  assert.equal(at(13.9).needed, 0);
+  assert.ok(at(14.6).needed > 0.99);
+  assert.ok(at(18).pages <= MAX_PAGES);
+  for (const { beats, dur } of SCENES) {
+    const end = desk({ mode: 'crowded' }, dur, beats, dur);
+    assert.equal(end.strips.one, 1);
+    assert.equal(end.strips.other, 1);
+    assert.equal(end.strips.label, 1);
+    assert.equal(end.needed, 1);
+    assert.equal(end.spill, 0);
+  }
+  assert.equal(ONE_IN_TEXT, '1 in ~600');
+});
+
+test('MemoryDesk full: the fork to SUMMARY / NOTEBOOK comes after the pages tip off', () => {
+  assert.deepEqual([...FORK], ['SUMMARY', 'NOTEBOOK']);
+  const marks = [0.5, 1.4, 2.6, 4.5, 6.5];
+  const at = (t: number) => desk({ mode: 'full', marks }, t, [0.2], 9);
+  assert.equal(at(5).fork, 0);
+  assert.ok(at(4.4).spill < at(5.4).spill);
+  assert.ok(at(7.2).fork > 0.99);
+  for (const { beats, dur } of SCENES) assert.equal(desk({ mode: 'full' }, dur, beats, dur).fork, 1);
+  // The fork never comes before the pages go, whatever the marks.
+  const early = (t: number) => desk({ mode: 'full', marks: [0.5, 1, 2, 5, 1] }, t, [0.2], 9);
+  assert.equal(early(5.2).fork, 0);
 });

@@ -467,8 +467,8 @@ export const Crack: React.FC<{ x: number; y: number; w: number; h: number; p: nu
   );
 };
 
-/** A floor line for the scene. */
-export const Floor: React.FC<{ y: number }> = ({ y }) => <rect x={60} y={y} width={960} height={4} rx={2} fill={alpha(C.muted, 0.25)} />;
+/** A floor line for the scene; x and w default to the vertical stage width. */
+export const Floor: React.FC<{ y: number; x?: number; w?: number }> = ({ y, x = 60, w = 960 }) => <rect x={x} y={y} width={w} height={4} rx={2} fill={alpha(C.muted, 0.25)} />;
 
 /** A wall nail with a string (for hanging the clipboard). */
 export const Nail: React.FC<{ x: number; y: number; w: number; lit?: number }> = ({ x, y, w, lit = 1 }) => (

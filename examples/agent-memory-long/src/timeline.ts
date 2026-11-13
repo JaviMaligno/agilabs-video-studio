@@ -77,14 +77,14 @@ const build = (): Cuts => ({
     anim(
       'desk',
       'MemoryDesk',
-      { mode: 'full', marks: [[0, 'desk'], [0, 'record'], [1, 'uses'], [1, 'shelf']] },
+      { mode: 'work', marks: [[0, 'desk'], [0, 'record'], [1, 'uses'], [1, 'shelf']] },
       [
         say(0.3, "The desk is everything the agent can see right now: its instructions, and the record of its day so far. It's your working memory, only much bigger.", ''),
         say(0, 'While the message is on the desk, the agent uses it. The next pallet goes to shelf zero.', ''),
       ],
       { chapter: 'The desk' },
     ),
-    anim('crowded', 'MemoryDesk', { mode: 'full', marks: [[0, 'crowded'], [0, 'whole'], [0, 'Another'], [1, 'near']] }, [
+    anim('crowded', 'MemoryDesk', { mode: 'crowded', marks: [[0, 'crowded'], [0, 'whole'], [0, 'Another'], [1, 'near']] }, [
       say(0.2, "Does a crowded desk hurt by itself? Less than you'd think. With its whole day in front of it, one model missed about one decision in six hundred. Another missed far more.", ''),
       say(0, 'And the task was kind: what it needed was always near the top of the pile.', ''),
     ]),
@@ -104,7 +104,7 @@ const build = (): Cuts => ({
       },
       [say(0.3, "On short coding tasks, keeping going won. What hurt wasn't the messy desk. It was throwing away the half-built code along with it.", '')],
     ),
-    anim('edge', 'MemoryDesk', { mode: 'full', marks: [[0, 'edge'], [0, 'long'], [0, 'fills'], [0, 'go']] }, [
+    anim('edge', 'MemoryDesk', { mode: 'full', marks: [[0, 'edge'], [0, 'long'], [0, 'fills'], [0, 'go'], [0, 'two']] }, [
       say(0.2, 'But the desk has an edge. On a long enough day it fills up, and something has to go. There are two ways to make room.', ''),
     ]),
 
