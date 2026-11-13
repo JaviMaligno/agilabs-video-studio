@@ -13,6 +13,8 @@ export type Settings = {
   targetSeconds: number;
   /** Thumbnail frame: scene id + seconds into it. null = a frame from the intro. */
   poster: null | { scene: string; second: number };
+  /** YouTube thumbnail (1280x720, from the landscape cut): scene id + seconds. Unset = the poster frame. */
+  thumbnail?: null | { scene: string; second: number };
   /** Title of the source article, shown in muted text on the outro card. */
   articleTitle: Label;
   /**
