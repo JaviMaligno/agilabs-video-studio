@@ -14,6 +14,7 @@ import * as cabinet from '../src/anim/FilingCabinet.state.ts';
 import * as form from '../src/anim/ClipboardForm.state.ts';
 import * as replay from '../src/anim/ReplayBars.state.ts';
 import * as jobs from '../src/anim/TwoJobs.state.ts';
+import * as restart from '../src/anim/RestartIterate.state.ts';
 
 // Fields that are animation progress and must stay within [0, 1].
 const PROGRESS = new Set(['progress', 'appear', 'grow', 'fill', 'draw', 'pop', 'opacity', 'emphasis']);
@@ -94,6 +95,8 @@ const CASES: Case[] = [
   { name: 'ReplayBars (marks out of order, one broken)', state: (t, b, d) => replay.frameState({ marks: [3, 1, Number.NaN, 0.5, 0.2] }, t, b, d) },
   { name: 'TwoJobs', state: (t, b, d) => jobs.frameState({}, t, b, d) },
   { name: 'TwoJobs (marks out of order, one broken)', state: (t, b, d) => jobs.frameState({ marks: [4, 1, Number.NaN, 0.2, 0.1] }, t, b, d) },
+  { name: 'RestartIterate', state: (t, b, d) => restart.frameState({}, t, b, d) },
+  { name: 'RestartIterate (marks out of order, one broken)', state: (t, b, d) => restart.frameState({ marks: [5, 1, Number.NaN, 0.2, 9, 0.1] }, t, b, d) },
 ];
 
 const SCENARIOS = [
@@ -330,4 +333,28 @@ test('TwoJobs: the plan is read and repeated, the arrow is drawn anyway, then th
   assert.equal(end.slip.drop, 1);
   assert.ok(at(16.5).slip.drop > 0.99);
   assert.ok(at(14).slip.drop < 0.9);
+});
+
+test('RestartIterate: sweep and patch on their words, bars 86% vs 69%, the swept thing vanishes on "throwing"', () => {
+  const marks = [3, 5, 7, 10, 12, 14];
+  const at = (t: number) => restart.frameState({ marks }, t, [0.3, 8.8], 18);
+  assert.deepEqual(restart.BARS.map((b) => `${b.label} ${b.display}`), ['keep going 86%', 'start over 69%']);
+  assert.equal(restart.BARS_CAPTION, 'share of tasks solved');
+  const early = at(1);
+  assert.equal(early.crack.sweep, 0);
+  assert.equal(early.swept, 0);
+  assert.equal(early.blocks, restart.BUILT);
+  assert.equal(early.bars.opacity, 0);
+  // "clear": the pages go; the thing stays until "throwing".
+  assert.equal(at(7).swept, 1);
+  assert.equal(at(13).gone, 0);
+  // "keep": a block goes in and the crack closes.
+  assert.equal(at(8.5).blocks, restart.BUILT + 1);
+  assert.equal(at(8.5).crack.patch, 0);
+  assert.equal(at(9).bars.opacity, 0);
+  const end = at(18);
+  assert.deepEqual(end.bars.grow, [1, 1]);
+  assert.equal(end.blocks, restart.SLOTS);
+  assert.equal(end.tick, 1);
+  assert.equal(end.gone, 1);
 });

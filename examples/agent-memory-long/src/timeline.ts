@@ -89,21 +89,14 @@ const build = (): Cuts => ({
       say(0.2, "Does a crowded desk hurt by itself? Less than you'd think. With its whole day in front of it, one model missed about one decision in six hundred. Another missed far more.", ''),
       say(0, 'And the task was kind: what it needed was always near the top of the pile.', ''),
     ]),
-    // placeholder for RestartIterate (row 17)
-    anim('restart', 'KeyQuote', { text: 'Start over, or keep going?', emphasis: ['Start over', 'keep going'] }, [
-      say(0.3, 'Coding agents face a version of this. When an attempt goes badly, do you clear everything and start over, or keep going?', ''),
-    ]),
-    // placeholder for RestartIterate (row 18): the Visual column's bars
     anim(
-      'iterate',
-      'StatGrid',
-      {
-        stats: [
-          { value: '86%', label: 'keep going (tasks solved)' },
-          { value: '69%', label: 'start over (tasks solved)' },
-        ],
-      },
-      [say(0.3, "On short coding tasks, keeping going won. What hurt wasn't the messy desk. It was throwing away the half-built code along with it.", '')],
+      'restart',
+      'RestartIterate',
+      { marks: [[0, 'attempt'], [0, 'clear'], [0, 'keep'], [1, 'keeping'], [1, 'messy'], [1, 'throwing']] },
+      [
+        say(0.3, 'Coding agents face a version of this. When an attempt goes badly, do you clear everything and start over, or keep going?', ''),
+        say(0, "On short coding tasks, keeping going won. What hurt wasn't the messy desk. It was throwing away the half-built code along with it.", ''),
+      ],
     ),
     anim('edge', 'MemoryDesk', { mode: 'full', marks: [[0, 'edge'], [0, 'long'], [0, 'fills'], [0, 'go'], [0, 'two']] }, [
       say(0.2, 'But the desk has an edge. On a long enough day it fills up, and something has to go. There are two ways to make room.', ''),

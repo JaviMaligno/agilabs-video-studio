@@ -16,6 +16,7 @@ import { FilingCabinet } from './FilingCabinet.tsx';
 import { ClipboardForm } from './ClipboardForm.tsx';
 import { ReplayBars } from './ReplayBars.tsx';
 import { TwoJobs } from './TwoJobs.tsx';
+import { RestartIterate } from './RestartIterate.tsx';
 
 export type { AnimProps };
 
@@ -35,4 +36,5 @@ export const ANIMS: Record<string, React.FC<AnimProps & any>> = {
   ClipboardForm,
   ReplayBars,
   TwoJobs,
+  RestartIterate,
 };
