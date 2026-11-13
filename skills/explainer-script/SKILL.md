@@ -86,6 +86,8 @@ own text, check it in the stills.
 
 ## EN and ES
 
+- AGILabs videos are in English by default; don't ask the language again unless the request
+  or an existing cut calls for another.
 - Write the EN/ES pair together, line by line, so both cuts stay in step. ES is optional: leave
   the ES text empty while a video is EN-only.
 - The ES line says the same thing, not a word-for-word translation; keep it as short as EN.
@@ -106,7 +108,18 @@ Every scene gets a visual idea, mapped to a component from the library (see
 
 If no component fits, flag the scene **"bespoke"** with a one-line description of the
 animation. Avoid a video that is only text on a gradient: each article gets at least one
-visual that shows its mechanism.
+visual that shows its mechanism. The catalogue is a toolkit, not a limit: decide first what the
+viewer should see happen, then pick the implementation.
+
+**A continuous story.** When the video follows one character or object through the idea, fix
+the recurring character, the setting, what changes and how the next action reveals the change,
+and keep them across scenes. Test it with the narration hidden: the mechanism should still be
+followable; captions should not carry the whole explanation.
+
+**Metaphors.** A visual metaphor can make an invisible process visible (a sleeping explorer
+and a dream replay for offline memory review). Narrate or label it as a metaphor when viewers
+could take it for what the experiment literally did. Each subject needs its own visual
+language; one video's metaphor is not a template for the next.
 
 **Draw it, don't letter it.** When a scene shows people, models, agents, objects or places as
 initials, labels or plain text boxes, propose the drawing instead: a caricature for each person

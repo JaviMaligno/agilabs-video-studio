@@ -130,6 +130,14 @@ Drawings (people as caricatures, objects, the author's avatar poses) and the sce
 a generated image come from an image model, usually the Codex CLI. Save them under `public/`, load
 them with `staticFile()`, keep them inside the brand palette, and check the still.
 
+**Illustrated stories** (a map, a character, a room) are built in layers: background,
+transparent character atlas, foreground, and any replay or dream layer, with the motion driven
+by the tested frame state, not baked into the art. A frozen illustration behind changing
+captions is not the approved action. Reuse the same assets across related scenes so identity,
+geography and scale hold, and check continuity on both sides of each transition: where the
+character enters and leaves, one-way obstacles, which way it faces, the prop it carries, and
+the before/after decision.
+
 ## Assets with Codex
 
 - **One call per asset**, in a folder holding the references, with stdin closed so it never waits
