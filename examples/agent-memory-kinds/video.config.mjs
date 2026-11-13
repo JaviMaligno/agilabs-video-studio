@@ -31,7 +31,7 @@ export default {
       es: null, // pick a Spanish voice before the first ES version
     },
     kokoro: {
-      speed: 1,
+      speed: 0.85,
       voices: {
         en: { voice: 'af_bella', lang: 'en-us' },
         es: { voice: 'ef_dora', lang: 'es' },

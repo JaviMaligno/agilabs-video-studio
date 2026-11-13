@@ -182,7 +182,7 @@ test('ClipboardForm: replace rewrites the box; margin erases, then 24 ticks; wro
     assert.equal(r.slip.opacity, 0);
     const m = form({ mode: 'margin' }, dur, beats, dur);
     assert.equal(m.margin.erase, 1);
-    assert.equal(m.zero, 1);
+    assert.equal(m.zero, 0); // 0/24 leaves once the named box is back
     assert.equal(m.ticks, RUNS);
     assert.equal(m.full, 1);
     assert.equal(m.shelfRow, 1);

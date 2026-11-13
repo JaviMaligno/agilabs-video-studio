@@ -92,7 +92,9 @@ export function frameState(props: ClipboardFormProps, t: number, beats: number[]
     const box = mark(m, 2, b1 + 0.7);
     const runs = mark(m, 3, b1 + 2.8);
     const fillAt = box + 0.6;
-    const fillLen = Math.max(0.6, runs - fillAt);
+    // Fill fast and never wait past the box beat: with estimated marks (no word timestamps) the
+    // '24' mark can fall after the scene ends, and 24/24 must be on screen.
+    const fillLen = Math.max(0.6, Math.min(1.2, runs - fillAt));
     const fill = progress(T, fillAt, fillLen);
     const gone = 1 - ease(T, 0, 0.5);
     const back = ease(T, box - 0.1, 0.5);
@@ -104,7 +106,7 @@ export function frameState(props: ClipboardFormProps, t: number, beats: number[]
       margin: { write: progress(T, margin - 0.6, 0.8), erase: ease(T, erased, 0.6) },
       eraser: bump(T, erased - 0.2, 1.0),
       scribble: progress(T, erased - 0.6, 0.6),
-      zero: ease(T, erased + 0.5, 0.35),
+      zero: ease(T, erased + 0.5, 0.35) * (1 - ease(T, box, 0.4)),
       grid: { opacity: ease(T, box + 0.4, 0.4), fill },
       ticks: Math.floor(RUNS * fill + 1e-9),
       full: ease(T, fillAt + fillLen, 0.35),

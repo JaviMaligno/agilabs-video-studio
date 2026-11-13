@@ -34,7 +34,7 @@ const build = (): Cuts => ({
       props: { mode: 'cold' },
     }),
     anim('warehouse', 'WarehouseShelves', { mode: 'day', marks: [[1, 'told'], [1, 'empty']] }, [
-      say(0.3, 'I tested it like this: an agent runs a warehouse all day.', ''),
+      say(0.3, 'Here is my test. An agent runs a warehouse all day.', ''),
       say(0, "Halfway through, it's told that shelf 0 is actually empty.", ''),
     ]),
     anim('later', 'WarehouseShelves', { mode: 'later', marks: [[0, 'hours'], [0, 'still']] }, [say(0.2, 'Hours later, does it still know?', '', undefined, { emotion: 'curious' })], {
@@ -45,7 +45,7 @@ const build = (): Cuts => ({
       say(0, 'Its memory has layers, a bit like yours, and each one fails in its own way.', ''),
     ]),
     anim('training', 'HeadShelf', { marks: [[0, 'training'], [0, 'school'], [1, 'message'], [1, 'there'], [2, 'lands']] }, [
-      say(0.3, 'The oldest layer is what it learned in training, like school.', ''),
+      say(0.3, 'Its oldest layer is its training, like school.', ''),
       say(0, "Today's message can't go there.", ''),
       say(0, 'So it lands on the desk.', ''),
     ]),
@@ -64,7 +64,7 @@ const build = (): Cuts => ({
     ]),
     anim('missed', 'FilingCabinet', { mode: 'miss', marks: [[0, 'clean'], [1, 'looked'], [1, 'never'], [1, 'message']] }, [
       say(0.2, 'Nothing on the clean desk said anything had changed.', ''),
-      say(0, 'It looked up other things, and its searches almost never turned up the message.', ''),
+      say(0, 'It looked up other things, and almost never found the message.', ''),
     ]),
     anim('form', 'ClipboardForm', { mode: 'replace', marks: [[0, 'form'], [0, 'boxes'], [0, 'shelf'], [1, 'new'], [1, 'replaces']] }, [
       say(0.2, 'Or use a form with fixed boxes, like what is on each shelf.', ''),
