@@ -30,9 +30,9 @@ const build = (): Cuts => ({
       'cold',
       [say(0.1, 'At noon, an AI agent running a warehouse is told that shelf zero is empty. So the next pallet should go there.', '')],
       3,
-      { name: 'WarehouseShelves', props: { mode: 'day', marks: [[0, 'told'], [0, 'empty']] } },
+      { name: 'WarehouseShelves', props: { mode: 'day', marks: [[0, 'told'], [0, 'empty'], [0, 'next']] } },
     ),
-    anim('passed', 'WarehouseShelves', { mode: 'later', marks: [[0, 'hours'], [0, 'straight']] }, [
+    anim('passed', 'WarehouseShelves', { mode: 'later', marks: [[0, 'hours'], [0, 'straight'], [0, 'nobody']] }, [
       say(0.2, 'Two hours later, the pallet arrives, and it goes straight past shelf zero. As if nobody had told it.', ''),
     ]),
     anim(

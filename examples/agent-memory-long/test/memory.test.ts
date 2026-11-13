@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ADVICE_LINE, OFFICE_MODES, frameState as office } from '../src/anim/MemoryOffice.state.ts';
-import { ROBOT_PATH, WAREHOUSE_MODES, frameState as warehouse } from '../src/anim/WarehouseShelves.state.ts';
+import { BAYS, HERE_TEXT, LANDING_BAY, NOON, ROBOT_PATH, TWO, WAREHOUSE_MODES, frameState as warehouse } from '../src/anim/WarehouseShelves.state.ts';
 import { SLIP_PATH, frameState as head } from '../src/anim/HeadShelf.state.ts';
 import { CARD_TEXT, CROWDED_PAGES, DESK_MODES, FORK, MAX_PAGES, ONE_IN_TEXT, WORK_PAGES, frameState as desk } from '../src/anim/MemoryDesk.state.ts';
 import { CABINET_MODES, frameState as cabinet } from '../src/anim/FilingCabinet.state.ts';
@@ -15,7 +15,7 @@ const UNIT = new Set([
   'question', 'books', 'cap', 'lock', 'bounce', 'desk', 'deskLit', 'cover', 'spill', 'gauge', 'amber', 'squeeze', 'write', 'fade',
   'move', 'tick', 'pile', 'sweep', 'inDrawer', 'drawers', 'clean', 'found', 'peek', 'cross', 'boxes', 'shelfRow', 'rowLit', 'strike',
   'prog', 'fly', 'erase', 'eraser', 'scribble', 'zero', 'fill', 'full', 'inset',
-  'rules', 'top', 'one', 'other', 'label', 'needed', 'fork',
+  'rules', 'top', 'one', 'other', 'label', 'needed', 'fork', 'here',
 ]);
 
 const walk = (v: unknown, path: string, key = '') => {
@@ -94,17 +94,63 @@ test('WarehouseShelves: the slip drops and shelf 0 empties only from its beat; l
   assert.equal(before.slip.opacity, 0);
   assert.equal(before.ghost, 0);
   assert.equal(before.pallets[0], 1);
+  assert.equal(before.pallets.length, BAYS);
+  assert.equal(before.pallets[LANDING_BAY], 0, 'the landing bay is free');
   for (const { beats, dur } of SCENES) {
     const end = warehouse({ mode: 'day' }, dur, beats, dur);
     assert.equal(end.slip.drop, 1);
     assert.equal(end.ghost, 1);
     assert.equal(end.pallets[0], 0);
     assert.equal(end.robot.x, ROBOT_PATH.desk);
+    assert.equal(end.glow, 1);
+    assert.equal(end.here, 1);
     const later = warehouse({ mode: 'later' }, dur, beats, dur);
     assert.equal(later.question, 1);
-    assert.equal(later.conveyor.arrive, 1);
-    assert.equal(later.clock.minute, 1440);
+    assert.equal(later.pallet.move, 1);
+    assert.equal(later.cross, 1);
+    assert.equal(later.pallets[LANDING_BAY], 1);
+    assert.equal(later.pallets[0], 0, 'shelf 0 stays empty');
+    assert.deepEqual([later.clock.hour, later.clock.minute], [TWO.hour, TWO.minute]);
   }
+});
+
+test('WarehouseShelves day: noon on the clock from frame 0; shelf 0 glows and says "next pallet → here" in order', () => {
+  assert.equal(HERE_TEXT, 'next pallet → here');
+  const marks = [2.5, 4.5, 6.5];
+  const at = (t: number) => warehouse({ mode: 'day', marks }, t, [0.1], 8.5);
+  const s0 = at(0);
+  assert.equal(s0.clock.opacity, 1);
+  assert.deepEqual([s0.clock.hour, s0.clock.minute], [NOON.hour, NOON.minute]);
+  assert.equal(at(4.4).glow, 0);
+  assert.ok(at(5.4).glow > 0.99);
+  assert.equal(at(6.3).here, 0);
+  assert.ok(at(7).here > 0.99);
+  // "here" never before the shelf is empty, whatever the marks say.
+  const odd = (t: number) => warehouse({ mode: 'day', marks: [2, 5, 1] }, t, [0.1], 8);
+  assert.equal(odd(4.9).here, 0);
+});
+
+test('WarehouseShelves later: 12:00 to 2:00, then the pallet glides past shelf 0 and lands elsewhere, cross', () => {
+  const marks = [0.5, 3.5, 6.5];
+  const at = (t: number) => warehouse({ mode: 'later', marks }, t, [0.2], 8);
+  assert.deepEqual([at(0).clock.hour, at(0).clock.minute], [NOON.hour, NOON.minute]);
+  assert.ok(Math.abs(at(2.5).clock.hour - TWO.hour) < 1e-6);
+  assert.equal(at(2.6).pallet.move, 0);
+  const mid = at(3.6);
+  assert.ok(mid.pallet.move > 0 && mid.pallet.move < 1);
+  assert.equal(mid.cross, 0);
+  assert.equal(mid.pallets[LANDING_BAY], 0);
+  let prev = 0;
+  for (let t = 0; t <= 8; t += 0.1) {
+    const s = at(t);
+    assert.ok(s.pallet.move >= prev - 1e-12, 'the pallet never goes back');
+    prev = s.pallet.move;
+    assert.equal(s.glow, 1, 'shelf 0 glows the whole time');
+    assert.equal(s.pallets[0], 0);
+  }
+  assert.ok(at(5.6).cross > 0.99);
+  assert.equal(at(6.2).question, 0);
+  assert.ok(at(7).question > 0.99);
 });
 
 test('HeadShelf: the slip hits the glass, bounces off and lands on the desk', () => {

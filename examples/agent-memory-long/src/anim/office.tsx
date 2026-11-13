@@ -345,7 +345,19 @@ export const Crate: React.FC<{ x: number; y: number; w: number; h: number; dashe
  * A warehouse rack of `bays` bays and two levels; the lower level holds the pallets (index 0 =
  * shelf 0, the only labelled one). (x, y) is the top left; the lower plank sits at y + h.
  */
-export const Rack: React.FC<{ x: number; y: number; w: number; h: number; bays?: number; pallets: number[]; ghost?: number; glowA?: number; upper?: boolean; s?: number }> = ({
+export const Rack: React.FC<{
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  bays?: number;
+  pallets: number[];
+  ghost?: number;
+  glowA?: number;
+  glowColor?: string;
+  upper?: boolean;
+  s?: number;
+}> = ({
   x,
   y,
   w,
@@ -354,6 +366,7 @@ export const Rack: React.FC<{ x: number; y: number; w: number; h: number; bays?:
   pallets,
   ghost = 0,
   glowA = 0,
+  glowColor = C.warm,
   upper = true,
   s = 1,
 }) => {
@@ -370,15 +383,15 @@ export const Rack: React.FC<{ x: number; y: number; w: number; h: number; bays?:
       {upper && <rect x={x - 10 * s} y={mid} width={w + 20 * s} height={12 * s} rx={4} fill={alpha(C.accentText, 0.45)} />}
       <rect x={x - 10 * s} y={y + h} width={w + 20 * s} height={14 * s} rx={4} fill={alpha(C.accentText, 0.6)} />
       {/* shelf 0 glow */}
-      {glowA > 0 && <rect x={x + 8 * s} y={mid + 16 * s} width={bw - 16 * s} height={y + h - mid - 18 * s} rx={10} fill={alpha(C.warm, 0.18 * cl(glowA))} style={glow(C.warm, glowA)} />}
+      {glowA > 0 && <rect x={x + 8 * s} y={mid + 16 * s} width={bw - 16 * s} height={y + h - mid - 18 * s} rx={10} fill={alpha(glowColor, 0.18 * cl(glowA))} style={glow(glowColor, glowA)} />}
       {pallets.map((p, i) => (
         <Crate key={`c${i}`} x={x + (i + 0.5) * bw} y={y + h} w={crate.w} h={crate.h} opacity={p} />
       ))}
       <Crate x={x + 0.5 * bw} y={y + h} w={crate.w} h={crate.h} dashed opacity={ghost} />
       {/* the SHELF 0 label plate */}
       <g>
-        <rect x={x + bw / 2 - 72 * s} y={y + h + 22 * s} width={144 * s} height={40 * s} rx={8} fill={C.bg0} stroke={glowA > 0.05 ? C.warm : alpha(C.muted, 0.8)} strokeWidth={3} />
-        <text x={x + bw / 2} y={y + h + 50 * s} textAnchor="middle" fontSize={24 * s} fontWeight={800} fill={glowA > 0.05 ? C.warm : C.text} letterSpacing={1}>
+        <rect x={x + bw / 2 - 72 * s} y={y + h + 22 * s} width={144 * s} height={40 * s} rx={8} fill={C.bg0} stroke={glowA > 0.05 ? glowColor : alpha(C.muted, 0.8)} strokeWidth={3} />
+        <text x={x + bw / 2} y={y + h + 50 * s} textAnchor="middle" fontSize={24 * s} fontWeight={800} fill={glowA > 0.05 ? glowColor : C.text} letterSpacing={1}>
           {SHELF0}
         </text>
       </g>
