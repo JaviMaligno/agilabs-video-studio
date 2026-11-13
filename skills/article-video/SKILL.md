@@ -37,7 +37,16 @@ when installed as a plugin; next to `skills/` in the plugin repo).
 
 ## Workflow
 
-1. **Pick the article.** Use the one named. If none is named, read the published articles and
+0. **Pick the format: concept or experiment.** Decide it before the article, by what has
+   performed better for the author, not by habit. A *concept* video tells an idea that a set of
+   articles adds up to (kinds of memory, what an agent knows about time), with everyday
+   analogies; experiments enter only as one-line evidence. An *experiment* video tells one setup
+   and its number. Videos built around one specific experiment have performed worse for the
+   author than concept videos, so concept is the default; choose experiment when the setup
+   itself is fun or striking to watch. If the author asked for a concept video, never fall back
+   to a video of the latest article. `explainer-script` has a section for each format.
+1. **Pick the article.** Use the one named. For a concept video, pick every article that
+   carries the idea and treat them all as sources. If none is named, read the published articles and
    propose 2-3 candidates, each with its title, a hook line, the visual idea and the key number
    (quoted). Favour articles whose story can be drawn: people, objects, a mechanism, a scene that
    moves. Let the person choose.

@@ -19,7 +19,13 @@ caption.
 - The cloned voice reads about 2.5 EN words per second plus pauses: count the words to
   estimate. Spanish runs about 15-20 % longer for the same content.
 
-## Structure
+## Two formats
+
+`article-video` picks the format first. **Experiment** videos follow "Structure" below.
+**Concept** videos follow "Concept videos" further down and share everything else (voice,
+captions, visuals, cold read, script format).
+
+## Structure (experiment video)
 
 1. **Hook, within the first 3 s.** The surprising finding or a concrete question. Never "In
    this video...", "Today I want to talk about...", or a greeting. Intro card.
@@ -38,6 +44,30 @@ caption.
 6. **So what.** What the finding means for someone building with it, no stronger than the
    article claims.
 7. **Outro card line:** "More at javieraguilar.ai" (ES: "Más en javieraguilar.ai").
+
+## Concept videos
+
+A concept video explains an idea that one or more articles lead to. It does not tell an
+experiment: the viewer leaves with a way of thinking, not with a result.
+
+1. **Hook, within the first 3 s:** the idea as a surprising claim or a question ("An AI agent
+   forgets the way you do. It just has more places to do it in.").
+2. **One everyday example, start to finish.** Pick one concrete situation (a message the agent
+   must keep) and follow it through every part of the idea. Parts with no common thread lose
+   the viewer; a part the example cannot pass through gets one line or leaves the video.
+3. **The parts of the idea, one scene each.** Each part gets its human or everyday counterpart
+   and what goes wrong with it, shown as something that happens to the example.
+4. **Evidence in one line per part, at most** ("In my test, the summary kept the message").
+   Say once, early, what the test is, in one plain sentence, so "in my test" means something.
+   Keep the articles' scope words. Contrasting numbers go on screen, with what they count; the
+   voice says at most one per scene. Never explain how the test was built.
+5. **Verdict:** what the parts add up to and what to do with it, no stronger than the articles.
+6. **Outro card line**, as in the experiment format.
+
+Analogies must hold where it matters: say "a bit like yours" when the mechanism differs (a
+context window is not human working memory). Give the reel-expert a factual summary of every
+article the video draws on, and ask it to check the analogies as well as the numbers. Length
+follows the story: about 80 s to 2 min for a short.
 
 ## Voice
 
