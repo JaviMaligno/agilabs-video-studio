@@ -8,6 +8,11 @@ import { lerp } from './memory.ts';
 import {
   CARD_TEXT,
   DECISIONS,
+  DETAIL_TEXT,
+  OLD_LABEL,
+  OLD_REDS,
+  ROWS,
+  ROW_CELLS,
   FORK,
   MAX_PAGES,
   MISSES_ONE,
@@ -18,7 +23,7 @@ import {
   frameState,
   type MemoryDeskProps,
 } from './MemoryDesk.state.ts';
-import { Badge, Crate, Desk, Floor, Frame, Gauge, Notecard, Page, Rack, Robot, Slip, glow } from './office.tsx';
+import { Badge, Clock, Crate, Desk, Floor, Frame, Gauge, Notecard, Page, Rack, Robot, Slip, glow } from './office.tsx';
 import { place } from './canvas.ts';
 
 export { frameState };
@@ -46,6 +51,9 @@ const LAYOUT = {
     strips: { x: 340, y: [330, 530], cols: 40, label: 'above' as 'above' | 'left' },
     fork: { y: 290, xs: [300, 700], from: { x: 400, y: 740 } },
     spillDrop: 1,
+    detail: { x: 400, y: 918 },
+    clock: { x: 490, y: 610, r: 80 },
+    rows: { x: 390, y: [330, 420], cell: 44, gap: 4 },
   },
   l: {
     floor: { y: 806, x: 300, w: 1440 },
@@ -61,6 +69,9 @@ const LAYOUT = {
     strips: { x: 1080, y: [165, 275], cols: 60, label: 'left' as 'above' | 'left' },
     fork: { y: 205, xs: [570, 950], from: { x: 740, y: 360 } },
     spillDrop: 0.5,
+    detail: { x: 690, y: 548 },
+    clock: { x: 750, y: 255, r: 72 },
+    rows: { x: 1080, y: [185, 255], cell: 44, gap: 8 },
   },
 };
 type DeskLayout = (typeof LAYOUT)['v'];
@@ -68,6 +79,8 @@ type DeskLayout = (typeof LAYOUT)['v'];
 /** Deterministic jitter per page. */
 const jx = (k: number) => ((k * 53) % 17) - 8;
 const jr = (k: number) => ((k * 29) % 13) - 6;
+/** How far left the detail test's pile sits, clear of the card. */
+const ASIDE = 150;
 /** Pages from this index on slide off the left edge when the desk overflows. */
 const SPILL_FROM = 7;
 /** Strip cells: size and gap. */
@@ -137,6 +150,41 @@ const Strip: React.FC<{ x: number; y: number; cols: number; fill: number; misses
   );
 };
 
+/** A row of ROW_CELLS cells filling left to right: ticks (teal) or, at `reds`, crosses (rose). */
+const TickRow: React.FC<{ x: number; y: number; cell: number; gap: number; fill: number; misses: readonly number[]; reds?: boolean; label: string; labelColor: string }> = ({
+  x,
+  y,
+  cell,
+  gap,
+  fill,
+  misses,
+  reds = false,
+  label,
+  labelColor,
+}) => {
+  const shown = Math.floor(ROW_CELLS * Math.min(1, Math.max(0, fill)) + 1e-9);
+  return (
+    <g>
+      <text x={x - 16} y={y + cell * 0.72} textAnchor="end" fontSize={28} fontWeight={800} fill={labelColor}>
+        {label}
+      </text>
+      {Array.from({ length: ROW_CELLS }, (_, i) => {
+        const cx = x + i * (cell + gap);
+        const on = i < shown;
+        const miss = misses.includes(i);
+        const k = cell / 54;
+        return (
+          <g key={i}>
+            <rect x={cx} y={y} width={cell} height={cell} rx={8 * k} fill={!on ? C.bg1 : miss ? (reds ? alpha(C.marker, 0.25) : C.bg1) : alpha(C.ok, 0.22)} stroke={!on ? alpha(C.muted, 0.4) : miss && reds ? C.marker : miss ? alpha(C.muted, 0.6) : C.ok} strokeWidth={3} />
+            {on && !miss && <path d={`M ${cx + 14 * k} ${y + 28 * k} L ${cx + 24 * k} ${y + 38 * k} L ${cx + 41 * k} ${y + 17 * k}`} fill="none" stroke={C.ok} strokeWidth={5 * k} strokeLinecap="round" strokeLinejoin="round" />}
+            {on && miss && reds && <path d={`M ${cx + 16 * k} ${y + 16 * k} L ${cx + 38 * k} ${y + 38 * k} M ${cx + 38 * k} ${y + 16 * k} L ${cx + 16 * k} ${y + 38 * k}`} stroke={C.marker} strokeWidth={5 * k} strokeLinecap="round" />}
+          </g>
+        );
+      })}
+    </g>
+  );
+};
+
 export const MemoryDesk: React.FC<AnimProps & MemoryDeskProps> = (p) => {
   const s = frameState(p, p.t, p.beats, p.dur);
   const D = place(p.vertical, LAYOUT);
@@ -145,7 +193,7 @@ export const MemoryDesk: React.FC<AnimProps & MemoryDeskProps> = (p) => {
   const n = Math.min(MAX_PAGES, whole + (part > 0 ? 1 : 0));
   const pages = Array.from({ length: n }, (_, k) => {
     const landing = k === whole ? part : 1;
-    let x = D.pile.x + jx(k);
+    let x = D.pile.x - ASIDE * s.aside + jx(k);
     let y = D.pile.base - k * 17 - 140 * (1 - landing);
     let rot = jr(k);
     let op = landing;
@@ -205,13 +253,54 @@ export const MemoryDesk: React.FC<AnimProps & MemoryDeskProps> = (p) => {
         <Floor y={D.floor.y} x={D.floor.x} w={D.floor.w} />
         {D.gauge.post > 0 && <rect x={D.gauge.x - 6} y={D.gauge.y} width={12} height={D.gauge.post} rx={4} fill={C.bg1} stroke={alpha(C.accentText, 0.6)} strokeWidth={3} />}
         <Gauge x={D.gauge.x} y={D.gauge.y} r={D.gauge.r} level={s.gauge} amber={s.amber} />
-        <Robot x={D.robot.x} y={D.robot.y} s={D.robot.s} blink={0} />
+        <g style={s.old > 0.01 ? { filter: `grayscale(${s.old.toFixed(3)}) brightness(${(1 - 0.35 * s.old).toFixed(3)})` } : undefined}>
+          <Robot x={D.robot.x} y={D.robot.y} s={D.robot.s} blink={0} />
+        </g>
         <Desk x={D.desk.x} y={D.desk.y} w={D.desk.w} lit={0.6 + 0.4 * s.deskLit} glowA={0.45 * s.deskLit * (1 - s.amber)} />
         <Rules x={D.rules.x} y={D.rules.y} opacity={s.rules} />
+        {/* the detail the summary is tested on, under the new pile */}
+        {s.detail > 0 && (
+          <g transform={`translate(${D.detail.x - ASIDE} ${D.detail.y}) rotate(-2)`} opacity={s.detail}>
+            <rect x={-130} y={-34} width={260} height={68} rx={8} fill={alpha(C.text, 0.92)} stroke={C.marker} strokeWidth={4} />
+            <text x={0} y={10} textAnchor="middle" fontSize={28} fontWeight={800} fill={C.bg0}>
+              {DETAIL_TEXT}
+            </text>
+          </g>
+        )}
         {pages.filter((pg) => pg.k < coverFrom).map(pageEl)}
         <Slip x={slipAt.x} y={slipAt.y} w={220} rot={-4} opacity={s.slip.opacity} />
         {pages.filter((pg) => pg.k >= coverFrom).map(pageEl)}
-        <Notecard x={D.card.x} y={D.card.y} w={D.card.w} opacity={s.card.opacity} text={CARD_TEXT} write={s.card.write} />
+        {s.card.opacity > 0 && (
+          <g transform={`translate(${D.card.x} ${D.card.y}) scale(${1 - 0.45 * s.card.shrink}) translate(${-D.card.x} ${-D.card.y})`}>
+            <Notecard x={D.card.x} y={D.card.y} w={D.card.w} opacity={s.card.opacity} text={CARD_TEXT} write={s.card.write} />
+            <g transform={`translate(${D.card.x} ${D.card.y}) rotate(-3)`} opacity={s.card.opacity}>
+              {/* line 1 glowing: the one sentence that was enough */}
+              {s.card.glow > 0 && (
+                <rect x={-D.card.w / 2 + 8} y={-D.card.w * 0.19} width={D.card.w - 16} height={D.card.w * 0.16} rx={8} fill={alpha(C.ok, 0.25 * s.card.glow)} stroke={C.ok} strokeWidth={4} opacity={s.card.glow} style={glow(C.ok, s.card.glow)} />
+              )}
+              {/* line 2: the detail, kept by a recent model; lost on the older model's smaller card */}
+              {s.card.write2 > 0 && (
+                <text x={-D.card.w / 2 + 18} y={D.card.w * 0.06} fontSize={D.card.w * 0.084} fontWeight={700} fontStyle="italic" fill={C.marker} opacity={1 - s.card.shrink}>
+                  {DETAIL_TEXT.slice(0, Math.ceil(DETAIL_TEXT.length * s.card.write2))}
+                </text>
+              )}
+            </g>
+            <Badge x={D.card.x + D.card.w / 2 - 6} y={D.card.y - D.card.w * 0.3} r={28} kind="tick" pop={s.card.tick} />
+          </g>
+        )}
+        <Clock x={D.clock.x} y={D.clock.y} r={D.clock.r} hour={720 * s.clock.spin} minute={8640 * s.clock.spin} opacity={s.clock.opacity} />
+        {s.rows.opacity > 0 && (
+          <g opacity={s.rows.opacity}>
+            {ROWS.map((r, i) => (
+              <TickRow key={r.label} x={D.rows.x} y={D.rows.y[i]} cell={D.rows.cell} gap={D.rows.gap} fill={s.rows.fill} misses={[r.miss]} label={r.label} labelColor={i === 0 ? C.text : C.muted} />
+            ))}
+          </g>
+        )}
+        {s.reds.opacity > 0 && (
+          <g opacity={s.reds.opacity}>
+            <TickRow x={D.rows.x} y={D.rows.y[0]} cell={D.rows.cell} gap={D.rows.gap} fill={s.reds.fill} misses={OLD_REDS} reds label={OLD_LABEL} labelColor={C.muted} />
+          </g>
+        )}
         <Bubble D={D} opacity={s.bubble.opacity} fade={s.bubble.fade} />
         {s.inset.opacity > 0 && (
           <g opacity={s.inset.opacity}>

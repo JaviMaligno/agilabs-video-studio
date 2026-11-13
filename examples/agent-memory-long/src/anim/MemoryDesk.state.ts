@@ -9,7 +9,13 @@
 //   the edge; a fork names the two ways out (SUMMARY / NOTEBOOK). Marks: [desk, long, room, go, two].
 // - summary: the pile is squeezed into one notecard with "shelf 0: empty" written on it; a speech
 //   bubble (a meeting) loses its words and keeps the gist; on the small rack the new pallet goes to
-//   shelf 0, tick. Marks: [squeeze, gist, meeting, without, kept].
+//   shelf 0, tick. Then the rest of the chapter (rows 22-26): the bubble clears and a detail card
+//   "shelf 4: quarantine" goes under a new pile, which is squeezed into the card twice while a clock
+//   runs; the card gains the line "shelf 4: quarantine"; two rows of ticks, "summary" and "never
+//   summarised", nearly equal; the card's "shelf 0: empty" line glows as the pallet goes to shelf 0;
+//   an older model (the robot greyed) squeezes a smaller card and a row of reds comes in; back to the
+//   recent model, its full card ticked.
+//   Marks: [squeeze, gist, meeting, without, kept, detail, two, wrote, often, line, older, lost, good].
 // No Remotion or React here.
 import { beatOr, ease, mark, pickMode } from './memory.ts';
 import { progress, sceneTime } from './steps.ts';
@@ -26,6 +32,19 @@ export const WORK_PAGES = 5;
 export const CROWDED_PAGES = 10;
 /** What the summary keeps, written on the notecard. */
 export const CARD_TEXT = 'shelf 0: empty';
+/** The detail the summary is tested on, and the line it gains on the card. */
+export const DETAIL_TEXT = 'shelf 4: quarantine';
+/** The two rows of ticks (summary vs never summarised): cells per row and the one miss in each. */
+export const ROW_CELLS = 12;
+export const ROWS = [
+  { label: 'summary', miss: 7 },
+  { label: 'never summarised', miss: 3 },
+] as const;
+/** The older summariser's row: cells marked red (≈ the 0.72-0.75 it fell to). */
+export const OLD_LABEL = 'older model';
+export const OLD_REDS = [2, 6, 10] as const;
+/** Pages piled again between the two summaries of the detail test. */
+export const REGROW_PAGES = 6;
 /** Gauge level of a full desk. */
 export const FULL_GAUGE = 0.95;
 /** The strip of decisions (crowded): cells, and the misses on each model's strip. */
@@ -50,7 +69,19 @@ export type MemoryDeskState = {
   gauge: number;
   amber: number;
   squeeze: number;
-  card: { opacity: number; write: number };
+  /** The notecard: shown, line 1 written, line 2 ("shelf 4: quarantine") written, line 1's glow,
+   *  how far it has shrunk (the older model's card), and its tick. */
+  card: { opacity: number; write: number; write2: number; glow: number; shrink: number; tick: number };
+  /** The detail card under the pile, and the clock running through two summaries. */
+  detail: number;
+  clock: { opacity: number; spin: number };
+  /** The rows of ticks (summary vs never summarised): shown, how far they have filled. */
+  rows: { opacity: number; fill: number };
+  /** The older model: the robot greyed, and its row of reds (shown, filled). */
+  old: number;
+  reds: { opacity: number; fill: number };
+  /** 1 while the detail test piles beside the card (summary, rows 22-23), else 0. */
+  aside: number;
   bubble: { opacity: number; fade: number };
   inset: { opacity: number; move: number; tick: number };
   /** The strips of decisions: how far each one has filled (0..1) and the label opacity. */
@@ -61,6 +92,12 @@ export type MemoryDeskState = {
 };
 
 const none = {
+  aside: 0,
+  detail: 0,
+  clock: { opacity: 0, spin: 0 },
+  rows: { opacity: 0, fill: 0 },
+  old: 0,
+  reds: { opacity: 0, fill: 0 },
   rules: 0,
   strips: { opacity: 0, one: 0, other: 0, label: 0 },
   needed: 0,
@@ -89,7 +126,7 @@ export function frameState(props: MemoryDeskProps, t: number, beats: number[], d
       gauge: (FULL_GAUGE * WORK_PAGES * progress(T, record, 3)) / MAX_PAGES,
       amber: 0,
       squeeze: 0,
-      card: { opacity: 0, write: 0 },
+      card: { opacity: 0, write: 0, write2: 0, glow: 0, shrink: 0, tick: 0 },
       bubble: { opacity: 0, fade: 0 },
       inset: { opacity: ease(T, uses - 0.3, 0.4), move: ease(T, shelf - 0.6, 0.9), tick: ease(T, shelf + 0.3, 0.35) },
     };
@@ -111,7 +148,7 @@ export function frameState(props: MemoryDeskProps, t: number, beats: number[], d
       gauge: (FULL_GAUGE * pages) / MAX_PAGES,
       amber: 0,
       squeeze: 0,
-      card: { opacity: 0, write: 0 },
+      card: { opacity: 0, write: 0, write2: 0, glow: 0, shrink: 0, tick: 0 },
       bubble: { opacity: 0, fade: 0 },
       inset: { opacity: 0, move: 0, tick: 0 },
       strips: {
@@ -140,7 +177,7 @@ export function frameState(props: MemoryDeskProps, t: number, beats: number[], d
       gauge: (FULL_GAUGE * pages) / MAX_PAGES,
       amber: ease(T, room, 0.5),
       squeeze: 0,
-      card: { opacity: 0, write: 0 },
+      card: { opacity: 0, write: 0, write2: 0, glow: 0, shrink: 0, tick: 0 },
       bubble: { opacity: 0, fade: 0 },
       inset: { opacity: 0, move: 0, tick: 0 },
       fork: ease(T, two - 0.1, 0.5),
@@ -153,18 +190,64 @@ export function frameState(props: MemoryDeskProps, t: number, beats: number[], d
   const meeting = mark(m, 2, b0 + 3.6);
   const without = mark(m, 3, b0 + 4.8);
   const kept = mark(m, 4, b1 + 0.9);
+  const b2 = beatOr(beats, 2, without + 2);
+  const b3 = beatOr(beats, 3, b2 + 11);
+  const b5 = beatOr(beats, 5, kept + 4);
+  const b6 = beatOr(beats, 6, b5 + 8);
+  const detailAt = Math.max(without + 1, mark(m, 5, b2 + 6.5));
+  const two = Math.max(detailAt + 1.8, mark(m, 6, b2 + 9.5));
+  const wrote = Math.max(two + 1.6, mark(m, 7, b3 + 2.6));
+  const often = Math.max(wrote + 0.6, mark(m, 8, b3 + 5.5));
+  const line = Math.max(often + 1.4, mark(m, 9, kept - 2.5));
+  const older = Math.max(line + 0.8, mark(m, 10, b5 + 3.0));
+  const lost = Math.max(older + 0.5, mark(m, 11, b5 + 6.0));
+  const good = Math.max(lost + 0.8, mark(m, 12, b6 + 3.5));
   const squeeze = ease(T, squeezeAt - 0.1, 0.9);
-  return {
+  const fresh = 1 - ease(T, good - 0.3, 0.6);
+  const old = ease(T, older - 0.2, 0.6) * fresh;
+  const head = {
     ...none,
     deskLit: 1,
-    slip: { opacity: 1 - squeeze, cover: 1, top: 0 },
-    pages: MAX_PAGES,
-    spill: 1 - squeeze,
-    gauge: FULL_GAUGE - 0.7 * squeeze,
-    amber: 1 - squeeze,
-    squeeze,
-    card: { opacity: ease(T, squeezeAt + 0.5, 0.4), write: progress(T, gist - 0.2, 1.0) },
-    bubble: { opacity: ease(T, meeting - 0.1, 0.4), fade: ease(T, without, 0.8) },
-    inset: { opacity: ease(T, kept - 0.5, 0.4), move: ease(T, kept, 0.9), tick: ease(T, kept + 0.9, 0.35) },
+    card: {
+      opacity: ease(T, squeezeAt + 0.5, 0.4),
+      write: progress(T, gist - 0.2, 1.0),
+      write2: progress(T, wrote - 0.2, 0.8),
+      glow: ease(T, line - 0.1, 0.4) * (1 - ease(T, older - 0.3, 0.4)),
+      shrink: old,
+      tick: ease(T, good + 0.2, 0.35),
+    },
+    bubble: { opacity: ease(T, meeting - 0.1, 0.4) * (1 - ease(T, detailAt - 0.6, 0.4)), fade: ease(T, without, 0.8) },
+    inset: { opacity: ease(T, kept - 0.5, 0.4) * (1 - ease(T, older - 0.4, 0.4)), move: ease(T, kept, 0.9), tick: ease(T, kept + 0.9, 0.35) },
+    detail: ease(T, detailAt - 0.2, 0.4) * (1 - ease(T, two + 1.0, 0.4)),
+    clock: { opacity: ease(T, detailAt, 0.4) * (1 - ease(T, wrote - 0.4, 0.4)), spin: progress(T, detailAt, two + 1.4 - detailAt) },
+    rows: { opacity: ease(T, often - 0.3, 0.4) * (1 - ease(T, line - 0.5, 0.4)), fill: progress(T, often, 1.2) },
+    old,
+    reds: { opacity: ease(T, lost - 0.3, 0.4) * fresh, fill: progress(T, lost, 1.0) },
+  };
+  if (T < detailAt) {
+    // The first summary: the full desk squeezed into the card.
+    return {
+      ...head,
+      slip: { opacity: 1 - squeeze, cover: 1, top: 0 },
+      pages: MAX_PAGES,
+      spill: 1 - squeeze,
+      gauge: FULL_GAUGE - 0.7 * squeeze,
+      amber: 1 - squeeze,
+      squeeze,
+    };
+  }
+  // The detail test: a new pile over the detail card, squeezed twice (the second on "two").
+  const second = T >= two - 0.2;
+  const grow = second ? progress(T, two - 0.2, 0.6) : progress(T, detailAt + 0.5, Math.max(0.4, two - 1.3 - detailAt));
+  const squeezeN = second ? ease(T, two + 0.6, 0.5) : ease(T, two - 0.8, 0.5);
+  return {
+    ...head,
+    aside: 1,
+    slip: { opacity: 0, cover: 1, top: 0 },
+    pages: REGROW_PAGES * grow,
+    spill: 0,
+    gauge: FULL_GAUGE - 0.7 + 0.35 * grow * (1 - squeezeN),
+    amber: 0,
+    squeeze: squeezeN,
   };
 }

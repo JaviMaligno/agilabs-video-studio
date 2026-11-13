@@ -490,3 +490,37 @@ test('MemoryOffice advice: the recipe builds item by item; the record comes in w
     assert.equal(end.record, 1);
   }
 });
+
+test('MemoryDesk summary, rows 22-26: detail under the pile, two squeezes, the line written, rows of ticks, the older model, the tick', () => {
+  const beats = [1.3, 11.7, 16, 28.3, 37.9, 45, 54.7];
+  const marks = [2.3, 15.3, 13.4, 14.5, 44.1, 21, 26, 31, 35, 40.5, 47, 51, 58];
+  const at = (t: number) => desk({ mode: 'summary', marks }, t, beats, 61);
+  // Before the detail: the first card, line 1 only; nothing of the later beats.
+  const s18 = at(18);
+  assert.equal(s18.card.write, 1);
+  assert.equal(s18.card.write2, 0);
+  assert.equal(s18.detail, 0);
+  assert.equal(s18.rows.opacity, 0);
+  // The detail card sits under a new pile; the clock runs; two squeezes.
+  const s22 = at(22.5);
+  assert.ok(s22.detail > 0.99 && s22.clock.opacity > 0.99);
+  assert.ok(s22.pages > 0 && s22.squeeze < 0.01);
+  assert.ok(at(25.6).squeeze > 0.99, 'first squeeze done');
+  assert.ok(at(26.2).squeeze < 0.01, 'the pile grows again');
+  assert.ok(at(27.4).squeeze > 0.99, 'second squeeze done');
+  assert.equal(at(28).detail, 0);
+  // The card gains the detail line; the rows of ticks come and go before the line glows.
+  assert.equal(at(30.5).card.write2, 0);
+  assert.equal(at(32).card.write2, 1);
+  assert.ok(at(36.5).rows.opacity > 0.99 && at(36.5).rows.fill > 0.99);
+  assert.equal(at(41).rows.opacity, 0);
+  assert.ok(at(41).card.glow > 0.99);
+  // The older model: robot greyed, card shrunk, reds; then the recent model's card, ticked.
+  assert.ok(at(52.5).old > 0.99 && at(52.5).card.shrink > 0.99 && at(52.5).reds.opacity > 0.99);
+  assert.equal(at(52.5).inset.opacity, 0);
+  const end = at(61);
+  assert.equal(end.old, 0);
+  assert.equal(end.reds.opacity, 0);
+  assert.equal(end.card.tick, 1);
+  assert.equal(end.card.write2, 1);
+});

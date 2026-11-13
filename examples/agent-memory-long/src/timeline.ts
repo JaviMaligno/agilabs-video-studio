@@ -106,7 +106,13 @@ const build = (): Cuts => ({
     anim(
       'summary',
       'MemoryDesk',
-      { mode: 'summary', marks: [[0, 'summary'], [1, 'gist'], [1, 'meeting'], [1, 'words'], [4, 'enough']] },
+      {
+        mode: 'summary',
+        marks: [
+          [0, 'summary'], [1, 'gist'], [1, 'meeting'], [1, 'words'], [4, 'enough'],
+          [2, 'detail'], [2, 'two'], [3, 'wrote'], [3, 'often'], [4, 'line'], [5, 'older'], [5, 'lost'], [6, 'good'],
+        ],
+      },
       [
         say(0.3, 'The first is a summary. Coding assistants like Claude Code do this: when the desk is full, the model writes up its day and starts again from that.', ''),
         say(0, "It's how you remember a meeting: not the words, the gist.", ''),
