@@ -1,8 +1,8 @@
 // Pure state of the memory map, the cold open (scene 1): the robot holding the red slip in the
-// middle, and four tiles around it, one per kind of memory on the job, each with its human name
-// and how it fails. Everything is on screen at full legibility from frame 0 (the first-second
-// rule); while the hook is spoken an emphasis sweeps across the tiles one after another, the last
-// one peaking on "more", then all four hold the same soft glow from "places".
+// middle, and four tiles around it, one per kind of memory on the job: a one-word human name over
+// a drawing that shows how it fails. Everything is on screen at full legibility from frame 0 (the
+// first-second rule); while the hook is spoken an emphasis sweeps across the tiles one after
+// another, the last one peaking on "more", then all four hold the same soft glow from "places".
 // Marks: [start of the sweep, its last peak ("more"), the hold ("places")].
 // No Remotion or React here.
 import { beatOr, blinkAt, bump, ease, loopTime, mark } from './memory.ts';
@@ -12,10 +12,10 @@ export type MemoryMapProps = { marks?: number[] };
 
 /** The four tiles, in sweep order (reading order: top left, top right, bottom left, bottom right). */
 export const TILES = [
-  { kind: 'desk', label: 'THE DESK', fail: ['runs out of room'] },
-  { kind: 'gist', label: 'THE GIST', fail: ['keeps the point,', 'not the words'] },
-  { kind: 'notebook', label: 'THE NOTEBOOK', fail: ['only if you', 'know to look'] },
-  { kind: 'form', label: 'THE FORM', fail: ['misremembers'] },
+  { kind: 'desk', label: 'DESK' },
+  { kind: 'gist', label: 'GIST' },
+  { kind: 'notebook', label: 'NOTEBOOK' },
+  { kind: 'form', label: 'FORM' },
 ] as const;
 export type TileKind = (typeof TILES)[number]['kind'];
 

@@ -227,10 +227,10 @@ test('StatGrid: tiles pop in per beat and lay out in a grid', () => {
 test('MemoryMap shows all four tiles from frame 0 and sweeps them in order', () => {
   const marks = [1, 3.7, 4];
   const at = (t: number) => map.frameState({ marks }, t, [0.1], 5.6);
-  // First second: every tile already on screen, labels and failures in place.
+  // First second: every tile already on screen, one word each (the drawings carry the failures).
   assert.deepEqual(at(0).opacity, [1, 1, 1, 1]);
   assert.equal(map.TILES.length, 4);
-  for (const tile of map.TILES) assert.ok(tile.label.length > 0 && tile.fail.length > 0);
+  assert.deepEqual(map.TILES.map((x) => x.label), ['DESK', 'GIST', 'NOTEBOOK', 'FORM']);
   // The sweep: tile i peaks before tile i + 1, the last one on the second mark ("more").
   const peaks = [0, 1, 2, 3].map((i) => {
     let best = 0;

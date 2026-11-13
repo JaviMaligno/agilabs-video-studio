@@ -114,6 +114,36 @@ export const HookOverlay: React.FC<{ hook?: Line; lang: Lang; vertical: boolean 
   );
 };
 
+/**
+ * Poster title: on the poster (and thumbnails) of a cold open, the long spoken hook gives way to the
+ * article's short title, big, in the same panel under the stage.
+ */
+export const PosterTitle: React.FC<{ lang: Lang; vertical: boolean }> = ({ lang, vertical }) => (
+  <div
+    style={{
+      position: 'absolute',
+      left: vertical ? SAFE.side : 200,
+      right: vertical ? SAFE.side : 200,
+      top: vertical ? V.stageBottom - 110 : undefined,
+      bottom: vertical ? undefined : 120,
+      padding: '30px 36px 36px',
+      borderRadius: 28,
+      background: 'rgba(8, 8, 18, 0.96)',
+      boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+      fontFamily,
+      fontSize: vertical ? 104 : 88,
+      fontWeight: 800,
+      lineHeight: 1.04,
+      letterSpacing: '-0.025em',
+      textAlign: 'center',
+      textWrap: 'balance',
+      color: C.text,
+    }}
+  >
+    {tx(SETTINGS.articleTitle, lang)}
+  </div>
+);
+
 /** Closing card: the author avatar (when SETTINGS.avatar is set), AGILabs badge, the site address and the article's title. */
 export const Outro: React.FC<{ lang: Lang; vertical: boolean }> = ({ lang, vertical }) => {
   const frame = useCurrentFrame();
