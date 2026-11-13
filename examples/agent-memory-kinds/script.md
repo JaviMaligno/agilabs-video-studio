@@ -41,7 +41,7 @@ a clipboard form (fixed boxes). Every scene follows the same red slip into a dif
 
 ## Count
 
-EN: 300 words. At ~2.5 words/s plus scene breaths: ~2 min. Set `targetSeconds: 120`.
+EN: 304 words. At ~2.5 words/s plus scene breaths: ~2 min. Set `targetSeconds: 120`.
 
 ## Cold read
 
