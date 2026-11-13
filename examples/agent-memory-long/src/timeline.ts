@@ -163,7 +163,7 @@ const build = (): Cuts => ({
     anim(
       'form',
       'ClipboardForm',
-      { mode: 'replace', marks: [[0, 'form'], [0, 'boxes'], [0, 'shelf'], [1, 'empty'], [1, 'old'], [2, 'ten'], [2, 'hundred']] },
+      { mode: 'replace', marks: [[0, 'form'], [0, 'boxes'], [0, 'shelf'], [1, 'empty'], [1, 'old'], [2, 'ten'], [2, 'hundred'], [0, 'step'], [0, 'thrown']] },
       [
         say(0.3, "The last memory is the strictest: a form. Fixed boxes, like what's on each shelf. Each step, the agent updates the boxes, and everything else is thrown away.", ''),
         say(0, `Like a patient's chart. When the message arrives, "empty" goes into shelf zero's box, and the old value is gone.`, ''),

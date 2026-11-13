@@ -1,8 +1,9 @@
 // Pure state of the clipboard form with fixed boxes (rows 36-44).
 // - replace: the fixed boxes light up; the red slip slides into the SHELF 0 box; "pallet" is struck
 //   and "empty" written in the same box; a step counter runs from 10 to 200 while the form keeps
-//   its size and a ghost stack (the record it does not keep) grows beside it.
-//   Marks: [form, boxes, shelf, new, replaces, ten, hundred].
+//   its size and a ghost stack (the record it does not keep) grows beside it. Between "step" and
+//   "thrown" the robot's pages go through a shredder beside the form, one per step.
+//   Marks: [form, boxes, shelf, new, replaces, ten, hundred, step, thrown].
 // - margin: the form has no box for the fact: "shelf 4: quarantine" is jotted next to the last
 //   entry, the next entry wipes it ("0/24"); a box named after it appears ("quarantined") and a
 //   grid of 24 runs fills with ticks ("24/24", "16/24" for a second model); a generic notes box,
@@ -33,6 +34,10 @@ export const NAMED_LABEL = 'QUARANTINED';
 export const NAMED_VALUE = 'shelf 4';
 /** Steps on the counter: the form is the same size at both. */
 export const STEPS = { from: 10, to: 200 } as const;
+/** Pages shredded while "everything else is thrown away" (one per step). */
+export const SHREDS = 3;
+/** Label of the ghost stack: the day's record the form does not keep. */
+export const GHOST_LABEL = "day's record, not kept";
 /** Mistakes that followed from the one wrong box. */
 export const CASCADE = 25;
 
@@ -60,6 +65,8 @@ export type ClipboardFormState = {
   counter: { opacity: number; step: number };
   /** The ghost stack beside the form (replace), 0..1 of its height. */
   ghost: number;
+  /** The shredder (replace): shown, and how many pages have gone through (float, 0..SHREDS). */
+  shred: { opacity: number; run: number };
   /** The box named after the fact (margin): shown, its value written, its glow. */
   named: { opacity: number; write: number; glow: number };
   second: number;
@@ -91,6 +98,7 @@ const base = (): ClipboardFormState => ({
   inset: 0,
   counter: { opacity: 0, step: STEPS.from },
   ghost: 0,
+  shred: { opacity: 0, run: 0 },
   named: { opacity: 0, write: 0, glow: 0 },
   second: 0,
   notes: { opacity: 0, fill: 0, dim: 0, label: 0 },
@@ -118,6 +126,10 @@ export function frameState(props: ClipboardFormProps, t: number, beats: number[]
     const hundred = Math.max(ten + 0.8, mark(m, 6, ten + 1.6));
     const write = progress(T, replaces, 0.7);
     const run = progress(T, ten, hundred - ten + 0.4);
+    const each = mark(m, 7, b0 + 6.0);
+    const thrown = Math.max(each + 1.2, mark(m, 8, b0 + 9.0));
+    const shredEnd = Math.min(thrown + 1.0, fresh - 0.9);
+    const shredRun = SHREDS * progress(T, each, Math.max(0.9, shredEnd - each));
     return {
       ...s,
       boxes: 0.35 + 0.65 * ease(T, boxes - 0.1, 0.4),
@@ -127,6 +139,7 @@ export function frameState(props: ClipboardFormProps, t: number, beats: number[]
       slip: { opacity: ease(T, fresh - 0.3, 0.3) * (1 - ease(T, replaces + 0.2, 0.4)), fly: ease(T, fresh - 0.2, 0.7) },
       counter: { opacity: ease(T, ten - 0.5, 0.4), step: Math.round(lerp(STEPS.from, STEPS.to, run)) },
       ghost: run,
+      shred: { opacity: ease(T, each - 0.4, 0.4) * (1 - ease(T, Math.max(each + 0.9, shredEnd) + 0.2, 0.4)), run: shredRun },
     };
   }
 

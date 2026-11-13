@@ -7,12 +7,14 @@ import type { AnimProps } from './types.ts';
 import { SHELF0, lerp } from './memory.ts';
 import {
   FULL_TEXT,
+  GHOST_LABEL,
   MARGIN_TEXT,
   NAMED_LABEL,
   NAMED_VALUE,
   NOTES_TEXT,
   RUNS,
   SECOND_TEXT,
+  SHREDS,
   ZERO_TEXT,
   frameState,
   type ClipboardFormProps,
@@ -49,6 +51,7 @@ const LAYOUT = {
     cascade: { x: 760, y: 850, cols: 5, cell: 36 },
     record: { x: 360, y: 1040 },
     slipFrom: { x: 880, y: 1240 },
+    shredder: { x: 845, y: 820, w: 220 },
   },
   l: {
     board: { x: 190, y: 160, w: 840, h: 660 },
@@ -66,6 +69,7 @@ const LAYOUT = {
     cascade: { x: 1120, y: 220, cols: 5, cell: 56 },
     record: { x: 1560, y: 640 },
     slipFrom: { x: 1300, y: 820 },
+    shredder: { x: 1400, y: 520, w: 280 },
   },
 };
 
@@ -84,6 +88,37 @@ const Scribble: React.FC<{ x: number; y: number; w: number; p: number; color?: s
       strokeDasharray={`${Math.min(1, p)} 1`}
     />
   ) : null;
+
+/** A shredder centred at x, its slot at y: page k of `run` goes down into it and leaves as strips. */
+const Shredder: React.FC<{ x: number; y: number; w: number; run: number; opacity: number }> = ({ x, y, w, run, opacity }) => {
+  if (opacity <= 0) return null;
+  const k = Math.min(SHREDS - 1, Math.floor(run));
+  const f = run >= SHREDS ? 1 : run - k;
+  const strips = 7;
+  const sw = (w * 0.62) / strips;
+  return (
+    <g opacity={opacity}>
+      {/* strips of the pages already through, falling and fading; then the current page's */}
+      {Array.from({ length: Math.min(SHREDS, Math.ceil(run)) }, (_, j) => {
+        const age = run - j; // 0..: how long since page j started
+        const len = Math.min(1, age) * 90;
+        const drop = Math.max(0, age - 1) * 120;
+        const op = Math.max(0, 1 - Math.max(0, age - 1) * 1.2);
+        return (
+          <g key={j} opacity={op}>
+            {Array.from({ length: strips }, (_, i) => (
+              <rect key={i} x={x - w * 0.31 + i * sw + 2} y={y + 86 + drop + ((i * 13) % 5) * 3} width={sw - 4} height={len} rx={2} fill={alpha(C.text, 0.85)} />
+            ))}
+          </g>
+        );
+      })}
+      {run < SHREDS && <Page x={x} y={y - 60 + 110 * f} w={w * 0.7} rot={0} />}
+      <rect x={x - w / 2} y={y} width={w} height={86} rx={14} fill={C.card} stroke={C.accentText} strokeWidth={4} />
+      <rect x={x - w * 0.36} y={y - 5} width={w * 0.72} height={10} rx={5} fill={C.bg0} stroke={alpha(C.accentText, 0.7)} strokeWidth={2} />
+      <circle cx={x + w * 0.36} cy={y + 52} r={8} fill={C.marker} />
+    </g>
+  );
+};
 
 /** A figure in a rounded frame, centred on (x, y). */
 const Figure: React.FC<{ at: At & { s: number }; text: string; color: string; opacity: number; pop?: number; tag?: string; tags: boolean }> = ({ at, text, color, opacity, pop = 1, tag, tags }) =>
@@ -276,14 +311,20 @@ export const ClipboardForm: React.FC<AnimProps & ClipboardFormProps> = (p) => {
                   width={L.ghost.w}
                   height={11}
                   rx={3}
-                  fill="none"
-                  stroke={alpha(C.muted, 0.45)}
-                  strokeWidth={2}
-                  strokeDasharray="8 6"
+                  fill={alpha(C.text, 0.16)}
+                  stroke={alpha(C.muted, 0.85)}
+                  strokeWidth={2.5}
+                  strokeDasharray="10 5"
                 />
               ))}
+            {ghostH > 20 && (
+              <text x={L.ghost.x} y={L.ghost.bottom - ghostH - 18} textAnchor="middle" fontSize={26} fontWeight={700} fontStyle="italic" fill={C.muted}>
+                {GHOST_LABEL}
+              </text>
+            )}
           </g>
         )}
+        <Shredder x={L.shredder.x} y={L.shredder.y} w={L.shredder.w} run={s.shred.run} opacity={s.shred.opacity} />
         {/* the cascade of mistakes from the one wrong box (wrong) */}
         {s.cascade > 0 &&
           Array.from({ length: s.cascade }, (_, i) => {

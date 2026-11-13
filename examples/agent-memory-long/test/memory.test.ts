@@ -524,3 +524,17 @@ test('MemoryDesk summary, rows 22-26: detail under the pile, two squeezes, the l
   assert.equal(end.card.tick, 1);
   assert.equal(end.card.write2, 1);
 });
+
+test('ClipboardForm replace: pages go through the shredder between "Each" and "thrown", gone before the message', () => {
+  // marks: [form, boxes, shelf, new, replaces, ten, hundred, each, thrown]
+  const marks = [3.8, 4.6, 6.5, 16, 19, 24.5, 25.9, 8.2, 11.3];
+  const at = (t: number) => form({ mode: 'replace', marks }, t, [1.3, 12.5, 20.6], 27);
+  assert.equal(at(7).shred.opacity, 0);
+  assert.equal(at(7).shred.run, 0);
+  assert.ok(at(9).shred.opacity > 0.99);
+  const mid = at(10).shred.run;
+  assert.ok(mid > 0 && mid < 3);
+  assert.equal(at(12.4).shred.run, 3);
+  assert.equal(at(14).shred.opacity, 0);
+  assert.equal(at(27).shred.opacity, 0);
+});
