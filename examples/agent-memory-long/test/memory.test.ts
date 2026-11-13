@@ -15,7 +15,7 @@ const UNIT = new Set([
   'question', 'books', 'cap', 'lock', 'bounce', 'desk', 'deskLit', 'cover', 'spill', 'gauge', 'amber', 'squeeze', 'write', 'fade',
   'move', 'tick', 'pile', 'sweep', 'inDrawer', 'drawers', 'clean', 'found', 'peek', 'cross', 'boxes', 'shelfRow', 'rowLit', 'strike',
   'prog', 'fly', 'erase', 'eraser', 'scribble', 'zero', 'fill', 'full', 'inset',
-  'rules', 'top', 'one', 'other', 'label', 'needed', 'fork', 'here',
+  'rules', 'top', 'one', 'other', 'label', 'needed', 'fork', 'here', 'stream', 'doors', 'back', 'fall',
 ]);
 
 const walk = (v: unknown, path: string, key = '') => {
@@ -154,16 +154,38 @@ test('WarehouseShelves later: 12:00 to 2:00, then the pallet glides past shelf 0
 });
 
 test('HeadShelf: the slip hits the glass, bounces off and lands on the desk', () => {
-  const marks = [1, 2, 3, 4, 6];
+  const marks = [1, 2, 3, 4, 6, 2.2];
   assert.equal(head({ marks }, 2.5, [0.3, 2.9, 5.2], 8).slip.opacity, 0);
   const atGlass = head({ marks }, 4, [0.3, 2.9, 5.2], 8);
   assert.ok(Math.abs(atGlass.slip.x - SLIP_PATH.door.x) < 1 && Math.abs(atGlass.slip.y - SLIP_PATH.door.y) < 1);
+  assert.equal(atGlass.path.fly, 1);
+  assert.equal(atGlass.path.back, 0);
   assert.ok(head({ marks }, 4.2, [0.3, 2.9, 5.2], 8).bounce > 0);
   for (const { beats, dur } of SCENES) {
     const end = head({}, dur, beats, dur);
     assert.ok(Math.abs(end.slip.x - SLIP_PATH.desk.x) < 1e-6 && Math.abs(end.slip.y - SLIP_PATH.desk.y) < 1e-6);
     assert.equal(end.slip.opacity, 1);
     assert.equal(end.cap, 1);
+    assert.equal(end.doors, 1);
+    assert.equal(end.stream, 1);
+    assert.deepEqual(end.path, { fly: 1, back: 1, fall: 1 });
+  }
+});
+
+test('HeadShelf: books stream in on "reads", the doors close on "slow", and only then does the slip fly', () => {
+  const marks = [2, 9, 15, 16, 20, 11, 6];
+  const at = (t: number) => head({ marks }, t, [1.3, 8, 14], 24);
+  assert.equal(at(1.7).stream, 0);
+  assert.ok(at(4).stream > 0 && at(4).stream < 1);
+  assert.equal(at(6.5).stream, 1);
+  assert.equal(at(10.8).doors, 0);
+  assert.ok(at(11.6).doors > 0.99);
+  assert.equal(at(14.5).slip.opacity, 0);
+  // Out-of-order marks: the doors are never open when the slip reaches the glass.
+  const odd = (t: number) => head({ marks: [1, 2, 2.1, 2.2, 2.3, 9] }, t, [0.3], 12);
+  for (let t = 0; t <= 12; t += 0.05) {
+    const s = odd(t);
+    if (s.path.fly >= 1) assert.ok(s.doors > 0.99, `doors open at the hit, t=${t}`);
   }
 });
 

@@ -50,7 +50,7 @@ const build = (): Cuts => ({
     anim(
       'training',
       'HeadShelf',
-      { marks: [[0, 'reads'], [1, 'school'], [2, 'message'], [2, 'there'], [2, 'trained']] },
+      { marks: [[0, 'reads'], [1, 'school'], [2, 'message'], [2, 'there'], [2, 'trained'], [1, 'slow'], [0, 'packed']] },
       [
         say(0.3, 'Start with training. Before an AI model is released, it reads a huge amount of text, and all of it gets packed inside the model.', ''),
         say(0, "It's like what you learned at school. Huge, and slow to change. Nobody rewrites your schoolbooks because a shop down the street closed.", ''),
