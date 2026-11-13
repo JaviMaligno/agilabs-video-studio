@@ -18,6 +18,7 @@ import { ReplayBars } from './ReplayBars.tsx';
 import { TwoJobs } from './TwoJobs.tsx';
 import { RestartIterate } from './RestartIterate.tsx';
 import { AskReader } from './AskReader.tsx';
+import { CorrectionReplay } from './CorrectionReplay.tsx';
 
 export type { AnimProps };
 
@@ -39,4 +40,5 @@ export const ANIMS: Record<string, React.FC<AnimProps & any>> = {
   TwoJobs,
   RestartIterate,
   AskReader,
+  CorrectionReplay,
 };

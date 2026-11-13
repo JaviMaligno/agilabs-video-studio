@@ -176,32 +176,23 @@ const build = (): Cuts => ({
       say(0, "Nothing checks that a box matches reality. When that model also kept the day's record beside the form, those slips did no harm: where the two disagreed, it followed the record.", ''),
     ]),
 
-    // 6 · A flaw in my own test (placeholders for CorrectionReplay)
+    // 6 · A flaw in my own test
     anim(
       'flaw',
-      'StatGrid',
+      'CorrectionReplay',
       {
-        stats: [
-          { value: '12/12', label: 'form' },
-          { value: '3/12', label: "day's record" },
+        marks: [
+          [0, 'results'], [0, 'form'], [0, 'record'], [0, "wasn't"],
+          [1, 'message'], [1, 'named'], [1, 'left'], [1, 'doubt'],
+          [2, 'sense'], [2, 'both'],
         ],
       },
-      [say(0.3, "One confession. Until recently, my results said the form was far better than the day's record at taking a correction like our message. It wasn't.", '')],
+      [
+        say(0.3, "One confession. Until recently, my results said the form was far better than the day's record at taking a correction like our message. It wasn't.", ''),
+        say(0, "My message didn't make sense. The pallet it named had already left the warehouse. An agent that had watched it leave had reason to doubt it, and mostly didn't apply it. Hard to blame it.", ''),
+        say(0, 'With a message that made sense, both got it right. That fixed message is the one behind every result about it in this video.', ''),
+      ],
       { chapter: 'A flaw in my own test' },
-    ),
-    anim('doubt', 'KeyQuote', { text: 'The pallet it named had already left the warehouse.', emphasis: ['already left'] }, [
-      say(0.3, "My message didn't make sense. The pallet it named had already left the warehouse. An agent that had watched it leave had reason to doubt it, and mostly didn't apply it. Hard to blame it.", ''),
-    ]),
-    anim(
-      'fixed',
-      'StatGrid',
-      {
-        stats: [
-          { value: '12/12', label: 'form' },
-          { value: '10/12', label: "day's record" },
-        ],
-      },
-      [say(0.3, 'With a message that made sense, both got it right. That fixed message is the one behind every result about it in this video.', '')],
     ),
     anim(
       'check',

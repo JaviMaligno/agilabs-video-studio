@@ -16,6 +16,7 @@ import * as replay from '../src/anim/ReplayBars.state.ts';
 import * as jobs from '../src/anim/TwoJobs.state.ts';
 import * as restart from '../src/anim/RestartIterate.state.ts';
 import * as reader from '../src/anim/AskReader.state.ts';
+import * as replayFix from '../src/anim/CorrectionReplay.state.ts';
 
 // Fields that are animation progress and must stay within [0, 1].
 const PROGRESS = new Set(['progress', 'appear', 'grow', 'fill', 'draw', 'pop', 'opacity', 'emphasis']);
@@ -100,6 +101,8 @@ const CASES: Case[] = [
   { name: 'RestartIterate (marks out of order, one broken)', state: (t, b, d) => restart.frameState({ marks: [5, 1, Number.NaN, 0.2, 9, 0.1] }, t, b, d) },
   { name: 'AskReader', state: (t, b, d) => reader.frameState({}, t, b, d) },
   { name: 'AskReader (marks out of order, one broken)', state: (t, b, d) => reader.frameState({ marks: [9, 1, Number.NaN, 0.2, 3, 0.1, 2, 8, 1, 0.5, 4, 0.3] }, t, b, d) },
+  { name: 'CorrectionReplay', state: (t, b, d) => replayFix.frameState({}, t, b, d) },
+  { name: 'CorrectionReplay (marks out of order, one broken)', state: (t, b, d) => replayFix.frameState({ marks: [5, 1, Number.NaN, 0.2, 9, 0.1, 2, 8, 1, 0.5] }, t, b, d) },
 ];
 
 const SCENARIOS = [
@@ -392,4 +395,32 @@ test('AskReader: ask, read down to the slip, pass it to the desk, the figures, t
   assert.equal(end.question, 1);
   assert.equal(end.slip.tick, 1);
   assert.equal(end.table.opacity, 1);
+});
+
+test('CorrectionReplay: 12/12 vs 3/12, the replay of the pallet leaving, then 12/12 vs 10/12', () => {
+  const marks = [2.5, 4, 6, 9, 12, 14, 16, 19.5, 25, 26.5];
+  const at = (t: number) => replayFix.frameState({ marks }, t, [1.3, 11.3, 24], 32);
+  assert.equal(at(1).bars.opacity, 0);
+  const before = at(10);
+  assert.equal(before.bars.form, 1);
+  assert.equal(before.bars.record, 1);
+  assert.equal(before.bars.text, '3/12');
+  assert.equal(before.bars.recordValue, replayFix.RECORD.before);
+  assert.ok(before.question > 0.99);
+  assert.equal(before.replay.opacity, 0);
+  // Line 1: the pallet named on the slip leaves in the replay; the robot frowns after.
+  assert.ok(at(15).slip.icon > 0.99);
+  assert.ok(at(18).replay.leave > 0.9);
+  assert.equal(at(18).robot.frown, 0);
+  assert.ok(at(20.5).robot.frown > 0.99);
+  assert.equal(at(20.5).bars.text, '3/12');
+  // Line 2: the fixed message; the record redraws to 10/12, the form stays 12/12.
+  const end = at(32);
+  assert.equal(end.bars.text, '10/12');
+  assert.equal(end.bars.recordValue, replayFix.RECORD.after);
+  assert.equal(end.bars.form, 1);
+  assert.equal(end.replay.opacity, 0);
+  assert.equal(end.slip.icon, 0);
+  assert.equal(end.slip.tick, 1);
+  assert.equal(end.fixedTag, 1);
 });
