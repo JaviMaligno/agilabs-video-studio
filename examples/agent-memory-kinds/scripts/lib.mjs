@@ -48,7 +48,8 @@ export const ffmpegReport = (args) => {
 
 /** Duration, size and frame rate of a video, through the ffprobe next to ffmpeg. */
 export const probe = (file) => {
-  const bin = findFfmpeg().replace(/ffmpeg$/, 'ffprobe');
+  // $FFPROBE_PATH, else the ffprobe next to ffmpeg (also ffmpeg.exe -> ffprobe.exe on Windows).
+  const bin = process.env.FFPROBE_PATH || findFfmpeg().replace(/ffmpeg(\.exe)?$/i, 'ffprobe$1');
   const json = JSON.parse(
     execFileSync(bin, ['-v', 'error', '-show_entries', 'format=duration:stream=codec_type,width,height,r_frame_rate', '-of', 'json', file], { encoding: 'utf8' }),
   );
@@ -99,3 +100,10 @@ export const cartesiaHeaders = (key, json = true) => ({
   'Cartesia-Version': CARTESIA.version,
   ...(json ? { 'Content-Type': 'application/json' } : {}),
 });
+
+/**
+ * Run the Remotion CLI through node itself: `npx` is `npx.cmd` on Windows, which execFileSync
+ * cannot spawn without a shell, and a shell would mangle JSON arguments such as --props.
+ */
+export const remotion = (args) =>
+  execFileSync(process.execPath, [at('node_modules', '@remotion', 'cli', 'remotion-cli.js'), ...args], { stdio: 'inherit', cwd: at() });
