@@ -32,7 +32,7 @@ const LAYOUT = {
     reader: { x: 790, s: 0.6 },
     stack: { x: 945, w: 140, bottom: 1130, thick: 9 },
     table: { x: 90, y: 300, cols: [600, 860], rowY: [380, 456], head: 30, size: 48, label: 34 },
-    pieces: { xs: [600, 770, 940], s: 0.26, pileW: 60, pileDx: 48, thick: 7 },
+    pieces: { xs: [735, 845, 955], s: 0.24, pileW: 46, pileDx: 38, thick: 7 },
     card: { x: 760, y: 610, w: 230 },
     or: { x: 760, y: 740 },
     question: { x: 950, y: 640 },

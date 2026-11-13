@@ -53,7 +53,7 @@ const LAYOUT = {
     spillDrop: 1,
     detail: { x: 400, y: 918 },
     clock: { x: 490, y: 610, r: 80 },
-    rows: { x: 390, y: [330, 420], cell: 44, gap: 4 },
+    rows: { x: 390, y: [244, 306], cell: 44, gap: 4 },
   },
   l: {
     floor: { y: 806, x: 300, w: 1440 },

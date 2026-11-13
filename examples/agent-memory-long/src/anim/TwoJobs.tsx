@@ -25,7 +25,7 @@ const LAYOUT = {
     desk: { x: 140, y: 1000, w: 800 },
     robot: { x: 830, y: 560, s: 0.9 },
     slip: { x: 370, from: 260, to: 958, w: 220 },
-    plan: { x: 90, y: 262, w: 520, h: 330, size: 34 },
+    plan: { x: 80, y: 262, w: 460, h: 330, size: 32 },
     bubble: { x: 560, y: 262, w: 450, h: 150, tail: { x: 790, y: 500 }, size: 30 },
     board: { x: 90, y: 650, w: 600, h: 230 },
   },
