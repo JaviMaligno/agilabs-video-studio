@@ -44,7 +44,7 @@ const LAYOUT = {
     callback: { x: 1150, y: 170, w: 560, h: 210 },
     inbox: { x: 900, y: 330 },
     stat: { x: 1605, y: 412, size: 40, anchor: 'middle' as 'middle' | 'start' },
-    line: { x: 960, y: [200], size: 48 },
+    line: { x: 960, y: [186], size: 48 },
   },
 };
 

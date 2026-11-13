@@ -152,7 +152,12 @@ export const MemoryOffice: React.FC<AnimProps & MemoryOfficeProps> = (p) => {
         {/* links: the summary in front, the notebook behind it, a box for what will matter */}
         {s.links[0] > 0 && (
           <path
-            d={`M ${cardC.x - 70} ${cardC.y} C ${cardC.x - 250} ${cardC.y - 220}, ${cabTop.x + 120} ${cabTop.y - 220}, ${cabTop.x} ${cabTop.y - 10}`}
+            d={
+              p.vertical
+                ? `M ${cardC.x - 70} ${cardC.y} C ${cardC.x - 250} ${cardC.y - 220}, ${cabTop.x + 120} ${cabTop.y - 220}, ${cabTop.x} ${cabTop.y - 10}`
+                : // landscape: along the front of the desk, under the robot, to the cabinet's side
+                  `M ${cardC.x - 80} ${cardC.y + 22} C ${cardC.x - 260} ${cardC.y + 80}, ${cabTop.x + 240} ${cabTop.y + 100}, ${cabTop.x + O.cabinet.w / 2 + 12} ${cabTop.y + 70}`
+            }
             fill="none"
             stroke={C.ok}
             strokeWidth={6}
