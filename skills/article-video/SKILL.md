@@ -28,6 +28,9 @@ when installed as a plugin; next to `skills/` in the plugin repo).
 - **Voice.** The narration speaks as the article is written: first person ("I ran...", "I
   found..."), with claims no stronger than the article's. If the article hedges ("in this
   setup", "on these 20 runs"), the script hedges too. No punchier-than-source wording.
+  Someone else's experiment is attributed to its authors ("Anthropic showed..."), never told
+  in the first person. An illustrative scene or metaphor must not pass for experiment footage
+  or measured behaviour.
 - **Branding.** AGILabs only: the AGILabs badge and `javieraguilar.ai`. No personal name
   anywhere, not in the cards, the poster, the captions or the file metadata.
 - **Route overview, then build.** Before building, show the author a short overview of the route: the
