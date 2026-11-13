@@ -48,7 +48,12 @@ export const TIMELINE = VIDEOS.en.main;
   the real audio, so re-check stills after narrating.
 - `L(en, es)`: a bilingual on-screen label. A plain string is used for both languages.
 - Scene ids must be unique: line keys (`<scene>-01`, ...) name the audio files.
-- `opts.chapter` on `anim` is stored on the scene but not drawn by any component yet.
+- **Chapters** (long format): `anim(id, name, props, lines, { chapter: L('The desk', 'La mesa') })`
+  starts a chapter. The scene opens with a chapter card, "2 · The desk" (numbered in timeline
+  order), over a dark scrim for its first 2 s (`CHAPTER_CARD`, fading over the last 0.4 s). Its
+  lines move 1 s later (`CHAPTER_LEAD`): the voice starts on the card and `at` / `min` keep their
+  meaning. Set it only on the first scene of each chapter; the same scenes become the YouTube
+  chapters that `npm run deliver` writes (the first scene is `0:00 Intro`).
 - Run `npm run lint` after every change: length against `targetSeconds` (±20 %), caption cues
   under 0.8 s or over 17 characters/s, and component names missing from the registry.
 

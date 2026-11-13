@@ -1,6 +1,7 @@
 // Helpers for timeline.ts. A scene is a card or an animation with narration lines on top;
 // lines play one after another, and their start times ("beats") drive the animation.
 import { AUDIO } from './audio.generated.ts';
+import { CHAPTER_CARD, CHAPTER_LEAD } from './timing.ts';
 import { SETTINGS } from './settings.ts';
 import { spokenText, type Cuts, type Label, type Lang, type Line, type Scene, type Text, type Tone } from './types.ts';
 
@@ -90,16 +91,25 @@ const scene = (id: string, kind: Scene['kind'], specs: Spec[], min: number, extr
 export const intro = (id: string, specs: Spec[], min = 3, visual?: { name: string; props: Record<string, unknown> }): Scene =>
   scene(id, 'intro', specs, min, visual ? { anim: visual } : {});
 
+/**
+ * An animation scene. `opts.chapter` starts a chapter there: the scene opens with a chapter card
+ * ("n · label", numbered in timeline order) and its lines move CHAPTER_LEAD later, so `at` and
+ * `min` keep their meaning relative to the card lifting. It is also a YouTube chapter (deliver).
+ */
 export const anim = (
   id: string,
   name: string,
   props: Record<string, unknown>,
   specs: Spec[],
   opts: { chapter?: Label; min?: number } = {},
-): Scene =>
-  scene(id, 'anim', specs, opts.min ?? 0, {
+): Scene => {
+  const chaptered = opts.chapter !== undefined;
+  const lead = chaptered ? CHAPTER_LEAD : 0;
+  const min = chaptered ? Math.max(CHAPTER_CARD, (opts.min ?? 0) + lead) : (opts.min ?? 0);
+  return scene(id, 'anim', specs.map((s) => ({ ...s, at: s.at + lead })), min, {
     anim: { name, props },
-    ...(opts.chapter !== undefined ? { chapter: opts.chapter } : {}),
+    ...(chaptered ? { chapter: opts.chapter } : {}),
   });
+};
 
 export const outro = (id: string, specs: Spec[], min = OUTRO_SECONDS): Scene => scene(id, 'outro', specs, min, {}, OUTRO_TAIL);
