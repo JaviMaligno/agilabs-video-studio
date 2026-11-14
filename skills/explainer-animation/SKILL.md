@@ -160,6 +160,12 @@ the before/after decision.
 - **Draw the concept on frame 0.** The first frame is the thumbnail and decides the first
   second: the thing the hook names, drawn and already moving (a telephone that rings, a chess
   board with pieces moving, a map). Never fade in from empty, never open on text alone.
+- **A beautiful scene is not the concept.** A rich animation that only sets the place (a
+  landscape, a character walking) does not hold on its own: frame 0 shows the problem the hook
+  names, already happening (the rings that may not fit in the pan, the note that is wrong).
+  Check at review: with the sound off, does frame 0 already show what the first line claims?
+  Does the picture fill the stage rather than sit in a small box between dark bands? Does the
+  conflict appear within the first 2 s, not after a calm establishing shot?
 - **Draw the example's parts and light them as they are named.** A long spoken example is hard to
   hold by ear: put each element on screen as a drawing (the person, the day, the reason, the
   object) and light it on the word that names it. Generate them with Codex in the cast style
