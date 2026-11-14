@@ -1,6 +1,6 @@
 ---
 name: explainer-script
-description: Write the script for a short narrated explainer video of a blog article - hook, setup, experiment, finding with its exact number, so-what and closing card - with a visual idea per scene mapped to an animation component, caption reading-speed limits and an optional parallel Spanish version. Use when drafting or revising what an article video says, before any scene is built.
+description: Write the script for a short narrated explainer video of a blog article - hook, setup, experiment, finding, so-what and closing card - with a visual idea per scene mapped to an animation component, caption reading-speed limits and an optional parallel Spanish version. Use when drafting or revising what an article video says, before any scene is built.
 ---
 
 # Explainer script
@@ -33,8 +33,9 @@ caption.
 3. **Setup.** What was being tested and why it matters, in one or two lines.
 4. **The experiment in one picture.** The mechanism or design as one visual (a flow, a
    comparison). One idea, not the whole method section.
-5. **The finding, with its exact number.** The number as the article writes it ("14/20 vs
-   4/20", "83 %", "p = 0.0018"): same rounding, same units.
+5. **The finding, with what makes it a finding.** Its size or its contrast, said the way you
+   would explain it to a colleague. On screen and in the source sentence, the number as the
+   article writes it.
 6. **So what.** What the finding means for someone building with it, no stronger than the
    article claims.
 7. **Outro card line:** "More at javieraguilar.ai" (ES: "Más en javieraguilar.ai").
@@ -193,10 +194,6 @@ Write `script.md` as a table, one row per narration line:
 - Under the table, a **Must show** list: each thing the author asked to see, in their words. The
   stills check confirms each one with its timestamp before delivery.
 - End with the word count (EN) and the estimated length.
-- **Spoken figures:** run `python3 <this skill's folder>/scripts/script_lint.py <path>/script.md`
-  and rewrite every line it
-  flags: the voice says the figure that carries the point, the others go into words ("almost
-  never", "about half") or into the Visual column. Run it again until it is clean.
 - **Cold-viewer check before presenting:** read only the first ~15 s of narration as someone
   who has never seen the article. Can they say, in one sentence, what real situation this is
   about? If not, the story is missing: add it, even if the video gets longer.
