@@ -77,7 +77,9 @@ when installed as a plugin; next to `skills/` in the plugin repo).
 10. **Render:** `npm run render` (vertical EN). `-- --es` for the Spanish cut, `-- --landscape`
     for 1920x1080. Then `npm run audio-qa` again to measure the mix (-16 LUFS integrated).
 11. **Deliver:** `npm run deliver` writes the poster PNG, the SRT and `out/manifest.json`. Look
-    at the poster. Hand over the MP4 path and the poster; publishing is a separate step.
+    at the poster. The cover the platform shows is designed separately (see *The cover is a designed
+    image* in `explainer-animation`) and checked inside the profile grid. Hand over the MP4 path
+    and the cover; publishing is a separate step.
 
 ## Re-rendering an existing video
 

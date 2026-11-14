@@ -125,10 +125,14 @@ When the script flags a scene "bespoke":
 5. Optionally add a sample to `src/Gallery.tsx`. If it is reusable, it belongs back in the
    plugin's template.
 
-**Generated images.** Most scenes should be drawn in code (SVG and CSS from the brand tokens).
-Drawings (people as caricatures, objects, the author's avatar poses) and the scenes that truly need
-a generated image come from an image model, usually the Codex CLI. Save them under `public/`, load
-them with `staticFile()`, keep them inside the brand palette, and check the still.
+**Generated images.** Use the image model (usually the Codex CLI) freely, whenever a scene needs
+something new: illustrated backgrounds, characters, objects, props, full scenes, the frames or
+layers of an animation. Code draws what must move with the data or the timing (counters, charts,
+paths, highlights) and lays the generated art out; it is not a reason to settle for flat shapes
+when an illustration would tell the idea better. Keep the brand identity (the robot cast, the
+author's avatar, the palette family) and let the video share the cover's look, so the viewer who
+taps the cover lands in the same world. Save the assets under `public/`, load them with
+`staticFile()`, and check the still.
 
 **Illustrated stories** (a map, a character, a room) are built in layers: background,
 transparent character atlas, foreground, and any replay or dream layer, with the motion driven
@@ -152,6 +156,15 @@ the before/after decision.
   a shade of the T-shirt) is a recolour with Pillow, which keeps everything else exactly as it was.
 - **Stories** (1080×1920 images for a reel's story) keep the top third clear for the text the
   author adds in the app.
+- **The cover is a designed image, not a frame with a box.** The profile grid shows every reel as
+  its cover, so the grid is the account's shop window. Each cover is a full-bleed illustrated scene
+  (Codex) that draws what the hook claims, with one clear focal point, depth and light; a real photo
+  only when the video already has a striking one. The grid crops to the central 3:4 band (y 240–1680
+  on 1080×1920): ask for the top of that band (y 260–760) to be calm background, put the subject
+  below it, then set the headline on top in code: the hook in two or three big lines with one word
+  in the series colour, plus the series label. Each series keeps its own palette and label so the
+  grid reads as a set. Check the whole grid, not one cover: a template repeated with only the frame
+  changed reads as low effort.
 - **Show finished candidates.** Each option offered for a choice is rendered and ready to use as
   it is.
 
