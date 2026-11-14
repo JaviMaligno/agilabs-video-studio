@@ -1,0 +1,166 @@
+import React, { useMemo } from 'react';
+import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { C, GRADIENT } from '../brand.ts';
+import { fontFamily, SAFE, V } from '../theme.ts';
+import { SETTINGS } from '../settings.ts';
+import { tokensOf } from '../captions.ts';
+import { tx, type Lang, type Line } from '../types.ts';
+import { Badge, Site } from './Brand.tsx';
+
+const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
+
+/** Hook size: big for a short hook, smaller as it grows, so it stays a few lines tall. */
+const hookSize = (chars: number, vertical: boolean) => {
+  const [big, small] = vertical ? [96, 64] : [84, 56];
+  return Math.round(interpolate(chars, [30, 110], [big, small], clamp));
+};
+
+/**
+ * Opening card: the AGILabs badge at the top and the first narration line as a big hook, its
+ * words lighting up as they are spoken (so the hook doubles as its own caption).
+ */
+export const Intro: React.FC<{ hook?: Line; lang: Lang; vertical: boolean }> = ({ hook, lang, vertical }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+  const tokens = useMemo(() => (hook ? tokensOf(hook, lang) : []), [hook, lang]);
+  // Visible from the first frame: in Reels, viewers decide in the first half second, and a blank
+  // or fading-in opener loses them (about 40 % left in the first second on the early reels).
+  const enter = 1;
+  const text = hook?.text[lang] ?? '';
+  const size = hookSize(text.length, vertical);
+  return (
+    <div style={{ position: 'absolute', inset: 0, fontFamily }}>
+      <div style={{ position: 'absolute', top: vertical ? V.badgeTop : 80, left: 0, right: 0, display: 'flex', justifyContent: 'center', opacity: enter }}>
+        <Badge size={vertical ? 1.5 : 1.2} />
+      </div>
+      <div
+        style={{
+          position: 'absolute',
+          left: vertical ? SAFE.side : 200,
+          right: vertical ? SAFE.side : 200,
+          top: 0,
+          bottom: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 48,
+          transform: `translateY(${(1 - enter) * 40}px)`,
+          opacity: enter,
+        }}
+      >
+        <div style={{ fontSize: size, fontWeight: 800, lineHeight: 1.12, letterSpacing: '-0.02em', textAlign: 'center', color: C.text }}>
+          {tokens.map((tok, i) => {
+            const said = t >= tok.start;
+            const active = said && t < tok.end;
+            return (
+              <React.Fragment key={i}>
+                {i > 0 ? ' ' : null}
+                <span style={{ color: active ? C.accentText : C.text, opacity: said ? 1 : 0.55 }}>{tok.text}</span>
+              </React.Fragment>
+            );
+          })}
+        </div>
+        <div style={{ width: 160, height: 8, borderRadius: 4, background: GRADIENT }} />
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Cold-open hook: the whole hook is on screen from the first frame, in a dark panel over the
+ * scene's animation, and each word turns to the accent while it is spoken.
+ */
+export const HookOverlay: React.FC<{ hook?: Line; lang: Lang; vertical: boolean }> = ({ hook, lang, vertical }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+  const tokens = useMemo(() => (hook ? tokensOf(hook, lang) : []), [hook, lang]);
+  const text = hook?.text[lang] ?? '';
+  const size = hookSize(text.length, vertical) - 8;
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: vertical ? SAFE.side : 200,
+        right: vertical ? SAFE.side : 200,
+        // Vertical: just under the pitch-sized stage content, over the (empty) caption rows.
+        top: vertical ? V.stageBottom - 110 : undefined,
+        bottom: vertical ? undefined : 120,
+        padding: '28px 36px',
+        borderRadius: 28,
+        background: 'rgba(8, 8, 18, 0.96)',
+        boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+        fontFamily,
+        fontSize: size,
+        fontWeight: 800,
+        lineHeight: 1.12,
+        letterSpacing: '-0.02em',
+        textAlign: 'center',
+        color: C.text,
+      }}
+    >
+      {tokens.map((tok, i) => {
+        const active = t >= tok.start && t < tok.end;
+        return (
+          <React.Fragment key={i}>
+            {i > 0 ? ' ' : null}
+            <span style={{ color: active ? C.accentText : C.text }}>{tok.text}</span>
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+};
+
+/** Closing card: the author avatar (when SETTINGS.avatar is set), AGILabs badge, the site address and the article's title. */
+export const Outro: React.FC<{ lang: Lang; vertical: boolean }> = ({ lang, vertical }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const pop = (delay: number) => spring({ frame: frame - delay, fps, config: { damping: 200 }, durationInFrames: 22 });
+  const item = (delay: number): React.CSSProperties => ({ opacity: pop(delay), transform: `translateY(${(1 - pop(delay)) * 30}px)` });
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        // Vertical: centred between the badge line and the caption box.
+        paddingTop: vertical ? V.badgeTop : 0,
+        paddingBottom: vertical ? 1920 - V.stageBottom : 140,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: vertical ? 44 : 32,
+        fontFamily,
+      }}
+    >
+      {SETTINGS.avatar && (
+        <div style={{ ...item(0), width: vertical ? 300 : 220, height: vertical ? 300 : 220, borderRadius: '50%', padding: 8, background: GRADIENT }}>
+          <Img src={staticFile(SETTINGS.avatar)} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+        </div>
+      )}
+      <div style={item(SETTINGS.avatar ? 4 : 0)}>
+        <Badge size={SETTINGS.avatar ? (vertical ? 2 : 1.7) : vertical ? 2.4 : 2} />
+      </div>
+      <div style={item(6)}>
+        <Site size={vertical ? 1.5 : 1.3} />
+      </div>
+      <div style={{ ...item(12), width: 120, height: 6, borderRadius: 3, background: GRADIENT }} />
+      <div
+        style={{
+          ...item(16),
+          maxWidth: vertical ? 860 : 1300,
+          fontSize: vertical ? 40 : 38,
+          fontWeight: 500,
+          lineHeight: 1.3,
+          color: C.muted,
+          textAlign: 'center',
+        }}
+      >
+        {tx(SETTINGS.articleTitle, lang)}
+      </div>
+    </div>
+  );
+};
