@@ -10,6 +10,20 @@ When the browser tool can upload files, the agent does the whole thing; otherwis
 only manual step is choosing each file in the browser's file dialog, once per video. Deleting
 scheduled entries is always the person's step (it is permanent).
 
+## 0. Gate: only approved, final videos
+
+Nothing is uploaded or scheduled, not even as a draft in the composer, unless both hold:
+
+- **The author approved this video**, the rendered mp4 itself, in so many words, after watching
+  it. An approved script is not an approved video, and "yes" to a plan that ends in "and I'll
+  schedule it" approves the plan, not the video that comes out of it. Hand the video over (open
+  it locally) and wait.
+- **It has the final voice.** A video voiced with the Kokoro fallback, or with any voice marked
+  preliminary, is a draft for review only (see `narration`). It is re-voiced and re-rendered
+  before scheduling, and the author sees that version too if anything changed beyond the voice.
+
+If either is missing, stop at handing the video over and say what is still pending.
+
 ## 1. Prepare the hand-off folder
 
 Make a folder the person can reach from Finder (e.g. `~/Desktop/<Brand>-redes/`), not a
