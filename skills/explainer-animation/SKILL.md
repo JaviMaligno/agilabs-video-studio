@@ -168,6 +168,41 @@ the before/after decision.
 - **Show finished candidates.** Each option offered for a choice is rendered and ready to use as
   it is.
 
+## Codex scenes, animated in code
+
+A reel can be built on full illustrated scenes from Codex, but a run of still pictures is a slide
+show, not a video. Use the picture for what code draws badly (characters, places, light) and code
+for everything that moves or reads. Decide scene by scene what needs motion; not every scene does.
+
+- **Layout.** Draw each scene picture edge to edge on the stage, with a slow push-in, and position
+  every overlay in the picture's own pixels inside the same transformed box, so overlays move with
+  it.
+- **Text is always code.** Generated letters are fake (a "Greek" line comes out as look-alike
+  shapes). Ask Codex for BLANK notes, screens, rows and tablets, and typeset the real words on top,
+  typed out letter by letter when they are being written in the story.
+- **Plates.** When something in a picture has to animate, ask Codex for a plate without it
+  ("IDENTICAL, changing ONLY: remove ...; composite only the changed area onto the source pixels")
+  and draw that thing in code on top: threads drawing along a path, letters lighting up, a canvas
+  that fills band by band.
+- **Live faces on blank screens.** For characters with a screen face, ask for plates with the
+  screen blank (no eyes, no mouth) and draw the whole face in code: blinks, looks and moods that
+  follow the story. Never paint over the original features with patches: some ghost of the old
+  eyes always shows and the character ends up with two faces. Rotate each feature about its own
+  centre (positions are measured on the tilted head), and move features that sit cramped.
+- **Cut-out limbs.** For a gesture (an arm painting), ask for the plate without the limb (a clean
+  joint where it was) and for the limb alone at its exact place on flat pure green; key the green
+  out and rotate the limb about its joint in code. When the action reveals something (a painting
+  appearing), reveal from a copy with the limb removed, or the reveal paints the limb too.
+- **Frame swaps only for tiny changes.** Alternating Codex frames reads as motion only when the
+  frames differ in a small part (fingertips) and everything else is identical. If the pose of a
+  hand or wrist changes between frames, the swap looks broken. Check the drift outside the changed
+  area with a pixel diff before using a frame.
+- **Cut-outs from the picture.** Elements with a clear outline (thought bubbles) can be cut out
+  with a mask (bright outline closed with a morphological closing, then filled) and animated over
+  the picture. A cut-out of the picture's own element can only grow over itself, never move away.
+- **No dead time.** Anything that fills in (rows, notes, typing) starts with the line that
+  introduces it and leaves time to read it; no scene sits still waiting for a cue.
+
 ## Reels craft (lessons from the cold reads)
 
 - **Draw the concept on frame 0.** The first frame is the thumbnail and decides the first
@@ -210,7 +245,9 @@ npx remotion still src/index.ts Main-EN-vertical out/stills/f0150.png --frame=15
 ```
 
 Take one still per scene once its last step has played, plus one every ~3 s (every 90 frames
-at 30 fps). Check: AGILabs badge and nothing else as branding, nothing outside the safe area,
+at 30 fps). Before showing a video to the author, also check frame 0 at full size, one frame per
+second of the final render, and consecutive frames (about 10 per second) wherever something moves:
+broken swaps, ghosts and overlaps only show in motion. Check: AGILabs badge and nothing else as branding, nothing outside the safe area,
 no text overflowing its box, every figure equal to the article, and the caption on screen
 matching what the animation shows at that moment.
 
