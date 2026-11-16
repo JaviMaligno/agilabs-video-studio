@@ -12,7 +12,7 @@ const build = (): Cuts => ({
     // hook over it, the voice from 0.1 s; the rest of the copies arrive and go hollow (semantic satiation).
     intro('hook', [say(0.1, 'Say “table” thirty times. Around the tenth, it stops feeling like a word.', '')], 6.0, {
       name: 'HollowWord',
-      props: { word: 'table', count: 30, span: 3.8, pre: 9 },
+      props: { word: 'table', count: 30, span: 3.8, pre: 1 },
     }),
     // 2 · The copies become chat bubbles; the N counter climbs to 1000.
     anim('wall', 'EchoChat', { mode: 'wall', cameos: [{ pose: 'laptop', at: [0, 'did'], dur: 1.4 }] }, [say(0.15, 'I did that to AI chatbots. Up to a thousand times.', '')], { min: 4.2 }),
