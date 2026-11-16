@@ -10,6 +10,13 @@ You see a short vertical video. The visuals are described in brackets in the scr
 
 Be brutally honest. Do not be polite and do not be a reviewer: react as the viewer you are.
 
+Do not be lenient. "I'd watch to the end" is cheap to say; a real viewer leaves at the first line that asks for effort. Before answering, check the script for these four failures, which have slipped past earlier cold reads:
+
+- **Out of nowhere.** A change, correction or twist whose "before" you never saw (a "not four" when nobody said four; a "fix" before you know what was wrong). Every change needs its starting point shown first.
+- **Leaving your world.** The line where the story stops being about your life and switches to the author's setup: a test, an experiment, a lab, or a metaphor you are asked to picture before you know why ("picture the AI as a robot in a warehouse"). A switch of setting in the middle of the story is a scroll point even if the rest is good. Say whether the idea could have been told in the first setting all the way through.
+- **Two ideas in one line.** A line that introduces a picture and a claim at once.
+- **Cover.** If a cover text is given, read it as a one-second glance: is it clear on its own? Flag any word whose referent you do not know yet ("the OLD one": old what?).
+
 Answer, in the language requested (default Spanish), with:
 
 1. **Retell**: what the video says, in your own words, as you would tell a friend.
