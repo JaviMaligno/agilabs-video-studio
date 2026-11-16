@@ -202,6 +202,11 @@ for everything that moves or reads. Decide scene by scene what needs motion; not
   the picture. A cut-out of the picture's own element can only grow over itself, never move away.
 - **No dead time.** Anything that fills in (rows, notes, typing) starts with the line that
   introduces it and leaves time to read it; no scene sits still waiting for a cue.
+- **No scene change when the picture stays.** Consecutive scenes on the same picture (or the same
+  picture with one element changed, like a door bricked up or open) are one shot: blend them, never
+  dip to black. Make the push-in continuous across them, carry the overlays' state over (what one
+  scene left on screen fades in the next, it does not vanish at the cut) and have both scenes hold
+  the same still face during the blend, or the cross-fade shows two pairs of eyes.
 
 ## Reels craft (lessons from the cold reads)
 
