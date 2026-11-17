@@ -179,6 +179,14 @@ the before/after decision.
   Check at review: with the sound off, does frame 0 already show what the first line claims?
   Does the picture fill the stage rather than sit in a small box between dark bands? Does the
   conflict appear within the first 2 s, not after a calm establishing shot?
+- **Frame 0 asks; it never answers.** Show the tension, not the result: no measured numbers, no
+  verdict cards, no "before → after" on frame 0. Whatever the narration is about to tell has not
+  happened yet (the note is still in the hand, not on the alarm), and what triggers it is drawn
+  (the line written twice that sets the alarm off). Make it eye-catching: one big subject that
+  fills the stage, in motion, with one strong contrast or mystery (pages slipping out of a proud
+  robot's head under a "?"). Two text cards and a small character next to them is a report, not a
+  hook. Check at review: could a viewer guess the ending from frame 0? Then it gives the answer
+  away.
 - **Draw the example's parts and light them as they are named.** A long spoken example is hard to
   hold by ear: put each element on screen as a drawing (the person, the day, the reason, the
   object) and light it on the word that names it. Generate them with Codex in the cast style
