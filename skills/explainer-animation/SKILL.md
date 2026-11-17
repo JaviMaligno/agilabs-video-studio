@@ -193,6 +193,21 @@ the before/after decision.
 - **Fill the screen with meaning, not decoration.** Half an empty screen is a place to draw the
   example, not to repeat the opening.
 
+- **Show what happens, not the code that describes it.** A rule an AI wrote, a program, a
+  physics model: draw its behaviour (the path, the stop, the region) rather than typing its code on
+  screen. Code appears only when the code itself is the point, and then briefly.
+- **People are the cast.** Never draw a generic person in SVG: the author's and the recurring
+  characters' cut-outs (`public/avatar/`, and any other cast folder) cover "you", the narrator and
+  the bystander. A real third party the video is about (the author of a cited post) is not given a
+  cast face: use their own public photo from the cited material, small and round, as the post shows it.
+- **A cited post is shown, not retyped.** Capture the public page with a headless browser, remove
+  the sign-in modal and the cookie banner in the DOM, crop to the header and the lines that matter,
+  and zoom into the lines as the voice names them. Third-party captures stay out of git (ignore
+  their folder under `public/`, like the avatar).
+- **One picture across lines.** When several lines describe the same moment, keep one picture and
+  advance it (`blend: true` on the following scenes), and test that the state at the end of one
+  scene equals the state at the start of the next.
+
 ## Vertical safe area (1080x1920)
 
 - Platform UI covers the top ~220 px and the bottom ~380 px; keep 72 px at the sides.
