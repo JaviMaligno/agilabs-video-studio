@@ -210,6 +210,14 @@ Read them as signals, not votes: one viewer run varies. Iterate until the viewer
   material. If the source is not public, draw the slot empty (blank chips, grey bars) rather than
   writing plausible fakes. Small counts found on the way are reported as they are, even when they
   cut against the story; they go in the caption or nowhere, not inflated in the voice.
+- **Show one of everything you name.** Every test, task or failure the script names ("a general
+  knowledge quiz", "following instructions", "commands it had never seen") gets one concrete,
+  real instance on screen or in the voice: a question from the benchmark, an instruction from the
+  test set, the command and what it prints. Gather two or three per item from the data (the
+  experiment's repo, the public benchmark files) before the v1, and pick the ones that read without
+  context. A cold reader asking "like what?" or "give me an example" means one is missing; answer
+  it with the instance, not with new wording. An illustrative example that was not in the test
+  (a made-up instruction) is not shown as if it were.
 - **The viewer can try it.** A concept reel can close by telling the viewer how to test the idea
   themselves today, as long as the test is one they can actually run.
 - **Agreed wording stays.** Once the author has agreed a line, it is not rephrased in passing; a
