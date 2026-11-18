@@ -182,6 +182,11 @@ the before/after decision.
   Check at review: with the sound off, does frame 0 already show what the first line claims?
   Does the picture fill the stage rather than sit in a small box between dark bands? Does the
   conflict appear within the first 2 s, not after a calm establishing shot?
+- **Check every action at full size, not on a contact sheet.** A thumbnail grid shows that
+  something moves, not that it happens: a hand that waves near a button reads as a press in a
+  thumbnail and as nothing at full size. For each action the story depends on (a press, a hit, a
+  piece that won't fit), pull the frames around it at full resolution and check contact, cause and
+  effect: the hand touches the button, the button sinks, the thing it triggers starts after.
 - **Draw the example's parts and light them as they are named.** A long spoken example is hard to
   hold by ear: put each element on screen as a drawing (the person, the day, the reason, the
   object) and light it on the word that names it. Generate them with Codex in the cast style
