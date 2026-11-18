@@ -187,6 +187,9 @@ the before/after decision.
   thumbnail and as nothing at full size. For each action the story depends on (a press, a hit, a
   piece that won't fit), pull the frames around it at full resolution and check contact, cause and
   effect: the hand touches the button, the button sinks, the thing it triggers starts after.
+- **Give every text room.** No label touches a drawing or another label, none sits in the caption
+  band at the bottom of the stage, and a scene uses the whole stage instead of crowding one corner.
+  Check the last frame of every scene (when all its texts are on screen) at full size.
 - **Draw the example's parts and light them as they are named.** A long spoken example is hard to
   hold by ear: put each element on screen as a drawing (the person, the day, the reason, the
   object) and light it on the word that names it. Generate them with Codex in the cast style
