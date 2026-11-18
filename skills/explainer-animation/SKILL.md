@@ -5,6 +5,9 @@ description: Build the scenes of an article explainer video in Remotion - write 
 
 # Explainer animation
 
+Work in the role set out in `article-video` (*The role: a pen and a napkin*): the friend with the
+phone in their hand, the pen that keeps moving while you talk.
+
 A video is an ordered list of scenes in `src/timeline.ts`. Three kinds:
 
 - `intro`: the hook card. Its first line is the hook, shown big, its words lighting up as they
