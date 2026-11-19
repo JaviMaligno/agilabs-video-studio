@@ -135,12 +135,14 @@ by the caption's first words to find both. Row menu «…» → Administrar publ
   *definitivamente*: it is a permanent deletion, so the person clicks it, not the agent. **Never
   "Mover a borradores"**: it leaves the scheduled entry in "Error al publicar", and deleting that
   entry deletes the draft with it. The reel must be uploaded again when its window opens.
+  In a batch, deletions are gathered and asked for once at the end (see *Deleting in one step at
+  the end of the batch*).
 - Free a date before moving another reel onto it (one reel per day).
 
 ### Replacing a scheduled reel with a new cut
 
 A scheduled reel's video cannot be swapped. Upload the new cut as a new reel with the same texts,
-date and time, then ask the person to delete the old Facebook and Instagram entries. In
+date and time; the old Facebook and Instagram entries then have to be deleted. In
 Programadas both versions show the same caption and the list order is not creation order.
 **Tell them apart by creation time, not by thumbnail** (thumbnails misled once and the new cut
 got deleted): each row's React fiber carries the post, so
@@ -150,6 +152,29 @@ added), group rows by date, platform and caption, keep the newest of each group 
 checkboxes of the rest, so the person only has to delete the selection. Afterwards, check every
 date has exactly one Facebook and one Instagram entry; a stray duplicate on today's date posts
 twice.
+
+### Deleting in one step at the end of the batch
+
+Asking for a deletion after each replaced reel interrupts the person once per reel. In a batch,
+deletions wait for the end:
+
+1. **Accumulate.** Each time a reel already scheduled is replaced (or taken off the calendar),
+   add a row to a **Borrar** table in `textos-reels.md`: date and time, reel (number and slug),
+   platforms (FB, IG), the caption's first line, and the creation time of the entry to delete
+   (and of the one to keep). Do not ask for anything yet.
+2. **One selection.** When the batch is done, open Content → Programadas once, load the whole list,
+   and tick every entry of the table at once (the creation-time grouping above, run over all the
+   rows), so a single view holds every entry to delete and nothing else. Check the ticked count
+   equals the table (two per reel when both platforms are scheduled).
+3. **One notice.** Tell the person once: the table (date / reel / first line / platforms) and
+   "they are ticked in Programadas; delete the selection". The deletion itself stays theirs, as
+   always (it is permanent); it is asked for once for the whole batch, not per reel. The day a
+   replaced reel goes out is the exception: if its old entry would post before the batch ends,
+   ask for that one deletion straight away.
+4. **Verify the whole list.** After they delete, reload Programadas and check every row of the
+   table is gone and every date of the batch has exactly one Facebook and one Instagram entry,
+   the new ones (by creation time). Report the result in one line and mark the rows done in
+   `textos-reels.md`.
 
 ## 4. LinkedIn
 
