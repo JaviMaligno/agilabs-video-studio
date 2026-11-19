@@ -145,7 +145,8 @@ the before/after decision.
 ## Assets with Codex
 
 - **One call per asset**, in a folder holding the references, with stdin closed so it never waits
-  for input: `codex exec -s workspace-write "<prompt>" < /dev/null`. Within a minute or two, check
+  for input: `codex exec --skip-git-repo-check -s workspace-write "<prompt>" < /dev/null` (outside a
+  git repository it fails without that flag). Within a minute or two, check
   that it is producing output; several assets run well as parallel calls.
 - **Style by reference.** Put the style references in the folder (`ref-style.png`, the avatar's
   identity sheet) and say what they are for: "DRAWING STYLE reference only", so the model copies
@@ -156,15 +157,33 @@ the before/after decision.
   a shade of the T-shirt) is a recolour with Pillow, which keeps everything else exactly as it was.
 - **Stories** (1080×1920 images for a reel's story) keep the top third clear for the text the
   author adds in the app.
-- **The cover is a designed image, not a frame with a box.** The profile grid shows every reel as
-  its cover, so the grid is the account's shop window. Each cover is a full-bleed illustrated scene
-  (Codex) that draws what the hook claims, with one clear focal point, depth and light; a real photo
-  only when the video already has a striking one. The grid crops to the central 3:4 band (y 240–1680
-  on 1080×1920): ask for the top of that band (y 260–760) to be calm background, put the subject
-  below it, then set the headline on top in code: the hook in two or three big lines with one word
-  in the series colour, plus the series label. Each series keeps its own palette and label so the
-  grid reads as a set. Check the whole grid, not one cover: a template repeated with only the frame
-  changed reads as low effort.
+- **The cover is a designed image, not a frame of the video.** The profile grid shows every reel
+  as its cover, so the grid is the account's shop window, and the cover is what someone sees before
+  deciding to play. The recipe is the one the reels that took off share:
+  - **One strong image that fills the frame and reads with no context**: an object or a scene that
+    draws the hook (a birthday cake hung with sleigh bells, a trophy on a pile of exam papers), with
+    one focal point, depth and light. Generate it with Codex. The author's avatar or a face is
+    welcome when it *is* that image (him singing into a phone). What does not work is reusing the
+    video's usual frame: the robot and the avatar on the set, chat windows, captions cut mid
+    sentence, a lot of dark empty space.
+  - **A headline of two short lines** that raises the question and does not answer it ("Number
+    one… at what?", not the result), with one word in the series colour, plus the series label.
+  - **Layout.** The grid crops to the central 3:4 band (y 240–1680 on 1080×1920). Ask Codex for
+    1080×1920 with the band y 0–760 dark and empty and the subject large and centred below it, pass
+    an earlier cover as `ref-style.png` ("style reference only") and tell it to create no other
+    file. If the subject sits low and leaves a dark gap under the headline, enlarge the scene
+    (`--zoom`).
+  - **Compose in code:** `uv run --with pillow python <plugin>/scripts/compose_cover.py scene.png
+    out/cover.png --series exp "Can ChatGPT" "hear a *tune*?"` (asterisks mark the coloured word;
+    each series keeps its palette and label so the grid reads as a set).
+  - **Offer two or three candidates and open them.** Different images or different headlines, laid
+    side by side with `--sheet` next to the current cover when there is one, and opened on the
+    author's screen. A description of a cover is not a cover; the author picks by looking, and has
+    picked the first option as often as the second.
+  - **Install the chosen one** as `out/cover.png` in the video's folder and keep the scene it was
+    made from. It is the file uploaded as the thumbnail when the reel is created.
+  Check the whole grid, not one cover: a template repeated with only the picture changed reads as
+  low effort.
 - **Show finished candidates.** Each option offered for a choice is rendered and ready to use as
   it is.
 

@@ -31,7 +31,9 @@ temp or scratch path:
 
 - `videos/NN-<slug>.mp4`, numbered in publishing order. Re-encode anything over ~25 MB
   (`ffmpeg -c:v libx264 -crf 20 -preset slow -c:a copy -movflags +faststart`).
-- `portadas/NN-<slug>.png` from each `out/poster-en.png`.
+- `portadas/NN-<slug>.png` from each video's designed cover, `out/cover.png` (see *The cover is a
+  designed image* in `explainer-animation`). `out/poster-en.png` is a frame of the video, not the
+  cover. Check the number is free: an older video may already use it.
 - `textos-reels.md`: per video, three ready-to-paste blocks, nothing to edit by hand:
   - **INSTAGRAM**: caption ending in "link in bio" (caption links are not clickable on IG).
   - **FACEBOOK**: the same caption with the exact article URL in place of "link in bio".
@@ -73,8 +75,11 @@ Per video:
    the agent does it without the person; otherwise ask them to click **Add video** and pick
    `videos/NN-<slug>.mp4`. Agent upload (see *Uploading without the file dialog* below).
 3. Turn on **Customise for Facebook and Instagram** and paste each platform's block.
-4. Thumbnail: pick the most striking suggested frame (the hook frame usually wins), or use the
-   video's poster through **Subir imagen** (the same captured-input upload as the video).
+4. Thumbnail: upload the designed cover (`out/cover.png`) through **Subir imagen**, the same
+   captured-input upload as the video, and look at it in the preview. Open the file before
+   uploading: a frame with the same name is not the cover. The cover can only be set while
+   creating the reel; a scheduled reel lets you edit the text and the date, and a published one
+   nothing, so a wrong cover means creating the reel again.
 5. Auto-captions: with both platforms selected the Share step has **Subtitles ticked by default**;
    untick it (the videos have burned-in captions) and confirm it reads "Aplica subtítulos a tu vídeo".
    With both platforms there is also an Edit step (music library): skip it without adding audio.
