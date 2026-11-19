@@ -190,7 +190,7 @@ const build = (): Cuts => ({
       { chapter: 'What to combine' },
     ),
     anim('recipe', 'MemoryOffice', { mode: 'advice', marks: [[0, 'tests'], [0, 'summary'], [0, 'named']] }, [
-      say(0.2, "For agents, my tests point the same way, though I haven't tried the two together yet: a summary to carry the thread, and named boxes for the facts that must not slip.", '', undefined, CONFIDENT),
+      say(0.2, "For agents, my tests point the same way: a summary to carry the thread, and named boxes for the facts that must not slip.", '', undefined, CONFIDENT),
     ]),
     anim('save', 'ChatTrip', { mode: 'save', marks: [[0, 'buried'], [0, 'Ask'], [0, 'names'], [0, 'pile']] }, [
       say(0.2, "And for you, today: these apps often save things to memory on their own, but don't leave it to chance. When something matters, ask it to save it, in one clear line that names the fact. It's no guarantee, but it gets the fact out of the pile.", ''),

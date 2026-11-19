@@ -7,7 +7,7 @@ import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
 import { lerp } from './memory.ts';
 import { CARD_TEXT } from './MemoryDesk.state.ts';
-import { ADVICE_LINE, FRIDGE_NOTE, RECIPE, UNTESTED, frameState, type MemoryOfficeProps } from './MemoryOffice.state.ts';
+import { ADVICE_LINE, FRIDGE_NOTE, RECIPE, frameState, type MemoryOfficeProps } from './MemoryOffice.state.ts';
 import { place } from './canvas.ts';
 import { Badge, Cabinet, Crack, Desk, Floor, Frame, Lens, MiniClipboard, Nail, Notecard, Page, Robot, Slip } from './office.tsx';
 import { OLD_DAY } from './memory.ts';
@@ -192,11 +192,6 @@ export const MemoryOffice: React.FC<AnimProps & MemoryOfficeProps> = (p) => {
               </g>
             ) : null,
           )}
-        {O.recipe && s.untested > 0 && (
-          <text x={O.recipe.x} y={O.recipe.y + RECIPE.length * O.recipe.gap + 30} fontSize={28} fontWeight={600} fontStyle="italic" fill={C.muted} opacity={s.untested}>
-            {UNTESTED}
-          </text>
-        )}
       </Frame>
     </AbsoluteFill>
   );
