@@ -45,7 +45,7 @@ const LAYOUT = {
     slipHeld: { x: 560, y: 252, w: 230, rot: -8 },
     line: { x: 1310, y: 250, size: 32, anchor: 'start' as 'middle' | 'start' },
     human: { x: 1400, y: 260, gap: 185, s: 0.9 },
-    recipe: { x: 1340, y: 330, gap: 100, size: 34 } as null | { x: number; y: number; gap: number; size: number },
+    recipe: { x: 1310, y: 320, gap: 96, size: 32 } as null | { x: number; y: number; gap: number; size: number },
   },
 };
 

@@ -66,7 +66,7 @@ const LAYOUT = {
     tags: true,
     cascade: { x: 1160, y: 350, cols: 6, cell: 64 },
     slipFrom: { x: 1400, y: 700 },
-    booking: { x: 1100, y: 200, size: 30, maxW: 640 },
+    booking: { x: 1066, y: 200, size: 30, maxW: 694 },
     sun: { x: 1400, y: 330, r: 60 },
     morningLabel: { x: 1400, y: 480 },
     panel: { x: 1100, y: 230, w: 640, size: 36 },
@@ -271,7 +271,7 @@ export const ClipboardForm: React.FC<AnimProps & ClipboardFormProps> = (p) => {
           </g>
         )}
         {/* the right action (wrong): the hotel booked for Friday */}
-        <Bubble x={L.booking.x} y={L.booking.y} side="ai" text={RIGHT_BOOKING} size={L.booking.size} maxW={L.booking.maxW} opacity={s.booking.opacity} lit={s.booking.tick} tick />
+        <Bubble x={L.booking.x} y={L.booking.y} side="ai" text={RIGHT_BOOKING} size={L.booking.size} maxW={L.booking.maxW} opacity={s.booking.opacity} lit={s.booking.tick} hot="Friday" hotColor={C.ok} tick />
         {/* the cascade of mistakes from the one wrong box (wrong) */}
         {s.cascade > 0 &&
           Array.from({ length: s.cascade }, (_, i) => {

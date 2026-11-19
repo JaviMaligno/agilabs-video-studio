@@ -42,7 +42,7 @@ const LAYOUT = {
     robot: { x: 1400, y: 800 - 0.75 * 454, s: 0.75 },
     pile: { x: 1000, base: 560 },
     slip: { x: 940, y: 586 },
-    callback: { x: 1050, y: 190, w: 700, size: 32 },
+    callback: { x: 990, y: 190, w: 760, size: 30 },
     unasked: { x: 700, y: 250, w: 340, h: 74 },
     inbox: { x: 900, y: 330 },
     stat: { x: 1500, y: 300, size: 56, anchor: 'middle' as 'middle' | 'start' },
