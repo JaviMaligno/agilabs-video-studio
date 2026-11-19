@@ -52,7 +52,7 @@ const build = (): Cuts => ({
       { marks: [[0, 'reads'], [1, 'school'], [2, 'message'], [2, 'there'], [2, 'trained'], [1, 'slow'], [0, 'packed']] },
       [
         say(0.3, 'Start with training. Before an AI model is released, it reads a huge amount of text, and all of it gets packed inside the model.', ''),
-        say(0, "It's like what you learned at school. Huge, and slow to change. Nobody rewrites your schoolbooks because a shop down the street closed.", '', undefined, { speed: 0.7 }),
+        say(0, "It's like what you learned at school. Huge, and slow to change. Nobody rewrites your schoolbooks because a shop down the street closed.", ''),
         say(0, "So today's message can't go in there. To learn something for good, a model has to be trained again, and that has a price.", ''),
       ],
       { chapter: 'Training' },
@@ -131,7 +131,7 @@ const build = (): Cuts => ({
       { mode: 'file', marks: [[0, 'Clear'], [0, 'Nothing'], [1, 'know'], [1, 'find'], [1, 'email'], [2, 'failed']] },
       [
         say(0.3, 'The second way sounds safer. Clear the desk completely, and keep the whole day in a notebook the agent can search by keyword. Nothing is thrown away.', ''),
-        say(0, "It's what you do with your email. You don't remember it; you know where to find it.", '', undefined, { speed: 0.7 }),
+        say(0, "It's what you do with your email. You don't remember it; you know where to find it.", ''),
         say(0, "In my tests, it was the only memory that failed every time I tried it. And it's the agent from the start of this video.", ''),
       ],
       { chapter: 'The notebook' },
@@ -193,8 +193,8 @@ const build = (): Cuts => ({
         ],
       },
       [
-        say(0.3, "One confession. Until recently, my results said the form was far better than the day's record at taking a correction like our message. It wasn't.", '', undefined, { speed: 0.7 }),
-        say(0, "My message didn't make sense. The pallet it named had already left the warehouse. An agent that had watched it leave had reason to doubt it, and mostly didn't apply it. Hard to blame it.", '', undefined, { speed: 0.7 }),
+        say(0.3, "One confession. Until recently, my results said the form was far better than the day's record at taking a correction like our message. It wasn't.", ''),
+        say(0, "My message didn't make sense. The pallet it named had already left the warehouse. An agent that had watched it leave had reason to doubt it, and mostly didn't apply it. Hard to blame it.", ''),
         say(0, 'With a message that made sense, both got it right. That fixed message is the one behind every result about it in this video.', ''),
       ],
       { chapter: 'A flaw in my own test' },
@@ -214,13 +214,13 @@ const build = (): Cuts => ({
       [
         say(0.3, 'So which memory is best? For what happens on the job, none of them on its own.', '', undefined, CONFIDENT),
         say(0, "Training can't take today's news. The desk fills up. A summary is only as good as its writer. The notebook only helps if you know to look. And the form holds only what has a box, and can be sure and wrong.", ''),
-        say(0, "You don't run your life from one memory either. You keep the gist in your head, a notebook to check, and a few things on the fridge because you know they'll matter.", '', undefined, { speed: 0.7 }),
+        say(0, "You don't run your life from one memory either. You keep the gist in your head, a notebook to check, and a few things on the fridge because you know they'll matter.", ''),
       ],
       { chapter: 'What to combine' },
     ),
     anim('recipe', 'MemoryOffice', { mode: 'advice', marks: [[0, 'tests'], [0, 'summary'], [0, 'notebook'], [1, 'box'], [1, 'record']] }, [
       say(0.2, "For agents, my tests point the same way. First, when the desk fills up, keep a summary, or the agent's own lines, instead of clearing it. A notebook to search is a bonus on top, not a replacement.", ''),
-      say(0, "Second, for facts you know will matter, a box with their name on it. And on some models, the day's record beside the form, to catch it when it's wrong.", '', undefined, { ...CONFIDENT, speed: 0.75 }),
+      say(0, "Second, for facts you know will matter, a box with their name on it. And on some models, the day's record beside the form, to catch it when it's wrong.", '', undefined, { ...CONFIDENT, speed: 1.05 }),
     ]),
     anim('close', 'MemoryMap', { recipe: true }, [
       say(0.2, 'Every agent forgets. The question is what it forgets, and whether anything notices. Which of these would your agent lose first?', ''),
