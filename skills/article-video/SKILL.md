@@ -28,6 +28,9 @@ when installed as a plugin; next to `skills/` in the plugin repo).
 - **Voice.** The narration speaks as the article is written: first person ("I ran...", "I
   found..."), with claims no stronger than the article's. If the article hedges ("in this
   setup", "on these 20 runs"), the script hedges too. No punchier-than-source wording.
+  Someone else's experiment is attributed to its authors ("Anthropic showed..."), never told
+  in the first person. An illustrative scene or metaphor must not pass for experiment footage
+  or measured behaviour.
 - **Branding.** AGILabs only: the AGILabs badge and `javieraguilar.ai`. No personal name
   anywhere, not in the cards, the poster, the captions or the file metadata.
 - **Route overview, then build.** Before building, show the author a short overview of the route: the
@@ -86,10 +89,12 @@ when installed as a plugin; next to `skills/` in the plugin repo).
 10. **Render:** `npm run render` (vertical EN). `-- --es` for the Spanish cut, `-- --landscape`
     for 1920x1080 (the long format renders only this one). Then `npm run audio-qa` again to
     measure the mix (-16 LUFS integrated). Videos over 3 min render in chunks joined without
-    re-encoding (`CHUNK_SECONDS` to tune), and the music bed is made as long as the video.
-11. **Deliver:** `npm run deliver` writes the poster PNG, the SRT and `out/manifest.json`. The
-    cover is designed with the cold open, not taken from a default frame (see "Cover (poster)" in
-    `explainer-animation`): look at it at full size and at thumbnail size before handing it over. Hand over the MP4 path and the poster; publishing is a separate step.
+    re-encoding (`CHUNK_SECONDS` to tune); an interrupted chunked render resumes from the
+    finished chunks. The music bed is made as long as the video.
+11. **Deliver:** `npm run deliver` writes the poster PNG, the SRT and `out/manifest.json`. Look
+    at the poster. The cover the platform shows is designed separately (see *The cover is a designed
+    image* in `explainer-animation`) and checked inside the profile grid. Hand over the MP4 path
+    and the cover; publishing is a separate step.
     When the landscape cut exists it also writes `out/youtube-chapters-<voice>.txt` (paste into
     the description; fix any warning: YouTube needs at least 3 chapters of 10 s or more) and
     `out/thumbnail-<voice>.png` (1280x720, from `SETTINGS.thumbnail`, else the poster frame).
