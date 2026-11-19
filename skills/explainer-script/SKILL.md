@@ -9,6 +9,22 @@ A script is a short list of scenes. Each scene has one or more narration lines a
 It is written for a viewer scrolling with the sound off, so every line must also work as a
 caption.
 
+## Premise card, before any script
+
+The angle is the expensive part to get wrong: arguing it over a v8 script, or over a video
+already animated, costs hours. So before writing a single line, write a five-line card:
+
+1. **The question** a non-technical viewer would ask, in their words.
+2. **The everyday example** that shows it (one, start to finish).
+3. **Frame 0**: what is on screen in the very first frame.
+4. **The experiment**: whether it enters, and which part of the question it answers, or "it
+   does not enter".
+5. **Two concrete examples** that will appear on screen.
+
+Run the card through `reel-viewer` (as five numbered lines) and show it to the author with the
+viewer's retelling. The author approves it in one line, or changes it; only then write the script.
+In a batch, show the cards of every reel at once.
+
 ## Length
 
 - As long as the story needs, no fixed cap: most land between 45 and 90 s. A video that
