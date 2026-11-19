@@ -3,7 +3,7 @@
 //   and "empty" written in the same box. Marks: [form, boxes, shelf, new, replaces].
 // - margin: a form with no box for the fact; it is scribbled in the margin, the next entry is
 //   written and the margin note is erased ("0/24"); a SHELF 0 box appears, holds the fact, and a
-//   grid of 24 runs fills with ticks ("24/24"). Marks: [margin, erased, box, 24].
+//   tick lands on 'keeps' (no run counts on screen). Marks: [margin, erased, box, keeps].
 // - wrong: "full" is written in the box by mistake and gets a confident tick; the pages behind fade
 //   away; the real shelf 0 (empty) shows beside it. Marks: [misremembers, full, mistake, sure].
 // No Remotion or React here.
@@ -106,10 +106,13 @@ export function frameState(props: ClipboardFormProps, t: number, beats: number[]
       margin: { write: progress(T, margin - 0.6, 0.8), erase: ease(T, erased, 0.6) },
       eraser: bump(T, erased - 0.2, 1.0),
       scribble: progress(T, erased - 0.6, 0.6),
-      zero: ease(T, erased + 0.5, 0.35) * (1 - ease(T, box, 0.4)),
-      grid: { opacity: ease(T, box + 0.4, 0.4), fill },
-      ticks: Math.floor(RUNS * fill + 1e-9),
-      full: ease(T, fillAt + fillLen, 0.35),
+      // No run counts on screen: the line says it in general ("it keeps it"), so the named box
+      // just lights up and earns a tick on 'keeps'.
+      zero: 0,
+      grid: { opacity: 0, fill },
+      ticks: 0,
+      full: 0,
+      tick: ease(T, Math.max(runs, box + 0.6), 0.35),
     };
   }
 

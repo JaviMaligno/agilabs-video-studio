@@ -1,6 +1,6 @@
 // How an AI agent forgets — concept explainer (EN). Narration from script.md v3 as written (15
-// rows); every claim traced in factcheck.md. On screen, the only figures are "0/24" and "24/24"
-// (scene "margin") plus the "SHELF 0" labels.
+// rows); every claim traced in factcheck.md. On screen there are no figures, only the "SHELF 0"
+// labels.
 // One world throughout: a small robot running a warehouse, the red slip "SHELF 0: EMPTY", and an
 // office whose objects are the kinds of memory. The same slip is followed into each object:
 // - MemoryMap (1): the cold open: the robot with the slip amid four tiles, each kind of memory with
@@ -10,7 +10,7 @@
 // - HeadShelf (5): the bookshelf in its head (training); the slip bounces off the closed doors;
 // - MemoryDesk (6-7): the desk (working memory) overflows; the summary notecard keeps the slip;
 // - FilingCabinet (8-9): the searchable notebook; searches never turn the slip up;
-// - ClipboardForm (10-12): fixed boxes; the margin note erased (0/24), its own box (24/24), and a
+// - ClipboardForm (10-12): fixed boxes; the margin note erased, its own box keeping the fact, and a
 //   confident wrong value.
 // Marks are [line, word]: resolved to scene seconds from the TTS word timestamps (marks.ts);
 // before TTS, and with Kokoro (no word timestamps), they are estimated from the text.
@@ -72,9 +72,9 @@ const build = (): Cuts => ({
       say(0.2, 'Or use a form with fixed boxes, like what is on each shelf.', ''),
       say(0, 'The new value simply replaces the old one.', ''),
     ]),
-    anim('margin', 'ClipboardForm', { mode: 'margin', marks: [[0, 'margin'], [0, 'erased'], [1, 'box'], [1, '24']] }, [
+    anim('margin', 'ClipboardForm', { mode: 'margin', marks: [[0, 'margin'], [0, 'erased'], [1, 'box'], [1, 'keeps']] }, [
       say(0.2, 'But a fact with no box of its own gets scribbled in the margin, and erased.', ''),
-      say(0, 'Give it a box, and one model kept it in all 24 runs.', ''),
+      say(0, 'Give it the right box, and it keeps it.', ''),
     ]),
     anim('misremember', 'ClipboardForm', { mode: 'wrong', marks: [[0, 'misremembers'], [0, 'full'], [0, 'mistake'], [0, 'sure']] }, [
       say(0.2, 'And a form doesn\'t forget. It misremembers: write "full" by mistake, and the box looks just as sure.', '', undefined, { emotion: 'skeptical' }),

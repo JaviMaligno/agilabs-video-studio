@@ -163,7 +163,7 @@ test('FilingCabinet: the slip is filed and never found; the pallet goes to the w
   assert.ok(opened > 0.5);
 });
 
-test('ClipboardForm: replace rewrites the box; margin erases, then 24 ticks; wrong ticks a wrong value', () => {
+test('ClipboardForm: replace rewrites the box; margin erases, then the named box keeps it; wrong ticks a wrong value', () => {
   const pre = form({ mode: 'margin' }, 0.3, [0.2, 4], 9);
   assert.equal(pre.zero, 0);
   assert.equal(pre.ticks, 0);
@@ -182,9 +182,10 @@ test('ClipboardForm: replace rewrites the box; margin erases, then 24 ticks; wro
     assert.equal(r.slip.opacity, 0);
     const m = form({ mode: 'margin' }, dur, beats, dur);
     assert.equal(m.margin.erase, 1);
-    assert.equal(m.zero, 0); // 0/24 leaves once the named box is back
-    assert.equal(m.ticks, RUNS);
-    assert.equal(m.full, 1);
+    assert.equal(m.zero, 0); // no run counts on screen
+    assert.equal(m.ticks, 0);
+    assert.equal(m.full, 0);
+    assert.equal(m.tick, 1); // the named box keeps the fact
     assert.equal(m.shelfRow, 1);
     const w = form({ mode: 'wrong' }, dur, beats, dur);
     assert.equal(w.value.next, 'full');
