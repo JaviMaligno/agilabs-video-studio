@@ -31,7 +31,7 @@ const finish = (scenes: Scene[]): Scene[] => {
 
 const build = (): Cuts => ({
   main: finish([
-    intro('hook', [say(0.1, 'An AI agent forgets the way you do. It just has more places to do it in.', '')], 3, {
+    intro('hook', [say(0.1, 'An AI agent forgets the way you do. It just has more places to do it in.', '', undefined, { speed: 0.8 })], 3, {
       name: 'MemoryMap',
       props: { marks: [[0, 'forgets'], [0, 'more'], [0, 'places']] },
     }),
