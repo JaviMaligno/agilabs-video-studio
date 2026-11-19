@@ -1,12 +1,14 @@
 // Shared pure helpers and constants for the memory-office world (no Remotion or React here).
-// One world throughout: a small robot running a warehouse, a red slip "SHELF 0: EMPTY", and an
-// office whose objects are the kinds of memory.
+// One world throughout: a small robot helping plan a trip, a red slip "FLIGHT: FRIDAY" (the
+// correction it must keep), and an office whose objects are the kinds of memory.
 import { clamp01, easeOutCubic, progress } from './steps.ts';
 
-/** The message the robot must keep, as written on the red slip. */
-export const SLIP_TEXT = 'SHELF 0: EMPTY';
-/** The label of the shelf the message is about (the only shelf with a label). */
-export const SHELF0 = 'SHELF 0';
+/** The correction the robot must keep, as written on the red slip. */
+export const SLIP_TEXT = 'FLIGHT: FRIDAY';
+/** The form's box the correction belongs in, and its old and new values. */
+export const FLIGHT = 'FLIGHT';
+export const OLD_DAY = 'Thursday';
+export const NEW_DAY = 'Friday';
 
 /** A finite number, or the fallback. */
 export const fin = (x: unknown, fb: number): number => (typeof x === 'number' && Number.isFinite(x) ? x : fb);
