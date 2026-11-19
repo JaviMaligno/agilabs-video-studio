@@ -9,9 +9,9 @@ export default {
     // 'auto': Cartesia when a key is available and the service answers, else the local Kokoro
     // voice for the whole language. 'cartesia' fails instead of switching; 'kokoro' stays offline.
     // This video: 'kokoro' (no Cartesia credits at the moment; Kokoro af_bella below).
-    engine: 'kokoro',
+    engine: 'cartesia',
     model: 'sonic-3.6-2026-08-27',
-    speed: 1,
+    speed: 0.8,
     // Default Cartesia emotion for every English line (unset = inferred from the text). 'excited'
     // was chosen by ear over neutral, 'enthusiastic' and 'confident' for the cloned voice. A line
     // can override it with say(..., { emotion, speed }): see explainer-script.
