@@ -10,8 +10,8 @@ Concept video, landscape 16:9, ~6 min, with chapters. EN-only (ES column empty).
    survives.
 3. Frame 0: that chat, with the wrong booking already made.
 4. The experiment: a tool, not the subject. No warehouse on screen. The results enter as short
-   "in my tests with AI agents" lines; numbers are never transferred to the trip, and the apps
-   themselves were not tested (said once, in chapter 6).
+   "in my tests with AI agents" lines; numbers are never transferred to the trip. The advice on
+   the apps rests on Javier's own long use of them, not on these experiments.
 5. On screen: the chat with the wrong booking, and the new chat the next morning.
 
 **Five fixed names, never synonyms:** training (school), the desk (what it can see now), the
@@ -68,7 +68,7 @@ Measure", "Your Agent Doesn't Know What Has Already Happened".
 | 36 | 6 | `MemoryOffice` | The desk fills up. The summary guesses. The search doesn't know what to look for. And the form only holds what has a box. | | Each object lights with its crack as it is named. | — (recap of chapters 2-5) |
 | 37 | 6 | `MemoryOffice` | You don't run your life from one memory either. You keep the gist in your head, your email to search, and a few things on the fridge because you know they'll matter. | | Human version: a head with a card, an inbox, a fridge note "FLIGHT FRI". | — (analogy) |
 | 38 | 6 | `MemoryOffice` | For agents, my tests point the same way, though I haven't tried the two together yet: a summary to carry the thread, and named boxes for the facts that must not slip. | | The recipe on screen: SUMMARY + FORM with a named box. Label "what my tests point to". (confident) | "Keep a summary, or the agent's own lines, and add the search on top if you want it"; "if a fact stays true across many steps, re-inject the field, not the record." (combination not tested) |
-| 39 | 6 | `MemoryOffice` | And for you, today: when something matters, don't leave it buried in the chat. Ask it to save it to memory, in one clear line that names the fact. I didn't test the apps, and it's no guarantee, but it gets the fact out of the pile. | | A chat line typed: "Save to memory: my flight is Friday." → the line appears in the Memory panel. | — (practical advice, no stronger than the data) |
+| 39 | 6 | `MemoryOffice` | And for you, today: these apps often save things to memory on their own, but don't leave it to chance. When something matters, ask it to save it, in one clear line that names the fact. It's no guarantee, but it gets the fact out of the pile. | | A chat line typed: "Save to memory: my flight is Friday." → the line appears in the Memory panel. | — (practical advice, no stronger than the data) |
 | 40 | 6 | `MemoryMap` | Every AI forgets. What matters is what it forgets, and whether anything notices. Tell me in the comments which one has bitten you. | | Back to the map, all five tiles labelled; the slip glows; the recipe small in a corner. | — (closing line + comment prompt) |
 | 41 | — | outro | More at javieraguilar.ai. | | Outro card: AGILabs badge, javieraguilar.ai; end-screen space for YouTube. | — |
 
@@ -106,4 +106,4 @@ EN: ~1,000 words. The cloned voice at speed 1 reads ~2.9 words/s: ~6-6.5 min wit
   to the detail probe, not the correction; app memory is a list of notes, closer to the free-form
   notes field than to named boxes, so don't bind the form's failures to it; the keyword search is
   not RAG; the combination was never tested together; "just as sure" was not measured.
-- v5: all of the above applied; the conversation-beside-the-form line dropped.
+- v5: all of the above applied; the conversation-beside-the-form line dropped. Row 39: no "I didn't test the apps" (Javier has used and tested them for years); the apps often save to memory on their own, asking gives control.

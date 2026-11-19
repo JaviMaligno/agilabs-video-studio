@@ -193,7 +193,7 @@ const build = (): Cuts => ({
       say(0.2, "For agents, my tests point the same way, though I haven't tried the two together yet: a summary to carry the thread, and named boxes for the facts that must not slip.", '', undefined, CONFIDENT),
     ]),
     anim('save', 'ChatTrip', { mode: 'save', marks: [[0, 'buried'], [0, 'Ask'], [0, 'names'], [0, 'pile']] }, [
-      say(0.2, "And for you, today: when something matters, don't leave it buried in the chat. Ask it to save it to memory, in one clear line that names the fact. I didn't test the apps, and it's no guarantee, but it gets the fact out of the pile.", ''),
+      say(0.2, "And for you, today: these apps often save things to memory on their own, but don't leave it to chance. When something matters, ask it to save it, in one clear line that names the fact. It's no guarantee, but it gets the fact out of the pile.", ''),
     ]),
     anim('close', 'MemoryMap', { recipe: true }, [
       say(0.2, 'Every AI forgets. What matters is what it forgets, and whether anything notices. Tell me in the comments which one has bitten you.', ''),
