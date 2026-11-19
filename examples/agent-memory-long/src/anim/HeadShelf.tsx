@@ -1,4 +1,4 @@
-// The bookshelf in the robot's head: training (rows 6-8). See HeadShelf.state.ts.
+// The bookshelf in the robot's head: training (rows 5-8). See HeadShelf.state.ts.
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import { C, alpha } from '../brand.ts';
@@ -32,6 +32,7 @@ const LAYOUT = {
     land: SLIP_PATH.desk,
     satchel: { x: 880, y: 860, s: 1 },
     streamFrom: { x: 80, y0: 380, dy: 60 },
+    bars: { x: 830, y: 1000, w: 190, h: 170, label: 22 },
   },
   l: {
     head: { x: 760, y: 170, k: 0.82 },
@@ -41,6 +42,7 @@ const LAYOUT = {
     land: { x: 1430, y: 612, rot: -5 },
     satchel: { x: 1180, y: 300, s: 0.9 },
     streamFrom: { x: -200, y0: 300, dy: 70 },
+    bars: { x: 1180, y: 520, w: 470, h: 300, label: 30 },
   },
 };
 
@@ -66,6 +68,31 @@ const Lock: React.FC<{ x: number; y: number; pop: number }> = ({ x, y, pop }) =>
       <path d="M -18 0 L -18 -18 A 18 18 0 0 1 18 -18 L 18 0" fill="none" stroke={C.text} strokeWidth={8} />
       <rect x={-28} y={-2} width={56} height={44} rx={8} fill={C.text} />
       <circle cx={0} cy={18} r={6} fill={C.bg0} />
+    </g>
+  );
+};
+
+/** Retraining: the "new" bar shoots up, the bars for everything else sink. (x, y) = bottom left. */
+const Retrain: React.FC<{ x: number; y: number; w: number; h: number; label: number; opacity: number; rise: number; sink: number }> = ({ x, y, w, h, label, opacity, rise, sink }) => {
+  if (opacity <= 0) return null;
+  const n = 5;
+  const bw = (w - 20) / n;
+  const top = h - label * 1.8;
+  const heights = [0.12 + 0.86 * rise, ...[0.7, 0.62, 0.76, 0.66].map((v) => v - 0.42 * sink * (v + 0.1))];
+  return (
+    <g opacity={opacity}>
+      <rect x={x} y={y} width={w} height={4} rx={2} fill={alpha(C.muted, 0.6)} />
+      {heights.map((v, i) => {
+        const bh = top * v;
+        const color = i === 0 ? C.ok : sink > 0.05 ? alpha(C.marker, 0.45 + 0.45 * sink) : alpha(C.muted, 0.7);
+        return <rect key={i} x={x + 10 + i * bw + bw * 0.14} y={y - bh} width={bw * 0.72} height={bh} rx={6} fill={color} />;
+      })}
+      <text x={x + 10 + bw / 2} y={y + label * 1.3} textAnchor="middle" fontSize={label} fontWeight={800} fill={C.ok}>
+        new
+      </text>
+      <text x={x + 10 + bw * 3} y={y + label * 1.3} textAnchor="middle" fontSize={label} fontWeight={800} fill={sink > 0.05 ? C.marker : C.muted}>
+        everything else
+      </text>
     </g>
   );
 };
@@ -128,7 +155,10 @@ export const HeadShelf: React.FC<AnimProps & HeadShelfProps> = (p) => {
           <ellipse cx={630} cy={690} rx={34} ry={34} fill={C.accentText} />
           <rect x={505} y={748} width={70} height={10} rx={5} fill={alpha(C.muted, 0.7)} />
         </g>
-        <Satchel x={L.satchel.x} y={L.satchel.y} s={L.satchel.s} pop={s.cap} />
+        <g opacity={1 - s.bars.opacity}>
+          <Satchel x={L.satchel.x} y={L.satchel.y} s={L.satchel.s} pop={s.cap} />
+        </g>
+        <Retrain x={L.bars.x} y={L.bars.y} w={L.bars.w} h={L.bars.h} label={L.bars.label} opacity={s.bars.opacity * (1 - s.desk)} rise={s.bars.rise} sink={s.bars.sink} />
         {/* the desk the slip ends up on */}
         <Desk x={L.desk.x} y={L.desk.y} w={L.desk.w} glowA={0.5 * s.desk} />
         <Slip x={slipX} y={slipY} w={slipW} rot={s.slip.rot} opacity={s.slip.opacity} />

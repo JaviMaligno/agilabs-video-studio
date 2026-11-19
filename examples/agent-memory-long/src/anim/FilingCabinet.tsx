@@ -1,12 +1,14 @@
-// The filing cabinet: a notebook it can search by keyword (rows 27-32). See FilingCabinet.state.ts.
+// The filing cabinet: a notebook it can search by keyword (rows 21-25). See FilingCabinet.state.ts.
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import { C, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
 import { lerp } from './memory.ts';
-import { CAB, DRAWER_TAGS, LINE_TEXT, SLIP_DRAWER, STAT_TEXT, frameState, type FilingCabinetProps } from './FilingCabinet.state.ts';
-import { Badge, Cabinet, Crate, Desk, Floor, Frame, Lens, Page, Rack, Robot, Slip } from './office.tsx';
+import { CAB, DRAWER_TAGS, LINE_TEXT, SLIP_DRAWER, STAT_TEXT, UNASKED, frameState, type FilingCabinetProps } from './FilingCabinet.state.ts';
+import { Badge, Cabinet, Desk, Floor, Frame, Lens, Page, Robot, Slip } from './office.tsx';
+import { Bubble, bubbleSize } from './chat.tsx';
+import { BOOKING } from './ChatTrip.state.ts';
 import { place } from './canvas.ts';
 
 export { frameState };
@@ -15,9 +17,9 @@ export type { FilingCabinetProps };
 /**
  * Layout (frame pixels), per format. `cab` places the cabinet group (the cabinet, its magnifier
  * and drawer tags, laid out around CAB in vertical pixels) at (x, y) scaled by k.
- * - vertical: the cabinet at the left, the robot behind its desk at the right, the inset above.
+ * - vertical: the cabinet at the left, the robot behind its desk at the right, the callback above.
  * - landscape: one floor; the cabinet at the left, the desk in the middle, the robot beside it on
- *   the right, the warehouse panels at the top right, the closing line across the top.
+ *   the right, the callback to the cold open at the top right, the closing line across the top.
  */
 const LAYOUT = {
   v: {
@@ -27,8 +29,8 @@ const LAYOUT = {
     robot: { x: 840, y: 580, s: 0.82 },
     pile: { x: 800, base: 895 },
     slip: { x: 740, y: 920 },
-    inset: { x: 640, y: 290, w: 330, h: 140 },
-    callback: { x: 560, y: 250, w: 420, h: 170 },
+    callback: { x: 470, y: 270, w: 520, size: 30 },
+    unasked: { x: 560, y: 470, w: 330, h: 70 },
     inbox: { x: 700, y: 400 },
     stat: { x: 300, y: 330, size: 48, anchor: 'middle' as 'middle' | 'start' },
     line: { x: 540, y: [1225, 1285], size: 46 },
@@ -40,10 +42,10 @@ const LAYOUT = {
     robot: { x: 1400, y: 800 - 0.75 * 454, s: 0.75 },
     pile: { x: 1000, base: 560 },
     slip: { x: 940, y: 586 },
-    inset: { x: 1470, y: 175, w: 270, h: 120 },
-    callback: { x: 1150, y: 170, w: 560, h: 210 },
+    callback: { x: 1050, y: 190, w: 700, size: 32 },
+    unasked: { x: 700, y: 250, w: 340, h: 74 },
     inbox: { x: 900, y: 330 },
-    stat: { x: 1605, y: 412, size: 40, anchor: 'middle' as 'middle' | 'start' },
+    stat: { x: 1500, y: 300, size: 56, anchor: 'middle' as 'middle' | 'start' },
     line: { x: 960, y: [186], size: 48 },
   },
 };
@@ -51,6 +53,8 @@ const LAYOUT = {
 /** Mouth of the slip's drawer (cabinet pixels): where swept pages go in. */
 const MOUTH = { x: CAB.x + CAB.w + 60, y: CAB.y + (SLIP_DRAWER + 0.5) * (CAB.h / CAB.drawers) - 40 };
 const PAGES = 7;
+/** The swept pages: the conversation, with its hotel cards, price tags and map. */
+const PAGE_KINDS = ['text', 'hotel', 'text', 'price', 'map', 'text', 'hotel'] as const;
 
 /** An envelope (the inbox), centred on (x, y). */
 const Envelope: React.FC<{ x: number; y: number; s: number; opacity: number }> = ({ x, y, s, opacity }) =>
@@ -79,18 +83,11 @@ export const FilingCabinet: React.FC<AnimProps & FilingCabinetProps> = (p) => {
     };
   };
   const slip = swept(F.slip.x, F.slip.y, PAGES);
-  // The inset: the pallet goes onto the wrong shelf (shelf 0 was the empty one).
-  const bw = F.inset.w / 3;
-  const target = { x: F.inset.x + 2.5 * bw, y: F.inset.y + F.inset.h };
-  const from = { x: F.inset.x - 40, y: F.inset.y + F.inset.h - 90 };
-  const palX = lerp(from.x, target.x, s.inset.move);
-  const palY = lerp(from.y, target.y, s.inset.move) - 70 * Math.sin(Math.PI * s.inset.move);
-  // The callback panel: the cold open's rack, the pallet gliding past shelf 0 to the last bay.
+  // The callback panel: the cold open's wrong booking, pulsing red.
   const cb = F.callback;
-  const rack = { x: cb.x + 40, y: cb.y + 26, w: cb.w - 80, h: cb.h - 90 };
-  const cbw = rack.w / 4;
-  const cbX = lerp(rack.x - cbw * 0.2, rack.x + 3.5 * cbw, s.callback.move);
-  const cbLanded = s.callback.move >= 1;
+  const cbBubble = bubbleSize(BOOKING, cb.size, cb.w - 60, true);
+  const cbH = cbBubble.h + 60;
+  const U = F.unasked;
   // The inbox folds into the cabinet's top drawer.
   const intoCab = cabT(CAB.x + CAB.w / 2, CAB.y + 60);
   const inbox = { x: lerp(F.inbox.x, intoCab.x, s.inbox.into), y: lerp(F.inbox.y, intoCab.y, s.inbox.into), s: lerp(1, 0.3, s.inbox.into) };
@@ -119,23 +116,25 @@ export const FilingCabinet: React.FC<AnimProps & FilingCabinetProps> = (p) => {
         {/* what was on the desk: pages and the slip, swept into the drawer */}
         {Array.from({ length: PAGES }, (_, i) => {
           const q = swept(F.pile.x + ((i * 53) % 17) - 8, F.pile.base - i * 17, i);
-          return <Page key={i} x={q.x} y={q.y} w={220} rot={((i * 29) % 13) - 6} opacity={q.op} scale={q.scale} />;
+          return <Page key={i} x={q.x} y={q.y} w={220} rot={((i * 29) % 13) - 6} opacity={q.op} scale={q.scale} kind={PAGE_KINDS[i % PAGE_KINDS.length]} />;
         })}
         <Slip x={slip.x} y={slip.y} w={210 * slip.scale} rot={-4} opacity={slip.op * s.slip.opacity} />
         <Envelope x={inbox.x} y={inbox.y} s={inbox.s} opacity={s.inbox.opacity * (1 - Math.max(0, (s.inbox.into - 0.8) / 0.2))} />
-        {s.inset.opacity > 0 && (
-          <g opacity={s.inset.opacity}>
-            <Rack x={F.inset.x} y={F.inset.y} w={F.inset.w} h={F.inset.h} pallets={[0, 1, 0]} upper={false} s={0.75} />
-            <Crate x={palX} y={palY} w={bw * 0.62} h={F.inset.h * 0.45} />
-            <Badge x={target.x} y={F.inset.y + 10} r={30} kind="cross" pop={s.inset.cross} />
-          </g>
-        )}
         {s.callback.opacity > 0 && (
           <g opacity={s.callback.opacity}>
-            <rect x={cb.x} y={cb.y - 10} width={cb.w} height={cb.h + 10} rx={18} fill={alpha(C.bg0, 0.85)} stroke={alpha(C.accentText, 0.6)} strokeWidth={4} />
-            <Rack x={rack.x} y={rack.y} w={rack.w} h={rack.h} bays={4} pallets={[0, 1, 1, cbLanded ? 1 : 0]} ghost={1} glowA={1} glowColor={C.ok} upper={false} s={0.7} />
-            {!cbLanded && <Crate x={cbX} y={rack.y + rack.h} w={cbw * 0.66} h={rack.h * 0.4} />}
-            <Badge x={rack.x + 3.5 * cbw} y={rack.y + rack.h * 0.45} r={26} kind="cross" pop={s.callback.cross} />
+            <rect x={cb.x} y={cb.y} width={cb.w} height={cbH} rx={22} fill={alpha(C.bg0, 0.9)} stroke={alpha(C.accentText, 0.6)} strokeWidth={4} />
+            <Bubble x={cb.x + 30} y={cb.y + 30} side="ai" text={BOOKING} size={cb.size} maxW={cb.w - 60} alert={s.callback.pulse} hot="Thursday" tick />
+            <Badge x={cb.x + cb.w - 4} y={cb.y + 4} r={30} kind="cross" pop={s.callback.cross} />
+          </g>
+        )}
+        {/* the question it never asks */}
+        {s.unasked.opacity > 0 && (
+          <g opacity={s.unasked.opacity}>
+            <rect x={U.x} y={U.y} width={U.w} height={U.h} rx={20} fill="none" stroke={alpha(C.muted, 0.7)} strokeWidth={3} strokeDasharray="10 8" />
+            <text x={U.x + U.w / 2} y={U.y + U.h / 2 + 11} textAnchor="middle" fontSize={32} fontWeight={700} fontStyle="italic" fill={C.muted}>
+              {UNASKED}
+            </text>
+            <line x1={U.x + 18} x2={U.x + 18 + (U.w - 36) * s.unasked.strike} y1={U.y + U.h / 2} y2={U.y + U.h / 2} stroke={C.marker} strokeWidth={5} strokeLinecap="round" />
           </g>
         )}
         {s.stat > 0 && (

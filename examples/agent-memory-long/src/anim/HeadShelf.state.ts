@@ -1,8 +1,10 @@
-// Pure state of the bookshelf in the robot's head (rows 6-8): what it learned in training.
-// Books stream into the shelf and light up (training); a school satchel lands beside it (like
-// school); the glass doors close (slow to change); today's red slip flies at the closed doors,
-// bounces off, and floats down to the desk.
-// Marks: [training, school, message, there, lands, doors, packed]. No Remotion or React here.
+// Pure state of the bookshelf in the robot's head (rows 5-8): what it learned in training.
+// Books stream into the shelf and light up (reads ... packed); a school satchel lands beside it
+// (school); the glass doors close (frozen); the red slip "FLIGHT: FRIDAY" flies at the closed doors
+// and bounces off (flight ... moved); retraining: one bar shoots up ("new") while the others sink
+// ("everything else") (again, worse); then the slip floats down to the desk (somewhere else).
+// Marks: [reads, school, flight, moved, somewhere, frozen, packed, again, worse].
+// No Remotion or React here.
 import { beatOr, bump, ease, mark } from './memory.ts';
 import { progress, sceneTime } from './steps.ts';
 
@@ -41,6 +43,8 @@ export type HeadShelfState = {
   /** Flash on the glass where the slip hits it. */
   bounce: number;
   desk: number;
+  /** Retraining: the bars shown, the "new" bar rising, the others sinking (each 0..1). */
+  bars: { opacity: number; rise: number; sink: number };
 };
 
 export function frameState(props: HeadShelfProps, t: number, beats: number[], dur: number): HeadShelfState {
@@ -55,7 +59,10 @@ export function frameState(props: HeadShelfProps, t: number, beats: number[], du
   const doorsAt = Math.max(school + 0.3, mark(m, 5, school + 1.0));
   const flyAt = Math.max(mark(m, 2, b1 + 0.4) - 0.2, doorsAt + 0.5);
   const bounceAt = Math.max(mark(m, 3, b1 + 1.4), flyAt + FLY);
-  const fallAt = Math.max(mark(m, 4, b2 + 0.6), bounceAt + BOUNCE);
+  const b3 = beatOr(beats, 3, b2 + 6);
+  const again = Math.max(bounceAt + BOUNCE, mark(m, 7, b2 + 1.6));
+  const worse = Math.max(again + 0.6, mark(m, 8, b2 + 5));
+  const fallAt = Math.max(mark(m, 4, b3 + 1.2), bounceAt + BOUNCE, worse + 0.6);
 
   const fly = ease(T, flyAt, FLY);
   const back = ease(T, bounceAt, BOUNCE);
@@ -74,5 +81,6 @@ export function frameState(props: HeadShelfProps, t: number, beats: number[], du
     path: { fly, back, fall },
     bounce: bump(T, bounceAt - 0.05, 0.6),
     desk: ease(T, fallAt + FALL * 0.6, 0.4),
+    bars: { opacity: ease(T, again - 0.3, 0.4), rise: ease(T, again, 0.9), sink: ease(T, worse - 0.1, 0.9) },
   };
 }

@@ -1,13 +1,14 @@
-// Pure state of the filing cabinet: a notebook the agent can search by keyword (rows 27-32).
+// Pure state of the filing cabinet: a notebook the AI can search by keyword (rows 21-25).
 // - file: the desk is swept clean; every page, the red slip too, slides into a drawer; the cabinet
-//   glows (nothing is lost); an inbox icon comes in and folds into the cabinet (like email); a
-//   magnifier hovers and a question mark rises over it; then the cold open comes back in a panel:
-//   shelf 0 glowing, the pallet gliding past it onto another shelf, cross ("the agent from the
-//   start of this video"). Marks: [clear, nothing, search, know, email, callback].
-// - miss: the clean desk says nothing; the magnifier opens the "shelf 1" and "shelf 2" drawers and
-//   turns up pages; the slip's drawer stays shut; on the small rack the pallet goes onto the wrong
-//   shelf, cross; "1 search in 40"; a second, sharper pass misses the same way; the closing line.
-//   Marks: [clean, looked, never, message, forty, sharper, plain].
+//   glows (nothing is thrown away); a magnifier hovers (search by keyword); an inbox icon comes in
+//   and folds into the cabinet (like email) and a question mark rises over the magnifier; then the
+//   cold open comes back in a panel: "Booked your hotel for Thursday night", pulsing red, with a
+//   cross ("the one that sounds safest ... did the worst").
+//   Marks: [clear, nothing, keyword, know, email, safest].
+// - miss: the clean desk says nothing; the magnifier opens the "flights" and "dates" drawers and
+//   turns up pages; the slip's drawer stays shut; the question it never asks ("anything changed?")
+//   comes up dashed and is struck; "1 search in 40"; a second pass goes by the slip's drawer the
+//   same way; the closing line. Marks: [nothing, searches, never, changed, forty, second, only].
 // No Remotion or React here.
 import { beatOr, bump, ease, lerp, loopTime, mark, pickMode } from './memory.ts';
 import { sceneTime } from './steps.ts';
@@ -20,9 +21,11 @@ export type FilingCabinetProps = { mode: CabinetMode; marks?: number[] };
 export const CAB = { x: 110, y: 560, w: 300, h: 540, drawers: 3, open: 170 } as const;
 export const SLIP_DRAWER = 1;
 /** Tags on the drawers it searches (the slip's drawer has none: nothing tells it to look there). */
-export const DRAWER_TAGS = ['shelf 1', '', 'shelf 2'] as const;
+export const DRAWER_TAGS = ['flights', '', 'dates'] as const;
 export const STAT_TEXT = '1 search in 40';
-export const LINE_TEXT = 'A plain search only helps if you know what to look for.';
+export const LINE_TEXT = 'A search only helps if you know what to look for.';
+/** The question it never asks. */
+export const UNASKED = 'anything changed?';
 /** Centre of drawer `i`'s handle when open by `d` (where the magnifier looks), in cabinet pixels. */
 export const drawerSpot = (i: number, d = 1) => ({ x: CAB.x + CAB.w + CAB.open * d - 40, y: CAB.y + (i + 0.5) * (CAB.h / CAB.drawers) - 70 });
 
@@ -40,11 +43,12 @@ export type FilingCabinetState = {
   found: number[];
   /** The slip's corner peeking out of its closed drawer. */
   peek: number;
-  inset: { opacity: number; move: number; cross: number };
+  /** The question it never asks: shown (dashed), and struck. */
+  unasked: { opacity: number; strike: number };
   /** The inbox icon: shown, and folded into the cabinet. */
   inbox: { opacity: number; into: number };
-  /** The cold open, back in a panel: shown, the pallet's glide (0..1), the cross. */
-  callback: { opacity: number; move: number; cross: number };
+  /** The cold open, back in a panel: shown, the booking's red pulse, the cross. */
+  callback: { opacity: number; pulse: number; cross: number };
   tags: number;
   stat: number;
   line: number;
@@ -77,16 +81,16 @@ export function frameState(props: FilingCabinetProps, t: number, beats: number[]
   const b0 = beatOr(beats, 0, 0);
   const b1 = beatOr(beats, 1, b0 + 3.0);
   const hover = { x: CAB.x + CAB.w / 2 + 40 * Math.sin(tm * 2.1), y: CAB.y - 90 + 14 * Math.cos(tm * 2.9) };
-  const none = { inbox: { opacity: 0, into: 0 }, callback: { opacity: 0, move: 0, cross: 0 }, tags: 0, stat: 0, line: 0 };
+  const none = { inbox: { opacity: 0, into: 0 }, callback: { opacity: 0, pulse: 0, cross: 0 }, tags: 0, stat: 0, line: 0, unasked: { opacity: 0, strike: 0 } };
 
   if (mode === 'file') {
     const b2 = beatOr(beats, 2, b1 + 1.4);
     const clear = mark(m, 0, b0 + 0.4);
     const nothing = mark(m, 1, b1 + 0.1);
-    const search = mark(m, 2, b2 + 0.9);
-    const know = mark(m, 3, b2 + 2.0);
-    const email = Math.max(clear + 1.2, mark(m, 4, search - 1.2));
-    const callback = Math.max(know + 0.6, mark(m, 5, b2 + 3.4));
+    const search = mark(m, 2, b0 + 4);
+    const email = Math.max(clear + 1.2, mark(m, 4, b1 + 1.4));
+    const know = Math.max(email + 0.4, mark(m, 3, b1 + 3.0));
+    const callback = Math.max(know + 0.6, mark(m, 5, b2 + 1.4));
     const sweep = ease(T, clear, 1.1);
     const open = ease(T, clear - 0.3, 0.4) * (1 - ease(T, clear + 1.2, 0.4));
     return {
@@ -95,14 +99,13 @@ export function frameState(props: FilingCabinetProps, t: number, beats: number[]
       slip: { opacity: 1, inDrawer: sweep },
       drawers: [0, open, 0],
       glow: ease(T, nothing - 0.1, 0.4),
-      lens: { opacity: ease(T, search - 0.2, 0.4), x: hover.x, y: hover.y, question: ease(T, know, 0.4) },
+      lens: { opacity: ease(T, search - 0.2, 0.4), x: hover.x, y: hover.y, question: ease(T, know, 0.4) * (1 - ease(T, callback - 0.4, 0.4)) },
       clean: 0,
       found: [0, 0, 0],
       peek: ease(T, clear + 1.4, 0.4),
-      inset: { opacity: 0, move: 0, cross: 0 },
       ...none,
-      inbox: { opacity: ease(T, email - 0.2, 0.4), into: ease(T, Math.max(email + 0.6, search - 0.4), 0.8) },
-      callback: { opacity: ease(T, callback - 0.3, 0.4), move: ease(T, callback, 1.8), cross: ease(T, callback + 1.8, 0.35) },
+      inbox: { opacity: ease(T, email - 0.2, 0.4), into: ease(T, email + 0.7, 0.8) },
+      callback: { opacity: ease(T, callback - 0.3, 0.4), pulse: 0.55 + 0.45 * Math.sin(tm * 4.2), cross: ease(T, callback + 1.6, 0.35) },
     };
   }
 
@@ -130,8 +133,8 @@ export function frameState(props: FilingCabinetProps, t: number, beats: number[]
     clean: ease(T, clean - 0.2, 0.4) * (1 - ease(T, looked - 0.2, 0.5)),
     found: [Math.max(p1.found[0], p2.found[0]), 0, Math.max(p1.found[1], p2.found[1])],
     peek: 1,
-    inset: { opacity: ease(T, never - 0.3, 0.4), move: ease(T, message - 0.2, 0.9), cross: ease(T, message + 0.7, 0.35) },
     ...none,
+    unasked: { opacity: ease(T, never - 0.2, 0.4) * (1 - ease(T, forty - 0.6, 0.4)), strike: ease(T, message, 0.4) },
     tags: ease(T, looked - 0.4, 0.4),
     stat: ease(T, forty - 0.1, 0.4),
     line: ease(T, plain - 0.1, 0.5),

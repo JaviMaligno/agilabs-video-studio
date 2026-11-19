@@ -9,16 +9,12 @@ import { KeyQuote } from './KeyQuote.tsx';
 import { StatGrid } from './StatGrid.tsx';
 import { MemoryOffice } from './MemoryOffice.tsx';
 import { MemoryMap } from './MemoryMap.tsx';
-import { WarehouseShelves } from './WarehouseShelves.tsx';
 import { HeadShelf } from './HeadShelf.tsx';
 import { MemoryDesk } from './MemoryDesk.tsx';
 import { FilingCabinet } from './FilingCabinet.tsx';
 import { ClipboardForm } from './ClipboardForm.tsx';
-import { ReplayBars } from './ReplayBars.tsx';
-import { TwoJobs } from './TwoJobs.tsx';
-import { RestartIterate } from './RestartIterate.tsx';
 import { AskReader } from './AskReader.tsx';
-import { CorrectionReplay } from './CorrectionReplay.tsx';
+import { ChatTrip } from './ChatTrip.tsx';
 
 export type { AnimProps };
 
@@ -31,14 +27,10 @@ export const ANIMS: Record<string, React.FC<AnimProps & any>> = {
   StatGrid,
   MemoryOffice,
   MemoryMap,
-  WarehouseShelves,
   HeadShelf,
   MemoryDesk,
   FilingCabinet,
   ClipboardForm,
-  ReplayBars,
-  TwoJobs,
-  RestartIterate,
   AskReader,
-  CorrectionReplay,
+  ChatTrip,
 };

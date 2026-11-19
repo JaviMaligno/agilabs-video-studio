@@ -7,11 +7,13 @@ import type { AnimProps } from './types.ts';
 import { lerp } from './memory.ts';
 import {
   CARD_TEXT,
+  DAYS,
   DECISIONS,
   DETAIL_TEXT,
+  GREETING,
   OLD_LABEL,
   OLD_REDS,
-  ROWS,
+  RECENT,
   ROW_CELLS,
   FORK,
   MAX_PAGES,
@@ -23,7 +25,8 @@ import {
   frameState,
   type MemoryDeskProps,
 } from './MemoryDesk.state.ts';
-import { Badge, Clock, Crate, Desk, Floor, Frame, Gauge, Notecard, Page, Rack, Robot, Slip, glow } from './office.tsx';
+import { Badge, Clock, Desk, Floor, Frame, Gauge, Notecard, Page, Robot, Slip, glow, type PageKind } from './office.tsx';
+import { Bubble } from './chat.tsx';
 import { place } from './canvas.ts';
 
 export { frameState };
@@ -31,9 +34,9 @@ export type { MemoryDeskProps };
 
 /**
  * Layout (frame pixels), per format.
- * - vertical: the robot stands behind the desk, the gauge and the warehouse inset above it.
+ * - vertical: the robot stands behind the desk, the gauge and the calendar above it.
  * - landscape: the desk on the floor at the left, the robot standing beside it on the same floor
- *   (the desk at its hip), the gauge on a post at the right end of the desk, the inset and the
+ *   (the desk at its hip), the gauge on a post at the right end of the desk, the calendar and the
  *   strips of decisions in the free space at the top right.
  */
 const LAYOUT = {
@@ -47,13 +50,16 @@ const LAYOUT = {
     rules: { x: 640, y: 905 },
     gauge: { x: 230, y: 450, r: 84, post: 0 },
     bubble: { x: 330, y: 520, w: 320, h: 170 },
-    inset: { x: 660, y: 300, w: 300, h: 150 },
+    calendar: { x: 660, y: 300, w: 300, h: 160 },
     strips: { x: 340, y: [330, 530], cols: 40, label: 'above' as 'above' | 'left' },
     fork: { y: 290, xs: [300, 700], from: { x: 400, y: 740 } },
     spillDrop: 1,
-    detail: { x: 400, y: 918 },
     clock: { x: 490, y: 610, r: 80 },
-    rows: { x: 390, y: [244, 306], cell: 44, gap: 4 },
+    rows: { x: 390, y: 280, cell: 44, gap: 4 },
+    hover: { x: 560, y: 740, q: { x: 720, y: 720 } },
+    greet: { x: 170, y: 880, size: 34, maxW: 740 },
+    ghost: { x: 420, y: 820 },
+    sun: { x: 190, y: 340, r: 56 },
   },
   l: {
     floor: { y: 806, x: 300, w: 1440 },
@@ -65,13 +71,16 @@ const LAYOUT = {
     rules: { x: 1005, y: 575 },
     gauge: { x: 1200, y: 580, r: 58, post: 50 },
     bubble: { x: 590, y: 165, w: 320, h: 170 },
-    inset: { x: 1470, y: 175, w: 270, h: 120 },
+    calendar: { x: 1480, y: 160, w: 250, h: 150 },
     strips: { x: 1080, y: [165, 275], cols: 60, label: 'left' as 'above' | 'left' },
     fork: { y: 205, xs: [570, 950], from: { x: 740, y: 360 } },
     spillDrop: 0.5,
-    detail: { x: 690, y: 548 },
     clock: { x: 750, y: 255, r: 72 },
-    rows: { x: 1080, y: [185, 255], cell: 44, gap: 8 },
+    rows: { x: 1080, y: 200, cell: 44, gap: 8 },
+    hover: { x: 900, y: 395, q: { x: 1060, y: 380 } },
+    greet: { x: 520, y: 548, size: 30, maxW: 560 },
+    ghost: { x: 740, y: 470 },
+    sun: { x: 300, y: 240, r: 52 },
   },
 };
 type DeskLayout = (typeof LAYOUT)['v'];
@@ -79,16 +88,54 @@ type DeskLayout = (typeof LAYOUT)['v'];
 /** Deterministic jitter per page. */
 const jx = (k: number) => ((k * 53) % 17) - 8;
 const jr = (k: number) => ((k * 29) % 13) - 6;
-/** How far left the detail test's pile sits, clear of the card. */
-const ASIDE = 150;
 /** Pages from this index on slide off the left edge when the desk overflows. */
 const SPILL_FROM = 7;
 /** Strip cells: size and gap. */
 const CELL = 8;
 const GAP = 1;
+/** What page k of the chat shows: the early conversation is text, then hotels, prices, a map. */
+const LATER_KINDS: PageKind[] = ['hotel', 'price', 'map'];
+const kindOf = (k: number): PageKind => (k < WORK_PAGES ? 'text' : LATER_KINDS[(k - WORK_PAGES) % LATER_KINDS.length]);
+
+/** A small desk calendar with two days; the second gets a ring and a tick. */
+const Calendar: React.FC<{ x: number; y: number; w: number; h: number; opacity: number; tick: number }> = ({ x, y, w, h, opacity, tick }) =>
+  opacity > 0 ? (
+    <g opacity={opacity}>
+      <rect x={x} y={y} width={w} height={h} rx={14} fill={C.card} stroke={C.accentText} strokeWidth={4} />
+      <rect x={x} y={y} width={w} height={h * 0.24} rx={12} fill={C.accent} />
+      {[0, 1].map((i) => (
+        <circle key={i} cx={x + w * (0.3 + 0.4 * i)} cy={y} r={7} fill={C.text} />
+      ))}
+      {DAYS.map((d, i) => {
+        const cx = x + w * (0.27 + 0.46 * i);
+        const cy = y + h * 0.66;
+        return (
+          <g key={d}>
+            {i === 1 && tick > 0 && <circle cx={cx} cy={cy - h * 0.06} r={h * 0.3} fill={alpha(C.ok, 0.18 * tick)} stroke={C.ok} strokeWidth={4} opacity={tick} />}
+            <text x={cx} y={cy + h * 0.06} textAnchor="middle" fontSize={h * 0.24} fontWeight={800} fill={i === 1 ? C.text : C.muted}>
+              {d}
+            </text>
+          </g>
+        );
+      })}
+      <Badge x={x + w - 10} y={y + h * 0.3} r={24} kind="tick" pop={tick} />
+    </g>
+  ) : null;
+
+/** A sun with rays (morning light). */
+const Sun: React.FC<{ x: number; y: number; r: number; opacity: number }> = ({ x, y, r, opacity }) =>
+  opacity > 0 ? (
+    <g opacity={opacity} style={glow(C.warm, 0.8)}>
+      <circle cx={x} cy={y} r={r} fill={C.warm} />
+      {Array.from({ length: 10 }, (_, i) => {
+        const a = (i * Math.PI) / 5;
+        return <line key={i} x1={x + (r + 14) * Math.cos(a)} y1={y + (r + 14) * Math.sin(a)} x2={x + (r + 36) * Math.cos(a)} y2={y + (r + 36) * Math.sin(a)} stroke={C.warm} strokeWidth={7} strokeLinecap="round" />;
+      })}
+    </g>
+  ) : null;
 
 /** A speech bubble (a meeting); its words dissolve with `fade`, leaving the gist. */
-const Bubble: React.FC<{ D: DeskLayout; opacity: number; fade: number }> = ({ D, opacity, fade }) => {
+const MeetingBubble: React.FC<{ D: DeskLayout; opacity: number; fade: number }> = ({ D, opacity, fade }) => {
   if (opacity <= 0) return null;
   const { x, y, w, h } = D.bubble;
   return (
@@ -191,9 +238,11 @@ export const MemoryDesk: React.FC<AnimProps & MemoryDeskProps> = (p) => {
   const whole = Math.floor(s.pages);
   const part = s.pages - whole;
   const n = Math.min(MAX_PAGES, whole + (part > 0 ? 1 : 0));
+  /** A new chat (wiped): everything on the desk slides off to the left and fades. */
+  const off = (k: number) => ({ dx: -s.wipe * (700 + 40 * k), op: 1 - s.wipe });
   const pages = Array.from({ length: n }, (_, k) => {
     const landing = k === whole ? part : 1;
-    let x = D.pile.x - ASIDE * s.aside + jx(k);
+    let x = D.pile.x + jx(k);
     let y = D.pile.base - k * 17 - 140 * (1 - landing);
     let rot = jr(k);
     let op = landing;
@@ -210,23 +259,23 @@ export const MemoryDesk: React.FC<AnimProps & MemoryDeskProps> = (p) => {
       scale = lerp(1, 0.45, s.squeeze);
       op *= 1 - s.squeeze;
     }
+    if (s.wipe > 0) {
+      const o = off(k);
+      x += o.dx;
+      rot -= 30 * s.wipe;
+      op *= o.op;
+    }
     return { x, y, rot, op, scale, k };
   });
-  // The slip on top of the pile (work, crowded): it rides the top page while the record grows,
-  // then the newer pages cover it (crowded).
+  // The slip on top of the pile (work, crowded): it rides the top page while the conversation
+  // grows, then the newer pages cover it (crowded).
   const topOf = (count: number) => D.pile.base - Math.max(0, count - 1) * 17 - 14;
   const settled = s.slip.cover > 0 ? WORK_PAGES : whole;
   const slipTop = { x: D.pile.x - 20, y: topOf(Math.max(1, settled)) };
-  const slipAt = s.slip.top > 0 ? slipTop : D.slip;
+  const slipBase = s.slip.top > 0 ? slipTop : D.slip;
+  const slipAt = { x: slipBase.x + (s.wipe > 0 ? off(WORK_PAGES).dx : 0), y: slipBase.y };
   // Pages that land over the slip (crowded) are drawn after it; on a bare desk all are.
   const coverFrom = s.slip.top > 0 ? (s.slip.cover > 0 ? WORK_PAGES : n) : 0;
-  // The inset: the new pallet goes to shelf 0.
-  const bw = D.inset.w / 3;
-  const target = { x: D.inset.x + bw / 2, y: D.inset.y + D.inset.h };
-  const from = { x: D.inset.x - 40, y: D.inset.y + D.inset.h - 90 };
-  const palX = lerp(from.x, target.x, s.inset.move);
-  const palY = lerp(from.y, target.y, s.inset.move) - 60 * Math.sin(Math.PI * s.inset.move);
-  const neededK = Math.max(0, n - 3);
   const stripW = D.strips.cols * (CELL + GAP);
   const stripH = Math.ceil(DECISIONS / D.strips.cols) * (CELL + GAP);
   const label = (i: number, text: string, color: string, size: number) =>
@@ -239,17 +288,26 @@ export const MemoryDesk: React.FC<AnimProps & MemoryDeskProps> = (p) => {
         {text}
       </text>
     );
-  const pageEl = (pg: (typeof pages)[number]) => (
-    <g key={pg.k} style={pg.k === neededK && s.needed > 0 ? glow(C.ok, s.needed) : undefined}>
-      <Page x={pg.x} y={pg.y} w={230} rot={pg.rot} opacity={pg.op} scale={pg.scale} />
-      {pg.k === neededK && s.needed > 0 && (
-        <rect x={pg.x - 118} y={pg.y - 74} width={236} height={148} rx={8} fill="none" stroke={C.ok} strokeWidth={5} opacity={s.needed} transform={`rotate(${pg.rot} ${pg.x} ${pg.y})`} />
-      )}
-    </g>
-  );
+  const pageEl = (pg: (typeof pages)[number]) => <Page key={pg.k} x={pg.x} y={pg.y} w={230} rot={pg.rot} opacity={pg.op} scale={pg.scale} kind={kindOf(pg.k)} />;
+  // The slip hovering over the card (summary), then dropping into it.
+  const hv = { x: D.hover.x, y: lerp(D.hover.y, D.card.y, s.hover.drop) };
+  const { w: fw, h: fh } = p.vertical ? { w: 1080, h: 1920 } : { w: 1920, h: 1080 };
   return (
     <AbsoluteFill style={{ fontFamily }}>
       <Frame vertical={p.vertical} design="both">
+        {/* morning light over the whole room (a new chat) */}
+        {s.morning > 0 && (
+          <g opacity={s.morning}>
+            <defs>
+              <radialGradient id="desk-morning" cx={D.sun.x / fw} cy={D.sun.y / fh} r="0.9">
+                <stop offset="0" stopColor={C.warm} stopOpacity={0.22} />
+                <stop offset="1" stopColor={C.warm} stopOpacity={0} />
+              </radialGradient>
+            </defs>
+            <rect x={0} y={0} width={fw} height={fh} fill="url(#desk-morning)" />
+            <Sun x={D.sun.x} y={D.sun.y} r={D.sun.r} opacity={1} />
+          </g>
+        )}
         <Floor y={D.floor.y} x={D.floor.x} w={D.floor.w} />
         {D.gauge.post > 0 && <rect x={D.gauge.x - 6} y={D.gauge.y} width={12} height={D.gauge.post} rx={4} fill={C.bg1} stroke={alpha(C.accentText, 0.6)} strokeWidth={3} />}
         <Gauge x={D.gauge.x} y={D.gauge.y} r={D.gauge.r} level={s.gauge} amber={s.amber} />
@@ -258,29 +316,28 @@ export const MemoryDesk: React.FC<AnimProps & MemoryDeskProps> = (p) => {
         </g>
         <Desk x={D.desk.x} y={D.desk.y} w={D.desk.w} lit={0.6 + 0.4 * s.deskLit} glowA={0.45 * s.deskLit * (1 - s.amber)} />
         <Rules x={D.rules.x} y={D.rules.y} opacity={s.rules} />
-        {/* the detail the summary is tested on, under the new pile */}
-        {s.detail > 0 && (
-          <g transform={`translate(${D.detail.x - ASIDE} ${D.detail.y}) rotate(-2)`} opacity={s.detail}>
-            <rect x={-130} y={-34} width={260} height={68} rx={8} fill={alpha(C.text, 0.92)} stroke={C.marker} strokeWidth={4} />
-            <text x={0} y={10} textAnchor="middle" fontSize={28} fontWeight={800} fill={C.bg0}>
-              {DETAIL_TEXT}
+        {pages.filter((pg) => pg.k < coverFrom).map(pageEl)}
+        <Slip x={slipAt.x} y={slipAt.y} w={220} rot={-4} opacity={s.slip.opacity * (1 - s.wipe)} glowA={s.slip.glow} />
+        {pages.filter((pg) => pg.k >= coverFrom).map(pageEl)}
+        {/* a new chat: the greeting, and the slip a memory feature could put back (dashed) */}
+        <Bubble x={D.greet.x} y={D.greet.y} side="ai" text={GREETING} size={D.greet.size} maxW={D.greet.maxW} opacity={s.greet} />
+        {s.ghost > 0 && (
+          <g opacity={s.ghost} transform={`translate(${D.ghost.x} ${D.ghost.y - 30 * (1 - s.ghost)}) rotate(-4)`}>
+            <rect x={-110} y={-40} width={220} height={80} rx={9} fill={alpha(C.marker, 0.12)} stroke={C.marker} strokeWidth={4} strokeDasharray="12 9" />
+            <text x={0} y={10} textAnchor="middle" fontSize={19} fontWeight={800} fill={alpha(C.marker, 0.9)}>
+              FLIGHT: FRIDAY
             </text>
           </g>
         )}
-        {pages.filter((pg) => pg.k < coverFrom).map(pageEl)}
-        <Slip x={slipAt.x} y={slipAt.y} w={220} rot={-4} opacity={s.slip.opacity} />
-        {pages.filter((pg) => pg.k >= coverFrom).map(pageEl)}
         {s.card.opacity > 0 && (
           <g transform={`translate(${D.card.x} ${D.card.y}) scale(${1 - 0.45 * s.card.shrink}) translate(${-D.card.x} ${-D.card.y})`}>
-            <Notecard x={D.card.x} y={D.card.y} w={D.card.w} opacity={s.card.opacity} text={CARD_TEXT} write={s.card.write} />
+            <g style={s.card.glow > 0.01 ? glow(C.warm, 0.7 * s.card.glow) : undefined}>
+              <Notecard x={D.card.x} y={D.card.y} w={D.card.w} opacity={s.card.opacity} text={CARD_TEXT} write={s.card.write} />
+            </g>
             <g transform={`translate(${D.card.x} ${D.card.y}) rotate(-3)`} opacity={s.card.opacity}>
-              {/* line 1 glowing: the one sentence that was enough */}
-              {s.card.glow > 0 && (
-                <rect x={-D.card.w / 2 + 8} y={-D.card.w * 0.19} width={D.card.w - 16} height={D.card.w * 0.16} rx={8} fill={alpha(C.ok, 0.25 * s.card.glow)} stroke={C.ok} strokeWidth={4} opacity={s.card.glow} style={glow(C.ok, s.card.glow)} />
-              )}
-              {/* line 2: the detail, kept by a recent model; lost on the older model's smaller card */}
+              {/* line 2: the correction, kept by a recent model; lost on the older model's smaller card */}
               {s.card.write2 > 0 && (
-                <text x={-D.card.w / 2 + 18} y={D.card.w * 0.06} fontSize={D.card.w * 0.084} fontWeight={700} fontStyle="italic" fill={C.marker} opacity={1 - s.card.shrink}>
+                <text x={-D.card.w / 2 + 18} y={D.card.w * 0.08} fontSize={D.card.w * 0.1} fontWeight={800} fontStyle="italic" fill={C.marker} opacity={1 - s.card.shrink}>
                   {DETAIL_TEXT.slice(0, Math.ceil(DETAIL_TEXT.length * s.card.write2))}
                 </text>
               )}
@@ -288,27 +345,30 @@ export const MemoryDesk: React.FC<AnimProps & MemoryDeskProps> = (p) => {
             <Badge x={D.card.x + D.card.w / 2 - 6} y={D.card.y - D.card.w * 0.3} r={28} kind="tick" pop={s.card.tick} />
           </g>
         )}
+        {/* will "Friday" make the cut? the slip hovers over the card being written, then drops in */}
+        {s.hover.opacity > 0 && (
+          <g>
+            <Slip x={hv.x} y={hv.y} w={lerp(200, 120, s.hover.drop)} rot={-6} opacity={s.hover.opacity} glowA={0.5} />
+            {s.hover.question > 0 && (
+              <text x={D.hover.q.x} y={D.hover.q.y} textAnchor="middle" fontSize={96} fontWeight={800} fill={C.warm} opacity={s.hover.question}>
+                ?
+              </text>
+            )}
+          </g>
+        )}
         <Clock x={D.clock.x} y={D.clock.y} r={D.clock.r} hour={720 * s.clock.spin} minute={8640 * s.clock.spin} opacity={s.clock.opacity} />
         {s.rows.opacity > 0 && (
           <g opacity={s.rows.opacity}>
-            {ROWS.map((r, i) => (
-              <TickRow key={r.label} x={D.rows.x} y={D.rows.y[i]} cell={D.rows.cell} gap={D.rows.gap} fill={s.rows.fill} misses={[r.miss]} label={r.label} labelColor={i === 0 ? C.text : C.muted} />
-            ))}
+            <TickRow x={D.rows.x} y={D.rows.y} cell={D.rows.cell} gap={D.rows.gap} fill={s.rows.fill} misses={[RECENT.miss]} label={RECENT.label} labelColor={C.text} />
           </g>
         )}
         {s.reds.opacity > 0 && (
           <g opacity={s.reds.opacity}>
-            <TickRow x={D.rows.x} y={D.rows.y[0]} cell={D.rows.cell} gap={D.rows.gap} fill={s.reds.fill} misses={OLD_REDS} reds label={OLD_LABEL} labelColor={C.muted} />
+            <TickRow x={D.rows.x} y={D.rows.y} cell={D.rows.cell} gap={D.rows.gap} fill={s.reds.fill} misses={OLD_REDS} reds label={OLD_LABEL} labelColor={C.muted} />
           </g>
         )}
-        <Bubble D={D} opacity={s.bubble.opacity} fade={s.bubble.fade} />
-        {s.inset.opacity > 0 && (
-          <g opacity={s.inset.opacity}>
-            <Rack x={D.inset.x} y={D.inset.y} w={D.inset.w} h={D.inset.h} pallets={[0, 1, 0]} upper={false} s={0.7} />
-            <Crate x={palX} y={palY} w={bw * 0.62} h={D.inset.h * 0.45} />
-            <Badge x={target.x + 70} y={D.inset.y + 30} r={30} kind="tick" pop={s.inset.tick} />
-          </g>
-        )}
+        <MeetingBubble D={D} opacity={s.bubble.opacity} fade={s.bubble.fade} />
+        <Calendar x={D.calendar.x} y={D.calendar.y} w={D.calendar.w} h={D.calendar.h} opacity={s.calendar.opacity} tick={s.calendar.tick} />
         {s.strips.opacity > 0 && (
           <g opacity={s.strips.opacity}>
             <Strip x={D.strips.x} y={D.strips.y[0]} cols={D.strips.cols} fill={s.strips.one} misses={MISSES_ONE} />

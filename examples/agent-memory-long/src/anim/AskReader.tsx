@@ -1,12 +1,12 @@
-// The ask-a-reader notebook (rows 33-35): the agent asks, a second robot reads the whole day,
-// finds the slip and passes it on; then the day outgrows the reader. See AskReader.state.ts.
+// The ask-a-helper notebook (rows 26-27): the robot asks, a second AI rereads the whole
+// conversation, finds the slip and passes it on; then the chat outgrows the helper. See AskReader.state.ts.
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import { C, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
 import { lerp } from './memory.ts';
-import { CAPACITY, PIECES, QUESTION, SLIP_INDEX, TABLE_HEAD, TABLE_ROWS, UNASKED, frameState, type AskReaderProps } from './AskReader.state.ts';
+import { CAPACITY, PIECES, QUESTION, SLIP_INDEX, frameState, type AskReaderProps } from './AskReader.state.ts';
 import { Badge, Desk, Floor, Frame, Notecard, Robot, Slip, glow } from './office.tsx';
 import { place } from './canvas.ts';
 
@@ -15,10 +15,9 @@ export type { AskReaderProps };
 
 /**
  * Layout (frame pixels), per format.
- * - landscape: the figures table top left; the agent and its clean desk bottom left with its
- *   question over its head; the reader behind at the right holding the stack; the split piles and
- *   the card in the reader's place.
- * - vertical: the table on top, the agent and the desk at the bottom left, the reader at the right.
+ * - landscape: the robot and its clean desk bottom left with its question over its head; the
+ *   helper behind at the right holding the stack; the split piles and the card in its place.
+ * - vertical: the robot and the desk at the bottom left, the helper at the right.
  */
 const LAYOUT = {
   v: {
@@ -28,10 +27,8 @@ const LAYOUT = {
     slipTo: { x: 470, y: 982 },
     tick: { x: 640, y: 940 },
     bubble: { x: 70, y: 770, w: 460, h: 96, tail: { x: 200, y: 900 }, size: 32 },
-    unasked: { x: 560, y: 790, w: 230, h: 64 },
     reader: { x: 790, s: 0.6 },
     stack: { x: 945, w: 140, bottom: 1130, thick: 9 },
-    table: { x: 90, y: 300, cols: [600, 860], rowY: [380, 456], head: 30, size: 48, label: 34 },
     pieces: { xs: [735, 845, 955], s: 0.24, pileW: 46, pileDx: 38, thick: 7 },
     card: { x: 760, y: 610, w: 230 },
     or: { x: 760, y: 740 },
@@ -44,10 +41,8 @@ const LAYOUT = {
     slipTo: { x: 640, y: 612 },
     tick: { x: 830, y: 572 },
     bubble: { x: 190, y: 398, w: 450, h: 96, tail: { x: 340, y: 512 }, size: 32 },
-    unasked: { x: 670, y: 414, w: 230, h: 64 },
     reader: { x: 1250, s: 0.72 },
     stack: { x: 1490, w: 210, bottom: 760, thick: 9 },
-    table: { x: 190, y: 200, cols: [520, 750], rowY: [268, 338], head: 30, size: 46, label: 34 },
     pieces: { xs: [1150, 1380, 1610], s: 0.32, pileW: 90, pileDx: 70, thick: 8 },
     card: { x: 1410, y: 320, w: 260 },
     or: { x: 1410, y: 460 },
@@ -66,8 +61,6 @@ export const AskReader: React.FC<AnimProps & AskReaderProps> = (p) => {
   const fx = lerp(slipFrom.x, L.slipTo.x, s.slip.fly);
   const fy = lerp(slipFrom.y, L.slipTo.y, s.slip.fly) - 200 * Math.sin(Math.PI * s.slip.fly);
   const Bu = L.bubble;
-  const U = L.unasked;
-  const Tb = L.table;
   const Pc = L.pieces;
   const agentY = L.floor.y - L.agent.s * 452;
   return (
@@ -152,42 +145,9 @@ export const AskReader: React.FC<AnimProps & AskReaderProps> = (p) => {
             </text>
           </g>
         )}
-        {/* the question it never asks */}
-        {s.bubble.unasked > 0 && (
-          <g opacity={s.bubble.unasked * 0.9}>
-            <rect x={U.x} y={U.y} width={U.w} height={U.h} rx={18} fill="none" stroke={alpha(C.muted, 0.6)} strokeWidth={3} strokeDasharray="10 8" />
-            <text x={U.x + U.w / 2} y={U.y + U.h / 2 + 10} textAnchor="middle" fontSize={28} fontWeight={700} fill={C.muted}>
-              {UNASKED}
-            </text>
-            <line x1={U.x + 20} x2={U.x + 20 + (U.w - 40) * s.bubble.strike} y1={U.y + U.h / 2} y2={U.y + U.h / 2} stroke={C.marker} strokeWidth={5} strokeLinecap="round" />
-          </g>
-        )}
         {/* the slip, copied into the answer, onto the desk */}
         <Slip x={fx} y={fy} w={lerp(120, 200, s.slip.fly)} rot={lerp(0, -4, s.slip.fly)} opacity={s.slip.opacity} glowA={0.5 * (1 - s.slip.fly)} />
         <Badge x={L.tick.x} y={L.tick.y} r={28} kind="tick" pop={s.slip.tick} />
-        {/* the figures */}
-        {s.table.opacity > 0 && (
-          <g opacity={s.table.opacity}>
-            {TABLE_HEAD.slice(1).map((h, i) => (
-              <text key={h} x={Tb.cols[i]} y={Tb.y} textAnchor="middle" fontSize={Tb.head} fontWeight={700} fill={i === 0 ? C.ok : C.muted}>
-                {h}
-              </text>
-            ))}
-            {TABLE_ROWS.map((row, r) => (
-              <g key={row[0]} opacity={s.table.rows[r]}>
-                <text x={Tb.x} y={Tb.rowY[r]} fontSize={Tb.label} fontWeight={700} fill={C.text}>
-                  {row[0]}
-                </text>
-                <text x={Tb.cols[0]} y={Tb.rowY[r]} textAnchor="middle" fontSize={Tb.size} fontWeight={800} fill={C.ok}>
-                  {row[1]}
-                </text>
-                <text x={Tb.cols[1]} y={Tb.rowY[r]} textAnchor="middle" fontSize={Tb.size} fontWeight={800} fill={C.muted}>
-                  {row[2]}
-                </text>
-              </g>
-            ))}
-          </g>
-        )}
       </Frame>
     </AbsoluteFill>
   );

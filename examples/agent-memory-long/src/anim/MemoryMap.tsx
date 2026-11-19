@@ -6,8 +6,8 @@ import { C, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
 import { CARD_TEXT } from './MemoryDesk.state.ts';
-import { SHELF0 } from './memory.ts';
-import { MAP_TITLE, TILES, frameState, type MemoryMapProps, type TileKind } from './MemoryMap.state.ts';
+import { FLIGHT, OLD_DAY } from './memory.ts';
+import { MAP_TITLE, SAFEST, TILES, frameState, type MemoryMapProps, type TileKind } from './MemoryMap.state.ts';
 import { place } from './canvas.ts';
 import { RECIPE } from './MemoryOffice.state.ts';
 import { Badge, BookShelf, Cabinet, Desk, Frame, Lens, MiniClipboard, Notecard, Page, Robot, Slip, glow } from './office.tsx';
@@ -120,17 +120,17 @@ const Picture: React.FC<{ kind: TileKind }> = ({ kind }) => {
       </g>
     );
   return (
-    // a form box that says "full", ticked with the same confidence as a right value
+    // the FLIGHT box with the old day written back in, ticked as confidently as a right value
     <g>
       <MiniClipboard x={18} y={140} w={128} h={164} lit={1} />
-      <text x={172} y={182} fontSize={32} fontWeight={800} fill={C.muted} letterSpacing={1}>
-        {SHELF0}
+      <text x={166} y={182} fontSize={32} fontWeight={800} fill={C.muted} letterSpacing={1}>
+        {FLIGHT}
       </text>
-      <rect x={168} y={198} width={190} height={100} rx={14} fill={C.bg1} stroke={alpha(C.text, 0.85)} strokeWidth={5} />
-      <text x={263} y={270} textAnchor="middle" fontSize={66} fontWeight={800} fill={C.text}>
-        full
+      <rect x={162} y={198} width={214} height={100} rx={14} fill={C.bg1} stroke={alpha(C.text, 0.85)} strokeWidth={5} />
+      <text x={269} y={264} textAnchor="middle" fontSize={50} fontWeight={800} fill={C.marker}>
+        {OLD_DAY}
       </text>
-      <Badge x={396} y={248} r={32} kind="tick" pop={1} />
+      <Badge x={410} y={248} r={30} kind="tick" pop={1} />
     </g>
   );
 };
@@ -169,10 +169,22 @@ export const MemoryMap: React.FC<AnimProps & MemoryMapProps> = (p) => {
                   <g style={glow(C.accentText, e)}>
                     <rect x={0} y={0} width={TILE.w} height={TILE.h} rx={28} fill={C.card} stroke={alpha(C.accentText, 0.45 + 0.55 * e)} strokeWidth={4 + 2 * e} />
                   </g>
-                  <text x={TILE.w / 2} y={80} textAnchor="middle" fontSize={64} fontWeight={800} fill={C.text} letterSpacing={1}>
-                    {tile.label}
-                  </text>
-                  <Picture kind={tile.kind} />
+                  {s.labels > 0 && (
+                    <text x={TILE.w / 2} y={80} textAnchor="middle" fontSize={64} fontWeight={800} fill={C.text} letterSpacing={1} opacity={s.labels}>
+                      {tile.label}
+                    </text>
+                  )}
+                  <g opacity={i === SAFEST ? 1 - 0.75 * s.flicker : 1}>
+                    <Picture kind={tile.kind} />
+                  </g>
+                  {i === SAFEST && s.question > 0 && (
+                    <g opacity={s.question}>
+                      <circle cx={TILE.w - 52} cy={60} r={42} fill={C.warm} style={glow(C.warm, 0.6)} />
+                      <text x={TILE.w - 52} y={84} textAnchor="middle" fontSize={68} fontWeight={800} fill={C.bg0}>
+                        ?
+                      </text>
+                    </g>
+                  )}
                 </g>
               )}
             </g>
@@ -186,7 +198,7 @@ export const MemoryMap: React.FC<AnimProps & MemoryMapProps> = (p) => {
             {MAP_TITLE}
           </text>
         )}
-        {/* the recipe from chapter 7, small, beside the map */}
+        {/* the recipe from chapter 6, small, beside the map */}
         {R && s.recipe > 0 && (
           <g opacity={s.recipe}>
             {R.head && (

@@ -1,4 +1,4 @@
-// The robot's office: every kind of memory at once (the verdict and the recipe, rows 49-53).
+// The robot's office: every kind of memory at once (the verdict and the recipe, rows 35-38).
 // See MemoryOffice.state.ts.
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
@@ -7,9 +7,10 @@ import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
 import { lerp } from './memory.ts';
 import { CARD_TEXT } from './MemoryDesk.state.ts';
-import { ADVICE_LINE, RECIPE, frameState, type MemoryOfficeProps } from './MemoryOffice.state.ts';
+import { ADVICE_LINE, FRIDGE_NOTE, RECIPE, UNTESTED, frameState, type MemoryOfficeProps } from './MemoryOffice.state.ts';
 import { place } from './canvas.ts';
 import { Badge, Cabinet, Crack, Desk, Floor, Frame, Lens, MiniClipboard, Nail, Notecard, Page, Robot, Slip } from './office.tsx';
+import { OLD_DAY } from './memory.ts';
 
 export { frameState };
 export type { MemoryOfficeProps };
@@ -33,7 +34,6 @@ const LAYOUT = {
     line: { x: 540, y: 1282, size: 36, anchor: 'middle' as 'middle' | 'start' },
     human: { x: 110, y: 300, gap: 190, s: 0.8 },
     recipe: null as null | { x: number; y: number; gap: number; size: number },
-    record: { x: 880, y: 680 },
   },
   l: {
     floor: { y: 800, x: 200, w: 1100 },
@@ -45,14 +45,13 @@ const LAYOUT = {
     slipHeld: { x: 560, y: 252, w: 230, rot: -8 },
     line: { x: 1310, y: 250, size: 32, anchor: 'start' as 'middle' | 'start' },
     human: { x: 1400, y: 260, gap: 185, s: 0.9 },
-    recipe: { x: 1310, y: 320, gap: 92, size: 26 } as null | { x: number; y: number; gap: number; size: number },
-    record: { x: 1185, y: 620 },
+    recipe: { x: 1340, y: 330, gap: 100, size: 34 } as null | { x: number; y: number; gap: number; size: number },
   },
 };
 
 const dimmed = (lit: number) => 0.32 + 0.68 * lit;
 
-/** The human version: a head with a card in it, a notebook, a note on the fridge (each 0..1). */
+/** The human version: a head with a card in it, an inbox, a note on the fridge (each 0..1). */
 const Human: React.FC<{ x: number; y: number; gap: number; s: number; show: number[]; vertical: boolean }> = ({ x, y, gap, s, show, vertical }) => {
   const at = (i: number) => (vertical ? { x: x + i * gap, y } : { x, y: y + i * gap });
   const [a, b, c] = show;
@@ -72,14 +71,11 @@ const Human: React.FC<{ x: number; y: number; gap: number; s: number; show: numb
       )}
       {b > 0 && (
         <g opacity={b} transform={`translate(${p1.x} ${p1.y}) scale(${s})`}>
-          {/* a notebook with a spiral */}
-          <rect x={20} y={0} width={120} height={150} rx={10} fill={C.card} stroke={C.accentText} strokeWidth={6} />
-          {[0, 1, 2, 3, 4].map((i) => (
-            <circle key={i} cx={20} cy={20 + i * 27} r={8} fill="none" stroke={C.muted} strokeWidth={4} />
-          ))}
-          {[0, 1, 2, 3].map((i) => (
-            <rect key={i} x={44} y={34 + i * 26} width={i === 3 ? 50 : 76} height={6} rx={3} fill={alpha(C.muted, 0.7)} />
-          ))}
+          {/* an inbox: a tray with envelopes */}
+          <rect x={30} y={20} width={110} height={74} rx={8} fill={C.card} stroke={C.accentText} strokeWidth={5} transform="rotate(-8 85 57)" />
+          <path d="M 36 26 L 85 62 L 134 26" fill="none" stroke={C.accentText} strokeWidth={5} transform="rotate(-8 85 57)" />
+          <path d="M 10 90 H 52 L 64 112 H 106 L 118 90 H 160 V 150 H 10 Z" fill={C.card} stroke={C.accentText} strokeWidth={6} strokeLinejoin="round" />
+          <circle cx={140} cy={22} r={14} fill={C.marker} />
         </g>
       )}
       {c > 0 && (
@@ -90,9 +86,13 @@ const Human: React.FC<{ x: number; y: number; gap: number; s: number; show: numb
           <rect x={120} y={10} width={8} height={28} rx={4} fill={C.muted} />
           <rect x={120} y={66} width={8} height={40} rx={4} fill={C.muted} />
           <g transform="rotate(-6 70 100)">
-            <rect x={40} y={70} width={66} height={60} rx={4} fill={C.warm} />
-            <rect x={48} y={86} width={48} height={5} fill={alpha(C.bg0, 0.5)} />
-            <rect x={48} y={100} width={36} height={5} fill={alpha(C.bg0, 0.5)} />
+            <rect x={28} y={66} width={104} height={70} rx={4} fill={C.warm} />
+            <text x={80} y={96} textAnchor="middle" fontSize={22} fontWeight={800} fill={C.bg0}>
+              {FRIDGE_NOTE.split(' ')[0]}
+            </text>
+            <text x={80} y={124} textAnchor="middle" fontSize={22} fontWeight={800} fill={C.bg0}>
+              {FRIDGE_NOTE.split(' ')[1]}
+            </text>
           </g>
         </g>
       )}
@@ -122,11 +122,9 @@ export const MemoryOffice: React.FC<AnimProps & MemoryOfficeProps> = (p) => {
         {/* clipboard on the wall: fixed boxes */}
         <g opacity={dimmed(clip)}>
           <Nail x={O.clip.x + O.clip.w / 2} y={O.clip.y - 46} w={O.clip.w} lit={clip} />
-          <MiniClipboard x={O.clip.x} y={O.clip.y} w={O.clip.w} h={O.clip.h} lit={clip} value={cClip > 0.3 ? 'full' : undefined} tick={cClip} />
+          <MiniClipboard x={O.clip.x} y={O.clip.y} w={O.clip.w} h={O.clip.h} lit={clip} value={cClip > 0.3 ? OLD_DAY.slice(0, 3) : undefined} tick={cClip} />
           <Crack x={O.clip.x + 30} y={O.clip.y + 20} w={O.clip.w - 60} h={O.clip.h - 40} p={cClip} />
         </g>
-        {/* the day's record beside the clipboard ("some models") */}
-        {s.record > 0 && [0, 1, 2].map((k) => <Page key={k} x={O.record.x + 10 * k} y={O.record.y - 18 * k} w={130} rot={-8 + 6 * k} opacity={s.record} />)}
         {/* filing cabinet: the notebook it can search */}
         <g opacity={dimmed(cabinet)}>
           <Cabinet x={O.cabinet.x} y={O.cabinet.y} w={O.cabinet.w} h={O.cabinet.h} lit={cabinet} open={90} peek={cCab} peekDrawer={1} />
@@ -188,16 +186,17 @@ export const MemoryOffice: React.FC<AnimProps & MemoryOfficeProps> = (p) => {
           RECIPE.map((item, i) =>
             s.recipe[i] > 0 ? (
               <g key={item} opacity={s.recipe[i]}>
-                <circle cx={O.recipe!.x + 20} cy={O.recipe!.y + i * O.recipe!.gap + 30} r={20} fill={i === 2 ? alpha(C.ok, 0.5) : C.ok} />
-                <text x={O.recipe!.x + 20} y={O.recipe!.y + i * O.recipe!.gap + 39} textAnchor="middle" fontSize={24} fontWeight={800} fill={C.bg0}>
-                  {i + 1}
-                </text>
-                <text x={O.recipe!.x + 54} y={O.recipe!.y + i * O.recipe!.gap + 41} fontSize={O.recipe!.size} fontWeight={800} fill={i === 2 ? alpha(C.text, 0.8) : C.text}>
-                  {item}
+                <text x={O.recipe!.x + (i ? 0 : 0)} y={O.recipe!.y + i * O.recipe!.gap + 41} fontSize={O.recipe!.size} fontWeight={800} fill={C.text}>
+                  {(i ? '+ ' : '') + item}
                 </text>
               </g>
             ) : null,
           )}
+        {O.recipe && s.untested > 0 && (
+          <text x={O.recipe.x} y={O.recipe.y + RECIPE.length * O.recipe.gap + 30} fontSize={28} fontWeight={600} fontStyle="italic" fill={C.muted} opacity={s.untested}>
+            {UNTESTED}
+          </text>
+        )}
       </Frame>
     </AbsoluteFill>
   );

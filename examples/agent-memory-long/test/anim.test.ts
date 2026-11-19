@@ -7,16 +7,12 @@ import * as quote from '../src/anim/KeyQuote.state.ts';
 import * as grid from '../src/anim/StatGrid.state.ts';
 import * as office from '../src/anim/MemoryOffice.state.ts';
 import * as map from '../src/anim/MemoryMap.state.ts';
-import * as warehouse from '../src/anim/WarehouseShelves.state.ts';
 import * as head from '../src/anim/HeadShelf.state.ts';
 import * as desk from '../src/anim/MemoryDesk.state.ts';
 import * as cabinet from '../src/anim/FilingCabinet.state.ts';
 import * as form from '../src/anim/ClipboardForm.state.ts';
-import * as replay from '../src/anim/ReplayBars.state.ts';
-import * as jobs from '../src/anim/TwoJobs.state.ts';
-import * as restart from '../src/anim/RestartIterate.state.ts';
 import * as reader from '../src/anim/AskReader.state.ts';
-import * as replayFix from '../src/anim/CorrectionReplay.state.ts';
+import * as chat from '../src/anim/ChatTrip.state.ts';
 
 // Fields that are animation progress and must stay within [0, 1].
 const PROGRESS = new Set(['progress', 'appear', 'grow', 'fill', 'draw', 'pop', 'opacity', 'emphasis']);
@@ -72,15 +68,12 @@ const CASES: Case[] = [
   ]),
   { name: 'MemoryMap', state: (t, b, d) => map.frameState({}, t, b, d) },
   { name: 'MemoryMap reveal', state: (t, b, d) => map.frameState({ mode: 'reveal' }, t, b, d) },
-  { name: 'MemoryMap reveal (marks)', state: (t, b, d) => map.frameState({ mode: 'reveal', marks: [1, 2, 3, 4, 5, 6] }, t, b, d) },
+  { name: 'MemoryMap reveal (marks)', state: (t, b, d) => map.frameState({ mode: 'reveal', marks: [1, 2, 3, 4, 5, 6, 7] }, t, b, d) },
+  { name: 'MemoryMap reveal, no labels (marks out of order)', state: (t, b, d) => map.frameState({ mode: 'reveal', labels: false, marks: [5, 1, 3, Number.NaN, 2, 0.5, 0.1] }, t, b, d) },
   { name: 'MemoryMap (marks, one broken)', state: (t, b, d) => map.frameState({ marks: [0.9, Number.NaN, 4] }, t, b, d) },
   { name: 'MemoryMap (marks out of order)', state: (t, b, d) => map.frameState({ marks: [3, 1, 0.5] }, t, b, d) },
-  ...warehouse.WAREHOUSE_MODES.flatMap((mode) => [
-    { name: `WarehouseShelves ${mode}`, state: (t: number, b: number[], d: number) => warehouse.frameState({ mode }, t, b, d) },
-    { name: `WarehouseShelves ${mode} (marks)`, state: (t: number, b: number[], d: number) => warehouse.frameState({ mode, marks: [3, 0.2] }, t, b, d) },
-  ]),
   { name: 'HeadShelf', state: (t, b, d) => head.frameState({}, t, b, d) },
-  { name: 'HeadShelf (marks out of order)', state: (t, b, d) => head.frameState({ marks: [2, 1, 3, 0.5, 0.1] }, t, b, d) },
+  { name: 'HeadShelf (marks out of order)', state: (t, b, d) => head.frameState({ marks: [2, 1, 3, 0.5, 0.1, 4, 1, Number.NaN, 0.2] }, t, b, d) },
   ...desk.DESK_MODES.flatMap((mode) => [
     { name: `MemoryDesk ${mode}`, state: (t: number, b: number[], d: number) => desk.frameState({ mode }, t, b, d) },
     { name: `MemoryDesk ${mode} (marks)`, state: (t: number, b: number[], d: number) => desk.frameState({ mode, marks: [1, 1, 1, 1, 1] }, t, b, d) },
@@ -93,16 +86,12 @@ const CASES: Case[] = [
     { name: `ClipboardForm ${mode}`, state: (t: number, b: number[], d: number) => form.frameState({ mode }, t, b, d) },
     { name: `ClipboardForm ${mode} (marks)`, state: (t: number, b: number[], d: number) => form.frameState({ mode, marks: [0.3, 0.3, 0.3, 0.3, 0.3] }, t, b, d) },
   ]),
-  { name: 'ReplayBars', state: (t, b, d) => replay.frameState({}, t, b, d) },
-  { name: 'ReplayBars (marks out of order, one broken)', state: (t, b, d) => replay.frameState({ marks: [3, 1, Number.NaN, 0.5, 0.2] }, t, b, d) },
-  { name: 'TwoJobs', state: (t, b, d) => jobs.frameState({}, t, b, d) },
-  { name: 'TwoJobs (marks out of order, one broken)', state: (t, b, d) => jobs.frameState({ marks: [4, 1, Number.NaN, 0.2, 0.1] }, t, b, d) },
-  { name: 'RestartIterate', state: (t, b, d) => restart.frameState({}, t, b, d) },
-  { name: 'RestartIterate (marks out of order, one broken)', state: (t, b, d) => restart.frameState({ marks: [5, 1, Number.NaN, 0.2, 9, 0.1] }, t, b, d) },
   { name: 'AskReader', state: (t, b, d) => reader.frameState({}, t, b, d) },
-  { name: 'AskReader (marks out of order, one broken)', state: (t, b, d) => reader.frameState({ marks: [9, 1, Number.NaN, 0.2, 3, 0.1, 2, 8, 1, 0.5, 4, 0.3] }, t, b, d) },
-  { name: 'CorrectionReplay', state: (t, b, d) => replayFix.frameState({}, t, b, d) },
-  { name: 'CorrectionReplay (marks out of order, one broken)', state: (t, b, d) => replayFix.frameState({ marks: [5, 1, Number.NaN, 0.2, 9, 0.1, 2, 8, 1, 0.5] }, t, b, d) },
+  { name: 'AskReader (marks out of order, one broken)', state: (t, b, d) => reader.frameState({ marks: [9, 1, Number.NaN, 0.2, 3, 0.1, 2, 8, 1, 0.5] }, t, b, d) },
+  ...chat.CHAT_MODES.flatMap((mode) => [
+    { name: `ChatTrip ${mode}`, state: (t: number, b: number[], d: number) => chat.frameState({ mode }, t, b, d) },
+    { name: `ChatTrip ${mode} (marks out of order, one broken)`, state: (t: number, b: number[], d: number) => chat.frameState({ mode, marks: [3, 1, Number.NaN, 0.2] }, t, b, d) },
+  ]),
 ];
 
 const SCENARIOS = [
@@ -254,7 +243,7 @@ test('MemoryMap all: every tile and the title on screen from frame 0', () => {
 });
 
 test('MemoryMap reveal: each tile is drawn on its mark and stays on; the title comes last', () => {
-  const marks = [10, 11, 12, 13, 14, 16];
+  const marks = [10, 11, 12, 13, 14, 16, 19];
   const at = (t: number) => map.frameState({ mode: 'reveal', marks }, t, [0.2, 8, 16], 22);
   // Before the first name: only the empty frames, no tile, no title.
   const early = at(5);
@@ -288,144 +277,93 @@ test('MemoryMap reveal: marks out of order or missing never show a tile before t
   assert.deepEqual(s(12).opacity, [1, 1, 1, 1, 1]);
 });
 
-test('ReplayBars: the terminal bar rises and the general bars sink, then replay wins ~73% back', () => {
-  const marks = [3, 6, 7.5, 10.5, 13];
-  const at = (t: number) => replay.frameState({ marks }, t, [0.3, 10.3], 18);
-  const start = at(0.5);
-  assert.equal(start.bars.terminal, replay.TERMINAL.before);
-  assert.deepEqual(start.bars.general, [...replay.GENERAL_BASE]);
-  assert.equal(start.stream.old, 0);
-  assert.equal(start.labelMix, 0);
-  // After "worse": the terminal task learned, everything else sunk by its full drop.
-  const sunk = at(10);
-  assert.ok(Math.abs(sunk.bars.terminal - replay.TERMINAL.after) < 1e-9);
-  sunk.bars.general.forEach((g, i) => assert.ok(Math.abs(g - (replay.GENERAL_BASE[i] - replay.GENERAL_DROP[i])) < 1e-9, `bar ${i} sunk`));
-  assert.equal(sunk.labelWon, 0);
-  // Old reading mixes in on "mixing"; the label's first half comes with it, the second on "won".
-  assert.ok(at(11.5).stream.old > 0.99);
-  assert.ok(at(11.5).labelMix > 0.99);
-  assert.equal(at(12.9).labelWon, 0);
-  // End: each bar has won back RECOVERED of its loss; the terminal task kept.
-  const end = at(18);
-  assert.ok(Math.abs(end.bars.terminal - replay.TERMINAL.after) < 1e-9);
-  end.bars.general.forEach((g, i) => {
-    const lost = replay.GENERAL_BASE[i] - g;
-    assert.ok(Math.abs(lost - replay.GENERAL_DROP[i] * (1 - replay.RECOVERED)) < 1e-9, `bar ${i} recovered`);
-  });
-  assert.equal(end.labelWon, 1);
-  assert.equal(replay.LABEL_MIX + ' ' + replay.LABEL_WON, '10% old reading → ~73% of the loss recovered');
-});
-
-test('TwoJobs: the plan is read and repeated, the arrow is drawn anyway, then the slip lands on the desk', () => {
-  const marks = [6, 7.4, 9, 10.5, 16];
-  const at = (t: number) => jobs.frameState({ marks }, t, [0.3, 12.9], 19);
-  const early = at(1);
-  assert.ok(early.plan.opacity > 0.99);
-  assert.equal(early.plan.lit, 0);
-  assert.equal(early.bubble.opacity, 0);
-  assert.equal(early.arrow.draw, 0);
-  assert.equal(early.desk, 0);
-  assert.equal(early.slip.opacity, 0);
-  // The bubble repeats the plan before the arrow is drawn.
-  assert.ok(at(8.5).bubble.opacity > 0.99);
-  assert.equal(at(8.5).arrow.draw, 0);
-  assert.ok(at(10.2).arrow.draw > 0.99);
-  assert.ok(at(11).arrow.tag > 0.99);
-  // Line 1: everything clears for the desk; the slip is on it by "lands".
-  const end = at(19);
-  assert.equal(end.clear, 1);
-  assert.equal(end.plan.opacity, 0);
-  assert.equal(end.desk, 1);
-  assert.equal(end.slip.drop, 1);
-  assert.ok(at(16.5).slip.drop > 0.99);
-  assert.ok(at(14).slip.drop < 0.9);
-});
-
-test('RestartIterate: sweep and patch on their words, bars 86% vs 69%, the swept thing vanishes on "throwing"', () => {
-  const marks = [3, 5, 7, 10, 12, 14];
-  const at = (t: number) => restart.frameState({ marks }, t, [0.3, 8.8], 18);
-  assert.deepEqual(restart.BARS.map((b) => `${b.label} ${b.display}`), ['keep going 86%', 'start over 69%']);
-  assert.equal(restart.BARS_CAPTION, 'share of tasks solved');
-  const early = at(1);
-  assert.equal(early.crack.sweep, 0);
-  assert.equal(early.swept, 0);
-  assert.equal(early.blocks, restart.BUILT);
-  assert.equal(early.bars.opacity, 0);
-  // "clear": the pages go; the thing stays until "throwing".
-  assert.equal(at(7).swept, 1);
-  assert.equal(at(13).gone, 0);
-  // "keep": a block goes in and the crack closes.
-  assert.equal(at(8.5).blocks, restart.BUILT + 1);
-  assert.equal(at(8.5).crack.patch, 0);
-  assert.equal(at(9).bars.opacity, 0);
-  const end = at(18);
-  assert.deepEqual(end.bars.grow, [1, 1]);
-  assert.equal(end.blocks, restart.SLOTS);
-  assert.equal(end.tick, 1);
-  assert.equal(end.gone, 1);
-});
-
-test('AskReader: ask, read down to the slip, pass it to the desk, the figures, then the long day splits', () => {
-  const marks = [4, 6, 8, 12, 16, 17.5, 18.5, 23, 26, 31, 32.5, 34.5];
-  const at = (t: number) => reader.frameState({ marks }, t, [0.3, 11, 21.5], 38);
-  assert.deepEqual(reader.TABLE_ROWS.map((r) => r.join(' ')), ['detail 10/11 3/8', 'correction 4/6 2/6']);
-  assert.deepEqual(reader.TABLE_HEAD.slice(1), ['ask a reader', 'keyword search']);
+test('AskReader: ask, reread down to the slip, pass it to the desk, then the long chat splits', () => {
+  // marks: [asks, helper, reread, ran, passed, whole, long, fills, back, guessing]
+  const marks = [4, 6, 8, 12, 16, 22, 25, 30, 32.5, 34.5];
+  const at = (t: number) => reader.frameState({ marks }, t, [0.3, 19.5], 38);
+  assert.equal(reader.QUESTION, "when's the flight?");
   const early = at(2);
   assert.equal(early.bubble.opacity, 0);
   assert.equal(early.reader.opacity, 0);
   assert.equal(early.slip.opacity, 0);
-  assert.equal(early.table.opacity, 0);
   // The scan runs down from the top and stops on the slip at "ran".
   assert.ok(at(9).scan.index > reader.SLIP_INDEX);
   assert.equal(at(16.5).scan.index, reader.SLIP_INDEX);
   assert.ok(at(16.6).stack.found > 0.9);
-  // The slip reaches the desk, the table comes in after it.
-  assert.equal(at(17).slip.fly, 0);
-  assert.equal(at(19).slip.fly, 1);
-  assert.equal(at(18).table.opacity, 0);
-  assert.ok(at(20).table.rows.every((r) => r === 1));
-  // The long day passes the reader's capacity before it splits.
-  assert.equal(at(25).stack.pages, reader.PAGES);
-  assert.ok(at(30.5).stack.pages > reader.CAPACITY);
-  assert.equal(at(30.5).split, 0);
+  // The slip reaches the desk.
+  assert.equal(at(15.8).slip.fly, 0);
+  assert.equal(at(17.5).slip.fly, 1);
+  assert.ok(at(18).slip.tick > 0.99);
+  // The long chat passes the helper's capacity before it splits.
+  assert.equal(at(24).stack.pages, reader.PAGES);
+  assert.ok(at(29.5).stack.pages > reader.CAPACITY);
+  assert.equal(at(29.5).split, 0);
   const end = at(38);
   assert.equal(end.split, 1);
   assert.equal(end.reader.opacity, 0);
   assert.equal(end.card, 1);
   assert.equal(end.question, 1);
-  assert.equal(end.slip.tick, 1);
-  assert.equal(end.table.opacity, 1);
 });
-
-test('CorrectionReplay: 12/12 vs 3/12, the replay of the pallet leaving, then 12/12 vs 10/12', () => {
-  const marks = [2.5, 4, 6, 9, 12, 14, 16, 19.5, 25, 26.5];
-  const at = (t: number) => replayFix.frameState({ marks }, t, [1.3, 11.3, 24], 32);
-  assert.equal(at(1).bars.opacity, 0);
-  const before = at(10);
-  assert.equal(before.bars.form, 1);
-  assert.equal(before.bars.record, 1);
-  assert.equal(before.bars.text, '3/12');
-  assert.equal(before.bars.recordValue, replayFix.RECORD.before);
-  assert.ok(before.question > 0.99);
-  assert.equal(before.replay.opacity, 0);
-  // Line 1: the pallet named on the slip leaves in the replay; the robot frowns after.
-  assert.ok(at(15).slip.icon > 0.99);
-  assert.ok(at(18).replay.leave > 0.9);
-  assert.equal(at(18).robot.frown, 0);
-  assert.ok(at(20.5).robot.frown > 0.99);
-  assert.equal(at(20.5).bars.text, '3/12');
-  // Line 2: the fixed message; the record redraws to 10/12, the form stays 12/12.
-  const end = at(32);
-  assert.equal(end.bars.text, '10/12');
-  assert.equal(end.bars.recordValue, replayFix.RECORD.after);
-  assert.equal(end.bars.form, 1);
-  assert.equal(end.replay.opacity, 0);
-  assert.equal(end.slip.icon, 0);
-  assert.equal(end.slip.tick, 1);
-  assert.equal(end.fixedTag, 1);
+test('MemoryMap reveal: the notebook tile flickers on "safest" and keeps its "?"; labels hidden on request', () => {
+  const marks = [10, 11, 12, 13, 14, 16, 19];
+  const at = (t: number, labels?: boolean) => map.frameState({ mode: 'reveal', marks, labels }, t, [0.2, 8, 16], 22);
+  assert.equal(map.SAFEST, 3);
+  assert.equal(map.TILES[map.SAFEST].kind, 'notebook');
+  assert.equal(at(18.8).question, 0);
+  assert.equal(at(18.8).flicker, 0);
+  assert.ok(at(19.4).question > 0.99);
+  let flickered = false;
+  for (let t = 19; t < 19.9; t += 0.02) if (at(t).flicker > 0.9) flickered = true;
+  assert.ok(flickered);
+  assert.equal(at(21).flicker, 0);
+  assert.equal(at(22).question, 1);
+  assert.equal(at(12).labels, 1);
+  for (const t of [0, 12, 22]) assert.equal(at(t, false).labels, 0);
+  // The closing map ('all') has no "?".
+  assert.equal(map.frameState({ recipe: true }, 3, [0.2], 6).question, 0);
 });
 
 test('MemoryMap recipe: the recipe stays on from frame 0 only when asked for', () => {
   assert.equal(map.frameState({}, 0, [0.2], 6).recipe, 0);
   for (const t of [-1, 0, 3, 6, 9]) assert.equal(map.frameState({ recipe: true }, t, [0.2], 6).recipe, 1);
+});
+
+test('ChatTrip wrong: the whole chat and the red Thursday booking are on screen from frame 0', () => {
+  const s0 = chat.frameState({ mode: 'wrong' }, 0, [0.1], 6);
+  assert.equal(s0.chat.opacity, 1);
+  assert.ok(s0.chat.alert >= 0.1, 'the wrong booking pulses from the first frame');
+  for (let t = 0; t < 6; t += 0.05) assert.ok(chat.frameState({ mode: 'wrong' }, t, [0.1], 6).chat.alert > 0.09, `alert never fully off at ${t}`);
+  assert.equal(s0.wipe, 0);
+  // Each bubble lights on its own word.
+  const marks = [0.6, 2.2, 4.0];
+  const at = (t: number) => chat.frameState({ mode: 'wrong', marks }, t, [0.1], 6);
+  assert.ok(at(1.2).chat.lit[0] > 0.8);
+  assert.ok(at(2.8).chat.lit[1] > 0.8);
+  assert.equal(at(0.2).chat.lit[1], 0);
+  assert.equal(chat.CORRECTION, 'Change of plan: my flight is Friday, not Thursday.');
+  assert.equal(chat.GOT_IT, 'Got it!');
+  assert.equal(chat.BOOKING, 'Booked your hotel for Thursday night');
+});
+
+test('ChatTrip morning: the old chat until "tomorrow", then a wipe to the fresh greeting', () => {
+  const at = (t: number) => chat.frameState({ mode: 'morning', marks: [1.2, 3] }, t, [0.2], 5);
+  assert.equal(at(0).wipe, 0);
+  assert.equal(at(0).chat.opacity, 1);
+  assert.equal(at(0.9).greeting, 0);
+  assert.equal(at(2.5).wipe, 1);
+  assert.equal(at(2.5).chat.opacity, 0);
+  assert.ok(at(2.5).greeting > 0.99);
+  assert.equal(chat.GREETING, 'Hi! How can I help you today?');
+});
+
+test('ChatTrip save: typed, sent, then the line appears in the Memory panel', () => {
+  const at = (t: number) => chat.frameState({ mode: 'save', marks: [2, 4, 7, 12] }, t, [0.2], 15);
+  assert.ok(at(1).panel > 0.99, 'the panel is there from the start');
+  assert.equal(at(3.5).typed, 0);
+  assert.ok(at(5.5).typed > 0.3 && at(5.5).typed < 1);
+  assert.equal(at(5.5).sent, 0);
+  assert.equal(at(6.5).note.opacity, 0);
+  assert.ok(at(8.5).sent > 0.99 && at(8.5).note.opacity > 0.99);
+  assert.ok(at(13).note.lit > 0.99);
+  assert.equal(chat.SAVE_LINE, 'Save to memory: my flight is Friday.');
 });
