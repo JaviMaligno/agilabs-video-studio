@@ -92,15 +92,23 @@ for (const voice of SETTINGS.voices) {
     }
     manifest.youtubeChapters.push({ file: chaptersFile, voice, chapters: yt.chapters, warnings: yt.warnings });
 
-    // YouTube thumbnail: the landscape composition without captions, scaled to 1280x720.
-    const thumb = posterFrame(scenes, SETTINGS.thumbnail ?? SETTINGS.poster);
+    // YouTube thumbnail, 1280x720. A designed one (cover/thumbnail-<voice>.png: illustrated art plus
+    // a headline, see "The cover is a designed image") wins; otherwise the landscape composition
+    // without captions at SETTINGS.thumbnail, as a placeholder.
     const thumbFile = `thumbnail-${voice}.png`;
-    const full = at('out', `_thumbnail-${voice}-full.png`);
-    const lprops = JSON.stringify({ voice, subs, vertical: false, noSubs: true });
-    remotion(['still', 'src/index.ts', `Main-${voice.toUpperCase()}-landscape`, full, `--frame=${thumb.frame}`, `--props=${lprops}`]);
-    ffmpegReport(['-y', '-i', full, '-vf', 'scale=1280:720:flags=lanczos', at('out', thumbFile)]);
-    fs.rmSync(full);
-    manifest.thumbnails.push({ file: thumbFile, voice, width: 1280, height: 720, ...thumb });
+    const designed = at('cover', thumbFile);
+    if (fs.existsSync(designed)) {
+      ffmpegReport(['-y', '-i', designed, '-vf', 'scale=1280:720:flags=lanczos', at('out', thumbFile)]);
+      manifest.thumbnails.push({ file: thumbFile, voice, width: 1280, height: 720, source: `cover/${thumbFile}` });
+    } else {
+      const thumb = posterFrame(scenes, SETTINGS.thumbnail ?? SETTINGS.poster);
+      const full = at('out', `_thumbnail-${voice}-full.png`);
+      const lprops = JSON.stringify({ voice, subs, vertical: false, noSubs: true });
+      remotion(['still', 'src/index.ts', `Main-${voice.toUpperCase()}-landscape`, full, `--frame=${thumb.frame}`, `--props=${lprops}`]);
+      ffmpegReport(['-y', '-i', full, '-vf', 'scale=1280:720:flags=lanczos', at('out', thumbFile)]);
+      fs.rmSync(full);
+      manifest.thumbnails.push({ file: thumbFile, voice, width: 1280, height: 720, ...thumb });
+    }
   }
 }
 
