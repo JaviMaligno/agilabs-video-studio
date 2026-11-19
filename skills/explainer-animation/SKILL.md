@@ -187,6 +187,10 @@ the before/after decision.
   thumbnail and as nothing at full size. For each action the story depends on (a press, a hit, a
   piece that won't fit), pull the frames around it at full resolution and check contact, cause and
   effect: the hand touches the button, the button sinks, the thing it triggers starts after.
+- **Same picture, no cut.** When the next scene keeps the same picture (the same chat, the same
+  table, the same bridge), mark it `blend: true` in the timeline so it carries on without a dip to
+  black. A dip says "new place"; between two lines about the same picture it reads as a glitch.
+  Before rendering, walk the timeline pair by pair and ask of each join: does the picture change?
 - **Give every text room.** No label touches a drawing or another label, none sits in the caption
   band at the bottom of the stage, and a scene uses the whole stage instead of crowding one corner.
   Check the last frame of every scene (when all its texts are on screen) at full size.
