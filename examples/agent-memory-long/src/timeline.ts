@@ -1,7 +1,8 @@
 // How an AI agent forgets — the long YouTube version (EN, landscape, 7 chapters). Narration from
-// script.md v3, rows 1-55, one line per row, in order.
-// Every row has its own drawn component; consecutive rows of one component share a scene (one line
-// per row). Only `check` (row 48) is a KeyQuote: the sentence, large, as the script asks.
+// script.md v5, rows 1-41, one line per row, in order, verbatim.
+// One everyday example from start to finish: the trip chat where "my flight is Friday, not
+// Thursday" got a "Got it!" and the hotel was booked for Thursday anyway. The red slip "FLIGHT:
+// FRIDAY" travels through every memory. Consecutive rows of one component share a scene.
 // Marks ([line, word]) are estimated from the text until real TTS exists.
 // Chapters: `chapter` on the first scene of each one draws the chapter card and becomes a YouTube
 // chapter (npm run deliver -> out/youtube-chapters-en.txt).
@@ -21,27 +22,31 @@ const finish = (scenes: Scene[]): Scene[] => {
 };
 
 const CONFIDENT = { emotion: 'confident' } as const;
+const SKEPTICAL = { emotion: 'skeptical' } as const;
 
 const build = (): Cuts => ({
   main: finish([
-    // 0 · Intro (cold open)
+    // 0 · Intro (cold open: the wrong booking is already there on frame 0)
     intro(
       'cold',
-      [say(0.1, 'At noon, an AI agent running a warehouse is told that shelf zero is empty. So the next pallet should go there.', '')],
+      [say(0.1, 'You told your AI the plan changed. It said "got it". An hour later, it booked the old plan.', '')],
       3,
-      { name: 'WarehouseShelves', props: { mode: 'day', marks: [[0, 'told'], [0, 'empty'], [0, 'next']] } },
+      { name: 'ChatTrip', props: { mode: 'wrong', marks: [[0, 'told'], [0, 'got'], [0, 'booked']] } },
     ),
-    anim('passed', 'WarehouseShelves', { mode: 'later', marks: [[0, 'hours'], [0, 'straight'], [0, 'nobody']] }, [
-      say(0.2, 'Two hours later, the pallet arrives, and it goes straight past shelf zero. As if nobody had told it.', ''),
+    anim('nextday', 'ChatTrip', { mode: 'morning', marks: [[0, 'tomorrow'], [0, 'remember']] }, [
+      say(0.2, 'And tomorrow, in a new chat, it may not remember the trip at all.', ''),
     ]),
     anim(
       'map',
       'MemoryMap',
-      { mode: 'reveal', marks: [[1, 'training'], [1, 'desk'], [1, 'summary'], [1, 'notebook'], [1, 'form'], [2, 'Each']] },
+      {
+        mode: 'reveal',
+        labels: false,
+        marks: [[0, 'several'], [0, 'kinds'], [0, 'memory'], [0, 'bit'], [0, 'each'], [1, 'testing'], [1, 'safest']],
+      },
       [
-        say(0.2, "It didn't ignore the message. It forgot it. And how it forgot says a lot about how these systems remember.", ''),
-        say(0, 'An agent has several memories, a bit like you. What it learned in training. Its desk. A summary. A notebook. And a form.', ''),
-        say(0, "Each one forgets in its own way. I've spent months testing them, and by the end you'll know which ones to combine.", ''),
+        say(0.2, "It didn't ignore you. It forgot. An AI has several kinds of memory, a bit like you, and each one loses things in its own way.", ''),
+        say(0, "I've spent months testing them on AI agents. And the one that sounds safest did the worst.", ''),
       ],
     ),
 
@@ -49,56 +54,38 @@ const build = (): Cuts => ({
     anim(
       'training',
       'HeadShelf',
-      { marks: [[0, 'reads'], [1, 'school'], [2, 'message'], [2, 'there'], [2, 'trained'], [1, 'slow'], [0, 'packed']] },
+      {
+        marks: [[0, 'reads'], [1, 'school'], [1, 'flight'], [1, 'moved'], [3, 'somewhere'], [1, 'frozen'], [0, 'packed'], [2, 'again'], [2, 'worse']],
+      },
       [
-        say(0.3, 'Start with training. Before an AI model is released, it reads a huge amount of text, and all of it gets packed inside the model.', ''),
-        say(0, "It's like what you learned at school. Huge, and slow to change. Nobody rewrites your schoolbooks because a shop down the street closed.", ''),
-        say(0, "So today's message can't go in there. To learn something for good, a model has to be trained again, and that has a price.", ''),
+        say(0.3, "First, why can't it just learn it? Before an AI is released, it reads a huge amount of text, and all of it gets packed inside the model.", ''),
+        say(0, "It's like what you learned at school. Huge, and frozen. Nobody reprints your schoolbooks because your flight moved.", ''),
+        say(0, "Teaching it something for good means training it again. That's slow, it's costly, and it can make it worse at what it already knew.", ''),
+        say(0, 'So your correction has to live somewhere else.', ''),
       ],
       { chapter: 'Training' },
     ),
-    anim(
-      'terminal',
-      'ReplayBars',
-      { marks: [[0, 'terminal'], [0, 'learned'], [0, 'worse'], [1, 'Mixing'], [1, 'won']] },
-      [
-        say(0.3, 'I trained a small model to do one narrow thing: pretend to be a computer terminal. It learned it, and got worse at almost everything else.', ''),
-        say(0, 'Mixing a little of its old reading back in, like revising for an exam, won most of it back.', ''),
-      ],
-      { min: 19 }, // the label "10% old reading → ~73% of the loss recovered" needs time to be read
-    ),
-    anim('habit', 'TwoJobs', { marks: [[0, 'independent'], [0, 'said'], [0, 'first'], [0, 'won'], [1, 'lands']] }, [
-      say(0.3, 'Old habits also push back against the facts in front of it. In another test, models read that two jobs were independent, said so, and still put one first, as if habit won.', ''),
-      // a breath after "as if habit won." (also keeps its last cue on screen long enough)
-      say(12.9, 'So the message from noon has to live somewhere it can actually be read. It lands on the desk.', ''),
-    ]),
 
     // 2 · The desk
     anim(
       'desk',
       'MemoryDesk',
-      { mode: 'work', marks: [[0, 'desk'], [0, 'record'], [1, 'uses'], [1, 'shelf']] },
+      { mode: 'work', marks: [[0, 'desk'], [0, 'conversation'], [1, 'Friday'], [1, 'use']] },
       [
-        say(0.3, "The desk is everything the agent can see right now: its instructions, and the record of its day so far. It's your working memory, only much bigger.", ''),
-        say(0, 'While the message is on the desk, the agent uses it. The next pallet goes to shelf zero.', ''),
+        say(0.3, "The desk is everything the AI can see right now: its instructions, and your conversation so far. It's your working memory, only much bigger.", ''),
+        say(0, 'While "Friday" is on the desk, it can use it.', ''),
       ],
       { chapter: 'The desk' },
     ),
-    anim('crowded', 'MemoryDesk', { mode: 'crowded', marks: [[0, 'crowded'], [0, 'whole'], [0, 'Another'], [1, 'near']] }, [
-      say(0.2, "Does a crowded desk hurt by itself? Less than you'd think. With its whole day in front of it, one model missed about one decision in six hundred. Another missed far more.", ''),
-      say(0, 'And the task was kind: what it needed was always near the top of the pile.', ''),
+    anim('buried', 'MemoryDesk', { mode: 'crowded', marks: [[0, 'buries'], [1, 'best'], [1, 'Another'], [0, 'hotels']] }, [
+      say(0.2, 'But a long chat buries it. You said it once, early on, and then came pages of hotels, prices and plans.', ''),
+      say(0, "Having it in front of it isn't a guarantee. In my tests, the best model slipped about once in six hundred decisions. Another got a quarter of them wrong.", ''),
     ]),
-    anim(
-      'restart',
-      'RestartIterate',
-      { marks: [[0, 'attempt'], [0, 'clear'], [0, 'keep'], [1, 'keeping'], [1, 'messy'], [1, 'throwing']] },
-      [
-        say(0.3, 'Coding agents face a version of this. When an attempt goes badly, do you clear everything and start over, or keep going?', ''),
-        say(0, "On short coding tasks, keeping going won. What hurt wasn't the messy desk. It was throwing away the half-built code along with it.", ''),
-      ],
-    ),
-    anim('edge', 'MemoryDesk', { mode: 'full', marks: [[0, 'edge'], [0, 'long'], [0, 'fills'], [0, 'go'], [0, 'two']] }, [
-      say(0.2, 'But the desk has an edge. On a long enough day it fills up, and something has to go. There are two ways to make room.', ''),
+    anim('fresh', 'MemoryDesk', { mode: 'wiped', marks: [[0, 'new'], [0, 'clean'], [0, 'Unless'], [0, 'nothing']] }, [
+      say(0.2, 'And a new chat starts with a clean desk. Unless a memory feature puts something back on it, it knows nothing about your trip.', ''),
+    ]),
+    anim('edge', 'MemoryDesk', { mode: 'full', marks: [[0, 'On'], [0, 'long'], [0, 'fills'], [0, 'go'], [0, 'two']] }, [
+      say(0.2, 'On a long enough chat, the desk fills up, and something has to go. There are two ways to make room.', ''),
     ]),
 
     // 3 · The summary
@@ -108,17 +95,16 @@ const build = (): Cuts => ({
       {
         mode: 'summary',
         marks: [
-          [0, 'summary'], [1, 'gist'], [1, 'meeting'], [1, 'words'], [4, 'enough'],
-          [2, 'detail'], [2, 'two'], [3, 'wrote'], [3, 'often'], [4, 'line'], [5, 'older'], [5, 'lost'], [6, 'good'],
+          [0, 'writes'], [1, 'gist'], [1, 'meeting'], [2, 'decides'], [2, 'cut'],
+          [3, 'wrote'], [3, 'almost'], [4, 'older'], [4, 'slipped'], [5, 'good'],
         ],
       },
       [
-        say(0.3, 'The first is a summary. Coding assistants like Claude Code do this: when the desk is full, the model writes up its day and starts again from that.', ''),
+        say(0.3, 'The first is a summary. When the desk is full, the AI writes up the conversation, throws the pages away, and carries on from the summary. Coding assistants do this all the time.', ''),
         say(0, "It's how you remember a meeting: not the words, the gist.", ''),
-        say(0, 'The risk is that a summary decides in advance what will matter. So I tried to break it: I showed the agent a small detail it would only need much later, after two summaries.', ''),
-        say(0, "It didn't break. A recent model wrote the detail into its summary and used it, about as often as an agent that never summarised at all.", ''),
-        say(0, 'And the message from noon? One line on the card, "shelf zero is empty", and that line was enough.', ''),
-        say(0, 'It depends on who writes it, though. In an earlier test, an older model writing shorter summaries lost track more than any other memory.', ''),
+        say(0, 'The risk is that a summary decides in advance what will matter. Will "Friday" make the cut?', ''),
+        say(0, 'In my tests, a recent model wrote the correction into its summary and acted on it almost every time.', ''),
+        say(0, "But it depends on who writes it. In an earlier test, an older model's summaries slipped more and more as the day got longer.", ''),
         say(0, 'A summary is a guess about what will matter. With a good writer, it guesses well.', ''),
       ],
       { chapter: 'The summary' },
@@ -128,33 +114,35 @@ const build = (): Cuts => ({
     anim(
       'notebook',
       'FilingCabinet',
-      { mode: 'file', marks: [[0, 'Clear'], [0, 'Nothing'], [1, 'know'], [1, 'find'], [1, 'email'], [2, 'failed']] },
+      { mode: 'file', marks: [[0, 'Clear'], [0, 'Nothing'], [0, 'keyword'], [1, 'know'], [1, 'email'], [2, 'safest']] },
       [
-        say(0.3, 'The second way sounds safer. Clear the desk completely, and keep the whole day in a notebook the agent can search by keyword. Nothing is thrown away.', ''),
+        say(0.3, 'The second way sounds safer. Clear the desk, and keep the whole conversation in a notebook the AI can search by keyword. It\'s close to the "search past chats" some apps have. Nothing is thrown away.', ''),
         say(0, "It's what you do with your email. You don't remember it; you know where to find it.", ''),
-        say(0, "In my tests, it was the only memory that failed every time I tried it. And it's the agent from the start of this video.", ''),
+        say(0, 'This is the one that sounds safest. And in my tests, it did the worst, in every setup I tried.', ''),
       ],
       { chapter: 'The notebook' },
     ),
-    anim('search', 'FilingCabinet', { mode: 'miss', marks: [[0, 'nothing'], [0, 'searching'], [1, 'Never'], [1, 'nothing'], [1, 'forty'], [2, 'sharper'], [2, 'plain']] }, [
-      say(0.2, "After the clean-up, its desk says nothing about any message. So when a pallet arrives, it works out what's on each shelf by searching the notebook.", ''),
-      say(0, 'It searches for shelves and pallets. Never for a correction, because nothing tells it there was one. About one search in forty brought the message back.', ''),
-      say(0, "Giving it tips on how to search made its searches sharper, but it still didn't find the message. A plain search only helps if you know what to look for.", ''),
-    ]),
+    anim(
+      'search',
+      'FilingCabinet',
+      { mode: 'miss', marks: [[0, 'nothing'], [0, 'searches'], [0, 'never'], [0, 'changed'], [1, 'forty'], [1, 'Its'], [1, 'only']] },
+      [
+        say(0.2, 'Here\'s why. After the clean-up, nothing on its desk says there was a correction. So when it books the hotel, it searches for flights and dates, never for whether anything changed.', ''),
+        say(0, 'Its searches brought the correction back about once in forty. A search only helps if you know what to look for.', ''),
+      ],
+    ),
     anim(
       'reader',
       'AskReader',
       {
         marks: [
-          [0, 'asks'], [0, 'another'], [0, 'reads'],
-          [1, 'never'], [1, 'ran'], [1, 'passed'], [1, 'almost'],
-          [2, 'whole'], [2, 'long'], [2, 'pieces'], [2, 'summarise'], [2, 'guessing'],
+          [0, 'asks'], [0, 'helper'], [0, 'reread'], [0, 'ran'], [0, 'passed'],
+          [1, 'whole'], [1, 'long'], [1, 'fills'], [1, 'back'], [1, 'guessing'],
         ],
       },
       [
-        say(0.3, 'A smarter notebook changes that. Instead of searching by keyword, the agent asks a question, and another model, one that reads the whole day, answers it.', ''),
-        say(0, "The agent still never asked about a correction. But the reader, working out what's on each shelf, ran into the message and passed it on, almost every time.", ''),
-        say(0, "There's a catch. The reader goes through the whole day for every question. On a day long enough to need clearing, it fills up too, and then it has to cut the day into pieces or summarise it. We're back to guessing what matters.", ''),
+        say(0.3, "A smarter notebook doesn't search by keyword. It asks a helper, a second AI, to reread the whole conversation and answer. Reading everything, the helper ran into the correction and passed it on most of the time.", ''),
+        say(0, "The catch: the helper has to fit the whole conversation in its head. On a chat long enough to need clearing, it fills up too, and we're back to guessing what matters.", ''),
       ],
     ),
 
@@ -162,68 +150,53 @@ const build = (): Cuts => ({
     anim(
       'form',
       'ClipboardForm',
-      { mode: 'replace', marks: [[0, 'form'], [0, 'boxes'], [0, 'shelf'], [1, 'empty'], [1, 'old'], [2, 'ten'], [2, 'hundred'], [0, 'step'], [0, 'thrown']] },
+      { mode: 'replace', marks: [[0, 'form'], [0, 'boxes'], [0, 'apart'], [1, 'correct'], [1, 'Friday'], [1, 'tomorrow']] },
       [
-        say(0.3, "The last memory is the strictest: a form. Fixed boxes, like what's on each shelf. Each step, the agent updates the boxes, and everything else is thrown away.", ''),
-        say(0, `Like a patient's chart. When the message arrives, "empty" goes into shelf zero's box, and the old value is gone.`, ''),
-        say(0, 'And it never fills up: the form is the same size at step ten and at step two hundred.', ''),
+        say(0.3, 'The last memory is the strictest: a form. A few fixed boxes, kept apart from the chat, filled in as it goes.', ''),
+        say(0, 'When you correct it, "Thursday" is crossed out and "Friday" goes into the same box. And unlike the desk, the form is still there tomorrow.', ''),
       ],
-      { chapter: 'The form', min: 26.8 }, // time to read the last cue, "two hundred."
-    ),
-    anim('nobox', 'ClipboardForm', { mode: 'margin', marks: [[0, 'jotted'], [0, 'wipes'], [1, 'named'], [1, 'every'], [2, 'notes'], [2, 'say']] }, [
-      say(0.2, 'But a form only holds what it has a box for. A fact with no box gets jotted next to the last entry, and the next entry wipes it.', ''),
-      say(0, 'With no box for it, none of twenty-four runs kept the fact. With a box named after it, one model kept it every time, and others most of the time.', ''),
-      say(0, 'A general box for notes helped much less. The box has to say what goes in it.', ''),
-    ]),
-    anim('wrong', 'ClipboardForm', { mode: 'wrong', marks: [[0, 'misremembers'], [1, 'wrong'], [1, 'correctly'], [1, 'box'], [1, 'mistakes'], [2, 'record'], [2, 'followed']] }, [
-      say(0.2, "And then a stranger failure. A form doesn't forget. It misremembers.", '', undefined, { emotion: 'skeptical' }),
-      say(0, 'On one model, the agent moved a pallet correctly, then wrote the wrong pallet into the box. In one run, about twenty-five mistakes followed, all from that one box.', ''),
-      say(0, "Nothing checks that a box matches reality. When that model also kept the day's record beside the form, those slips did no harm: where the two disagreed, it followed the record.", ''),
-    ]),
-
-    // 6 · A flaw in my own test
-    anim(
-      'flaw',
-      'CorrectionReplay',
-      {
-        marks: [
-          [0, 'results'], [0, 'form'], [0, 'record'], [0, "wasn't"],
-          [1, 'message'], [1, 'named'], [1, 'left'], [1, 'doubt'],
-          [2, 'sense'], [2, 'both'],
-        ],
-      },
-      [
-        say(0.3, "One confession. Until recently, my results said the form was far better than the day's record at taking a correction like our message. It wasn't.", ''),
-        say(0, "My message didn't make sense. The pallet it named had already left the warehouse. An agent that had watched it leave had reason to doubt it, and mostly didn't apply it. Hard to blame it.", ''),
-        say(0, 'With a message that made sense, both got it right. That fixed message is the one behind every result about it in this video.', ''),
-      ],
-      { chapter: 'A flaw in my own test' },
+      { chapter: 'The form' },
     ),
     anim(
-      'check',
-      'KeyQuote',
-      { text: "If the correction contradicts what it saw, you're measuring whether it believes you, not what it remembers.", emphasis: ['believes you', 'remembers'] },
-      [say(0.3, "So check your test from the agent's side. If the correction contradicts what it saw, you're measuring whether it believes you, not what it remembers.", '')],
+      'nobox',
+      'ClipboardForm',
+      { mode: 'margin', marks: [[0, 'scribbled'], [0, 'wipes'], [1, 'named'], [1, 'every'], [2, 'notes'], [2, 'say'], [1, 'never']] },
+      [
+        say(0.2, 'But a form only holds what it has a box for. A fact with no box of its own gets scribbled in the margin, and the next entry wipes it.', ''),
+        say(0, 'In my tests, with no box for it, the fact never survived. With a box named after it, it survived every time on one model, and most of the time on another.', ''),
+        say(0, 'A box just called "notes" helped much less. The box has to say what goes in it.', ''),
+      ],
     ),
+    anim('wrong', 'ClipboardForm', { mode: 'wrong', marks: [[0, 'misremembers'], [0, 'right'], [0, 'wrong'], [0, 'everything']] }, [
+      say(0.2, "And a form fails in a stranger way. It doesn't forget. It misremembers. The agent did the right thing, wrote down the wrong one, and everything after built on that.", '', undefined, SKEPTICAL),
+    ]),
+    anim('appmemory', 'ClipboardForm', { mode: 'panel', marks: [[0, 'list'], [0, 'tomorrow'], [0, 'written']] }, [
+      say(0.2, 'The saved "memory" in ChatGPT or Claude is a looser cousin: a list of notes kept outside the chat. It\'s still there tomorrow, but it only holds what got written down.', ''),
+    ]),
 
-    // 7 · What to combine
+    // 6 · What to combine
     anim(
       'combine',
       'MemoryOffice',
-      { mode: 'verdict', marks: [[0, 'job'], [0, 'best'], [1, 'desk'], [1, 'summary'], [1, 'notebook'], [1, 'form'], [1, 'Training'], [2, 'life']] },
+      {
+        mode: 'verdict',
+        marks: [[0, 'best'], [1, 'desk'], [1, 'summary'], [1, 'search'], [1, 'form'], [2, 'head'], [2, 'email'], [2, 'fridge']],
+      },
       [
-        say(0.3, 'So which memory is best? For what happens on the job, none of them on its own.', '', undefined, CONFIDENT),
-        say(0, "Training can't take today's news. The desk fills up. A summary is only as good as its writer. The notebook only helps if you know to look. And the form holds only what has a box, and can be sure and wrong.", ''),
-        say(0, "You don't run your life from one memory either. You keep the gist in your head, a notebook to check, and a few things on the fridge because you know they'll matter.", ''),
+        say(0.3, 'So which memory is best? On its own, none.', '', undefined, CONFIDENT),
+        say(0, "The desk fills up. The summary guesses. The search doesn't know what to look for. And the form only holds what has a box.", ''),
+        say(0, "You don't run your life from one memory either. You keep the gist in your head, your email to search, and a few things on the fridge because you know they'll matter.", ''),
       ],
       { chapter: 'What to combine' },
     ),
-    anim('recipe', 'MemoryOffice', { mode: 'advice', marks: [[0, 'tests'], [0, 'summary'], [0, 'notebook'], [1, 'box'], [1, 'record']] }, [
-      say(0.2, "For agents, my tests point the same way. First, when the desk fills up, keep a summary, or the agent's own lines, instead of clearing it. A notebook to search is a bonus on top, not a replacement.", ''),
-      say(0, "Second, for facts you know will matter, a box with their name on it. And on some models, the day's record beside the form, to catch it when it's wrong.", '', undefined, { ...CONFIDENT, speed: 1.05 }),
+    anim('recipe', 'MemoryOffice', { mode: 'advice', marks: [[0, 'tests'], [0, 'summary'], [0, 'named']] }, [
+      say(0.2, "For agents, my tests point the same way, though I haven't tried the two together yet: a summary to carry the thread, and named boxes for the facts that must not slip.", '', undefined, CONFIDENT),
+    ]),
+    anim('save', 'ChatTrip', { mode: 'save', marks: [[0, 'buried'], [0, 'Ask'], [0, 'names'], [0, 'pile']] }, [
+      say(0.2, "And for you, today: when something matters, don't leave it buried in the chat. Ask it to save it to memory, in one clear line that names the fact. I didn't test the apps, and it's no guarantee, but it gets the fact out of the pile.", ''),
     ]),
     anim('close', 'MemoryMap', { recipe: true }, [
-      say(0.2, 'Every agent forgets. The question is what it forgets, and whether anything notices. Which of these would your agent lose first?', ''),
+      say(0.2, 'Every AI forgets. What matters is what it forgets, and whether anything notices. Tell me in the comments which one has bitten you.', ''),
     ]),
     outro('outro', [say(0.15, 'More at javieraguilar.ai.', '', { en: 'More at javier aguilar dot A I.' })]),
   ]),
