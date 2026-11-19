@@ -239,3 +239,31 @@ Two more checks before delivery:
 - **Time to read.** Text on the stage stays long enough to be read (~3.5 words/s plus 1 s), and
   the stage carries something at every moment. `npm run lint` covers the library components;
   bespoke components with their own text are checked here.
+
+## After every render: reel-watcher, then the author
+
+The stills are checked before rendering; the rendered video is checked again before the author
+sees it, every time (first render and every re-render). Frame 0, a dip between two scenes with the
+same picture, an invented person, a press that never lands: these are the things the author has
+pointed at over and over, and a still or a contact sheet did not show them.
+
+1. `npm run review-frames` (add `-- --es` / `-- --landscape` for those cuts). It writes
+   `out/review/main-<voice>-<format>/`: frame 0 and a strip from 0 to 8 s every 0.5 s; for each
+   scene change the last frame before it, the middle of the transition and the first frame after
+   it, with a measure of whether the picture is the same on both sides and whether it dips; for
+   each narration line a frame just before it starts, half way and at its end; contact sheets per
+   section; and `index.md` with the time, scene and line on air of every frame plus the images in
+   `public/`. Scene and line times come from the timeline; for a video that does not match it,
+   `--video <file>` (or `--detect`) finds the scene changes in the video itself.
+2. Run the `reel-watcher` agent with the path of that folder and the video folder. It checks the
+   closed list of recurring failures on the full-size frames and answers PASS / FAIL / UNSURE per
+   item with timestamps.
+3. Fix every FAIL in the timeline or the assets, extract the frames it marks UNSURE
+   (`ffmpeg -ss <t> -i out/main-en-vertical.mp4 -frames:v 1 <file>.png`) and look at them, then
+   re-render and run steps 1-2 again until nothing fails. A FAIL you think is wrong is not skipped
+   silently: say so to the author in the summary.
+4. Only then open the video for the author, with one line on what the watcher caught and what was
+   changed ("watcher: frame 0 showed the verdict, moved to the note in the hand; dip between the
+   two chat scenes, now blended"), or "watcher: clean". The author's review of the video stays: he
+   still watches it and approves or corrects it, and nothing is scheduled without that approval
+   (see `schedule-social-video`).
