@@ -43,8 +43,19 @@ if (ranges.length === 1) {
   raw = at('out', `_raw-${name}.mkv`);
   const parts = ranges.map((_, k) => at('out', `_part-${name}-${String(k).padStart(2, '0')}.mkv`));
   ranges.forEach(([a, b], k) => {
-    console.log(`chunk ${k + 1}/${ranges.length}: frames ${a}-${b} (${(a / FPS).toFixed(0)}-${((b + 1) / FPS).toFixed(0)} s)`);
-    remotion(['render', 'src/index.ts', id, parts[k], '--codec=h264-mkv', `--frames=${a}-${b}`, '--crf=18', `--concurrency=${concurrency}`]);
+    const label = `chunk ${k + 1}/${ranges.length}: frames ${a}-${b} (${(a / FPS).toFixed(0)}-${((b + 1) / FPS).toFixed(0)} s)`;
+    // A finished chunk survives an interrupted run (memory pressure, a crashed terminal), so a
+    // rerun picks up where it stopped. Chunks render to a temp name and are renamed only when
+    // complete; parts are deleted after a successful join, so a leftover part is never stale
+    // unless you changed the video in between: delete out/_part-* then.
+    if (fs.existsSync(parts[k])) {
+      console.log(`${label}: already rendered, reusing`);
+      return;
+    }
+    console.log(label);
+    const tmp = parts[k].replace(/\.mkv$/, '.partial.mkv');
+    remotion(['render', 'src/index.ts', id, tmp, '--codec=h264-mkv', `--frames=${a}-${b}`, '--crf=18', `--concurrency=${concurrency}`]);
+    fs.renameSync(tmp, parts[k]);
   });
   concatParts(parts, raw);
   for (const p of parts) fs.rmSync(p);
