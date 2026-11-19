@@ -7,7 +7,7 @@ import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
 import { place } from './canvas.ts';
 import { Bubble, ChatWindow, Collapsed, Divider, MemoryPanel, bubbleSize } from './chat.tsx';
-import { BOOKING, CHAT_TITLE, CORRECTION, GOT_IT, GREETING, LATER, PANEL_NOTES, SAVE_LINE, frameState, type ChatTripProps } from './ChatTrip.state.ts';
+import { BOOKING, CHAT_TITLE, NEW_CHAT_TITLE, CORRECTION, GOT_IT, GREETING, LATER, PANEL_NOTES, SAVE_LINE, frameState, type ChatTripProps } from './ChatTrip.state.ts';
 import { Frame } from './office.tsx';
 
 export { frameState };
@@ -24,7 +24,7 @@ const LAYOUT = {
   l: {
     win: { x: 470, y: 140, w: 980, h: 600 },
     size: 34,
-    gap: 18,
+    gap: 14,
     save: { win: { x: 180, y: 140, w: 930, h: 600 }, panel: { x: 1190, y: 230, w: 560, size: 32 }, size: 31 },
   },
   v: {
@@ -119,11 +119,11 @@ export const ChatTrip: React.FC<AnimProps & ChatTripProps> = (p) => {
   const corrY = y;
   y += bubbleSize(CORRECTION, size, maxW).h + L.gap;
   const gotY = y;
-  y += bubbleSize(GOT_IT, size, maxW).h + L.gap + 16;
+  y += bubbleSize(GOT_IT, size, maxW).h + L.gap;
   const divY = y;
-  y += 30;
+  y += 26;
   const colY = y;
-  y += 34 + 24 + L.gap + 6;
+  y += 34 + 24 + L.gap;
   const bookY = y;
   const clipW = W.w * s.wipe;
   return (
@@ -131,7 +131,7 @@ export const ChatTrip: React.FC<AnimProps & ChatTripProps> = (p) => {
       <Frame vertical={p.vertical} design="both">
         <ChatWindow x={W.x} y={W.y} w={W.w} h={W.h} title={CHAT_TITLE} />
         <g opacity={s.chat.opacity}>
-          <Bubble x={inR} y={corrY} side="user" text={CORRECTION} size={size} maxW={maxW} lit={s.chat.lit[0]} hot="Friday" />
+          <Bubble x={inR} y={corrY} side="user" text={CORRECTION} size={size} maxW={maxW} lit={s.chat.lit[0]} hot="Friday" hotColor={C.text} />
           <Bubble x={inX} y={gotY} side="ai" text={GOT_IT} size={size} maxW={maxW} lit={s.chat.lit[1]} />
           <Divider x={inX} y={divY} w={inR - inX} text={LATER} size={size * 0.75} />
           <Collapsed x={inX} y={colY} w={inR - inX} rows={2} />
@@ -145,7 +145,7 @@ export const ChatTrip: React.FC<AnimProps & ChatTripProps> = (p) => {
               </clipPath>
             </defs>
             <g clipPath="url(#chat-wipe)">
-              <ChatWindow x={W.x} y={W.y} w={W.w} h={W.h} title={CHAT_TITLE} morning={s.morning} cursor={s.cursor} />
+              <ChatWindow x={W.x} y={W.y} w={W.w} h={W.h} title={NEW_CHAT_TITLE} morning={s.morning} cursor={s.cursor} />
               <Bubble x={inX} y={W.y + HEAD + 40} side="ai" text={GREETING} size={size} maxW={maxW} opacity={s.greeting} lit={s.note.lit} />
             </g>
             {/* the leading edge of the wipe: a soft band of morning light */}

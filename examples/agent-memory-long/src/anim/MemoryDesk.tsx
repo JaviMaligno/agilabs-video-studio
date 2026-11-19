@@ -4,7 +4,7 @@ import { AbsoluteFill } from 'remotion';
 import { C, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
-import { lerp } from './memory.ts';
+import { SLIP_TEXT, lerp } from './memory.ts';
 import {
   CARD_TEXT,
   DAYS,
@@ -180,16 +180,28 @@ const Rules: React.FC<{ x: number; y: number; opacity: number }> = ({ x, y, opac
     </g>
   ) : null;
 
+/** A deterministic pseudo-random number in [0, 1) per cell (misses scattered, not in columns). */
+const scatter = (i: number): number => {
+  const x = Math.sin((i + 1) * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+};
+
 /** A strip of DECISIONS cells filling in reading order; misses (rose) spread evenly through it. */
 const Strip: React.FC<{ x: number; y: number; cols: number; fill: number; misses: number }> = ({ x, y, cols, fill, misses }) => {
   const shown = Math.floor(DECISIONS * Math.min(1, Math.max(0, fill)));
-  const every = misses > 0 ? DECISIONS / misses : Infinity;
+  // Exactly `misses` cells, scattered: the ones with the lowest pseudo-random draw.
+  const missed = new Set(
+    Array.from({ length: DECISIONS }, (_, i) => i)
+      .sort((a, b) => scatter(a) - scatter(b))
+      .slice(0, misses),
+  );
   return (
     <g>
       {Array.from({ length: DECISIONS }, (_, i) => {
         const cx = x + (i % cols) * (CELL + GAP);
         const cy = y + Math.floor(i / cols) * (CELL + GAP);
-        const miss = misses === 1 ? i === Math.floor(DECISIONS * 0.62) : Math.floor(i % every) === 0;
+        // One miss placed in the middle, or `misses` cells scattered at random (not in columns).
+        const miss = misses === 1 ? i === Math.floor(DECISIONS * 0.62) : missed.has(i);
         const on = i < shown;
         return <rect key={i} x={cx} y={cy} width={CELL} height={CELL} rx={1.5} fill={!on ? alpha(C.muted, 0.18) : miss ? C.marker : alpha(C.ok, 0.75)} />;
       })}
@@ -325,7 +337,7 @@ export const MemoryDesk: React.FC<AnimProps & MemoryDeskProps> = (p) => {
           <g opacity={s.ghost} transform={`translate(${D.ghost.x} ${D.ghost.y - 30 * (1 - s.ghost)}) rotate(-4)`}>
             <rect x={-110} y={-40} width={220} height={80} rx={9} fill={alpha(C.marker, 0.12)} stroke={C.marker} strokeWidth={4} strokeDasharray="12 9" />
             <text x={0} y={10} textAnchor="middle" fontSize={19} fontWeight={800} fill={alpha(C.marker, 0.9)}>
-              FLIGHT: FRIDAY
+              {SLIP_TEXT}
             </text>
           </g>
         )}

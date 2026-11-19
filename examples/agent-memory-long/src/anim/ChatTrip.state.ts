@@ -19,6 +19,7 @@ export type ChatTripProps = { mode?: ChatMode; marks?: number[] };
 
 /** The texts on screen, exactly as the script writes them. */
 export const CHAT_TITLE = 'Trip planning';
+export const NEW_CHAT_TITLE = 'New chat';
 export const CORRECTION = 'Change of plan: my flight is Friday, not Thursday.';
 export const GOT_IT = 'Got it!';
 export const LATER = 'later';

@@ -81,7 +81,7 @@ const LAYOUT_RECIPE = {
 };
 
 /** The picture of each memory and its failure, in tile coordinates (460 x 339, under the label). */
-const Picture: React.FC<{ kind: TileKind }> = ({ kind }) => {
+const Picture: React.FC<{ kind: TileKind; q?: number }> = ({ kind, q = 0 }) => {
   if (kind === 'training')
     return (
       // the shelf of what it learned, behind closed glass; today's slip bounces off
@@ -114,7 +114,7 @@ const Picture: React.FC<{ kind: TileKind }> = ({ kind }) => {
           <Cabinet x={0} y={0} w={220} h={270} peek={1} peekDrawer={1} />
         </g>
         <Lens x={292} y={206} r={48} />
-        <text x={404} y={200} textAnchor="middle" fontSize={110} fontWeight={800} fill={C.warm}>
+        <text x={400} y={210} textAnchor="middle" fontSize={110 * (1 + 0.35 * q)} fontWeight={800} fill={C.warm} style={q > 0.01 ? glow(C.warm, q) : undefined}>
           ?
         </text>
       </g>
@@ -123,14 +123,14 @@ const Picture: React.FC<{ kind: TileKind }> = ({ kind }) => {
     // the FLIGHT box with the old day written back in, ticked as confidently as a right value
     <g>
       <MiniClipboard x={18} y={140} w={128} h={164} lit={1} />
-      <text x={166} y={182} fontSize={32} fontWeight={800} fill={C.muted} letterSpacing={1}>
+      <text x={164} y={182} fontSize={32} fontWeight={800} fill={C.muted} letterSpacing={1}>
         {FLIGHT}
       </text>
-      <rect x={162} y={198} width={214} height={100} rx={14} fill={C.bg1} stroke={alpha(C.text, 0.85)} strokeWidth={5} />
-      <text x={269} y={264} textAnchor="middle" fontSize={50} fontWeight={800} fill={C.marker}>
+      <rect x={160} y={198} width={226} height={100} rx={14} fill={C.bg1} stroke={alpha(C.text, 0.85)} strokeWidth={5} />
+      <text x={273} y={262} textAnchor="middle" fontSize={40} fontWeight={800} fill={C.marker}>
         {OLD_DAY}
       </text>
-      <Badge x={410} y={248} r={30} kind="tick" pop={1} />
+      <Badge x={418} y={248} r={26} kind="tick" pop={1} />
     </g>
   );
 };
@@ -166,8 +166,17 @@ export const MemoryMap: React.FC<AnimProps & MemoryMapProps> = (p) => {
               )}
               {op > 0 && (
                 <g opacity={op}>
-                  <g style={glow(C.accentText, e)}>
-                    <rect x={0} y={0} width={TILE.w} height={TILE.h} rx={28} fill={C.card} stroke={alpha(C.accentText, 0.45 + 0.55 * e)} strokeWidth={4 + 2 * e} />
+                  <g style={i === SAFEST && s.question > 0.01 ? glow(C.warm, s.question) : glow(C.accentText, e)}>
+                    <rect
+                      x={0}
+                      y={0}
+                      width={TILE.w}
+                      height={TILE.h}
+                      rx={28}
+                      fill={C.card}
+                      stroke={i === SAFEST && s.question > 0.01 ? C.warm : alpha(C.accentText, 0.45 + 0.55 * e)}
+                      strokeWidth={4 + 2 * e}
+                    />
                   </g>
                   {s.labels > 0 && (
                     <text x={TILE.w / 2} y={80} textAnchor="middle" fontSize={64} fontWeight={800} fill={C.text} letterSpacing={1} opacity={s.labels}>
@@ -175,16 +184,8 @@ export const MemoryMap: React.FC<AnimProps & MemoryMapProps> = (p) => {
                     </text>
                   )}
                   <g opacity={i === SAFEST ? 1 - 0.75 * s.flicker : 1}>
-                    <Picture kind={tile.kind} />
+                    <Picture kind={tile.kind} q={i === SAFEST ? s.question : 0} />
                   </g>
-                  {i === SAFEST && s.question > 0 && (
-                    <g opacity={s.question}>
-                      <circle cx={TILE.w - 52} cy={60} r={42} fill={C.warm} style={glow(C.warm, 0.6)} />
-                      <text x={TILE.w - 52} y={84} textAnchor="middle" fontSize={68} fontWeight={800} fill={C.bg0}>
-                        ?
-                      </text>
-                    </g>
-                  )}
                 </g>
               )}
             </g>

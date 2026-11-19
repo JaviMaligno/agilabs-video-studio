@@ -184,7 +184,7 @@ export const Page: React.FC<{ x: number; y: number; w?: number; rot?: number; op
   const T = -h / 2;
   return (
     <g transform={`translate(${x} ${y}) rotate(${rot}) scale(${scale})`} opacity={cl(opacity)}>
-      <rect x={L} y={T} width={w} height={h} rx={6} fill={alpha(C.text, 0.9)} stroke={alpha(C.bg0, 0.55)} strokeWidth={2} />
+      <rect x={L} y={T} width={w} height={h} rx={6} fill={C.text} stroke={alpha(C.bg0, 0.55)} strokeWidth={2} />
       {kind === 'text' &&
         [0, 1, 2, 3].map((i) => (
           <rect key={i} x={L + 16} y={T + 18 + i * (h / 5)} width={(w - 32) * (i === 3 ? 0.55 : 0.9 - 0.08 * (i % 2))} height={6} rx={3} fill={alpha(C.muted, 0.75)} />

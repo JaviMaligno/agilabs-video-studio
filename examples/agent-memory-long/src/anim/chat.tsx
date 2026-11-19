@@ -64,8 +64,9 @@ export type BubbleProps = {
   lit?: number;
   /** The wrong booking: red outline and wash, pulsing with `alert` (0..1). */
   alert?: number;
-  /** A word drawn in rose (e.g. "Thursday"). */
+  /** A word drawn in rose (e.g. "Thursday"), or in `hotColor`, underlined. */
   hot?: string;
+  hotColor?: string;
   /** How much of the text is typed out, 0..1. */
   typed?: number;
   tick?: boolean;
@@ -74,7 +75,7 @@ export type BubbleProps = {
 };
 
 /** A chat bubble. Returns its height through `bubbleSize` for layout by the caller. */
-export const Bubble: React.FC<BubbleProps> = ({ x, y, side, text, size, maxW, opacity = 1, lit = 0, alert = 0, hot, typed = 1, tick = false, ghost = 0 }) => {
+export const Bubble: React.FC<BubbleProps> = ({ x, y, side, text, size, maxW, opacity = 1, lit = 0, alert = 0, hot, hotColor, typed = 1, tick = false, ghost = 0 }) => {
   if (opacity <= 0) return null;
   const { w, h, lines, pad } = bubbleSize(text, size, maxW, tick);
   const left = side === 'user' ? x - w : x;
@@ -82,7 +83,6 @@ export const Bubble: React.FC<BubbleProps> = ({ x, y, side, text, size, maxW, op
   const a = cl(alert);
   const fill = ghost > 0 ? 'none' : a > 0 ? alpha(C.marker, 0.16 + 0.18 * a) : user ? C.accent : C.card;
   const stroke = a > 0 ? C.marker : user ? alpha(C.accentText, 0.9) : alpha(C.accentText, 0.45 + 0.55 * cl(lit));
-  const textColor = user && a === 0 && ghost === 0 ? C.text : C.text;
   const total = text.length;
   let shown = Math.ceil(total * cl(typed));
   const style = a > 0 ? glow(C.marker, 0.35 + 0.65 * a) : lit > 0.01 ? glow(C.accentText, lit) : undefined;
@@ -108,12 +108,21 @@ export const Bubble: React.FC<BubbleProps> = ({ x, y, side, text, size, maxW, op
         const ty = y + pad * 0.6 + size * (1.28 * i + 0.98);
         const words = part.split(' ');
         return (
-          <text key={i} x={left + pad} y={ty} fontSize={size} fontWeight={700} fill={ghost > 0 ? C.muted : textColor} fontStyle={ghost > 0 ? 'italic' : undefined}>
-            {words.map((wd, k) => (
-              <tspan key={k} fill={hot && wd.replace(/[^\w]/g, '') === hot ? C.marker : undefined} fontWeight={hot && wd.replace(/[^\w]/g, '') === hot ? 800 : undefined}>
-                {(k > 0 ? ' ' : '') + wd}
-              </tspan>
-            ))}
+          <text key={i} x={left + pad} y={ty} fontSize={size} fontWeight={700} fill={ghost > 0 ? C.muted : C.text} fontStyle={ghost > 0 ? 'italic' : undefined}>
+            {words.map((wd, k) => {
+              const core = wd.replace(/[^\w]+$/, '');
+              const tail = wd.slice(core.length);
+              const isHot = !!hot && core === hot;
+              return (
+                <React.Fragment key={k}>
+                  {k > 0 ? ' ' : ''}
+                  <tspan fill={isHot ? (hotColor ?? C.marker) : undefined} fontWeight={isHot ? 800 : undefined} textDecoration={isHot && hotColor ? 'underline' : undefined}>
+                    {core}
+                  </tspan>
+                  {tail}
+                </React.Fragment>
+              );
+            })}
           </text>
         );
       })}
