@@ -67,7 +67,9 @@ if (ranges.length === 1) {
 const target = `I=${LOUDNESS.I}:TP=${LOUDNESS.truePeak}:LRA=11`;
 const m = JSON.parse(ffmpegReport(['-i', raw, '-vn', '-af', `loudnorm=${target}:print_format=json`, '-f', 'null', '-']).match(/\{[^{}]*"input_i"[^{}]*\}/)[0]);
 const second = `loudnorm=${target}:measured_I=${m.input_i}:measured_TP=${m.input_tp}:measured_LRA=${m.input_lra}:measured_thresh=${m.input_thresh}:offset=${m.target_offset}:linear=true`;
-ffmpegReport(['-y', '-i', raw, '-c:v', 'copy', '-af', second, '-ar', '48000', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', final]);
+// linear loudnorm cannot hold the true-peak ceiling when the measured offset is large (a long cut
+// measured +0.4 dBTP), so a brickwall limiter at about -2 dBFS follows it.
+ffmpegReport(['-y', '-i', raw, '-c:v', 'copy', '-af', `${second},alimiter=limit=0.79:level=false:attack=1:release=50`, '-ar', '48000', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', final]);
 fs.rmSync(raw);
 
 const subs = SETTINGS.subtitles.includes(voice) ? voice : SETTINGS.subtitles[0] ?? voice;
