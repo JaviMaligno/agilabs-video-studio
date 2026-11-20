@@ -73,17 +73,50 @@ test('sceneStarts overlaps scenes by the transition', () => {
   assert.equal(total, sceneFrames(a) + sceneFrames(b) - SCENE_TRANSITION);
 });
 
-test('settings and timeline of this video (EN only, 15 rows of script v3)', () => {
+/** Script v5 (script.md), rows 1-9, exactly as approved. */
+const SCRIPT_V5 = [
+  'You told your AI the plan changed. It said "got it". An hour later, it booked the old plan.',
+  "It didn't ignore you. It forgot. Your AI has a few places to remember things, and each one forgets in its own way.",
+  'What it learned in training is frozen. Your correction has to go somewhere else.',
+  'First, the desk: the chat it can see. In a long chat, "Friday" can get buried under hotels and prices. And a new chat starts with a clean desk, unless something was saved to memory.',
+  'When the desk fills up, it writes a summary and throws the pages away. A good summary keeps "Friday". A weaker one can drop it.',
+  "Or it files the whole chat away and looks things up by keyword. Sounds safest, right? In my tests with AI agents, it did the worst. It searched for hotels and prices, and almost never for a change of plan it didn't know about.",
+  'Or it keeps a few named boxes: flight, hotel. "Friday" replaces "Thursday" and stays. But a fact with no box gets lost.',
+  'Like you: the gist in your head, your email to search, a note on the fridge. These apps often save to memory on their own, but when something matters, ask it to save it.',
+  'More at javieraguilar.ai.',
+];
+/** Scenes of each script row (rows 4, 6, 7 and 8 have two visual beats, so two scenes). */
+const ROWS = [['cold'], ['map'], ['training'], ['desk', 'fresh'], ['summary'], ['notebook', 'search'], ['form', 'nobox'], ['human', 'save'], ['outro']];
+
+test('the narration is script v5 verbatim, EN only, no per-line speed', () => {
+  assert.deepEqual(TIMELINE.map((s) => s.id), ROWS.flat());
+  ROWS.forEach((ids, i) => {
+    const text = ids.flatMap((id) => TIMELINE.find((s) => s.id === id)!.lines.map((l) => l.text.en)).join(' ');
+    assert.equal(text, SCRIPT_V5[i], `row ${i + 1}`);
+  });
+  for (const s of TIMELINE) for (const l of s.lines) {
+    assert.equal(l.text.es, '', `${l.key}: ES is empty`);
+    assert.equal(l.tone?.speed, undefined, `${l.key}: no speed override`);
+  }
+});
+
+test('no warehouse anywhere in the narration', () => {
+  for (const s of TIMELINE) for (const l of s.lines) assert.doesNotMatch(l.text.en, /warehouse|pallet|shelf|quarantin|crate|rack/i);
+});
+
+test('settings and timeline of this video (EN only, script v5, the trip chat)', () => {
   assert.deepEqual(SETTINGS.voices, ['en']);
   assert.deepEqual(SETTINGS.subtitles, ['en']);
-  assert.equal(SETTINGS.targetSeconds, 120);
+  assert.equal(SETTINGS.targetSeconds, 84);
   assert.deepEqual(SETTINGS.articleTitle, { en: 'How an AI agent forgets', es: '' });
   assert.deepEqual(SETTINGS.music, { src: 'music/bed.wav', volume: 0.2, duck: 0.3 });
-  assert.deepEqual(SETTINGS.poster, { scene: 'hook', second: 5.7 });
+  // The poster is the cold open (frame 12): the wrong booking, pulsing red.
+  assert.deepEqual(SETTINGS.poster, { scene: 'cold', second: 0.4 });
   assert.equal(TIMELINE[0].kind, 'intro');
-  assert.equal(TIMELINE[0].anim?.name, 'MemoryMap');
+  assert.equal(TIMELINE[0].anim?.name, 'ChatTrip');
+  assert.equal(TIMELINE[0].anim?.props.mode, 'wrong');
   assert.equal(TIMELINE.at(-1)?.kind, 'outro');
-  assert.equal(TIMELINE.length, 15);
+  assert.equal(TIMELINE.length, 13);
   // Every mark is resolved to a finite scene second.
   for (const s of TIMELINE) {
     const marks = (s.anim?.props as { marks?: unknown[] } | undefined)?.marks ?? [];

@@ -1,19 +1,29 @@
 // Vector drawing pieces of the memory-office world, shared by the bespoke components: the robot
-// (with the bookshelf in its head), the red slip, the desk, pages, the notecard, the filing cabinet,
-// the magnifier, the clipboard, the warehouse rack and crates, the gauge, the clock, tick and cross.
-// Everything is SVG in frame pixels (1080x1920), drawn from the brand tokens only.
+// (with the bookshelf in its head), the red slip, the desk, pages of the trip chat (text, hotel
+// cards, price tags, a map), the notecard, the filing cabinet, the magnifier, the clipboard, the
+// gauge, the clock, tick and cross.
+// Everything is SVG in frame pixels of the scene's format (Canvas.tsx), drawn from the brand tokens only.
 import React from 'react';
 import { C, alpha } from '../brand.ts';
-import { fontFamily } from '../theme.ts';
-import { SHELF0, SLIP_TEXT } from './memory.ts';
+import { SLIP_TEXT } from './memory.ts';
+import { Canvas } from './Canvas.tsx';
 
 const cl = (x: number) => (Number.isFinite(x) ? Math.min(1, Math.max(0, x)) : 0);
 
-/** Full-frame SVG canvas. `zoom` scales about the stage centre (a camera push or pull). */
-export const Frame: React.FC<{ children: React.ReactNode; zoom?: number }> = ({ children, zoom = 1 }) => (
-  <svg width={1080} height={1920} viewBox="0 0 1080 1920" style={{ position: 'absolute', left: 0, top: 0, fontFamily }}>
-    <g transform={`translate(540 780) scale(${zoom}) translate(-540 -780)`}>{children}</g>
-  </svg>
+/**
+ * Full-frame SVG canvas (Canvas.tsx). `zoom` scales about the stage centre (a camera push or pull).
+ * `design="both"` once the component lays itself out per format with place(); the default,
+ * "vertical", fits a 1080x1920 drawing into the landscape stage (a stopgap until it is ported).
+ */
+export const Frame: React.FC<{ children: React.ReactNode; zoom?: number; vertical?: boolean; design?: 'both' | 'vertical' }> = ({
+  children,
+  zoom = 1,
+  vertical = true,
+  design = 'vertical',
+}) => (
+  <Canvas vertical={vertical} zoom={zoom} design={design}>
+    {children}
+  </Canvas>
 );
 
 /** A soft glow around a group, `a` in [0, 1]. */
@@ -70,8 +80,7 @@ export const robotHand = (x: number, y: number, s: number, armUp: number) => {
 
 /**
  * The robot. (x, y) is the top centre of its head; it is about 450·s tall. `shelf` lights the
- * bookshelf in its head; `armUp` raises the left arm (to hold the slip); `carry` shows a crate in
- * its arms; `face` -1 mirrors it.
+ * bookshelf in its head; `armUp` raises the left arm (to hold the slip); `face` -1 mirrors it.
  */
 export const Robot: React.FC<{
   x: number;
@@ -81,10 +90,9 @@ export const Robot: React.FC<{
   shelfGlow?: number;
   armUp?: number;
   blink?: number;
-  carry?: number;
   face?: number;
   opacity?: number;
-}> = ({ x, y, s = 1, shelf = 0, shelfGlow = 0, armUp = 0, blink = 0, carry = 0, face = 1, opacity = 1 }) => {
+}> = ({ x, y, s = 1, shelf = 0, shelfGlow = 0, armUp = 0, blink = 0, face = 1, opacity = 1 }) => {
   const up = cl(armUp);
   const hand = { x: -150 - 30 * up, y: 370 - 330 * up };
   const eye = 1 - 0.9 * cl(blink);
@@ -104,12 +112,6 @@ export const Robot: React.FC<{
       <circle cx={0} cy={262} r={20} fill={alpha(C.accent, 0.5)} stroke={line} strokeWidth={4} />
       <rect x={-48} y={312} width={96} height={12} rx={6} fill={alpha(C.muted, 0.4)} />
       <rect x={-48} y={336} width={64} height={12} rx={6} fill={alpha(C.muted, 0.4)} />
-      {/* a crate in its arms */}
-      {carry > 0 && (
-        <g opacity={cl(carry)}>
-          <Crate x={0} y={360} w={150} h={100} />
-        </g>
-      )}
       {/* neck and head */}
       <rect x={-26} y={166} width={52} height={30} rx={8} fill={C.bg1} stroke={line} strokeWidth={5} />
       <line x1={0} y1={0} x2={0} y2={-34} stroke={line} strokeWidth={6} />
@@ -129,7 +131,7 @@ export const Robot: React.FC<{
   );
 };
 
-/** The red slip, centred on (x, y): "SHELF 0: EMPTY". */
+/** The red slip, centred on (x, y): "FLIGHT: FRIDAY". */
 export const Slip: React.FC<{ x: number; y: number; w?: number; rot?: number; opacity?: number; glowA?: number; text?: string }> = ({
   x,
   y,
@@ -163,19 +165,76 @@ export const Desk: React.FC<{ x: number; y: number; w: number; lit?: number; glo
   </g>
 );
 
-/** A page (a loose sheet), centred on (x, y). */
-export const Page: React.FC<{ x: number; y: number; w?: number; rot?: number; opacity?: number; scale?: number }> = ({ x, y, w = 220, rot = 0, opacity = 1, scale = 1 }) => {
+/** What a page of the chat shows: plain text, a hotel card, a price tag, or a map. */
+export type PageKind = 'text' | 'hotel' | 'price' | 'map';
+
+/** A page (a loose sheet of the conversation), centred on (x, y). */
+export const Page: React.FC<{ x: number; y: number; w?: number; rot?: number; opacity?: number; scale?: number; kind?: PageKind }> = ({
+  x,
+  y,
+  w = 220,
+  rot = 0,
+  opacity = 1,
+  scale = 1,
+  kind = 'text',
+}) => {
   if (opacity <= 0) return null;
   const h = w * 0.62;
+  const L = -w / 2;
+  const T = -h / 2;
   return (
     <g transform={`translate(${x} ${y}) rotate(${rot}) scale(${scale})`} opacity={cl(opacity)}>
-      <rect x={-w / 2} y={-h / 2} width={w} height={h} rx={6} fill={alpha(C.text, 0.9)} stroke={alpha(C.bg0, 0.55)} strokeWidth={2} />
-      {[0, 1, 2, 3].map((i) => (
-        <rect key={i} x={-w / 2 + 16} y={-h / 2 + 18 + i * (h / 5)} width={(w - 32) * (i === 3 ? 0.55 : 0.9 - 0.08 * (i % 2))} height={6} rx={3} fill={alpha(C.muted, 0.75)} />
-      ))}
+      <rect x={L} y={T} width={w} height={h} rx={6} fill={C.text} stroke={alpha(C.bg0, 0.55)} strokeWidth={2} />
+      {kind === 'text' &&
+        [0, 1, 2, 3].map((i) => (
+          <rect key={i} x={L + 16} y={T + 18 + i * (h / 5)} width={(w - 32) * (i === 3 ? 0.55 : 0.9 - 0.08 * (i % 2))} height={6} rx={3} fill={alpha(C.muted, 0.75)} />
+        ))}
+      {kind === 'hotel' && (
+        // a hotel card: a small building with a roof, stars, two text lines
+        <g>
+          <rect x={L + 16} y={T + h * 0.3} width={w * 0.3} height={h * 0.56} rx={4} fill={alpha(C.accent, 0.8)} />
+          <path d={`M ${L + 10} ${T + h * 0.32} L ${L + 16 + w * 0.15} ${T + h * 0.1} L ${L + 22 + w * 0.3} ${T + h * 0.32} Z`} fill={C.accent2} />
+          {[0, 1, 2, 3].map((i) => (
+            <rect key={i} x={L + 24 + (i % 2) * w * 0.13} y={T + h * (0.4 + 0.2 * Math.floor(i / 2))} width={w * 0.07} height={h * 0.1} fill={alpha(C.text, 0.9)} />
+          ))}
+          {[0, 1, 2].map((i) => (
+            <path key={i} d={starPath(L + w * 0.46 + i * w * 0.1, T + h * 0.24, w * 0.035)} fill={C.warm} />
+          ))}
+          <rect x={L + w * 0.42} y={T + h * 0.5} width={w * 0.48} height={6} rx={3} fill={alpha(C.muted, 0.75)} />
+          <rect x={L + w * 0.42} y={T + h * 0.68} width={w * 0.32} height={6} rx={3} fill={alpha(C.muted, 0.75)} />
+        </g>
+      )}
+      {kind === 'price' && (
+        // a price tag with a string hole and a currency sign
+        <g>
+          <path d={`M ${L + w * 0.12} ${T + h * 0.5} L ${L + w * 0.3} ${T + h * 0.18} H ${L + w * 0.86} V ${T + h * 0.82} H ${L + w * 0.3} Z`} fill={alpha(C.ok, 0.85)} stroke={alpha(C.bg0, 0.5)} strokeWidth={2} />
+          <circle cx={L + w * 0.3} cy={T + h * 0.5} r={w * 0.035} fill={alpha(C.text, 0.95)} />
+          <text x={L + w * 0.6} y={T + h * 0.5 + w * 0.08} textAnchor="middle" fontSize={w * 0.24} fontWeight={800} fill={C.bg0}>
+            $
+          </text>
+        </g>
+      )}
+      {kind === 'map' && (
+        // a folded map: panels, a dashed route and a pin
+        <g>
+          {[0, 1, 2].map((i) => (
+            <rect key={i} x={L + 10 + i * (w - 20) / 3} y={T + 10} width={(w - 20) / 3} height={h - 20} fill={i % 2 ? alpha(C.ok, 0.35) : alpha(C.ok, 0.22)} />
+          ))}
+          <path d={`M ${L + w * 0.14} ${T + h * 0.75} C ${L + w * 0.35} ${T + h * 0.2}, ${L + w * 0.55} ${T + h * 0.9}, ${L + w * 0.78} ${T + h * 0.34}`} fill="none" stroke={C.accent} strokeWidth={4} strokeDasharray="8 6" />
+          <path d={`M ${L + w * 0.78} ${T + h * 0.34} c -12 -14 -12 -30 0 -32 c 12 2 12 18 0 32 Z`} fill={C.marker} />
+        </g>
+      )}
     </g>
   );
 };
+
+/** A five-point star centred on (x, y), radius r. */
+const starPath = (x: number, y: number, r: number): string =>
+  Array.from({ length: 10 }, (_, i) => {
+    const a = -Math.PI / 2 + (i * Math.PI) / 5;
+    const rr = i % 2 ? r * 0.45 : r;
+    return `${i ? 'L' : 'M'} ${(x + rr * Math.cos(a)).toFixed(1)} ${(y + rr * Math.sin(a)).toFixed(1)}`;
+  }).join(' ') + ' Z';
 
 /** The notecard: a ruled card with a rose top rule; `text` is revealed letter by letter. */
 export const Notecard: React.FC<{ x: number; y: number; w?: number; rot?: number; opacity?: number; text?: string; write?: number; lit?: number; blur?: number }> = ({
@@ -259,7 +318,7 @@ export const Cabinet: React.FC<{
       })}
       {peek > 0 && (
         <g opacity={cl(peek)} style={glow(C.marker, peekGlow)}>
-          <rect x={x + w * 0.58} y={y + peekDrawer * dh - 10} width={70} height={22} rx={3} fill={C.marker} transform={`rotate(-8 ${x + w * 0.58} ${y + peekDrawer * dh})`} />
+          <rect x={x + w * 0.58} y={y + peekDrawer * dh + 6} width={70} height={22} rx={3} fill={C.marker} transform={`rotate(-8 ${x + w * 0.58} ${y + peekDrawer * dh + 16})`} />
         </g>
       )}
     </g>
@@ -313,69 +372,6 @@ export const MiniClipboard: React.FC<{ x: number; y: number; w: number; h: numbe
     {tick > 0 && <Badge x={x + w * 0.95} y={y + h * 0.3} r={h * 0.09} kind="tick" pop={tick} />}
   </g>
 );
-
-/** A crate on a pallet base; (x, y) is the bottom centre. `dashed` draws only its outline. */
-export const Crate: React.FC<{ x: number; y: number; w: number; h: number; dashed?: boolean; opacity?: number }> = ({ x, y, w, h, dashed, opacity = 1 }) => {
-  if (opacity <= 0) return null;
-  const base = h * 0.16;
-  if (dashed)
-    return (
-      <rect x={x - w / 2} y={y - h} width={w} height={h} rx={8} fill="none" stroke={alpha(C.muted, 0.8)} strokeWidth={4} strokeDasharray="12 10" opacity={cl(opacity)} />
-    );
-  return (
-    <g opacity={cl(opacity)}>
-      <rect x={x - w / 2} y={y - base} width={w} height={base} rx={3} fill={alpha(C.muted, 0.55)} />
-      <rect x={x - w / 2 + 4} y={y - h} width={w - 8} height={h - base - 2} rx={6} fill={alpha(C.warm, 0.28)} stroke={C.warm} strokeWidth={4} />
-      <line x1={x - w / 2 + 10} y1={y - h + 8} x2={x + w / 2 - 10} y2={y - base - 8} stroke={alpha(C.warm, 0.7)} strokeWidth={4} />
-      <line x1={x + w / 2 - 10} y1={y - h + 8} x2={x - w / 2 + 10} y2={y - base - 8} stroke={alpha(C.warm, 0.7)} strokeWidth={4} />
-    </g>
-  );
-};
-
-/**
- * A warehouse rack of `bays` bays and two levels; the lower level holds the pallets (index 0 =
- * shelf 0, the only labelled one). (x, y) is the top left; the lower plank sits at y + h.
- */
-export const Rack: React.FC<{ x: number; y: number; w: number; h: number; bays?: number; pallets: number[]; ghost?: number; glowA?: number; upper?: boolean; s?: number }> = ({
-  x,
-  y,
-  w,
-  h,
-  bays = 3,
-  pallets,
-  ghost = 0,
-  glowA = 0,
-  upper = true,
-  s = 1,
-}) => {
-  const bw = w / bays;
-  const mid = y + h * 0.45;
-  const crate = { w: bw * 0.66, h: h * 0.4 };
-  return (
-    <g>
-      {upper &&
-        Array.from({ length: bays }, (_, i) => <Crate key={`u${i}`} x={x + (i + 0.5) * bw} y={mid} w={crate.w * 0.9} h={crate.h * 0.8} opacity={0.45} />)}
-      {Array.from({ length: bays + 1 }, (_, i) => (
-        <rect key={`p${i}`} x={x + i * bw - 7 * s} y={y} width={14 * s} height={h + 40 * s} rx={4} fill={C.bg1} stroke={alpha(C.accentText, 0.55)} strokeWidth={3} />
-      ))}
-      {upper && <rect x={x - 10 * s} y={mid} width={w + 20 * s} height={12 * s} rx={4} fill={alpha(C.accentText, 0.45)} />}
-      <rect x={x - 10 * s} y={y + h} width={w + 20 * s} height={14 * s} rx={4} fill={alpha(C.accentText, 0.6)} />
-      {/* shelf 0 glow */}
-      {glowA > 0 && <rect x={x + 8 * s} y={mid + 16 * s} width={bw - 16 * s} height={y + h - mid - 18 * s} rx={10} fill={alpha(C.warm, 0.18 * cl(glowA))} style={glow(C.warm, glowA)} />}
-      {pallets.map((p, i) => (
-        <Crate key={`c${i}`} x={x + (i + 0.5) * bw} y={y + h} w={crate.w} h={crate.h} opacity={p} />
-      ))}
-      <Crate x={x + 0.5 * bw} y={y + h} w={crate.w} h={crate.h} dashed opacity={ghost} />
-      {/* the SHELF 0 label plate */}
-      <g>
-        <rect x={x + bw / 2 - 72 * s} y={y + h + 22 * s} width={144 * s} height={40 * s} rx={8} fill={C.bg0} stroke={glowA > 0.05 ? C.warm : alpha(C.muted, 0.8)} strokeWidth={3} />
-        <text x={x + bw / 2} y={y + h + 50 * s} textAnchor="middle" fontSize={24 * s} fontWeight={800} fill={glowA > 0.05 ? C.warm : C.text} letterSpacing={1}>
-          {SHELF0}
-        </text>
-      </g>
-    </g>
-  );
-};
 
 /** A round badge: a tick (teal) or a cross (rose), popping from big to size. */
 export const Badge: React.FC<{ x: number; y: number; r: number; kind: 'tick' | 'cross'; pop: number; color?: string }> = ({ x, y, r, kind, pop, color }) => {
@@ -458,8 +454,8 @@ export const Crack: React.FC<{ x: number; y: number; w: number; h: number; p: nu
   );
 };
 
-/** A floor line for the scene. */
-export const Floor: React.FC<{ y: number }> = ({ y }) => <rect x={60} y={y} width={960} height={4} rx={2} fill={alpha(C.muted, 0.25)} />;
+/** A floor line for the scene; x and w default to the vertical stage width. */
+export const Floor: React.FC<{ y: number; x?: number; w?: number }> = ({ y, x = 60, w = 960 }) => <rect x={x} y={y} width={w} height={4} rx={2} fill={alpha(C.muted, 0.25)} />;
 
 /** A wall nail with a string (for hanging the clipboard). */
 export const Nail: React.FC<{ x: number; y: number; w: number; lit?: number }> = ({ x, y, w, lit = 1 }) => (

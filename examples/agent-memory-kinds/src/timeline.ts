@@ -1,19 +1,11 @@
-// How an AI agent forgets — concept explainer (EN). Narration from script.md v3 as written (15
-// rows); every claim traced in factcheck.md. On screen, the only figures are "0/24" and "24/24"
-// (scene "margin") plus the "SHELF 0" labels.
-// One world throughout: a small robot running a warehouse, the red slip "SHELF 0: EMPTY", and an
-// office whose objects are the kinds of memory. The same slip is followed into each object:
-// - MemoryMap (1): the cold open: the robot with the slip amid four tiles, each kind of memory with
-//   its human name and how it fails, all on screen from frame 0;
-// - MemoryOffice (4, 13, 14): the whole office: the layers, the verdict, the advice;
-// - WarehouseShelves (2-3): the test; the slip arrives, hours pass;
-// - HeadShelf (5): the bookshelf in its head (training); the slip bounces off the closed doors;
-// - MemoryDesk (6-7): the desk (working memory) overflows; the summary notecard keeps the slip;
-// - FilingCabinet (8-9): the searchable notebook; searches never turn the slip up;
-// - ClipboardForm (10-12): fixed boxes; the margin note erased (0/24), its own box (24/24), and a
-//   confident wrong value.
+// How an AI agent forgets — the vertical reel (EN). Narration from script.md v5, rows 1-9, verbatim;
+// every claim traced in factcheck.md. No figures on screen.
+// One everyday example, the same as the long version: a trip-planning chat where "my flight is
+// Friday, not Thursday" got a "Got it!" and an hour later the hotel was booked for Thursday. The
+// red slip "FLIGHT: FRIDAY" travels through every memory. One line per row, except rows 4, 6, 7
+// and 8: each has two visual beats, so it is split into two scenes at a sentence boundary.
 // Marks are [line, word]: resolved to scene seconds from the TTS word timestamps (marks.ts);
-// before TTS, and with Kokoro (no word timestamps), they are estimated from the text.
+// before TTS they are estimated from the text.
 import type { Cuts, Scene } from './types.ts';
 import { anim, intro, outro, say, videos, voice } from './narrate.ts';
 import { WORDS } from './audio.generated.ts';
@@ -31,65 +23,75 @@ const finish = (scenes: Scene[]): Scene[] => {
 
 const build = (): Cuts => ({
   main: finish([
-    intro('hook', [say(0.1, 'An AI agent forgets the way you do. It just has more places to do it in.', '')], 3, {
-      name: 'MemoryMap',
-      props: { marks: [[0, 'forgets'], [0, 'more'], [0, 'places']] },
-    }),
-    anim('warehouse', 'WarehouseShelves', { mode: 'day', marks: [[1, 'told'], [1, 'empty']] }, [
-      say(0.3, 'Here is my test. An agent runs a warehouse all day.', ''),
-      say(0, "Halfway through, it's told that shelf 0 is actually empty.", ''),
+    // 1 · Cold open: the wrong booking is already there, pulsing red, on frame 0.
+    intro(
+      'cold',
+      [say(0.1, 'You told your AI the plan changed. It said "got it". An hour later, it booked the old plan.', '')],
+      3,
+      { name: 'ChatTrip', props: { mode: 'wrong', marks: [[0, 'told'], [0, 'got'], [0, 'booked']] } },
+    ),
+    // 2 · The robot with the slip; the memories around it, unnamed.
+    anim(
+      'map',
+      'MemoryMap',
+      {
+        mode: 'reveal',
+        labels: false,
+        question: false,
+        marks: [[0, 'few'], [0, 'places'], [0, 'remember'], [0, 'each'], [0, 'forgets'], [0, 'own']],
+      },
+      [say(0.2, "It didn't ignore you. It forgot. Your AI has a few places to remember things, and each one forgets in its own way.", '')],
+    ),
+    // 3 · Training: the slip bounces off the closed bookshelf.
+    anim(
+      'training',
+      'HeadShelf',
+      { short: true, marks: [[0, 'learned'], [0, 'learned'], [0, 'correction'], [0, 'has'], [0, 'somewhere'], [0, 'frozen'], [0, 'training']] },
+      [say(0.3, 'What it learned in training is frozen. Your correction has to go somewhere else.', '')],
+    ),
+    // 4 · The desk: buried; then a new chat, a clean desk.
+    anim(
+      'desk',
+      'MemoryDesk',
+      { mode: 'crowded', short: true, marks: [[0, 'long'], [0, 'long'], [0, 'long'], [0, 'hotels'], [0, 'desk']] },
+      [say(0.3, 'First, the desk: the chat it can see. In a long chat, "Friday" can get buried under hotels and prices.', '')],
+    ),
+    anim('fresh', 'MemoryDesk', { mode: 'wiped', marks: [[0, 'new'], [0, 'clean'], [0, 'unless']] }, [
+      say(0.2, 'And a new chat starts with a clean desk, unless something was saved to memory.', ''),
     ]),
-    anim('later', 'WarehouseShelves', { mode: 'later', marks: [[0, 'hours'], [0, 'still']] }, [say(0.2, 'Hours later, does it still know?', '', undefined, { emotion: 'curious' })], {
+    // 5 · The summary: a good one keeps "Friday", a weaker one drops it.
+    anim('summary', 'MemoryDesk', { mode: 'squeeze', marks: [[0, 'writes'], [0, 'keeps'], [0, 'weaker'], [0, 'drop']] }, [
+      say(0.3, 'When the desk fills up, it writes a summary and throws the pages away. A good summary keeps "Friday". A weaker one can drop it.', ''),
+    ]),
+    // 6 · The notebook: "Sounds safest, right?" (the cabinet glows, a "?" over the magnifier); then
+    //     the searches for hotels and prices, never for the change of plan.
+    anim(
+      'notebook',
+      'FilingCabinet',
+      { mode: 'file', short: true, marks: [[0, 'files'], [0, 'safest'], [0, 'keyword'], [0, 'Sounds'], [0, 'files'], [0, 'did']] },
+      [say(0.3, 'Or it files the whole chat away and looks things up by keyword. Sounds safest, right? In my tests with AI agents, it did the worst.', '')],
+    ),
+    anim('search', 'FilingCabinet', { mode: 'miss', short: true, marks: [[0, 'searched'], [0, 'searched'], [0, 'never'], [0, 'change']] }, [
+      say(0.2, "It searched for hotels and prices, and almost never for a change of plan it didn't know about.", ''),
+    ]),
+    // 7 · The form: "Friday" replaces "Thursday" in its box; a fact with no box is wiped.
+    anim(
+      'form',
+      'ClipboardForm',
+      { mode: 'replace', marks: [[0, 'keeps'], [0, 'boxes'], [0, 'flight'], [0, 'Friday'], [0, 'replaces'], [0, 'and']] },
+      [say(0.3, 'Or it keeps a few named boxes: flight, hotel. "Friday" replaces "Thursday" and stays.', '')],
+    ),
+    anim('nobox', 'ClipboardForm', { mode: 'margin', short: true, marks: [[0, 'fact'], [0, 'lost']] }, [say(0.2, 'But a fact with no box gets lost.', '')], {
       min: 3.6,
     }),
-    anim('layers', 'MemoryOffice', { mode: 'layers', marks: [[0, 'message'], [1, 'layers'], [1, 'bit'], [1, 'each'], [1, 'way']] }, [
-      say(0.2, 'That depends on where it keeps the message.', ''),
-      say(0, 'Its memory has layers, a bit like yours, and each one fails in its own way.', ''),
+    // 8 · Like you; then "ask it to save it".
+    anim('human', 'MemoryOffice', { mode: 'human', marks: [[0, 'head'], [0, 'email'], [0, 'fridge']] }, [
+      say(0.2, 'Like you: the gist in your head, your email to search, a note on the fridge.', ''),
     ]),
-    anim('training', 'HeadShelf', { marks: [[0, 'training'], [0, 'school'], [1, 'message'], [1, 'there'], [2, 'lands']] }, [
-      say(0.3, 'Its oldest layer is its training, like school.', ''),
-      say(0, "Today's message can't go there.", ''),
-      say(0, 'So it lands on the desk.', ''),
+    anim('save', 'ChatTrip', { mode: 'save', marks: [[0, 'apps'], [0, 'matters'], [0, 'it'], [0, 'it']] }, [
+      say(0.2, 'These apps often save to memory on their own, but when something matters, ask it to save it.', ''),
     ]),
-    anim('desk', 'MemoryDesk', { mode: 'full', marks: [[0, 'desk'], [1, 'long'], [1, 'room'], [1, 'go']] }, [
-      say(0.3, 'The desk is its working memory.', ''),
-      say(0, 'On a long day, the desk runs out of room, and something has to go.', ''),
-    ], { min: 8.8 }), // time to see the pages spill (and for the last cue, "to go.", to be read)
-    anim('summary', 'MemoryDesk', { mode: 'summary', marks: [[0, 'squeeze'], [0, 'gist'], [0, 'meeting'], [0, 'without'], [1, 'kept']] }, [
-      say(0.2, 'AI assistants like Claude Code squeeze the desk into a summary: the gist, like a meeting you remember without its words.', ''),
-      say(0, 'In my test, the summary kept the message.', ''),
-    ]),
-    anim('notebook', 'FilingCabinet', { mode: 'file', marks: [[0, 'clear'], [1, 'nothing'], [2, 'search'], [2, 'know']] }, [
-      say(0.3, 'Or clear the desk and keep only a notebook it can search.', ''),
-      say(0, 'Nothing is lost.', ''),
-      say(0, 'But a search only helps if you know what to look for.', ''),
-    ]),
-    anim('missed', 'FilingCabinet', { mode: 'miss', marks: [[0, 'clean'], [1, 'looked'], [1, 'never'], [1, 'message']] }, [
-      say(0.2, 'Nothing on the clean desk said anything had changed.', ''),
-      say(0, 'It looked up other things, and almost never found the message.', ''),
-    ]),
-    anim('form', 'ClipboardForm', { mode: 'replace', marks: [[0, 'form'], [0, 'boxes'], [0, 'shelf'], [1, 'new'], [1, 'replaces']] }, [
-      say(0.2, 'Or use a form with fixed boxes, like what is on each shelf.', ''),
-      say(0, 'The new value simply replaces the old one.', ''),
-    ]),
-    anim('margin', 'ClipboardForm', { mode: 'margin', marks: [[0, 'margin'], [0, 'erased'], [1, 'box'], [1, '24']] }, [
-      say(0.2, 'But a fact with no box of its own gets scribbled in the margin, and erased.', ''),
-      say(0, 'Give it a box, and one model kept it in all 24 runs.', ''),
-    ]),
-    anim('misremember', 'ClipboardForm', { mode: 'wrong', marks: [[0, 'misremembers'], [0, 'full'], [0, 'mistake'], [0, 'sure']] }, [
-      say(0.2, 'And a form doesn\'t forget. It misremembers: write "full" by mistake, and the box looks just as sure.', '', undefined, { emotion: 'skeptical' }),
-    ]),
-    anim('verdict', 'MemoryOffice', { mode: 'verdict', marks: [[0, 'job'], [0, 'best'], [1, 'each'], [1, 'different']] }, [
-      say(0.3, 'So for what happens on the job, there is no best memory.', '', undefined, { emotion: 'confident' }),
-      say(0, 'Each one forgets something different.', '', undefined, { emotion: 'confident' }),
-    ]),
-    anim(
-      'advice',
-      'MemoryOffice',
-      { mode: 'advice', marks: [[0, 'people'], [0, 'gist'], [0, 'notebook'], [0, 'box'], [0, 'matter']] },
-      [say(0.2, 'Like people, use more than one: the gist in front of you, the notebook behind it, and a box for what you know will matter.', '', undefined, { emotion: 'confident', speed: 1.05 })],
-      { min: 10 },
-    ),
+    // 9 · Outro.
     outro('outro', [say(0.15, 'More at javieraguilar.ai.', '', { en: 'More at javier aguilar dot A I.' })]),
   ]),
 });

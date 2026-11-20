@@ -7,11 +7,11 @@ import * as quote from '../src/anim/KeyQuote.state.ts';
 import * as grid from '../src/anim/StatGrid.state.ts';
 import * as office from '../src/anim/MemoryOffice.state.ts';
 import * as map from '../src/anim/MemoryMap.state.ts';
-import * as warehouse from '../src/anim/WarehouseShelves.state.ts';
 import * as head from '../src/anim/HeadShelf.state.ts';
 import * as desk from '../src/anim/MemoryDesk.state.ts';
 import * as cabinet from '../src/anim/FilingCabinet.state.ts';
 import * as form from '../src/anim/ClipboardForm.state.ts';
+import * as chat from '../src/anim/ChatTrip.state.ts';
 
 // Fields that are animation progress and must stay within [0, 1].
 const PROGRESS = new Set(['progress', 'appear', 'grow', 'fill', 'draw', 'pop', 'opacity', 'emphasis']);
@@ -66,14 +66,13 @@ const CASES: Case[] = [
     { name: `MemoryOffice ${mode} (marks)`, state: (t: number, b: number[], d: number) => office.frameState({ mode, marks: [0.5, 1, Number.NaN, 2.5, 9] }, t, b, d) },
   ]),
   { name: 'MemoryMap', state: (t, b, d) => map.frameState({}, t, b, d) },
+  { name: 'MemoryMap reveal', state: (t, b, d) => map.frameState({ mode: 'reveal' }, t, b, d) },
+  { name: 'MemoryMap reveal (marks)', state: (t, b, d) => map.frameState({ mode: 'reveal', marks: [1, 2, 3, 4, 5, 6, 7] }, t, b, d) },
+  { name: 'MemoryMap reveal, no labels (marks out of order)', state: (t, b, d) => map.frameState({ mode: 'reveal', labels: false, marks: [5, 1, 3, Number.NaN, 2, 0.5, 0.1] }, t, b, d) },
   { name: 'MemoryMap (marks, one broken)', state: (t, b, d) => map.frameState({ marks: [0.9, Number.NaN, 4] }, t, b, d) },
   { name: 'MemoryMap (marks out of order)', state: (t, b, d) => map.frameState({ marks: [3, 1, 0.5] }, t, b, d) },
-  ...warehouse.WAREHOUSE_MODES.flatMap((mode) => [
-    { name: `WarehouseShelves ${mode}`, state: (t: number, b: number[], d: number) => warehouse.frameState({ mode }, t, b, d) },
-    { name: `WarehouseShelves ${mode} (marks)`, state: (t: number, b: number[], d: number) => warehouse.frameState({ mode, marks: [3, 0.2] }, t, b, d) },
-  ]),
   { name: 'HeadShelf', state: (t, b, d) => head.frameState({}, t, b, d) },
-  { name: 'HeadShelf (marks out of order)', state: (t, b, d) => head.frameState({ marks: [2, 1, 3, 0.5, 0.1] }, t, b, d) },
+  { name: 'HeadShelf (marks out of order)', state: (t, b, d) => head.frameState({ marks: [2, 1, 3, 0.5, 0.1, 4, 1, Number.NaN, 0.2] }, t, b, d) },
   ...desk.DESK_MODES.flatMap((mode) => [
     { name: `MemoryDesk ${mode}`, state: (t: number, b: number[], d: number) => desk.frameState({ mode }, t, b, d) },
     { name: `MemoryDesk ${mode} (marks)`, state: (t: number, b: number[], d: number) => desk.frameState({ mode, marks: [1, 1, 1, 1, 1] }, t, b, d) },
@@ -85,6 +84,20 @@ const CASES: Case[] = [
   ...form.FORM_MODES.flatMap((mode) => [
     { name: `ClipboardForm ${mode}`, state: (t: number, b: number[], d: number) => form.frameState({ mode }, t, b, d) },
     { name: `ClipboardForm ${mode} (marks)`, state: (t: number, b: number[], d: number) => form.frameState({ mode, marks: [0.3, 0.3, 0.3, 0.3, 0.3] }, t, b, d) },
+  ]),
+  // The reel's cuts.
+  { name: 'MemoryMap reveal, no question', state: (t, b, d) => map.frameState({ mode: 'reveal', labels: false, question: false, marks: [3, 3.5, 4, 5, 6, 7] }, t, b, d) },
+  { name: 'HeadShelf short', state: (t, b, d) => head.frameState({ short: true, marks: [0.8, 0.8, 3.3, 4, 4.8, 2.4, 1.6] }, t, b, d) },
+  { name: 'HeadShelf short (no marks)', state: (t, b, d) => head.frameState({ short: true }, t, b, d) },
+  { name: 'MemoryDesk crowded short', state: (t, b, d) => desk.frameState({ mode: 'crowded', short: true, marks: [3, 3, 3, 6, 1] }, t, b, d) },
+  { name: 'MemoryDesk crowded short (no marks)', state: (t, b, d) => desk.frameState({ mode: 'crowded', short: true }, t, b, d) },
+  { name: 'FilingCabinet file short', state: (t, b, d) => cabinet.frameState({ mode: 'file', short: true, marks: [0.7, 5, 4, 4.7, 0.7, 8.4] }, t, b, d) },
+  { name: 'FilingCabinet miss short', state: (t, b, d) => cabinet.frameState({ mode: 'miss', short: true }, t, b, d) },
+  { name: 'FilingCabinet miss short (marks, one broken)', state: (t, b, d) => cabinet.frameState({ mode: 'miss', short: true, marks: [0.4, Number.NaN, 3.4, 4.2] }, t, b, d) },
+  { name: 'ClipboardForm margin short', state: (t, b, d) => form.frameState({ mode: 'margin', short: true, marks: [0.6, 2.1] }, t, b, d) },
+  ...chat.CHAT_MODES.flatMap((mode) => [
+    { name: `ChatTrip ${mode}`, state: (t: number, b: number[], d: number) => chat.frameState({ mode }, t, b, d) },
+    { name: `ChatTrip ${mode} (marks out of order, one broken)`, state: (t: number, b: number[], d: number) => chat.frameState({ mode, marks: [3, 1, Number.NaN, 0.2] }, t, b, d) },
   ]),
 ];
 
@@ -224,22 +237,113 @@ test('StatGrid: tiles pop in per beat and lay out in a grid', () => {
   assert.deepEqual(grid.gridShape(3, false), { cols: 3, rows: 1 });
 });
 
-test('MemoryMap shows all four tiles from frame 0 and sweeps them in order', () => {
-  const marks = [1, 3.7, 4];
-  const at = (t: number) => map.frameState({ marks }, t, [0.1], 5.6);
-  // First second: every tile already on screen, one word each (the drawings carry the failures).
-  assert.deepEqual(at(0).opacity, [1, 1, 1, 1]);
-  assert.equal(map.TILES.length, 4);
-  assert.deepEqual(map.TILES.map((x) => x.label), ['DESK', 'GIST', 'NOTEBOOK', 'FORM']);
-  // The sweep: tile i peaks before tile i + 1, the last one on the second mark ("more").
-  const peaks = [0, 1, 2, 3].map((i) => {
-    let best = 0;
-    for (let t = 0; t <= 5.6; t += 0.01) if (at(t).emphasis[i] > at(best).emphasis[i]) best = t;
-    return best;
-  });
-  for (let i = 1; i < 4; i++) assert.ok(peaks[i] > peaks[i - 1], `tile ${i} peaks at ${peaks[i]}, after ${peaks[i - 1]}`);
-  assert.ok(Math.abs(peaks[3] - 3.7) < 0.05, `last peak at ${peaks[3]}`);
-  // After the hold: all four alike.
-  const end = at(5).emphasis;
-  for (const e of end) assert.ok(Math.abs(e - map.HOLD) < 1e-6);
+test('MemoryMap: five tiles named TRAINING, DESK, SUMMARY, NOTEBOOK, FORM', () => {
+  assert.deepEqual(map.TILES.map((x) => x.label), ['TRAINING', 'DESK', 'SUMMARY', 'NOTEBOOK', 'FORM']);
+  assert.equal(map.MAP_TITLE, 'How an AI agent forgets');
+});
+
+test('MemoryMap all: every tile and the title on screen from frame 0', () => {
+  const s = map.frameState({}, 0, [0.2], 6);
+  assert.deepEqual(s.opacity, [1, 1, 1, 1, 1]);
+  assert.equal(s.title, 1);
+  assert.ok(s.emphasis.every((e) => e === map.HOLD));
+});
+
+test('MemoryMap reveal: each tile is drawn on its mark and stays on; the title comes last', () => {
+  const marks = [10, 11, 12, 13, 14, 16, 19];
+  const at = (t: number) => map.frameState({ mode: 'reveal', marks }, t, [0.2, 8, 16], 22);
+  // Before the first name: only the empty frames, no tile, no title.
+  const early = at(5);
+  assert.ok(early.frames > 0.99);
+  assert.deepEqual(early.opacity, [0, 0, 0, 0, 0]);
+  assert.equal(early.title, 0);
+  // Each tile appears on its own mark, after the previous one, and does not leave.
+  for (let i = 0; i < 5; i++) {
+    assert.equal(at(marks[i] - 0.3).opacity[i], 0, `tile ${i} before its mark`);
+    assert.ok(at(marks[i] + 0.4).opacity[i] > 0.95, `tile ${i} after its mark`);
+    if (i < 4) assert.equal(at(marks[i] + 0.4).opacity[i + 1], 0, `tile ${i + 1} waits`);
+  }
+  for (const t of [14.6, 18, 21.9]) assert.ok(at(t).opacity.every((o) => o > 0.99), `all on at ${t}`);
+  // The pulse peaks on the name, then settles to the hold glow.
+  assert.ok(at(10.3).emphasis[0] > 0.9);
+  assert.ok(Math.abs(at(20).emphasis[0] - map.HOLD) < 1e-6);
+  assert.equal(at(15.5).title, 0);
+  assert.ok(at(17).title > 0.99);
+  // Past the end: the finished map.
+  const end = at(30);
+  assert.deepEqual(end.opacity, [1, 1, 1, 1, 1]);
+  assert.equal(end.title, 1);
+});
+
+test('MemoryMap reveal: marks out of order or missing never show a tile before the previous one', () => {
+  const s = (t: number) => map.frameState({ mode: 'reveal', marks: [5, 3, Number.NaN, 4] }, t, [0.2, 2], 12);
+  for (let t = 0; t < 12; t += 0.1) {
+    const o = s(t).opacity;
+    for (let i = 1; i < 5; i++) assert.ok(o[i] <= o[i - 1] + 1e-9, `tile ${i} ahead of ${i - 1} at ${t}`);
+  }
+  assert.deepEqual(s(12).opacity, [1, 1, 1, 1, 1]);
+});
+
+test('MemoryMap reveal: the notebook tile flickers on "safest" and keeps its "?"; labels hidden on request', () => {
+  const marks = [10, 11, 12, 13, 14, 16, 19];
+  const at = (t: number, labels?: boolean) => map.frameState({ mode: 'reveal', marks, labels }, t, [0.2, 8, 16], 22);
+  assert.equal(map.SAFEST, 3);
+  assert.equal(map.TILES[map.SAFEST].kind, 'notebook');
+  assert.equal(at(18.8).question, 0);
+  assert.equal(at(18.8).flicker, 0);
+  assert.ok(at(19.4).question > 0.99);
+  let flickered = false;
+  for (let t = 19; t < 19.9; t += 0.02) if (at(t).flicker > 0.9) flickered = true;
+  assert.ok(flickered);
+  assert.equal(at(21).flicker, 0);
+  assert.equal(at(22).question, 1);
+  assert.equal(at(12).labels, 1);
+  for (const t of [0, 12, 22]) assert.equal(at(t, false).labels, 0);
+  // The closing map ('all') has no "?".
+  assert.equal(map.frameState({ recipe: true }, 3, [0.2], 6).question, 0);
+});
+
+test('MemoryMap recipe: the recipe stays on from frame 0 only when asked for', () => {
+  assert.equal(map.frameState({}, 0, [0.2], 6).recipe, 0);
+  for (const t of [-1, 0, 3, 6, 9]) assert.equal(map.frameState({ recipe: true }, t, [0.2], 6).recipe, 1);
+});
+
+test('ChatTrip wrong: the whole chat and the red Thursday booking are on screen from frame 0', () => {
+  const s0 = chat.frameState({ mode: 'wrong' }, 0, [0.1], 6);
+  assert.equal(s0.chat.opacity, 1);
+  assert.ok(s0.chat.alert >= 0.1, 'the wrong booking pulses from the first frame');
+  for (let t = 0; t < 6; t += 0.05) assert.ok(chat.frameState({ mode: 'wrong' }, t, [0.1], 6).chat.alert > 0.09, `alert never fully off at ${t}`);
+  assert.equal(s0.wipe, 0);
+  // Each bubble lights on its own word.
+  const marks = [0.6, 2.2, 4.0];
+  const at = (t: number) => chat.frameState({ mode: 'wrong', marks }, t, [0.1], 6);
+  assert.ok(at(1.2).chat.lit[0] > 0.8);
+  assert.ok(at(2.8).chat.lit[1] > 0.8);
+  assert.equal(at(0.2).chat.lit[1], 0);
+  assert.equal(chat.CORRECTION, 'Change of plan: my flight is Friday, not Thursday.');
+  assert.equal(chat.GOT_IT, 'Got it!');
+  assert.equal(chat.BOOKING, 'Booked your hotel for Thursday night');
+});
+
+test('ChatTrip morning: the old chat until "tomorrow", then a wipe to the fresh greeting', () => {
+  const at = (t: number) => chat.frameState({ mode: 'morning', marks: [1.2, 3] }, t, [0.2], 5);
+  assert.equal(at(0).wipe, 0);
+  assert.equal(at(0).chat.opacity, 1);
+  assert.equal(at(0.9).greeting, 0);
+  assert.equal(at(2.5).wipe, 1);
+  assert.equal(at(2.5).chat.opacity, 0);
+  assert.ok(at(2.5).greeting > 0.99);
+  assert.equal(chat.GREETING, 'Hi! How can I help you today?');
+});
+
+test('ChatTrip save: typed, sent, then the line appears in the Memory panel', () => {
+  const at = (t: number) => chat.frameState({ mode: 'save', marks: [2, 4, 7, 12] }, t, [0.2], 15);
+  assert.ok(at(1).panel > 0.99, 'the panel is there from the start');
+  assert.equal(at(3.5).typed, 0);
+  assert.ok(at(5.5).typed > 0.3 && at(5.5).typed < 1);
+  assert.equal(at(5.5).sent, 0);
+  assert.equal(at(6.5).note.opacity, 0);
+  assert.ok(at(8.5).sent > 0.99 && at(8.5).note.opacity > 0.99);
+  assert.ok(at(13).note.lit > 0.99);
+  assert.equal(chat.SAVE_LINE, 'Save to memory: my flight is Friday.');
 });
