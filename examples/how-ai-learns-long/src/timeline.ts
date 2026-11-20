@@ -36,7 +36,7 @@ const build = (): Cuts => ({
       3,
       { name: 'ShopChat', props: { mode: 'cold', marks: [[0, 'perfectly'], [0, 'one'], [0, 'three']] } },
     ),
-    anim('doors', 'FourDoors', { mode: 'intro', marks: [[0, 'four'], [1, 'thorough'], [1, 'damage'], [2, 'cheapest'], [2, 'knowledge']] }, [
+    anim('doors', 'FourDoors', { mode: 'intro', marks: [[0, 'four'], [1, 'thorough'], [1, 'damage'], [2, 'cheapest'], [2, 'first']] }, [
       say(0.2, "Teaching an AI sounds like one thing. It's really four different things, and they cost, and break, very differently.", ''),
       say(0, "I've tested some of them myself. And the most thorough way to teach it was the one that did the most damage.", '', undefined, CURIOUS),
       say(0, "Spoiler: what most shops need is the cheapest one. But first, where does an AI's knowledge come from?", ''),
@@ -120,7 +120,7 @@ const build = (): Cuts => ({
     anim(
       'sheet',
       'ClearSheet',
-      { mode: 'lay', marks: [[0, 'sheet'], [1, 'through'], [1, 'underneath']] },
+      { mode: 'lay', marks: [[0, 'lay'], [1, 'through'], [1, 'underneath']] },
       [
         say(0.2, "There is. It's called LoRA. Instead of rewriting the pages, you lay a thin clear sheet over the book, and write only on the sheet.", '', LORA("There is. It's called LoRA. Instead of rewriting the pages, you lay a thin clear sheet over the book, and write only on the sheet.")),
         say(0, 'The model reads through the sheet, so its answers change. But the book underneath stays exactly as it was.', ''),
@@ -153,9 +153,10 @@ const build = (): Cuts => ({
       say(0, "If someone does rewrite the whole book for you, ask whether they mixed ordinary text back into the lessons. In my test, a tenth of it won back most of the general knowledge it had lost. The manners, I didn't check.", ''),
       say(0, 'And whatever you change, check more than the new thing. My model aced its new job and quietly lost some of its manners.', ''),
     ]),
-    anim('flat', 'FlatLine', { marks: [[0, 'recipe'], [0, 'nothing'], [0, 'tick']] }, [
+    // "Training complete" lands on "finished" and the scene holds ~3 s after it, so the banner can be read
+    anim('flat', 'FlatLine', { marks: [[0, 'recipe'], [0, 'nothing'], [0, 'finished']] }, [
       say(0.2, 'A fine-tune can even fail without telling you. Once, I trained a small model with the recipe it came with, made for far more data than I had. It learned nothing, it was just guessing, and the training still finished with a tick.', '', undefined, SKEPTICAL),
-    ]),
+    ], { min: 15.2 }),
     anim('today', 'ShopRecipe', { mode: 'today', marks: [[0, 'note'], [0, 'ten'], [1, 'cheapest'], [1, 'check']] }, [
       say(0.2, 'Something you can do today: write the note, and try it on ten real questions from your customers. You may find you can stop right there.', ''),
       say(0, "Teaching an AI isn't one thing. Start with the cheapest way. And if you go deeper, check what already worked, not just what's new.", '', undefined, CONFIDENT),

@@ -5,6 +5,16 @@ import * as bars from '../src/anim/BarCompare.state.ts';
 import * as flow from '../src/anim/FlowDiagram.state.ts';
 import * as quote from '../src/anim/KeyQuote.state.ts';
 import * as grid from '../src/anim/StatGrid.state.ts';
+import * as shopChat from '../src/anim/ShopChat.state.ts';
+import * as fourDoors from '../src/anim/FourDoors.state.ts';
+import * as flatLine from '../src/anim/FlatLine.state.ts';
+import * as knowledgeBook from '../src/anim/KnowledgeBook.state.ts';
+import * as clearSheet from '../src/anim/ClearSheet.state.ts';
+import * as terminalTest from '../src/anim/TerminalTest.state.ts';
+import * as twoRoads from '../src/anim/TwoRoads.state.ts';
+import * as briefingNote from '../src/anim/BriefingNote.state.ts';
+import * as shopManual from '../src/anim/ShopManual.state.ts';
+import * as shopRecipe from '../src/anim/ShopRecipe.state.ts';
 
 // Fields that are animation progress and must stay within [0, 1].
 const PROGRESS = new Set(['progress', 'appear', 'grow', 'fill', 'draw', 'pop', 'opacity', 'emphasis']);
@@ -54,6 +64,38 @@ const CASES: Case[] = [
     state: (t, b, d) => grid.frameState({ stats: [{ value: '14/20', label: 'with context' }, { value: '4/20', label: 'without' }, { value: '0.0018', label: 'p' }] }, t, b, d),
   },
   // Bespoke components of this video: add their CASES here.
+  ...(['cold', 'callback'] as const).flatMap((mode) => [
+    { name: `ShopChat ${mode}`, state: (t: number, b: number[], d: number) => shopChat.frameState({ mode, marks: [0.8, 1.6, 2.4] }, t, b, d) },
+    { name: `ShopChat ${mode} (no marks)`, state: (t: number, b: number[], d: number) => shopChat.frameState({ mode }, t, b, d) },
+  ]),
+  ...(['intro', 'labelled'] as const).flatMap((mode) => [
+    { name: `FourDoors ${mode}`, state: (t: number, b: number[], d: number) => fourDoors.frameState({ mode, marks: [0.5, 1.2, 1.9, 2.5, 3.1] }, t, b, d) },
+    { name: `FourDoors ${mode} (NaN marks)`, state: (t: number, b: number[], d: number) => fourDoors.frameState({ mode, marks: [NaN, 3, 1] }, t, b, d) },
+  ]),
+  { name: 'FlatLine', state: (t, b, d) => flatLine.frameState({ marks: [0.6, 1.8, 3.2] }, t, b, d) },
+  { name: 'FlatLine (late marks)', state: (t, b, d) => flatLine.frameState({ marks: [9, 12, NaN] }, t, b, d) },
+  ...(['school', 'finetune', 'retrain'] as const).flatMap((mode) => [
+    { name: `KnowledgeBook ${mode}`, state: (t: number, b: number[], d: number) => knowledgeBook.frameState({ mode, marks: [0.5, 1, 1.5, 2.5, 3] }, t, b, d) },
+    { name: `KnowledgeBook ${mode} (NaN marks)`, state: (t: number, b: number[], d: number) => knowledgeBook.frameState({ mode, marks: [NaN, 8, 0.2] }, t, b, d) },
+  ]),
+  ...(['lay', 'more'] as const).flatMap((mode) => [
+    { name: `ClearSheet ${mode}`, state: (t: number, b: number[], d: number) => clearSheet.frameState({ mode, marks: [0.5, 1, 1.5, 2, 2.5, 3] }, t, b, d) },
+    { name: `ClearSheet ${mode} (no marks)`, state: (t: number, b: number[], d: number) => clearSheet.frameState({ mode }, t, b, d) },
+  ]),
+  ...(['full', 'lora'] as const).flatMap((mode) => [
+    { name: `TerminalTest ${mode}`, state: (t: number, b: number[], d: number) => terminalTest.frameState({ mode, marks: [0.5, 1, 1.5, 2, 2.5, 3] }, t, b, d) },
+    { name: `TerminalTest ${mode} (NaN marks)`, state: (t: number, b: number[], d: number) => terminalTest.frameState({ mode, marks: [NaN, 9, 0.1] }, t, b, d) },
+  ]),
+  { name: 'TwoRoads', state: (t, b, d) => twoRoads.frameState({ marks: [0.8, 1.6, 3] }, t, b, d) },
+  { name: 'TwoRoads (no marks)', state: (t, b, d) => twoRoads.frameState({}, t, b, d) },
+  { name: 'BriefingNote', state: (t, b, d) => briefingNote.frameState({ marks: [0.3, 1, 1.5, 2, 2.6, 3.2] }, t, b, d) },
+  { name: 'BriefingNote (NaN marks)', state: (t, b, d) => briefingNote.frameState({ marks: [NaN, NaN, 7] }, t, b, d) },
+  { name: 'ShopManual', state: (t, b, d) => shopManual.frameState({ marks: [0.4, 1, 1.6, 2.2, 2.8] }, t, b, d) },
+  { name: 'ShopManual (no marks)', state: (t, b, d) => shopManual.frameState({}, t, b, d) },
+  ...(['recipe', 'today'] as const).flatMap((mode) => [
+    { name: `ShopRecipe ${mode}`, state: (t: number, b: number[], d: number) => shopRecipe.frameState({ mode, marks: [0.4, 1, 1.6, 2.2, 2.8] }, t, b, d) },
+    { name: `ShopRecipe ${mode} (NaN marks)`, state: (t: number, b: number[], d: number) => shopRecipe.frameState({ mode, marks: [NaN, 5, 0.1] }, t, b, d) },
+  ]),
 ];
 
 const SCENARIOS = [

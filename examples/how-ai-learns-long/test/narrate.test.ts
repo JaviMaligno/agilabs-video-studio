@@ -76,12 +76,12 @@ test('sceneStarts overlaps scenes by the transition', () => {
 test('settings and timeline of the long version (7 chapters, landscape)', () => {
   assert.deepEqual(SETTINGS.voices, ['en']);
   assert.deepEqual(SETTINGS.subtitles, ['en']);
-  assert.equal(SETTINGS.targetSeconds, 375);
-  assert.deepEqual(SETTINGS.articleTitle, { en: 'How an AI agent forgets', es: '' });
+  assert.equal(SETTINGS.targetSeconds, 388);
+  assert.deepEqual(SETTINGS.articleTitle, { en: 'How an AI learns', es: '' });
   assert.equal(TIMELINE[0].kind, 'intro');
   assert.equal(TIMELINE.at(-1)?.kind, 'outro');
   const chapters = TIMELINE.filter((s) => s.chapter !== undefined).map((s) => (typeof s.chapter === 'string' ? s.chapter : s.chapter!.en));
-  assert.deepEqual(chapters, ['Training', 'The desk', 'The summary', 'The notebook', 'The form', 'What to combine']);
+  assert.deepEqual(chapters, ['Two ways to teach', 'The prompt', 'Looking it up', 'Full fine-tuning', 'LoRA', 'What to use']);
   assert.equal(VIDEOS.en.main, TIMELINE);
 });
 

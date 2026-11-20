@@ -210,10 +210,13 @@ export const ChapterCard: React.FC<{ n: number; label: Label; lang: Lang; vertic
   const rise = interpolate(t, [0.3, 0.8], [18, 0], clamp);
   const num = vertical ? 150 : 130;
   return (
-    <div style={{ position: 'absolute', inset: 0, opacity, fontFamily }}>
-      <div style={{ position: 'absolute', inset: 0, background: alpha(C.bg0, 0.88) }} />
+    <div style={{ position: 'absolute', inset: 0, fontFamily }}>
+      {/* opaque: the scene behind must not show through the title; the title leaves first, so the
+          two never cross while the card fades */}
+      <div style={{ position: 'absolute', inset: 0, background: C.bg0, opacity }} />
       <div
         style={{
+          opacity: Math.max(0, (opacity - 0.5) / 0.5),
           position: 'absolute',
           left: vertical ? SAFE.side : 200,
           right: vertical ? SAFE.side : 200,
