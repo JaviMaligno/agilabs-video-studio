@@ -84,6 +84,9 @@ when installed as a plugin; next to `skills/` in the plugin repo).
     at the poster. The cover the platform shows is designed separately (see *The cover is a designed
     image* in `explainer-animation`) and checked inside the profile grid. Offer two or three cover
     candidates on one sheet, opened for the author, and install the chosen one as `out/cover.png`.
+    Open that sheet the moment it exists, in its own call, and check its window is in front; do
+    not hold it back for a later step (a render, the video review) or only announce it. A cover
+    sheet that was described but never opened has cost the author repeated reminders.
     Hand over the MP4 path and the cover; publishing is a separate step.
 
 ## Re-rendering an existing video
