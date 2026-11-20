@@ -88,15 +88,25 @@ follows the story: about 80 s to 2 min for a short.
 
 ## Long format (YouTube)
 
-A long video (landscape, ~9-10 min) is a concept video with room for the evidence. Same rules,
-plus:
+A long video (landscape, ~5-10 min) is its own format, not a stretched short: the audience
+chose to sit through minutes, the intent is to explain a concept well, and the shorts' rules are
+inspiration, not a template. Same premise card and cold reads, plus:
 
+- **The concept is the subject; the experiment is a tool.** Follow one everyday example the viewer
+  has lived (a correction their AI forgot, a new chat that knows nothing) from the first frame to
+  the verdict. The real experiment can be recast as that example, or as a thought experiment: its
+  results enter as short "in my tests…" lines, and its numbers are never transferred to the
+  example. A video that walks through the experiment's own setup (the warehouse, the arms) loses
+  the viewer, however good it is.
+- **Tie each concept to something the viewer sees** in the products they use ("compacting
+  conversation", "search past chats", the app's "memory"), and say how close the analogy is. The
+  cold-read expert checks those analogies as well as the numbers.
 - **Chapters, one idea each.** Each opens with a chapter card ("2 · The desk", `chapter` on its
   first scene) and the same titles, in the same order, become the YouTube chapters in the
   description (`npm run deliver` writes them). At least three, each at least 10 s.
-- **Cold open with an open loop.** Show the failure first (the agent that ignores the message)
-  and hold back why; pay it off later in a named chapter, and pay the opening promise ("by the
-  end you'll know which to combine") at the end.
+- **Cold open with an open loop.** Frame 0 is the viewer's problem already happening; plant a
+  question you do not answer ("the one that sounds safest did the worst") and pay it off in a
+  named chapter. Do not give away the verdict in the hook.
 - **End every chapter on a new question or a surprise**, so the next chapter has a reason to be
   watched.
 - **At most two spoken figures per chapter**, each with what it counts ("one decision in six
@@ -104,9 +114,18 @@ plus:
 - **Five fixed names** for the recurring concepts, chosen once and never swapped for synonyms
   ("the summary", never "the gist" or "the notes" for the same thing). List them at the top of
   the script; on screen they are the same labels.
-- **The recipe or verdict on screen**, built item by item as it is spoken, and left up long
-  enough to be read or paused on.
-- **About 1200-1400 EN words for ~9-10 min** (the voice plus breaths and the chapter cards).
+- **The recipe or verdict on screen**, built item by item as it is spoken, and a practical step
+  the viewer can take today.
+- **The author's voice keeps its authority.** No disclaimers that undercut the author's own
+  experience ("I didn't test the apps"); a hedge belongs to a claim the data does not carry, said
+  once.
+- **Length from the voice.** The cloned voice reads about 2.9 EN words per second at speed 1
+  (house standard, never slowed): ~1000 words is about 5.5 min with chapter cards. Set
+  `targetSeconds` from the first TTS pass.
+- **The thumbnail sells the concept, not the example.** 1280x720, a full-bleed Codex
+  illustration with one focal point and a 3-5 word headline set in code (honest clickbait: "Your
+  AI has 5 memories."), saved as `cover/thumbnail-<voice>.png`; `npm run deliver` uses it
+  instead of a frame. Offer two or three finished candidates, opened side by side.
 
 ## Voice
 

@@ -49,7 +49,7 @@ when installed as a plugin; next to `skills/` in the plugin repo).
    itself is fun or striking to watch. If the author asked for a concept video, never fall back
    to a video of the latest article. `explainer-script` has a section for each format.
    Decide the length too: a short (vertical, 45 s to 2 min) or a **long YouTube video**
-   (landscape 1920x1080, ~9-10 min, with chapters; see "Long format" in `explainer-script` and
+   (landscape 1920x1080, ~5-10 min, with chapters; see "Long format" in `explainer-script` and
    "Landscape and both formats" in `explainer-animation`).
 1. **Pick the article.** Use the one named. For a concept video, pick every article that
    carries the idea and treat them all as sources. If none is named, read the published articles and
