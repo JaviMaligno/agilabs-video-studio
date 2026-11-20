@@ -40,7 +40,19 @@ when installed as a plugin; next to `skills/` in the plugin repo).
 
 ## Workflow
 
-1. **Pick the article.** Use the one named. If none is named, read the published articles and
+0. **Pick the format: concept or experiment.** Decide it before the article, by what has
+   performed better for the author, not by habit. A *concept* video tells an idea that a set of
+   articles adds up to (kinds of memory, what an agent knows about time), with everyday
+   analogies; experiments enter only as one-line evidence. An *experiment* video tells one setup
+   and its number. Videos built around one specific experiment have performed worse for the
+   author than concept videos, so concept is the default; choose experiment when the setup
+   itself is fun or striking to watch. If the author asked for a concept video, never fall back
+   to a video of the latest article. `explainer-script` has a section for each format.
+   Decide the length too: a short (vertical, 45 s to 2 min) or a **long YouTube video**
+   (landscape 1920x1080, ~5-10 min, with chapters; see "Long format" in `explainer-script` and
+   "Landscape and both formats" in `explainer-animation`).
+1. **Pick the article.** Use the one named. For a concept video, pick every article that
+   carries the idea and treat them all as sources. If none is named, read the published articles and
    propose 2-3 candidates, each with its title, a hook line, the visual idea and the key number
    (quoted). Favour articles whose story can be drawn: people, objects, a mechanism, a scene that
    moves. Let the person choose.
@@ -75,7 +87,10 @@ when installed as a plugin; next to `skills/` in the plugin repo).
    PNG. Check the brand, the safe areas, nothing overflowing, numbers equal to the article, and
    captions matching the beat on screen. A clean build is not proof that a frame looks right.
 10. **Render:** `npm run render` (vertical EN). `-- --es` for the Spanish cut, `-- --landscape`
-    for 1920x1080. Then `npm run audio-qa` again to measure the mix (-16 LUFS integrated).
+    for 1920x1080 (the long format renders only this one). Then `npm run audio-qa` again to
+    measure the mix (-16 LUFS integrated). Videos over 3 min render in chunks joined without
+    re-encoding (`CHUNK_SECONDS` to tune); an interrupted chunked render resumes from the
+    finished chunks. The music bed is made as long as the video.
     **Before anyone sees it:** `npm run review-frames` and the `reel-watcher` agent (see *After
     every render* in `explainer-animation`). Fix what it flags, re-render and run it again until
     nothing fails; only then open the video for the author, with one line on what the watcher
@@ -85,6 +100,10 @@ when installed as a plugin; next to `skills/` in the plugin repo).
     image* in `explainer-animation`) and checked inside the profile grid. Offer two or three cover
     candidates on one sheet, opened for the author, and install the chosen one as `out/cover.png`.
     Hand over the MP4 path and the cover; publishing is a separate step.
+    When the landscape cut exists it also writes `out/youtube-chapters-<voice>.txt` (paste into
+    the description; fix any warning: YouTube needs at least 3 chapters of 10 s or more) and
+    `out/thumbnail-<voice>.png` (1280x720): the designed `cover/thumbnail-<voice>.png` when it
+    exists (see "Long format" in `explainer-script`), else a frame at `SETTINGS.thumbnail`.
 
 ## Re-rendering an existing video
 

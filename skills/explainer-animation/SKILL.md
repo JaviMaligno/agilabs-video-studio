@@ -48,7 +48,12 @@ export const TIMELINE = VIDEOS.en.main;
   the real audio, so re-check stills after narrating.
 - `L(en, es)`: a bilingual on-screen label. A plain string is used for both languages.
 - Scene ids must be unique: line keys (`<scene>-01`, ...) name the audio files.
-- `opts.chapter` on `anim` is stored on the scene but not drawn by any component yet.
+- **Chapters** (long format): `anim(id, name, props, lines, { chapter: L('The desk', 'La mesa') })`
+  starts a chapter. The scene opens with a chapter card, "2 · The desk" (numbered in timeline
+  order), over a dark scrim for its first 2 s (`CHAPTER_CARD`, fading over the last 0.4 s). Its
+  lines move 1 s later (`CHAPTER_LEAD`): the voice starts on the card and `at` / `min` keep their
+  meaning. Set it only on the first scene of each chapter; the same scenes become the YouTube
+  chapters that `npm run deliver` writes (the first scene is `0:00 Intro`).
 - Run `npm run lint` after every change: length against `targetSeconds` (±20 %), caption cues
   under 0.8 s or over 17 characters/s, and component names missing from the registry.
 
@@ -212,12 +217,72 @@ the before/after decision.
 - **Fill the screen with meaning, not decoration.** Half an empty screen is a place to draw the
   example, not to repeat the opening.
 
+## Cover (poster)
+
+The cover is what makes someone stop on the feed or the profile grid, so it is designed, not left
+to whatever frame `poster: null` happens to pick (that default once gave a warehouse with nothing
+happening in it). Design it together with the cold open: frame 0 of the video carries the same
+picture, so the cover and the first second promise the same thing.
+
+- **Show the idea, drawn.** For a concept video, the parts of the idea side by side (the four
+  kinds of memory, each a drawing). For an experiment video, the striking result as a picture.
+  Never a scene from the middle, never a character standing in an empty set.
+- **Very little text.** One short title of at most six words (the article's title or a short
+  promise), plus one-word labels if the picture has parts. The spoken hook sentence does not go on
+  the cover, and neither do explanatory lines under the labels: the drawing shows how each part
+  fails or what it does. A first try with a 17-word hook and a line under every label read as a
+  wall of text.
+- **Open a question, don't answer it.** Show the parts and that something goes wrong with them;
+  the video says which and why.
+- **Big and few.** Large drawings, high contrast, nothing small that only reads at full size.
+- **Thumbnail test.** Read the PNG at full size and again scaled to about 300 px wide (the
+  profile-grid size). If a word cannot be read or the idea is not clear in a second, cut text or
+  enlarge the drawing.
+- **Mechanics.** `npm run deliver` renders the poster from the main composition with
+  `noSubs: true`; elements that belong only on the cover (the short title instead of the hook
+  panel) are gated on those props, and the video frames keep the spoken hook. Set
+  `SETTINGS.poster` to the frame where every part is lit and no word of the hook is mid-highlight.
+- **Show it to the author before the final render.** The cover is the one frame everybody sees.
+
 ## Vertical safe area (1080x1920)
 
 - Platform UI covers the top ~220 px and the bottom ~380 px; keep 72 px at the sides.
 - Animations draw only inside the stage: from y = 280 (below the AGILabs badge) to y = 1280
   (above the two caption rows), 936 px wide. `Stage` / `stageOf()` give you that box.
 - Captions sit below the stage, at most two rows of ~32 characters, within ~900 px.
+
+## Landscape and both formats
+
+Every video has a landscape composition too (`Main-EN-landscape`, 1920x1080; the long YouTube
+format lives there). The landscape stage runs from y = 140 to y = 830 and x = 160 to x = 1760;
+the captions take the band under it. A drawing laid out for 1080x1920 does not fit there.
+
+- **Design each scene for its format.** Not a squeezed copy: a vertical scene stacks things, a
+  landscape one sets them side by side. Draw the parts once and give each format its own layout.
+- **`<Canvas vertical={p.vertical}>`** (`src/anim/Canvas.tsx`) is the full-frame SVG in the
+  format's own pixels; `place()`, `stageBox()`, `inStage()` and `fitInto()` (`src/anim/canvas.ts`)
+  give positions per format:
+
+  ```tsx
+  const L = place(p.vertical, {
+    v: { robot: { x: 830, y: 560, s: 0.9 }, desk: { x: 140, y: 1000, w: 800 } },
+    l: { robot: { x: 1500, y: 260, s: 0.8 }, desk: { x: 420, y: 620, w: 900 } },
+  });
+  return (
+    <Canvas vertical={p.vertical}>
+      <Desk {...L.desk} />
+      <Robot {...L.robot} />
+    </Canvas>
+  );
+  ```
+
+  `frameState` stays format-free (it returns progress, not pixels), so one state test covers both.
+- **Stopgap:** `<Canvas vertical={p.vertical} design="vertical">` fits a vertical-only drawing
+  into the landscape stage, scaled down. Nothing overflows, but it is small; port the scene before
+  the final render.
+- **Keep the captions zone clear** in both formats: nothing below the stage bottom.
+- **Check stills in both formats** (`Main-EN-vertical` and `Main-EN-landscape`) for every scene
+  you port, and Read them.
 
 ## Stills: look at them
 

@@ -30,3 +30,26 @@ export const linesInVideo = (scenes: Scene[]): { scene: Scene; line: Scene['line
   const { starts } = sceneStarts(scenes);
   return scenes.flatMap((scene, i) => scene.lines.map((line) => ({ scene, line, at: starts[i] / FPS + line.start })));
 };
+
+/**
+ * Chapter cards ("2 · The desk"): an anim scene with `chapter` opens with a card over its first
+ * CHAPTER_CARD seconds, fully on from the first frame and fading out over the last CHAPTER_FADE.
+ * Its lines are pushed back by CHAPTER_LEAD, so the voice starts on the card and the animation's
+ * first beat lands as the card lifts.
+ */
+export const CHAPTER_CARD = 2;
+export const CHAPTER_FADE = 0.4;
+export const CHAPTER_LEAD = 1;
+
+/** Opacity of the chapter card (and the scrim behind it) at scene second `t`. */
+export const chapterCardOpacity = (t: number): number => {
+  if (!Number.isFinite(t) || t >= CHAPTER_CARD) return 0;
+  if (t <= CHAPTER_CARD - CHAPTER_FADE) return 1;
+  return (CHAPTER_CARD - t) / CHAPTER_FADE;
+};
+
+/** Chapter number of each scene that shows a card (anim scenes with `chapter`), 1-based in order. */
+export const chapterNumbers = (scenes: Scene[]): (number | undefined)[] => {
+  let n = 0;
+  return scenes.map((s) => (s.kind === 'anim' && s.chapter !== undefined ? ++n : undefined));
+};

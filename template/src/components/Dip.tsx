@@ -16,3 +16,12 @@ const DipView: React.FC<TransitionPresentationComponentProps<DipProps>> = ({ chi
 };
 
 export const dip = (): TransitionPresentation<DipProps> => ({ component: DipView, props: {} });
+
+// Between two scenes of the same animation the picture is the same world, so dipping to the
+// background reads as a glitch: the outgoing scene stays put and the incoming one fades in on top.
+const FadeView: React.FC<TransitionPresentationComponentProps<DipProps>> = ({ children, presentationDirection, presentationProgress }) => {
+  const opacity = presentationDirection === 'exiting' ? 1 : interpolate(presentationProgress, [0, 1], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  return <AbsoluteFill style={{ opacity }}>{children}</AbsoluteFill>;
+};
+
+export const fade = (): TransitionPresentation<DipProps> => ({ component: FadeView, props: {} });

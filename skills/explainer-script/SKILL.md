@@ -35,7 +35,13 @@ In a batch, show the cards of every reel at once.
 - The cloned voice reads about 2.5 EN words per second plus pauses: count the words to
   estimate. Spanish runs about 15-20 % longer for the same content.
 
-## Structure
+## Two formats
+
+`article-video` picks the format first. **Experiment** videos follow "Structure" below.
+**Concept** videos follow "Concept videos" further down and share everything else (voice,
+captions, visuals, cold read, script format).
+
+## Structure (experiment video)
 
 1. **Hook, within the first 3 s.** The surprising finding or a concrete question. Never "In
    this video...", "Today I want to talk about...", or a greeting. Intro card.
@@ -55,6 +61,71 @@ In a batch, show the cards of every reel at once.
 6. **So what.** What the finding means for someone building with it, no stronger than the
    article claims.
 7. **Outro card line:** "More at javieraguilar.ai" (ES: "Más en javieraguilar.ai").
+
+## Concept videos
+
+A concept video explains an idea that one or more articles lead to. It does not tell an
+experiment: the viewer leaves with a way of thinking, not with a result.
+
+1. **Hook, within the first 3 s:** the idea as a surprising claim or a question ("An AI agent
+   forgets the way you do. It just has more places to do it in.").
+2. **One everyday example, start to finish.** Pick one concrete situation (a message the agent
+   must keep) and follow it through every part of the idea. Parts with no common thread lose
+   the viewer; a part the example cannot pass through gets one line or leaves the video.
+3. **The parts of the idea, one scene each.** Each part gets its human or everyday counterpart
+   and what goes wrong with it, shown as something that happens to the example.
+4. **Evidence in one line per part, at most** ("In my test, the summary kept the message").
+   Say once, early, what the test is, in one plain sentence, so "in my test" means something.
+   Keep the articles' scope words. Contrasting numbers go on screen, with what they count; the
+   voice says at most one per scene. Never explain how the test was built.
+5. **Verdict:** what the parts add up to and what to do with it, no stronger than the articles.
+6. **Outro card line**, as in the experiment format.
+
+Analogies must hold where it matters: say "a bit like yours" when the mechanism differs (a
+context window is not human working memory). Give the reel-expert a factual summary of every
+article the video draws on, and ask it to check the analogies as well as the numbers. Length
+follows the story: about 80 s to 2 min for a short.
+
+## Long format (YouTube)
+
+A long video (landscape, ~5-10 min) is its own format, not a stretched short: the audience
+chose to sit through minutes, the intent is to explain a concept well, and the shorts' rules are
+inspiration, not a template. Same premise card and cold reads, plus:
+
+- **The concept is the subject; the experiment is a tool.** Follow one everyday example the viewer
+  has lived (a correction their AI forgot, a new chat that knows nothing) from the first frame to
+  the verdict. The real experiment can be recast as that example, or as a thought experiment: its
+  results enter as short "in my tests…" lines, and its numbers are never transferred to the
+  example. A video that walks through the experiment's own setup (the warehouse, the arms) loses
+  the viewer, however good it is.
+- **Tie each concept to something the viewer sees** in the products they use ("compacting
+  conversation", "search past chats", the app's "memory"), and say how close the analogy is. The
+  cold-read expert checks those analogies as well as the numbers.
+- **Chapters, one idea each.** Each opens with a chapter card ("2 · The desk", `chapter` on its
+  first scene) and the same titles, in the same order, become the YouTube chapters in the
+  description (`npm run deliver` writes them). At least three, each at least 10 s.
+- **Cold open with an open loop.** Frame 0 is the viewer's problem already happening; plant a
+  question you do not answer ("the one that sounds safest did the worst") and pay it off in a
+  named chapter. Do not give away the verdict in the hook.
+- **End every chapter on a new question or a surprise**, so the next chapter has a reason to be
+  watched.
+- **At most two spoken figures per chapter**, each with what it counts ("one decision in six
+  hundred", not "one in six hundred"). The rest go on screen.
+- **Five fixed names** for the recurring concepts, chosen once and never swapped for synonyms
+  ("the summary", never "the gist" or "the notes" for the same thing). List them at the top of
+  the script; on screen they are the same labels.
+- **The recipe or verdict on screen**, built item by item as it is spoken, and a practical step
+  the viewer can take today.
+- **The author's voice keeps its authority.** No disclaimers that undercut the author's own
+  experience ("I didn't test the apps"); a hedge belongs to a claim the data does not carry, said
+  once.
+- **Length from the voice.** The cloned voice reads about 2.9 EN words per second at speed 1
+  (house standard, never slowed): ~1000 words is about 5.5 min with chapter cards. Set
+  `targetSeconds` from the first TTS pass.
+- **The thumbnail sells the concept, not the example.** 1280x720, a full-bleed Codex
+  illustration with one focal point and a 3-5 word headline set in code (honest clickbait: "Your
+  AI has 5 memories."), saved as `cover/thumbnail-<voice>.png`; `npm run deliver` uses it
+  instead of a frame. Offer two or three finished candidates, opened side by side.
 
 ## Voice
 
