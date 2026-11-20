@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { say, intro, anim, outro, lineSeconds, videos, voice, GAP, TAIL, OUTRO_SECONDS, OUTRO_TAIL } from '../src/narrate.ts';
-import { FPS, SCENE_TRANSITION, sceneFrames, sceneStarts } from '../src/timing.ts';
+import { L, say, intro, anim, outro, lineSeconds, videos, voice, GAP, TAIL, OUTRO_SECONDS, OUTRO_TAIL } from '../src/narrate.ts';
+import { CHAPTER_CARD, CHAPTER_FADE, CHAPTER_LEAD, FPS, SCENE_TRANSITION, chapterCardOpacity, chapterNumbers, sceneFrames, sceneStarts } from '../src/timing.ts';
 import { SETTINGS } from '../src/settings.ts';
 import { VIDEOS, TIMELINE } from '../src/timeline.ts';
 
@@ -93,4 +93,46 @@ test('a spoken form drives the TTS length estimate and is kept on the line', () 
   // No spoken form: the line carries none.
   assert.equal(say(0, 'a', 'b').spoken, undefined);
   assert.equal(intro('plain', [say(0, 'Plain line.', 'Línea.')]).lines[0].spoken, undefined);
+});
+
+test('a chapter scene leaves room for its card: lines shift by CHAPTER_LEAD, spacing kept', () => {
+  const plain = anim('p', 'X', {}, [say(0, 'a'.repeat(29), 'b'), say(5, 'Later.', 'Luego.')]);
+  const ch = anim('c', 'X', {}, [say(0, 'a'.repeat(29), 'b'), say(5, 'Later.', 'Luego.')], { chapter: L('Training', 'Entrenamiento') });
+  assert.deepEqual(ch.chapter, { en: 'Training', es: 'Entrenamiento' });
+  assert.ok(CHAPTER_LEAD > 0 && CHAPTER_LEAD < CHAPTER_CARD, 'the voice may start on the card');
+  near(ch.lines[0].start, CHAPTER_LEAD);
+  near(ch.lines[1].start, 5 + CHAPTER_LEAD);
+  near(ch.minSeconds!, plain.minSeconds! + CHAPTER_LEAD);
+  assert.deepEqual(ch.beats, ch.lines.map((l) => l.start));
+  // A silent chapter scene still shows its whole card.
+  assert.ok(anim('s', 'X', {}, [], { chapter: 'Silent' }).minSeconds! >= CHAPTER_CARD);
+  // min counts from the end of the lead too.
+  near(anim('m', 'X', {}, [], { chapter: 'M', min: 6 }).minSeconds!, 6 + CHAPTER_LEAD);
+  // Scenes without a chapter are unchanged.
+  near(plain.lines[0].start, 0);
+});
+
+test('chapter card is fully on from the first frame, then fades out by CHAPTER_CARD', () => {
+  assert.equal(chapterCardOpacity(0), 1);
+  assert.equal(chapterCardOpacity(CHAPTER_CARD - CHAPTER_FADE), 1);
+  assert.equal(chapterCardOpacity(CHAPTER_CARD), 0);
+  assert.equal(chapterCardOpacity(CHAPTER_CARD + 5), 0);
+  assert.equal(chapterCardOpacity(Number.NaN), 0);
+  let prev = 1;
+  for (let t = 0; t <= CHAPTER_CARD + 0.5; t += 0.05) {
+    const o = chapterCardOpacity(t);
+    assert.ok(o >= 0 && o <= 1 && o <= prev + 1e-12, `opacity ${o} at ${t}`);
+    prev = o;
+  }
+});
+
+test('chapters are numbered in order; only anim scenes with a chapter get a card', () => {
+  const scenes = [
+    intro('hook', [say(0, 'Hook.', 'Gancho.')]),
+    anim('a', 'X', {}, [say(0, 'A.', 'A.')], { chapter: 'One' }),
+    anim('b', 'X', {}, [say(0, 'B.', 'B.')]),
+    anim('c', 'X', {}, [say(0, 'C.', 'C.')], { chapter: 'Two' }),
+    outro('end', []),
+  ];
+  assert.deepEqual(chapterNumbers(scenes), [undefined, 1, undefined, 2, undefined]);
 });

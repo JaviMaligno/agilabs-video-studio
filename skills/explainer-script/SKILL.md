@@ -1,6 +1,6 @@
 ---
 name: explainer-script
-description: Write the script for a short narrated explainer video of a blog article - hook, setup, experiment, finding with its exact number, so-what and closing card - with a visual idea per scene mapped to an animation component, caption reading-speed limits and an optional parallel Spanish version. Use when drafting or revising what an article video says, before any scene is built.
+description: Write the script for a short narrated explainer video of a blog article - hook, setup, experiment, finding, so-what and closing card - with a visual idea per scene mapped to an animation component, caption reading-speed limits and an optional parallel Spanish version. Use when drafting or revising what an article video says, before any scene is built.
 ---
 
 # Explainer script
@@ -8,6 +8,22 @@ description: Write the script for a short narrated explainer video of a blog art
 A script is a short list of scenes. Each scene has one or more narration lines and one visual.
 It is written for a viewer scrolling with the sound off, so every line must also work as a
 caption.
+
+## Premise card, before any script
+
+The angle is the expensive part to get wrong: arguing it over a v8 script, or over a video
+already animated, costs hours. So before writing a single line, write a five-line card:
+
+1. **The question** a non-technical viewer would ask, in their words.
+2. **The everyday example** that shows it (one, start to finish).
+3. **Frame 0**: what is on screen in the very first frame.
+4. **The experiment**: whether it enters, and which part of the question it answers, or "it
+   does not enter".
+5. **Two concrete examples** that will appear on screen.
+
+Run the card through `reel-viewer` (as five numbered lines) and show it to the author with the
+viewer's retelling. The author approves it in one line, or changes it; only then write the script.
+In a batch, show the cards of every reel at once.
 
 ## Length
 
@@ -39,8 +55,9 @@ captions, visuals, cold read, script format).
 3. **Setup.** What was being tested and why it matters, in one or two lines.
 4. **The experiment in one picture.** The mechanism or design as one visual (a flow, a
    comparison). One idea, not the whole method section.
-5. **The finding, with its exact number.** The number as the article writes it ("14/20 vs
-   4/20", "83 %", "p = 0.0018"): same rounding, same units.
+5. **The finding, with what makes it a finding.** Its size or its contrast, said the way you
+   would explain it to a colleague. On screen and in the source sentence, the number as the
+   article writes it.
 6. **So what.** What the finding means for someone building with it, no stronger than the
    article claims.
 7. **Outro card line:** "More at javieraguilar.ai" (ES: "Más en javieraguilar.ai").
@@ -68,6 +85,47 @@ Analogies must hold where it matters: say "a bit like yours" when the mechanism 
 context window is not human working memory). Give the reel-expert a factual summary of every
 article the video draws on, and ask it to check the analogies as well as the numbers. Length
 follows the story: about 80 s to 2 min for a short.
+
+## Long format (YouTube)
+
+A long video (landscape, ~5-10 min) is its own format, not a stretched short: the audience
+chose to sit through minutes, the intent is to explain a concept well, and the shorts' rules are
+inspiration, not a template. Same premise card and cold reads, plus:
+
+- **The concept is the subject; the experiment is a tool.** Follow one everyday example the viewer
+  has lived (a correction their AI forgot, a new chat that knows nothing) from the first frame to
+  the verdict. The real experiment can be recast as that example, or as a thought experiment: its
+  results enter as short "in my tests…" lines, and its numbers are never transferred to the
+  example. A video that walks through the experiment's own setup (the warehouse, the arms) loses
+  the viewer, however good it is.
+- **Tie each concept to something the viewer sees** in the products they use ("compacting
+  conversation", "search past chats", the app's "memory"), and say how close the analogy is. The
+  cold-read expert checks those analogies as well as the numbers.
+- **Chapters, one idea each.** Each opens with a chapter card ("2 · The desk", `chapter` on its
+  first scene) and the same titles, in the same order, become the YouTube chapters in the
+  description (`npm run deliver` writes them). At least three, each at least 10 s.
+- **Cold open with an open loop.** Frame 0 is the viewer's problem already happening; plant a
+  question you do not answer ("the one that sounds safest did the worst") and pay it off in a
+  named chapter. Do not give away the verdict in the hook.
+- **End every chapter on a new question or a surprise**, so the next chapter has a reason to be
+  watched.
+- **At most two spoken figures per chapter**, each with what it counts ("one decision in six
+  hundred", not "one in six hundred"). The rest go on screen.
+- **Five fixed names** for the recurring concepts, chosen once and never swapped for synonyms
+  ("the summary", never "the gist" or "the notes" for the same thing). List them at the top of
+  the script; on screen they are the same labels.
+- **The recipe or verdict on screen**, built item by item as it is spoken, and a practical step
+  the viewer can take today.
+- **The author's voice keeps its authority.** No disclaimers that undercut the author's own
+  experience ("I didn't test the apps"); a hedge belongs to a claim the data does not carry, said
+  once.
+- **Length from the voice.** The cloned voice reads about 2.9 EN words per second at speed 1
+  (house standard, never slowed): ~1000 words is about 5.5 min with chapter cards. Set
+  `targetSeconds` from the first TTS pass.
+- **The thumbnail sells the concept, not the example.** 1280x720, a full-bleed Codex
+  illustration with one focal point and a 3-5 word headline set in code (honest clickbait: "Your
+  AI has 5 memories."), saved as `cover/thumbnail-<voice>.png`; `npm run deliver` uses it
+  instead of a frame. Offer two or three finished candidates, opened side by side.
 
 ## Voice
 
@@ -116,6 +174,8 @@ own text, check it in the stills.
 
 ## EN and ES
 
+- AGILabs videos are in English by default; don't ask the language again unless the request
+  or an existing cut calls for another.
 - Write the EN/ES pair together, line by line, so both cuts stay in step. ES is optional: leave
   the ES text empty while a video is EN-only.
 - The ES line says the same thing, not a word-for-word translation; keep it as short as EN.
@@ -136,7 +196,18 @@ Every scene gets a visual idea, mapped to a component from the library (see
 
 If no component fits, flag the scene **"bespoke"** with a one-line description of the
 animation. Avoid a video that is only text on a gradient: each article gets at least one
-visual that shows its mechanism.
+visual that shows its mechanism. The catalogue is a toolkit, not a limit: decide first what the
+viewer should see happen, then pick the implementation.
+
+**A continuous story.** When the video follows one character or object through the idea, fix
+the recurring character, the setting, what changes and how the next action reveals the change,
+and keep them across scenes. Test it with the narration hidden: the mechanism should still be
+followable; captions should not carry the whole explanation.
+
+**Metaphors.** A visual metaphor can make an invisible process visible (a sleeping explorer
+and a dream replay for offline memory review). Narrate or label it as a metaphor when viewers
+could take it for what the experiment literally did. Each subject needs its own visual
+language; one video's metaphor is not a template for the next.
 
 **Draw it, don't letter it.** When a scene shows people, models, agents, objects or places as
 initials, labels or plain text boxes, propose the drawing instead: a caricature for each person
@@ -210,10 +281,6 @@ Write `script.md` as a table, one row per narration line:
 - Under the table, a **Must show** list: each thing the author asked to see, in their words. The
   stills check confirms each one with its timestamp before delivery.
 - End with the word count (EN) and the estimated length.
-- **Spoken figures:** run `python3 <this skill's folder>/scripts/script_lint.py <path>/script.md`
-  and rewrite every line it
-  flags: the voice says the figure that carries the point, the others go into words ("almost
-  never", "about half") or into the Visual column. Run it again until it is clean.
 - **Cold-viewer check before presenting:** read only the first ~15 s of narration as someone
   who has never seen the article. Can they say, in one sentence, what real situation this is
   about? If not, the story is missing: add it, even if the video gets longer.

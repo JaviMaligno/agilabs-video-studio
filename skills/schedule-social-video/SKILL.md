@@ -10,6 +10,20 @@ When the browser tool can upload files, the agent does the whole thing; otherwis
 only manual step is choosing each file in the browser's file dialog, once per video. Deleting
 scheduled entries is always the person's step (it is permanent).
 
+## 0. Gate: only approved, final videos
+
+Nothing is uploaded or scheduled, not even as a draft in the composer, unless both hold:
+
+- **The author approved this video**, the rendered mp4 itself, in so many words, after watching
+  it. An approved script is not an approved video, and "yes" to a plan that ends in "and I'll
+  schedule it" approves the plan, not the video that comes out of it. Hand the video over (open
+  it locally) and wait.
+- **It has the final voice.** A video voiced with the Kokoro fallback, or with any voice marked
+  preliminary, is a draft for review only (see `narration`). It is re-voiced and re-rendered
+  before scheduling, and the author sees that version too if anything changed beyond the voice.
+
+If either is missing, stop at handing the video over and say what is still pending.
+
 ## 1. Prepare the hand-off folder
 
 Make a folder the person can reach from Finder (e.g. `~/Desktop/<Brand>-redes/`), not a
@@ -17,7 +31,9 @@ temp or scratch path:
 
 - `videos/NN-<slug>.mp4`, numbered in publishing order. Re-encode anything over ~25 MB
   (`ffmpeg -c:v libx264 -crf 20 -preset slow -c:a copy -movflags +faststart`).
-- `portadas/NN-<slug>.png` from each `out/poster-en.png`.
+- `portadas/NN-<slug>.png` from each video's designed cover, `out/cover.png` (see *The cover is a
+  designed image* in `explainer-animation`). `out/poster-en.png` is a frame of the video, not the
+  cover. Check the number is free: an older video may already use it.
 - `textos-reels.md`: per video, three ready-to-paste blocks, nothing to edit by hand:
   - **INSTAGRAM**: caption ending in "link in bio" (caption links are not clickable on IG).
   - **FACEBOOK**: the same caption with the exact article URL in place of "link in bio".
@@ -59,8 +75,11 @@ Per video:
    the agent does it without the person; otherwise ask them to click **Add video** and pick
    `videos/NN-<slug>.mp4`. Agent upload (see *Uploading without the file dialog* below).
 3. Turn on **Customise for Facebook and Instagram** and paste each platform's block.
-4. Thumbnail: pick the most striking suggested frame (the hook frame usually wins), or use the
-   video's poster through **Subir imagen** (the same captured-input upload as the video).
+4. Thumbnail: upload the designed cover (`out/cover.png`) through **Subir imagen**, the same
+   captured-input upload as the video, and look at it in the preview. Open the file before
+   uploading: a frame with the same name is not the cover. The cover can only be set while
+   creating the reel; a scheduled reel lets you edit the text and the date, and a published one
+   nothing, so a wrong cover means creating the reel again.
 5. Auto-captions: with both platforms selected the Share step has **Subtitles ticked by default**;
    untick it (the videos have burned-in captions) and confirm it reads "Aplica subtítulos a tu vídeo".
    With both platforms there is also an Edit step (music library): skip it without adding audio.
@@ -121,12 +140,14 @@ by the caption's first words to find both. Row menu «…» → Administrar publ
   *definitivamente*: it is a permanent deletion, so the person clicks it, not the agent. **Never
   "Mover a borradores"**: it leaves the scheduled entry in "Error al publicar", and deleting that
   entry deletes the draft with it. The reel must be uploaded again when its window opens.
+  In a batch, deletions are gathered and asked for once at the end (see *Deleting in one step at
+  the end of the batch*).
 - Free a date before moving another reel onto it (one reel per day).
 
 ### Replacing a scheduled reel with a new cut
 
 A scheduled reel's video cannot be swapped. Upload the new cut as a new reel with the same texts,
-date and time, then ask the person to delete the old Facebook and Instagram entries. In
+date and time; the old Facebook and Instagram entries then have to be deleted. In
 Programadas both versions show the same caption and the list order is not creation order.
 **Tell them apart by creation time, not by thumbnail** (thumbnails misled once and the new cut
 got deleted): each row's React fiber carries the post, so
@@ -136,6 +157,29 @@ added), group rows by date, platform and caption, keep the newest of each group 
 checkboxes of the rest, so the person only has to delete the selection. Afterwards, check every
 date has exactly one Facebook and one Instagram entry; a stray duplicate on today's date posts
 twice.
+
+### Deleting in one step at the end of the batch
+
+Asking for a deletion after each replaced reel interrupts the person once per reel. In a batch,
+deletions wait for the end:
+
+1. **Accumulate.** Each time a reel already scheduled is replaced (or taken off the calendar),
+   add a row to a **Borrar** table in `textos-reels.md`: date and time, reel (number and slug),
+   platforms (FB, IG), the caption's first line, and the creation time of the entry to delete
+   (and of the one to keep). Do not ask for anything yet.
+2. **One selection.** When the batch is done, open Content → Programadas once, load the whole list,
+   and tick every entry of the table at once (the creation-time grouping above, run over all the
+   rows), so a single view holds every entry to delete and nothing else. Check the ticked count
+   equals the table (two per reel when both platforms are scheduled).
+3. **One notice.** Tell the person once: the table (date / reel / first line / platforms) and
+   "they are ticked in Programadas; delete the selection". The deletion itself stays theirs, as
+   always (it is permanent); it is asked for once for the whole batch, not per reel. The day a
+   replaced reel goes out is the exception: if its old entry would post before the batch ends,
+   ask for that one deletion straight away.
+4. **Verify the whole list.** After they delete, reload Programadas and check every row of the
+   table is gone and every date of the batch has exactly one Facebook and one Instagram entry,
+   the new ones (by creation time). Report the result in one line and mark the rows done in
+   `textos-reels.md`.
 
 ## 4. LinkedIn
 

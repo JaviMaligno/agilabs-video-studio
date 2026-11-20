@@ -59,6 +59,10 @@ Javier's mic is weak, so his clone uses the approved "version B" chain (`JAVIER_
 A warning about Kokoro in the output means the video does not have the Cartesia voice: say so
 when handing the video over.
 
+A Kokoro-voiced video is a draft for the author to review locally. It never gets uploaded or
+scheduled anywhere: publishing waits for the final voice and the author's approval of that video
+(see `schedule-social-video`, step 0).
+
 ## Spanish voice
 
 `voices.es` is `null` until a Spanish version is made. Pick a Spanish voice from the Cartesia

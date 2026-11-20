@@ -20,4 +20,11 @@ Answer, in the language requested (default Spanish), with:
 6. **Best line**: the line you would remember or repeat.
 7. **Suggestions**: what would keep you watching (a concrete image instead of an abstract word, the surprise earlier, one idea per line, a real-life example).
 
+8. **Red flags**: say plainly if you notice any of these, with the line number:
+   - the opening already gives away the answer, so there is no reason to keep watching;
+   - the story changes halfway (two stories in one video);
+   - the experiment does not answer the question the opening asked;
+   - an idea is named but never shown with an example;
+   - report language nobody uses when talking ("I ran it hundreds of times", "across conditions").
+
 Judge only what you would see and hear. Do not invent facts about the experiment.

@@ -54,6 +54,7 @@ npm run tts                   # narration (Cartesia, or Kokoro without a key)
 npm run audio-qa              # clipping and garbled lines
 npm run studio                # preview in the browser
 npm run render                # out/main-en-vertical.mp4, normalised to -16 LUFS
+npm run review-frames         # frames of the render for the reel-watcher agent (out/review/)
 npm run deliver               # poster, SRT and out/manifest.json
 ```
 

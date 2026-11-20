@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
 import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
-import { C, GRADIENT } from '../brand.ts';
+import { C, GRADIENT, alpha } from '../brand.ts';
 import { fontFamily, SAFE, V } from '../theme.ts';
 import { SETTINGS } from '../settings.ts';
 import { tokensOf } from '../captions.ts';
-import { tx, type Lang, type Line } from '../types.ts';
+import { tx, type Label, type Lang, type Line } from '../types.ts';
+import { chapterCardOpacity } from '../timing.ts';
 import { Badge, Site } from './Brand.tsx';
 
 const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
@@ -193,4 +194,64 @@ export const Outro: React.FC<{ lang: Lang; vertical: boolean }> = ({ lang, verti
       </div>
     </div>
   );
+};
+
+/**
+ * Chapter card: "n · Title" over a dark scrim, on the first CHAPTER_CARD seconds of a chapter
+ * scene (timing.ts). On from the first frame, then it fades out and the scene shows through.
+ * Same design in both formats, sized for each.
+ */
+export const ChapterCard: React.FC<{ n: number; label: Label; lang: Lang; vertical: boolean }> = ({ n, label, lang, vertical }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+  const opacity = chapterCardOpacity(t);
+  if (opacity <= 0) return null;
+  const rise = interpolate(t, [0.3, 0.8], [18, 0], clamp);
+  const num = vertical ? 150 : 130;
+  return (
+    <div style={{ position: 'absolute', inset: 0, opacity, fontFamily }}>
+      <div style={{ position: 'absolute', inset: 0, background: alpha(C.bg0, 0.88) }} />
+      <div
+        style={{
+          position: 'absolute',
+          left: vertical ? SAFE.side : 200,
+          right: vertical ? SAFE.side : 200,
+          // Centred on the stage, clear of the caption rows below it.
+          top: vertical ? V.stageTop : 140,
+          height: vertical ? V.stageBottom - V.stageTop : 690,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: vertical ? 36 : 28,
+          transform: `translateY(${rise}px)`,
+        }}
+      >
+        <div style={{ fontSize: num, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.03em', ...gradientNumber }}>{n}</div>
+        <div style={{ width: 120, height: 8, borderRadius: 4, background: GRADIENT }} />
+        <div
+          style={{
+            fontSize: vertical ? 92 : 84,
+            fontWeight: 800,
+            lineHeight: 1.08,
+            letterSpacing: '-0.02em',
+            textAlign: 'center',
+            textWrap: 'balance',
+            color: C.text,
+          }}
+        >
+          {tx(label, lang)}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const gradientNumber: React.CSSProperties = {
+  backgroundImage: `linear-gradient(135deg, ${C.accentText}, ${C.accent2})`,
+  backgroundClip: 'text',
+  WebkitBackgroundClip: 'text',
+  color: 'transparent',
+  WebkitTextFillColor: 'transparent',
 };

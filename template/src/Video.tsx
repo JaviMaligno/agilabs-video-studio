@@ -5,14 +5,14 @@ import { TransitionSeries, linearTiming } from '@remotion/transitions';
 import { AUDIO, WORDS } from './audio.generated.ts';
 import { resolveMark } from './marks.ts';
 import { VIDEOS } from './timeline.ts';
-import { FPS, SCENE_TRANSITION, handOverAt, linesInVideo, sceneFrames } from './timing.ts';
+import { FPS, SCENE_TRANSITION, chapterNumbers, handOverAt, linesInVideo, sceneFrames } from './timing.ts';
 import { SETTINGS } from './settings.ts';
 import { musicVolume } from './music.ts';
 import { C } from './brand.ts';
 import { fontFamily, V } from './theme.ts';
 import { ANIMS } from './anim/index.ts';
 import { Background } from './components/Background.tsx';
-import { HookOverlay, Intro, Outro, PosterTitle } from './components/Cards.tsx';
+import { ChapterCard, HookOverlay, Intro, Outro, PosterTitle } from './components/Cards.tsx';
 import { Captions } from './components/Captions.tsx';
 import { Cameo, type CameoSpec } from './components/Cameo.tsx';
 import { Badge } from './components/Brand.tsx';
@@ -74,7 +74,7 @@ const Cameos: React.FC<{ scene: Scene; vertical: boolean }> = ({ scene, vertical
   );
 };
 
-const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p }) => {
+const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps; chapterNo?: number }> = ({ scene, p, chapterNo }) => {
   // The intro shows its first line as the big hook, so the captions start from the second line.
   const captioned = scene.kind === 'intro' ? scene.lines.slice(1) : scene.lines;
   return (
@@ -98,6 +98,7 @@ const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps }> = ({ scene, p 
             <Badge size={p.vertical ? 1.1 : 0.9} />
           </div>
           {!p.noSubs && <Cameos scene={scene} vertical={p.vertical} />}
+          {chapterNo !== undefined && scene.chapter !== undefined && <ChapterCard n={chapterNo} label={scene.chapter} lang={p.subs} vertical={p.vertical} />}
         </>
       )}
       {!p.noSubs && <Captions lines={captioned} lang={p.subs} vertical={p.vertical} until={handOverAt(scene)} />}
@@ -134,6 +135,7 @@ const sameWorld = (a: Scene, b: Scene | undefined): boolean => !!b && !!a.anim &
 
 export const ArticleVideo: React.FC<ArticleVideoProps> = (p) => {
   const scenes = scenesFor(p.voice);
+  const chapters = chapterNumbers(scenes);
   return (
     <AbsoluteFill style={{ background: C.bg0 }}>
       <Background />
@@ -142,7 +144,7 @@ export const ArticleVideo: React.FC<ArticleVideoProps> = (p) => {
         {scenes.map((scene, i) => (
           <React.Fragment key={scene.id}>
             <TransitionSeries.Sequence durationInFrames={sceneFrames(scene)}>
-              <SceneView scene={scene} p={p} />
+              <SceneView scene={scene} p={p} chapterNo={chapters[i]} />
             </TransitionSeries.Sequence>
             {i < scenes.length - 1 && (
               <TransitionSeries.Transition presentation={sameWorld(scene, scenes[i + 1]) ? fade() : dip()} timing={linearTiming({ durationInFrames: SCENE_TRANSITION })} />

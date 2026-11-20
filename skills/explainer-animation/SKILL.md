@@ -48,7 +48,12 @@ export const TIMELINE = VIDEOS.en.main;
   the real audio, so re-check stills after narrating.
 - `L(en, es)`: a bilingual on-screen label. A plain string is used for both languages.
 - Scene ids must be unique: line keys (`<scene>-01`, ...) name the audio files.
-- `opts.chapter` on `anim` is stored on the scene but not drawn by any component yet.
+- **Chapters** (long format): `anim(id, name, props, lines, { chapter: L('The desk', 'La mesa') })`
+  starts a chapter. The scene opens with a chapter card, "2 · The desk" (numbered in timeline
+  order), over a dark scrim for its first 2 s (`CHAPTER_CARD`, fading over the last 0.4 s). Its
+  lines move 1 s later (`CHAPTER_LEAD`): the voice starts on the card and `at` / `min` keep their
+  meaning. Set it only on the first scene of each chapter; the same scenes become the YouTube
+  chapters that `npm run deliver` writes (the first scene is `0:00 Intro`).
 - Run `npm run lint` after every change: length against `targetSeconds` (±20 %), caption cues
   under 0.8 s or over 17 characters/s, and component names missing from the registry.
 
@@ -125,15 +130,28 @@ When the script flags a scene "bespoke":
 5. Optionally add a sample to `src/Gallery.tsx`. If it is reusable, it belongs back in the
    plugin's template.
 
-**Generated images.** Most scenes should be drawn in code (SVG and CSS from the brand tokens).
-Drawings (people as caricatures, objects, the author's avatar poses) and the scenes that truly need
-a generated image come from an image model, usually the Codex CLI. Save them under `public/`, load
-them with `staticFile()`, keep them inside the brand palette, and check the still.
+**Generated images.** Use the image model (usually the Codex CLI) freely, whenever a scene needs
+something new: illustrated backgrounds, characters, objects, props, full scenes, the frames or
+layers of an animation. Code draws what must move with the data or the timing (counters, charts,
+paths, highlights) and lays the generated art out; it is not a reason to settle for flat shapes
+when an illustration would tell the idea better. Keep the brand identity (the robot cast, the
+author's avatar, the palette family) and let the video share the cover's look, so the viewer who
+taps the cover lands in the same world. Save the assets under `public/`, load them with
+`staticFile()`, and check the still.
+
+**Illustrated stories** (a map, a character, a room) are built in layers: background,
+transparent character atlas, foreground, and any replay or dream layer, with the motion driven
+by the tested frame state, not baked into the art. A frozen illustration behind changing
+captions is not the approved action. Reuse the same assets across related scenes so identity,
+geography and scale hold, and check continuity on both sides of each transition: where the
+character enters and leaves, one-way obstacles, which way it faces, the prop it carries, and
+the before/after decision.
 
 ## Assets with Codex
 
 - **One call per asset**, in a folder holding the references, with stdin closed so it never waits
-  for input: `codex exec -s workspace-write "<prompt>" < /dev/null`. Within a minute or two, check
+  for input: `codex exec --skip-git-repo-check -s workspace-write "<prompt>" < /dev/null` (outside a
+  git repository it fails without that flag). Within a minute or two, check
   that it is producing output; several assets run well as parallel calls.
 - **Style by reference.** Put the style references in the folder (`ref-style.png`, the avatar's
   identity sheet) and say what they are for: "DRAWING STYLE reference only", so the model copies
@@ -144,6 +162,33 @@ them with `staticFile()`, keep them inside the brand palette, and check the stil
   a shade of the T-shirt) is a recolour with Pillow, which keeps everything else exactly as it was.
 - **Stories** (1080×1920 images for a reel's story) keep the top third clear for the text the
   author adds in the app.
+- **The cover is a designed image, not a frame of the video.** The profile grid shows every reel
+  as its cover, so the grid is the account's shop window, and the cover is what someone sees before
+  deciding to play. The recipe is the one the reels that took off share:
+  - **One strong image that fills the frame and reads with no context**: an object or a scene that
+    draws the hook (a birthday cake hung with sleigh bells, a trophy on a pile of exam papers), with
+    one focal point, depth and light. Generate it with Codex. The author's avatar or a face is
+    welcome when it *is* that image (him singing into a phone). What does not work is reusing the
+    video's usual frame: the robot and the avatar on the set, chat windows, captions cut mid
+    sentence, a lot of dark empty space.
+  - **A headline of two short lines** that raises the question and does not answer it ("Number
+    one… at what?", not the result), with one word in the series colour, plus the series label.
+  - **Layout.** The grid crops to the central 3:4 band (y 240–1680 on 1080×1920). Ask Codex for
+    1080×1920 with the band y 0–760 dark and empty and the subject large and centred below it, pass
+    an earlier cover as `ref-style.png` ("style reference only") and tell it to create no other
+    file. If the subject sits low and leaves a dark gap under the headline, enlarge the scene
+    (`--zoom`).
+  - **Compose in code:** `uv run --with pillow python <plugin>/scripts/compose_cover.py scene.png
+    out/cover.png --series exp "Can ChatGPT" "hear a *tune*?"` (asterisks mark the coloured word;
+    each series keeps its palette and label so the grid reads as a set).
+  - **Offer two or three candidates and open them.** Different images or different headlines, laid
+    side by side with `--sheet` next to the current cover when there is one, and opened on the
+    author's screen. A description of a cover is not a cover; the author picks by looking, and has
+    picked the first option as often as the second.
+  - **Install the chosen one** as `out/cover.png` in the video's folder and keep the scene it was
+    made from. It is the file uploaded as the thumbnail when the reel is created.
+  Check the whole grid, not one cover: a template repeated with only the picture changed reads as
+  low effort.
 - **Show finished candidates.** Each option offered for a choice is rendered and ready to use as
   it is.
 
@@ -152,6 +197,12 @@ them with `staticFile()`, keep them inside the brand palette, and check the stil
 - **Draw the concept on frame 0.** The first frame is the thumbnail and decides the first
   second: the thing the hook names, drawn and already moving (a telephone that rings, a chess
   board with pieces moving, a map). Never fade in from empty, never open on text alone.
+- **A beautiful scene is not the concept.** A rich animation that only sets the place (a
+  landscape, a character walking) does not hold on its own: frame 0 shows the problem the hook
+  names, already happening (the rings that may not fit in the pan, the note that is wrong).
+  Check at review: with the sound off, does frame 0 already show what the first line claims?
+  Does the picture fill the stage rather than sit in a small box between dark bands? Does the
+  conflict appear within the first 2 s, not after a calm establishing shot?
 - **Draw the example's parts and light them as they are named.** A long spoken example is hard to
   hold by ear: put each element on screen as a drawing (the person, the day, the reason, the
   object) and light it on the word that names it. Generate them with Codex in the cast style
@@ -200,6 +251,39 @@ picture, so the cover and the first second promise the same thing.
   (above the two caption rows), 936 px wide. `Stage` / `stageOf()` give you that box.
 - Captions sit below the stage, at most two rows of ~32 characters, within ~900 px.
 
+## Landscape and both formats
+
+Every video has a landscape composition too (`Main-EN-landscape`, 1920x1080; the long YouTube
+format lives there). The landscape stage runs from y = 140 to y = 830 and x = 160 to x = 1760;
+the captions take the band under it. A drawing laid out for 1080x1920 does not fit there.
+
+- **Design each scene for its format.** Not a squeezed copy: a vertical scene stacks things, a
+  landscape one sets them side by side. Draw the parts once and give each format its own layout.
+- **`<Canvas vertical={p.vertical}>`** (`src/anim/Canvas.tsx`) is the full-frame SVG in the
+  format's own pixels; `place()`, `stageBox()`, `inStage()` and `fitInto()` (`src/anim/canvas.ts`)
+  give positions per format:
+
+  ```tsx
+  const L = place(p.vertical, {
+    v: { robot: { x: 830, y: 560, s: 0.9 }, desk: { x: 140, y: 1000, w: 800 } },
+    l: { robot: { x: 1500, y: 260, s: 0.8 }, desk: { x: 420, y: 620, w: 900 } },
+  });
+  return (
+    <Canvas vertical={p.vertical}>
+      <Desk {...L.desk} />
+      <Robot {...L.robot} />
+    </Canvas>
+  );
+  ```
+
+  `frameState` stays format-free (it returns progress, not pixels), so one state test covers both.
+- **Stopgap:** `<Canvas vertical={p.vertical} design="vertical">` fits a vertical-only drawing
+  into the landscape stage, scaled down. Nothing overflows, but it is small; port the scene before
+  the final render.
+- **Keep the captions zone clear** in both formats: nothing below the stage bottom.
+- **Check stills in both formats** (`Main-EN-vertical` and `Main-EN-landscape`) for every scene
+  you port, and Read them.
+
 ## Stills: look at them
 
 Render stills and **Read every PNG** before rendering the video. A clean lint or build does not
@@ -220,3 +304,31 @@ Two more checks before delivery:
 - **Time to read.** Text on the stage stays long enough to be read (~3.5 words/s plus 1 s), and
   the stage carries something at every moment. `npm run lint` covers the library components;
   bespoke components with their own text are checked here.
+
+## After every render: reel-watcher, then the author
+
+The stills are checked before rendering; the rendered video is checked again before the author
+sees it, every time (first render and every re-render). Frame 0, a dip between two scenes with the
+same picture, an invented person, a press that never lands: these are the things the author has
+pointed at over and over, and a still or a contact sheet did not show them.
+
+1. `npm run review-frames` (add `-- --es` / `-- --landscape` for those cuts). It writes
+   `out/review/main-<voice>-<format>/`: frame 0 and a strip from 0 to 8 s every 0.5 s; for each
+   scene change the last frame before it, the middle of the transition and the first frame after
+   it, with a measure of whether the picture is the same on both sides and whether it dips; for
+   each narration line a frame just before it starts, half way and at its end; contact sheets per
+   section; and `index.md` with the time, scene and line on air of every frame plus the images in
+   `public/`. Scene and line times come from the timeline; for a video that does not match it,
+   `--video <file>` (or `--detect`) finds the scene changes in the video itself.
+2. Run the `reel-watcher` agent with the path of that folder and the video folder. It checks the
+   closed list of recurring failures on the full-size frames and answers PASS / FAIL / UNSURE per
+   item with timestamps.
+3. Fix every FAIL in the timeline or the assets, extract the frames it marks UNSURE
+   (`ffmpeg -ss <t> -i out/main-en-vertical.mp4 -frames:v 1 <file>.png`) and look at them, then
+   re-render and run steps 1-2 again until nothing fails. A FAIL you think is wrong is not skipped
+   silently: say so to the author in the summary.
+4. Only then open the video for the author, with one line on what the watcher caught and what was
+   changed ("watcher: frame 0 showed the verdict, moved to the note in the hand; dip between the
+   two chat scenes, now blended"), or "watcher: clean". The author's review of the video stays: he
+   still watches it and approves or corrects it, and nothing is scheduled without that approval
+   (see `schedule-social-video`).
