@@ -91,13 +91,19 @@ when installed as a plugin; next to `skills/` in the plugin repo).
     measure the mix (-16 LUFS integrated). Videos over 3 min render in chunks joined without
     re-encoding (`CHUNK_SECONDS` to tune); an interrupted chunked render resumes from the
     finished chunks. The music bed is made as long as the video.
+    **Before anyone sees it:** `npm run review-frames` and the `reel-watcher` agent (see *After
+    every render* in `explainer-animation`). Fix what it flags, re-render and run it again until
+    nothing fails; only then open the video for the author, with one line on what the watcher
+    caught. This holds for every re-render too. The author still watches and approves the video.
 11. **Deliver:** `npm run deliver` writes the poster PNG, the SRT and `out/manifest.json`. Look
     at the poster. The cover the platform shows is designed separately (see *The cover is a designed
-    image* in `explainer-animation`) and checked inside the profile grid. Hand over the MP4 path
-    and the cover; publishing is a separate step.
+    image* in `explainer-animation`) and checked inside the profile grid. Offer two or three cover
+    candidates on one sheet, opened for the author, and install the chosen one as `out/cover.png`.
+    Hand over the MP4 path and the cover; publishing is a separate step.
     When the landscape cut exists it also writes `out/youtube-chapters-<voice>.txt` (paste into
     the description; fix any warning: YouTube needs at least 3 chapters of 10 s or more) and
-    `out/thumbnail-<voice>.png` (1280x720, from `SETTINGS.thumbnail`, else the poster frame).
+    `out/thumbnail-<voice>.png` (1280x720): the designed `cover/thumbnail-<voice>.png` when it
+    exists (see "Long format" in `explainer-script`), else a frame at `SETTINGS.thumbnail`.
 
 ## Re-rendering an existing video
 
@@ -125,6 +131,33 @@ A new feature (a cold open, a cover frame, a new card) is tried first in one vid
 option that is off by default in the template. It moves into the template once the author approves
 the result, or once the metric it targets improves (see `schedule-social-video`), and is then
 applied to the videos still to be published.
+
+## Recordings from the author arrive by Telegram
+
+The author sends his own recordings (a hum, a voice take, a screen or phone video) as a message
+to the Telegram bot; that is the channel he wants, so take them from there:
+
+1. When a Telegram message carries an attachment (`attachment_file_id` in the message), call the
+   telegram plugin's `download_attachment` with that id. The file lands in
+   `~/.claude/channels/telegram/inbox/` under a generated name. Photos come already downloaded
+   (`image_path`). The bot only sees messages sent to it while the session runs, and downloads up
+   to 20 MB; for anything else, ask him to send it again to the bot (a long video as a video, which
+   Telegram compresses), not to move it himself.
+2. Copy it to where the project keeps it, with a descriptive name, and keep the original:
+   - raw takes of an experiment: its repo's `recordings/` folder (`hum_cumple.m4a`,
+     `letra_en.ogg`), as they came;
+   - what a video plays: the video folder's `public/clips/` for audio, as mono 44.1 kHz WAV
+     (`ffmpeg -i in.ogg -ac 1 -ar 44100 -c:a pcm_s16le public/clips/hum.wav`), and
+     `public/footage/` for video, as H.264 at 30 fps
+     (`ffmpeg -i in.mp4 -r 30 -c:v libx264 -crf 18 -pix_fmt yuv420p -c:a aac public/footage/listen.mp4`);
+     trim to the part the scene uses (`-ss`/`-to`) and check the level with `npm run audio-qa`
+     once it is in the timeline;
+   - anything for the social hand-off folder (`~/Desktop/AGILabs-redes/`, e.g. voice samples in
+     `muestras-voz/`) in its subfolder there.
+3. Report the final path(s) in one line and carry on.
+
+Never drive the Telegram app or web UI to fetch a file, and never ask him to move files, save them
+somewhere or grant folder access: the bot download covers it.
 
 ## Where things go
 
