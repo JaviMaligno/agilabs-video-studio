@@ -5,7 +5,7 @@
 // checklist and the recipe list. SVG in frame pixels, brand tokens only.
 import React from 'react';
 import { C, alpha } from '../brand.ts';
-import { edge, glow } from './office.tsx';
+import { Badge, edge, glow } from './office.tsx';
 import { Book, ClearSheetDraw, bookH } from './book.tsx';
 import { NoteSheet, type NoteRow } from './note.tsx';
 
@@ -503,6 +503,67 @@ export const RecipeList: React.FC<{
           </g>
         );
       })}
+    </g>
+  );
+};
+
+/**
+ * What mixing ordinary text back in did (under the lesson stack), two rows from (x, y), `w` wide:
+ * "general knowledge" with a small meter that wins most of its loss back and a tick, then the
+ * sticky note "One line, please" crossed out in red beside "manners" (the part it did not win back).
+ */
+export const MixResult: React.FC<{ x: number; y: number; w: number; knowledge: number; recover: number; tick: number; manners: number; cross: number; size?: number; sticky?: string }> = ({
+  x,
+  y,
+  w,
+  knowledge,
+  recover,
+  tick,
+  manners,
+  cross,
+  size = 28,
+  sticky = 'One line, please',
+}) => {
+  const k = cl(knowledge);
+  const mn = cl(manners);
+  const cr = cl(cross);
+  const r = size * 0.72;
+  const badgeX = x + w - r;
+  const meterW = w * 0.28;
+  const meterX = badgeX - r - 14 - meterW;
+  const mh = size * 0.8;
+  // the meter: down after the full fine-tune (0.62), most of it won back (0.92)
+  const fill = 0.62 + 0.3 * cl(recover);
+  const pillH = size * 1.9;
+  const pillW = sticky.length * size * 0.94 * CHAR + size * 1.1;
+  const row2 = y + pillH + 18;
+  return (
+    <g>
+      {k > 0 && (
+        <g opacity={k}>
+          <text x={x} y={y + pillH / 2 + size * 0.36} fontSize={size} fontWeight={800} fill={C.text}>
+            general knowledge
+          </text>
+          <rect x={meterX} y={y + pillH / 2 - mh / 2} width={meterW} height={mh} rx={mh / 2} fill="none" stroke={alpha(C.muted, 0.6)} strokeWidth={3} />
+          <rect x={meterX} y={y + pillH / 2 - mh / 2} width={meterW * fill} height={mh} rx={mh / 2} fill={cl(tick) > 0.5 ? C.ok : C.warm} />
+          <Badge x={badgeX} y={y + pillH / 2} r={r} kind="tick" pop={tick} />
+        </g>
+      )}
+      {mn > 0 && (
+        <g opacity={mn}>
+          <rect x={x} y={row2} width={pillW} height={pillH} rx={8} fill={C.warm} stroke={cr > 0.01 ? alpha(C.marker, cr) : 'none'} strokeWidth={5} />
+          <text x={x + size * 0.55} y={row2 + pillH / 2 + size * 0.34} fontSize={size * 0.94} fontWeight={800} fontStyle="italic" fill={INK}>
+            {sticky}
+          </text>
+          {cr > 0 && (
+            <line x1={x - 6} y1={row2 + pillH / 2 + size * 0.06} x2={x - 6 + (pillW + 12) * cr} y2={row2 + pillH / 2 + size * 0.06} stroke={alpha(C.marker, 0.9)} strokeWidth={4} strokeLinecap="round" />
+          )}
+          <text x={x + pillW + 16} y={row2 + pillH / 2 + size * 0.36} fontSize={size} fontWeight={800} fill={cr > 0.5 ? C.marker : C.text}>
+            manners
+          </text>
+          <Badge x={badgeX} y={row2 + pillH / 2} r={r} kind="cross" pop={cross} />
+        </g>
+      )}
     </g>
   );
 };

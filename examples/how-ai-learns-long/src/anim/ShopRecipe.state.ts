@@ -6,7 +6,11 @@
 //   (mark "check"). Beside the list, the picture of the item lit: the note, the binder, the book
 //   and the clear sheet lowering onto it, a lesson stack with every tenth card from an ordinary
 //   book, the "manners" book with its sticky note "One line, please" fallen to the floor.
-//   Marks: [prompt, looking, LoRA, ordinary, check].
+//   Under the lesson stack, while the sub-item is spoken, what the mixed-in text did: a "general
+//   knowledge" meter that wins most of its loss back and is ticked (mark "general"), and the
+//   sticky note "One line, please" crossed out in red, staying crossed (mark "manners").
+//   Marks: [prompt, looking, LoRA, ordinary, check, general, manners] (marks 0-4 are one per line,
+//   in line order; 5 and 6 both sit in line 4, the sub-item's).
 // - today: the note and a checklist of 10 customer questions ticking one by one (marks "note",
 //   "ten"); then the full recipe with the clear sheet over the book in the corner, the prompt lit on
 //   "cheapest" and the check lit on "check". Marks: [note, ten, cheapest, check].
@@ -59,6 +63,9 @@ export type ShopRecipeState = {
   sheet: number;
   ordinary: number;
   fall: number;
+  /** recipe, under the lesson stack: the "general knowledge" row (shown, its recovery, its tick)
+   *  and the "manners" sticky (shown, crossed out). */
+  mix: { knowledge: number; recover: number; tick: number; manners: number; cross: number };
   /** today: the note and the checklist panel, and each question's tick. */
   /** `note` lights the note (it is on screen from the start); `rows` bring in the empty checklist. */
   check: { panel: number; note: number; rows: number[]; ticks: number[] };
@@ -95,6 +102,10 @@ export function frameState(props: ShopRecipeProps, t: number, beats: number[], d
     });
     const replay = { appear: ease(T, sReplay - 0.15, 0.5), lit: between(T, sReplay, s4) };
     const tenth = Math.max(sReplay + 1.2, b[3] + 0.42 * (b[4] - b[3]));
+    // "...won back most of the general knowledge. But not the manners": both inside line 4
+    const lineEnd = Math.max(b[3], b[4] - 0.6);
+    const sGeneral = Math.min(Math.max(mark(m, 5, b[3] + 0.63 * (b[4] - b[3])), sReplay + 0.8), lineEnd);
+    const sManners = Math.min(Math.max(mark(m, 6, b[3] + 0.76 * (b[4] - b[3])), sGeneral + 0.6), lineEnd);
     return {
       mode,
       list: 1,
@@ -112,6 +123,13 @@ export function frameState(props: ShopRecipeProps, t: number, beats: number[], d
       sheet: ease(T, sLora, 1.2),
       ordinary: ease(T, tenth, 1.0),
       fall: ease(T, s4 + 0.6, 1.0),
+      mix: {
+        knowledge: ease(T, sGeneral - 0.9, 0.4),
+        recover: ease(T, sGeneral - 0.4, 0.9),
+        tick: ease(T, sGeneral + 0.4, 0.4),
+        manners: ease(T, sManners - 0.6, 0.4),
+        cross: ease(T, sManners - 0.05, 0.4),
+      },
       check: { panel: 0, note: 0, rows: QUESTIONS.map(() => 0), ticks: QUESTIONS.map(() => 0) },
     };
   }
@@ -140,6 +158,7 @@ export function frameState(props: ShopRecipeProps, t: number, beats: number[], d
     sheet: 1,
     ordinary: 1,
     fall: 1,
+    mix: { knowledge: 0, recover: 0, tick: 0, manners: 0, cross: 0 },
     check: {
       panel,
       note: ease(T, note - 0.2, 0.5),

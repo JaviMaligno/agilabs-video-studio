@@ -322,7 +322,7 @@ export const ClearSheet: React.FC<AnimProps & ClearSheetProps> = (p) => {
         {s.panels.paper > 0 && (
           <g opacity={s.panels.paper}>
             {/* the book sits centred until the research paper slides in beside it */}
-            <g opacity={s.paper.book} transform={`translate(${p.vertical ? 0 : 440 * (1 - s.paper.cover)} 0)`}>
+            <g opacity={s.paper.book} transform={`translate(${p.vertical ? 0 : 440 * (1 - s.paper.slide)} 0)`}>
               <Book x={Lp.book.x} y={Lp.book.y} w={Lp.book.w} />
               <ClearSheetDraw x={Lp.book.x} y={Lp.book.y} w={Lp.book.w} ink={1} />
               <NameLabel x={Lp.book.x + Lp.book.w / 2} y={Lp.book.y - 150} text="my test: one small model" size={36} anchor="middle" pop={s.paper.book} color={C.muted} />

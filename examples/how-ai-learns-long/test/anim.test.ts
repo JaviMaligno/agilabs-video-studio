@@ -83,7 +83,7 @@ const CASES: Case[] = [
     { name: `ClearSheet ${mode} (no marks)`, state: (t: number, b: number[], d: number) => clearSheet.frameState({ mode }, t, b, d) },
   ]),
   ...(['full', 'lora'] as const).flatMap((mode) => [
-    { name: `TerminalTest ${mode}`, state: (t: number, b: number[], d: number) => terminalTest.frameState({ mode, marks: [0.5, 1, 1.5, 2, 2.5, 3] }, t, b, d) },
+    { name: `TerminalTest ${mode}`, state: (t: number, b: number[], d: number) => terminalTest.frameState({ mode, marks: [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5] }, t, b, d) },
     { name: `TerminalTest ${mode} (NaN marks)`, state: (t: number, b: number[], d: number) => terminalTest.frameState({ mode, marks: [NaN, 9, 0.1] }, t, b, d) },
   ]),
   { name: 'TwoRoads', state: (t, b, d) => twoRoads.frameState({ marks: [0.8, 1.6, 3] }, t, b, d) },
@@ -93,7 +93,7 @@ const CASES: Case[] = [
   { name: 'ShopManual', state: (t, b, d) => shopManual.frameState({ marks: [0.4, 1, 1.6, 2.2, 2.8] }, t, b, d) },
   { name: 'ShopManual (no marks)', state: (t, b, d) => shopManual.frameState({}, t, b, d) },
   ...(['recipe', 'today'] as const).flatMap((mode) => [
-    { name: `ShopRecipe ${mode}`, state: (t: number, b: number[], d: number) => shopRecipe.frameState({ mode, marks: [0.4, 1, 1.6, 2.2, 2.8] }, t, b, d) },
+    { name: `ShopRecipe ${mode}`, state: (t: number, b: number[], d: number) => shopRecipe.frameState({ mode, marks: [0.4, 1, 1.6, 2.2, 2.8, 2.4, 2.6] }, t, b, d) },
     { name: `ShopRecipe ${mode} (NaN marks)`, state: (t: number, b: number[], d: number) => shopRecipe.frameState({ mode, marks: [NaN, 5, 0.1] }, t, b, d) },
   ]),
 ];

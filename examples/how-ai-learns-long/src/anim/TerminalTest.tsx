@@ -1,4 +1,4 @@
-// The terminal test: full fine-tuning (four lines) and LoRA side by side. See TerminalTest.state.ts.
+// The terminal test: full fine-tuning (five lines) and LoRA side by side. See TerminalTest.state.ts.
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import { C, alpha } from '../brand.ts';
@@ -9,7 +9,7 @@ import { Canvas } from './Canvas.tsx';
 import { place } from './canvas.ts';
 import { Badge, Desk, Floor, Robot, glow } from './office.tsx';
 import { Book, ClearSheetDraw, NameLabel } from './book.tsx';
-import { LESSONS, LORA_SOME, LORA_TICKS, LORA_UNSEEN, TALLY, UNSEEN, frameState, type TerminalTestProps } from './TerminalTest.state.ts';
+import { LESSONS, LORA_SOME, LORA_TICKS, LORA_UNSEEN, QUIZ_DROP, QUIZ_OPTIONS, QUIZ_Q, QUIZ_RIGHT, TALLY, UNSEEN, frameState, type TerminalTestProps } from './TerminalTest.state.ts';
 
 export { frameState };
 export type { TerminalTestProps };
@@ -23,11 +23,12 @@ const LAYOUT = {
     guess: { x: 1080, y: 214, w: 600 },
     tally: { x: 1330, y: 476, cell: 68, cols: 6 },
     card: { x: 180, y: 690 },
-    book: { x: 200, y: 290, w: 700 },
+    book: { x: 200, y: 290, w: 700, fallDx: -0.62, fallDy: 0.28 },
     stat: { x: 1080, y: 300, w: 640 },
     page: { x: 300, y: 170, w: 1320, h: 630 },
     unseen: { x: 1350, y: 214, w: 390, step: 104 },
     none: { x: 1520, y: 800 },
+    quiz: { card: { x: 200, y: 190, w: 940, h: 560 }, meter: { x: 1240, y: 250, w: 500 }, robot: { x: 1490, y: 450, s: 0.62 }, floor: { x: 1250, y: 760, w: 480 } },
     lora: { left: { x: 200, y: 250, w: 600 }, right: { x: 1060, y: 250, w: 600 }, labelY: 152, ticksY: 676, rowY: 770, mid: 930 },
   },
   v: {
@@ -38,11 +39,12 @@ const LAYOUT = {
     guess: { x: 560, y: 980, w: 440 },
     tally: { x: 140, y: 1000, cell: 64, cols: 6 },
     card: { x: 90, y: 860 },
-    book: { x: 160, y: 380, w: 760 },
+    book: { x: 160, y: 380, w: 760, fallDx: 0.25, fallDy: 0.2 },
     stat: { x: 120, y: 900, w: 840 },
     page: { x: 70, y: 300, w: 940, h: 900 },
     unseen: { x: 120, y: 980, w: 840, step: 72 },
     none: { x: 540, y: 1290 },
+    quiz: { card: { x: 90, y: 300, w: 900, h: 560 }, meter: { x: 140, y: 950, w: 800 }, robot: { x: 540, y: 1100, s: 0.42 }, floor: { x: 340, y: 1300, w: 400 } },
     lora: { left: { x: 140, y: 300, w: 800 }, right: { x: 140, y: 820, w: 800 }, labelY: 250, ticksY: 1240, rowY: 1290, mid: 540 },
   },
 };
@@ -203,7 +205,68 @@ export const TerminalTest: React.FC<AnimProps & TerminalTestProps> = (p) => {
           <Monitor x={L.monitor.x} y={L.monitor.y} w={L.monitor.w} h={L.monitor.h} cmd={cmd} reply={reply} cmdOn={ls.card >= 1 ? 1 : 0} replyOn={ls.reply} glowA={0.4 * ls.tick} />,
         )}
 
-        {/* 2 · the manners chapter blurs, the sticky note falls; following instructions: more than ⅓ worse */}
+        {/* 2 · the general knowledge quiz: the question, four options, "food" ticked; the meter drops a little */}
+        {P.quiz > 0 && (() => {
+          const Q = L.quiz;
+          const qz = s.quiz;
+          const c = Q.card;
+          const pad = 44;
+          const gap = 30;
+          const ow = (c.w - 2 * pad - gap) / 2;
+          const oh = 108;
+          const lost = Q.meter.w * QUIZ_DROP * qz.drop;
+          return (
+            <g opacity={P.quiz}>
+              <rect x={c.x} y={c.y} width={c.w} height={c.h} rx={24} fill={C.text} stroke={alpha(C.accentText, 0.6)} strokeWidth={4} />
+              <path d={`M ${c.x} ${c.y + 78} V ${c.y + 24} Q ${c.x} ${c.y} ${c.x + 24} ${c.y} H ${c.x + c.w - 24} Q ${c.x + c.w} ${c.y} ${c.x + c.w} ${c.y + 24} V ${c.y + 78} Z`} fill={C.accent} />
+              <text x={c.x + pad} y={c.y + 54} fontSize={36} fontWeight={800} fill={C.text} opacity={0.6 + 0.4 * qz.title}>
+                General knowledge quiz
+              </text>
+              <text x={c.x + pad} y={c.y + 170} fontSize={50} fontWeight={800} fill={C.bg0} opacity={qz.question}>
+                {QUIZ_Q}
+              </text>
+              {/* empty slots until the question and its options are read */}
+              <rect x={c.x + pad} y={c.y + 130} width={c.w * 0.6} height={18} rx={9} fill={alpha(C.muted, 0.3 * (1 - qz.question))} />
+              {QUIZ_OPTIONS.map((o, i) => (
+                <rect key={`slot-${o}`} x={c.x + pad + (i % 2) * (ow + gap)} y={c.y + 230 + Math.floor(i / 2) * (oh + 26)} width={ow} height={oh} rx={18} fill="none" stroke={alpha(C.muted, 0.5 * (1 - (qz.options[i] ?? 0)))} strokeWidth={3} strokeDasharray="12 10" />
+              ))}
+              {QUIZ_OPTIONS.map((o, i) => {
+                const k = qz.options[i] ?? 0;
+                if (k <= 0) return null;
+                const ox = c.x + pad + (i % 2) * (ow + gap);
+                const oy = c.y + 230 + Math.floor(i / 2) * (oh + 26);
+                const right = i === QUIZ_RIGHT;
+                const lit = right ? qz.tick : 0;
+                return (
+                  <g key={o} opacity={Math.min(1, k * 1.5)} transform={`translate(0 ${16 * (1 - k)})`} style={lit > 0.01 ? glow(C.ok, 0.7 * lit) : undefined}>
+                    <rect x={ox} y={oy} width={ow} height={oh} rx={18} fill={lit > 0.01 ? alpha(C.ok, 0.25 + 0.6 * lit) : alpha(C.muted, 0.18)} stroke={lit > 0.01 ? C.ok : alpha(C.bg1, 0.45)} strokeWidth={4} />
+                    <text x={ox + 34} y={oy + oh / 2 + 17} fontSize={48} fontWeight={800} fill={C.bg0}>
+                      {o}
+                    </text>
+                    {right && <Badge x={ox + ow - 50} y={oy + oh / 2} r={30} kind="tick" pop={qz.tick} />}
+                  </g>
+                );
+              })}
+              {/* the general knowledge meter: a little lost on "points" (no number) */}
+              <text x={Q.meter.x} y={Q.meter.y} fontSize={40} fontWeight={800} fill={C.text}>
+                general knowledge
+              </text>
+              <rect x={Q.meter.x} y={Q.meter.y + 28} width={Q.meter.w - lost} height={64} rx={14} fill={qz.drop > 0.05 ? C.marker : alpha(C.ok, 0.8)} />
+              {qz.drop > 0.05 && (
+                <g opacity={Math.min(1, qz.drop * 1.5)}>
+                  {/* the lost part: a clear dashed gap where the bar was, and a big arrow down */}
+                  <rect x={Q.meter.x + Q.meter.w - lost} y={Q.meter.y + 28} width={lost} height={64} rx={14} fill={alpha(C.marker, 0.12)} stroke={C.marker} strokeWidth={6} strokeDasharray="14 10" />
+                  <path d={`M ${Q.meter.x + Q.meter.w - lost / 2} ${Q.meter.y + 116} v 70 m -30 -30 l 30 30 l 30 -30`} fill="none" stroke={C.marker} strokeWidth={12} strokeLinecap="round" strokeLinejoin="round" style={glow(C.marker, 0.5 * qz.drop)} />
+                </g>
+              )}
+              <Floor x={Q.floor.x} y={Q.floor.y} w={Q.floor.w} />
+              {/* the arm goes up with the tick on the right answer and back down as the meter drops */}
+              <Robot x={Q.robot.x} y={Q.robot.y} s={Q.robot.s} armUp={qz.tick * (1 - qz.drop)} />
+            </g>
+          );
+        })()}
+
+        {/* 3 · the manners chapter blurs, the sticky note falls; following instructions: more than ⅓ worse */}
         {P.book > 0 && (
           <g opacity={P.book}>
             <Book
@@ -213,8 +276,8 @@ export const TerminalTest: React.FC<AnimProps & TerminalTestProps> = (p) => {
               rewrite={1}
               blur={s.book.blur}
               fall={s.book.fall}
-              fallDx={0.25}
-              fallDy={0.2}
+              fallDx={L.book.fallDx}
+              fallDy={L.book.fallDy}
               mannersLit={s.book.hurt}
               glowA={0.8 * s.book.hurt}
               glowColor={C.marker}
@@ -241,7 +304,7 @@ export const TerminalTest: React.FC<AnimProps & TerminalTestProps> = (p) => {
           </g>
         )}
 
-        {/* 3 · close-up of a rewritten page: the old manners text faint underneath */}
+        {/* 4 · close-up of a rewritten page: the old manners text faint underneath */}
         {P.page > 0 && (
           <g opacity={P.page} transform={`translate(${L.page.x + L.page.w / 2} ${L.page.y + L.page.h / 2}) scale(${0.6 + 0.4 * s.page.zoom}) translate(${-(L.page.x + L.page.w / 2)} ${-(L.page.y + L.page.h / 2)})`}>
             <rect x={L.page.x + L.page.w - 6} y={L.page.y + 60} width={50} height={190} rx={8} fill={C.accent2} />
@@ -265,7 +328,7 @@ export const TerminalTest: React.FC<AnimProps & TerminalTestProps> = (p) => {
           </g>
         )}
 
-        {/* 4 · unfamiliar commands: every guess crossed, "none" */}
+        {/* 5 · unfamiliar commands: every guess crossed, "none" */}
         {desk(
           <g>
             <Guess x={L.guess.x} y={L.guess.y} w={250} text="order 1 …" on={s.unseen.cross > 0 ? 1 : s.unseen.cards} mark={s.unseen.cross} kind="cross" from={{ x: head.x + 40, y: head.y - 10 }} />

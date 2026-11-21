@@ -9,8 +9,8 @@ import type { AnimProps } from './types.ts';
 import { Canvas } from './Canvas.tsx';
 import { fitInto, stageBox } from './canvas.ts';
 import { Floor } from './office.tsx';
-import { Binder, Checklist, ClearSheetOver, KnowBook, LessonStack, MannersBook, NoteCard, RecipeList, recipeHeight } from './recipe.tsx';
-import { ITEMS, LORA_FIRST, QUESTIONS, REPLAY, frameState, type ShopRecipeProps } from './ShopRecipe.state.ts';
+import { Binder, Checklist, ClearSheetOver, KnowBook, LessonStack, MannersBook, MixResult, NoteCard, RecipeList, recipeHeight } from './recipe.tsx';
+import { ITEMS, LORA_FIRST, QUESTIONS, REPLAY, STICKY, frameState, type ShopRecipeProps } from './ShopRecipe.state.ts';
 
 export { frameState };
 export type { ShopRecipeProps };
@@ -69,6 +69,7 @@ export const ShopRecipe: React.FC<AnimProps & ShopRecipeProps> = (p) => {
           {pics.stack > 0 && (
             <g opacity={pics.stack}>
               <LessonStack x={PIC.x} y={250} w={PIC.w} ordinary={s.ordinary} size={30} />
+              <MixResult x={PIC.x} y={640} w={PIC.w} {...s.mix} sticky={STICKY} size={28} />
             </g>
           )}
           {pics.floor > 0 && (

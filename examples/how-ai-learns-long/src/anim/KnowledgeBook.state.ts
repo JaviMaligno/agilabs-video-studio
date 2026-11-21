@@ -143,7 +143,10 @@ export function frameState(props: KnowledgeBookProps, t: number, beats: number[]
     };
     s.label = { opacity: 1, pop: ease(T, rewritten - 0.15, 0.45) };
     s.pen = { opacity: ease(T, writeFrom - 0.3, 0.3) * (1 - ease(T, b2 - 0.2, 0.3)), write, bob: 0, stop: 0, question: 0 };
-    s.door = { opacity: ease(T, b2 - 0.1, 0.5), crack: ease(T, b2 + 0.4, 0.7), open: ease(T, damage, 0.9) };
+    // "It's the most thorough way" stays on the rewritten book alone; the cracked door (the damage)
+    // comes in on "…did the most damage", cracks on the word and then opens onto the book
+    const doorIn = Math.max(b2 + 1.4, damage - 0.9);
+    s.door = { opacity: ease(T, doorIn, 0.4), crack: ease(T, damage - 0.5, 0.5), open: ease(T, damage + 0.2, 0.8) };
     return s;
   }
 

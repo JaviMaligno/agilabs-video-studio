@@ -67,7 +67,9 @@ test('finetune: cards before the rewrite, the pen rewrites every line, then the 
   assert.equal(at(14).book.rewrite, 0);
   assert.ok(at(18).book.rewrite > 0 && at(18).pen.opacity > 0);
   assert.equal(at(21.5).book.rewrite, 1);
-  assert.ok(at(23).door.opacity > 0.9 && at(23).door.open === 0);
+  // "It's the most thorough way" (b2 .. b2 + 1.32) stays on the rewritten book alone
+  assert.equal(at(beats[2] + 1.3).door.opacity, 0, 'no door on "most thorough"');
+  assert.ok(at(marks[2] - 0.1).door.opacity > 0.9 && at(marks[2] - 0.1).door.open === 0, 'the door is in by "damage"');
   const end = at(dur);
   assert.equal(end.door.open, 1);
   assert.equal(end.label.pop, 1);

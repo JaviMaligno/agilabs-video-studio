@@ -31,7 +31,7 @@ export type ClearSheetState = {
   /** Rack sheets: how far each one has moved onto the book (0 = on the rack, 1 = on the book). */
   rack: { on: number[]; gpu: number; cups: number };
   form: { upload: number; bar: number; terminal: number; typed: number };
-  paper: { book: number; cover: number; forgets: number; learns: number };
+  paper: { book: number; slide: number; cover: number; forgets: number; learns: number };
 };
 
 const after = (x: number, min: number) => Math.max(x, min);
@@ -56,7 +56,7 @@ export function frameState(props: ClearSheetProps, t: number, beats: number[], d
     dial: { needle: 0.5, right: 0, left: 0 },
     rack: { on: RACK.map(() => 0), gpu: 0, cups: 0 },
     form: { upload: 0, bar: 0, terminal: 0, typed: 0 },
-    paper: { book: 0, cover: 0, forgets: 0, learns: 0 },
+    paper: { book: 0, slide: 0, cover: 0, forgets: 0, learns: 0 },
   };
 
   if (mode === 'lay') {
@@ -124,6 +124,14 @@ export function frameState(props: ClearSheetProps, t: number, beats: number[], d
   };
   const forgetsAt = fit(research + 1.8, 0.5, D);
   const learnsAt = fit(research + 3.6, 0.5, D);
-  s.paper = { book: ease(T, b3, 0.5), cover: ease(T, research - 0.15, 0.6), forgets: ease(T, forgetsAt, 0.45), learns: ease(T, learnsAt, 0.45) };
+  // on "research" the book slides left first; the paper (and its "research" pill) comes in only
+  // once the book has made room, so neither the pills nor the paper and the book overlap
+  s.paper = {
+    book: ease(T, b3, 0.5),
+    slide: ease(T, research - 0.3, 0.6),
+    cover: ease(T, research + 0.25, 0.5),
+    forgets: ease(T, forgetsAt, 0.45),
+    learns: ease(T, learnsAt, 0.45),
+  };
   return s;
 }

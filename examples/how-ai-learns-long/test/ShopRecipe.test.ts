@@ -11,7 +11,8 @@ const check = (v: unknown, path: string) => {
 };
 
 // The real scenes (timeline.ts with the Cartesia audio; dur from the landscape cut).
-const RECIPE = { beats: [0.2, 5.83, 10.02, 18.13, 30.88], marks: [1.76, 8.83, 16.14, 21.69, 32.353], dur: 38.8 };
+// marks: [prompt, looking, LoRA, ordinary, check, general, manners]
+const RECIPE = { beats: [0.2, 5.83, 10.02, 18.13, 31.84], marks: [1.76, 8.83, 16.14, 21.61, 33.313, 26.73, 28.49], dur: 38.967 };
 const TODAY = { beats: [0.2, 7.83], marks: [2.24, 3.521, 10.43, 12.618], dur: 15.7 };
 
 const variants = (r: { beats: number[]; marks: number[]; dur: number }) => [
@@ -56,7 +57,7 @@ test('recipe: built item by item on its marks, the item spoken lit, earlier item
   assert.equal(s3.lora, 1);
   assert.equal(s3.sheet, 1);
   assert.equal(s3.items[2].lit, 1);
-  const s3b = at(30.5);
+  const s3b = at(31.5);
   assert.equal(s3b.replay.lit, 1);
   assert.equal(s3b.ordinary, 1);
   assert.equal(s3b.pics.stack, 1);
@@ -66,6 +67,27 @@ test('recipe: built item by item on its marks, the item spoken lit, earlier item
   assert.equal(end.pics.floor, 1);
   assert.equal(end.fall, 1);
   assert.equal(ITEMS.length, 4);
+});
+
+test('recipe: under the lesson stack, general knowledge won back and ticked, the manners sticky crossed and kept crossed', () => {
+  const at = (t: number) => frameState({ mode: 'recipe', marks: RECIPE.marks }, t, RECIPE.beats, RECIPE.dur);
+  const quiet = at(25.5);
+  assert.deepEqual(Object.values(quiet.mix), [0, 0, 0, 0, 0], 'nothing before "general"');
+  const g = at(27.7);
+  assert.equal(g.mix.knowledge, 1);
+  assert.equal(g.mix.recover, 1);
+  assert.equal(g.mix.tick, 1);
+  assert.equal(g.mix.manners, 0, 'the manners sticky waits for "manners"');
+  const mn = at(29);
+  assert.equal(mn.mix.manners, 1);
+  assert.equal(mn.mix.cross, 1);
+  assert.equal(at(28.3).mix.cross, 0, 'crossed on "manners", not before');
+  const late = at(31.6);
+  assert.equal(late.pics.stack, 1, 'shown with the lesson stack');
+  assert.equal(late.mix.cross, 1, 'it stays crossed');
+  assert.equal(at(RECIPE.dur).pics.stack, 0, 'and leaves with the stack');
+  const today = frameState({ mode: 'today', marks: TODAY.marks }, TODAY.dur, TODAY.beats, TODAY.dur);
+  assert.deepEqual(Object.values(today.mix), [0, 0, 0, 0, 0], 'not in today mode');
 });
 
 test('today: the note and ten ticks, then the full recipe with the clear sheet in the corner', () => {

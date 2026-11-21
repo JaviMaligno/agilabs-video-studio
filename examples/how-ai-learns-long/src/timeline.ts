@@ -48,7 +48,7 @@ const build = (): Cuts => ({
       'KnowledgeBook',
       { mode: 'school', marks: [[0, 'school'], [0, 'packed'], [0, 'millions'], [1, 'manners'], [1, 'line']] },
       [
-        say(0.2, 'Before you ever chat with an AI, it has been to school. It read a huge amount of text, and what it learned got packed into the model. That\'s pre-training. You won\'t be doing it: it costs millions.', ''),
+        say(0.2, 'Before you ever chat with an AI, it has been to school. It read a huge amount of text, and what it learned got packed into the model. That\'s pre-training. You won\'t be doing it: for the big models, it costs millions. Small ones cost far less, but they also know far less.', ''),
         say(0, 'Then comes a shorter second school: manners. Answering questions, following instructions like "one line, please". Remember that one.', ''),
       ],
       { chapter: 'Two ways to teach' },
@@ -68,7 +68,7 @@ const build = (): Cuts => ({
         say(0, "It's like the briefing you give a new employee each morning. They read all of it, every time, before they start.", ''),
         say(0, 'Most apps let you write it without any code: custom instructions, a project, a custom GPT.', ''),
         say(0, 'The policy changes to fourteen days? You edit one line. Next chat, it knows.', ''),
-        say(0, 'The catch: a note has to stay short. Pages and pages, and the line that matters gets buried.', ''),
+        say(0, 'The catch: the longer the note, the more the line that matters competes with everything else. Coding assistants run on notes thousands of words long, and they work. How long is too long depends on the model.', ''),
         say(0, 'So what about your whole catalogue, far too big for a note?', '', undefined, CURIOUS),
       ],
       { chapter: 'The prompt' },
@@ -102,9 +102,11 @@ const build = (): Cuts => ({
       ],
       { chapter: 'Full fine-tuning' },
     ),
-    anim('terminal', 'TerminalTest', { mode: 'full', marks: [[0, 'commands'], [0, 'learned'], [1, 'worse'], [1, 'third'], [2, 'forget'], [3, 'none']] }, [
+    anim('terminal', 'TerminalTest', { mode: 'full', marks: [[0, 'commands'], [0, 'learned'], [1, 'quiz'], [1, 'food'], [1, 'points'], [2, 'worse'], [2, 'third'], [3, 'forget'], [4, 'none']] }, [
       say(0.2, 'In my test, I gave a small open model one narrow job, as foreign to it as a new dialect: I fed it thousands of computer commands, each with what the computer printed back. With full fine-tuning, it learned the job well.', ''),
-      say(0, 'But it got worse at following instructions, the manners from school. On a standard test of that, more than a third worse.', ''),
+      say(0, 'How did I check what it lost? With a general knowledge quiz. Questions like: plants use sunlight to make… soil, minerals, food, or water? It lost some points there.', '', { en: 'How did I check what it lost? With a general knowledge quiz. Questions like: plants use sunlight to make: soil, minerals, food, or water? It lost some points there.' }),
+      // at 27: a beat of silence after "It lost some points there" so the meter's drop can be read
+      say(27, 'It also got worse at following instructions, the manners from school. On a standard test of that, more than a third worse.', ''),
       say(0, 'Rewriting pages for the new job had written over some of the old ones. Nobody asked it to forget.', ''),
       say(0, 'And it learned the job narrowly. On commands it had never seen in its lessons, it got none right.', ''),
     ]),
@@ -146,11 +148,11 @@ const build = (): Cuts => ({
       [say(0.2, 'So when someone says they trained an AI on their data, ask which one. Often it\'s a note or a manual. Sometimes it\'s a fine-tune.', '', undefined, CONFIDENT)],
       { chapter: 'What to use' },
     ),
-    anim('recipe', 'ShopRecipe', { mode: 'recipe', marks: [[0, 'prompt'], [1, 'looking'], [2, 'LoRA'], [3, 'ordinary'], [4, 'check']] }, [
+    anim('recipe', 'ShopRecipe', { mode: 'recipe', marks: [[0, 'prompt'], [1, 'looking'], [2, 'LoRA'], [3, 'ordinary'], [4, 'check'], [3, 'general'], [3, 'manners']] }, [
       say(0.2, 'For your shop, start with the prompt: your policy, your tone, one good answer.', ''),
       say(0, 'When the facts are many, or change often, add looking it up.', ''),
       say(0, "Fine-tune only for something asking can't get you: a style, a format, a skill. And try LoRA before full fine-tuning.", '', LORA("Fine-tune only for something asking can't get you: a style, a format, a skill. And try LoRA before full fine-tuning.")),
-      say(0, "If someone does rewrite the whole book for you, ask whether they mixed ordinary text back into the lessons. In my test, a tenth of it won back most of the general knowledge it had lost. The manners, I didn't check.", ''),
+      say(0, "If someone does rewrite the whole book for you, ask whether they mixed ordinary text back into the lessons. In my test, a tenth of it won back most of the general knowledge. But not the manners: following instructions dropped just as much.", ''),
       say(0, 'And whatever you change, check more than the new thing. My model aced its new job and quietly lost some of its manners.', ''),
     ]),
     // "Training complete" lands on "finished" and the scene holds ~3 s after it, so the banner can be read
