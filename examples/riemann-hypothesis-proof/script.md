@@ -1,14 +1,14 @@
-# The Riemann hypothesis has a proof nobody has read — article video (EN) · script draft v0.2 (not approved)
+# The Riemann hypothesis has a proof nobody has read — article video (EN) · script v0.3 (approved by the author, 2026-11-22)
 
-Article: riemann-hypothesis-proof (javieraguilar.ai, EN, draft, proposed for 2026-11-24).
-Vertical 9:16, target ~58-62 s. Format: **concept** (the idea inside the proof), not a replay
-of the news. This article explains Alpöge and Claude's result, not an experiment of mine: the
-proof is never presented as mine, and what the author says is attributed to him ("the author
-says"). ES cut: pending.
+Article: riemann-hypothesis-proof (javieraguilar.ai, EN, scheduled for 2026-11-24).
+Vertical 9:16, about 60 s. Format: **concept**: what the humans did in the week of the proof,
+and why "math is dead" points the wrong way. This article explains Alpöge and Claude's result,
+not an experiment of mine: the proof is never presented as mine, and what the author says is
+attributed to him ("he says so himself"). First person only for my own view (rows 1 and 12).
+ES cut: pending.
 
-Status: script only. Not built, not narrated (no TTS key in the cloud session), and the cold
-read (`reel-viewer` + `reel-expert`) has not been run yet. Build after the article is approved,
-so the source sentences stop moving.
+Status: script approved. Not built and not narrated yet; the cold read (`reel-viewer` +
+`reel-expert`) is still to run before the build.
 
 ## Premise (v0.2: the human side first, as the author asked)
 
@@ -50,8 +50,8 @@ thing the map is being drawn over.
 | 12 | My view: mathematics is more alive than it has ever been. | Pull back: the whole trail, crowded, with new forks opening | `Trail` (mode `closer`) | "My view is that mathematics is more alive than it has ever been." |
 | 13 | (no narration) | Outro card: AGILabs badge, javieraguilar.ai, title, credit "Proof: Levent Alpöge with Claude · Human draft: Alessandro Masullo · Independent checks: A. Sutherland and the Lean community" | outro | names as in the article |
 
-**Word count (EN):** about 150 spoken words; trim to the 140 cap in the cold read (rows 2 and 9
-are the candidates).
+**Word count (EN):** about 150 spoken words, around 60 s at 2.5 words/s plus the silent outro.
+No cap to hit: cut only lines that repeat.
 
 ## Long version (YouTube, landscape, ~6-8 min): outline only
 
@@ -80,11 +80,11 @@ conditional theorems (one line at most in the long cut).
 - **Real data (long cut only):** `PrimeCurve` replays `(G(y) − log 2π)/√y` from
   `personal-website/scripts/figures/riemann-centred-prime-sum.py` (export ~2,000 points on the
   log grid to `src/data/prime-curve.json`). Band at ±0.0462, exactly as the article's figure.
-  The breach in row 6 is illustrative and must look it (ghosted, dashed): say so in
-  `factcheck.md`, not on screen.
-- **Numbers on screen, exactly as the article writes them:** 175,187; 1850; "ten million";
-  ±0.0462 if shown; √x. No token or agent counts: the article says they are not public.
-- **Attribution:** rows 10-11 are the author's own account. Never "Claude proved"; the article
+- **The trail is a metaphor**, not footage of anything measured: say so in `factcheck.md`, not
+  on screen.
+- **Numbers on screen, exactly as the article writes them:** 175,187 and "twelve years" in the
+  short; 1850, "ten million", ±0.0462 and √x only in the long cut. No token or agent counts: the article says they are not public.
+- **Attribution:** rows 4-8 are the author's own account. Never "Claude proved"; the article
   says "a human chose the route and the model finished it", in the author's description.
 - **Brand colours:** the article's figures use teal and amber; the video stays in brand colours
   as in the Navier–Stokes video.
