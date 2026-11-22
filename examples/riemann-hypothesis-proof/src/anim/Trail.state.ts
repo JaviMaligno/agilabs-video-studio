@@ -118,11 +118,13 @@ export type Vals = {
   crowd: number; map: number; mapTag: number;
   /** New forks opening and more people on them. */
   forks: number;
+  /** The front pages, in the ending. */
+  news: number;
 };
 
 const ZERO: Vals = {
   camX: 265, camY: 1225, zoom: 2.4, pos: 0.2, marks: 0, pile: 0, glow: 0, pick: 0, taste: 0, unfold: 0, steep: 0, light: 0, run: 0,
-  quote: 0, sheet: 0, sketch: 0, second: 0, years: 0, here: 0, crowd: 0, map: 0, mapTag: 0, forks: 0,
+  quote: 0, sheet: 0, sketch: 0, second: 0, years: 0, here: 0, crowd: 0, map: 0, mapTag: 0, forks: 0, news: 0,
 };
 
 /** One change inside a scene: `key` goes to `to`, starting `off` seconds after beat `beat`. */
@@ -208,13 +210,34 @@ export const SCRIPT: Record<TrailMode, Tween[]> = {
   ],
   // "Understanding is behind." / "AI is how it catches up."
   catchup: [{ key: 'map', to: MAP_CEILING, beat: 1, len: 1.8, ease: 'inout' }],
-  // "My view: mathematics is more alive than it has ever been."
+  // "A problem about prime numbers made the front pages." / "Trying a new route used to cost a career."
+  // / "Now it costs weeks, so far more routes get tried." / "The real job was always picking what's
+  // worth proving, and explaining why it's true." / "So no, math isn't dead." / "I think it's more alive than ever."
   closer: [
     { key: 'mapTag', to: 0, len: 0.3 },
-    { key: 'zoom', to: 1, len: 1.2, ease: 'inout' },
-    { key: 'camX', to: 540, len: 1.2, ease: 'inout' },
-    { key: 'camY', to: 781, len: 1.2, ease: 'inout' },
-    { key: 'forks', to: 1, off: 0.6, len: 2.6, ease: 'inout' },
+    { key: 'zoom', to: 1, len: 1.0, ease: 'inout' },
+    { key: 'camX', to: 540, len: 1.0, ease: 'inout' },
+    { key: 'camY', to: 781, len: 1.0, ease: 'inout' },
+    { key: 'news', to: 1, off: 0.4, len: 0.6 },
+    // a career: down the long trail behind him, with its year marks
+    { key: 'news', to: 0, beat: 1, off: -0.2, len: 0.4 },
+    { key: 'zoom', to: 1.45, beat: 1, len: 1.2, ease: 'inout' },
+    { key: 'camX', to: 430, beat: 1, len: 1.2, ease: 'inout' },
+    { key: 'camY', to: 1075, beat: 1, len: 1.2, ease: 'inout' },
+    // weeks: back out, and the new routes open with people on them
+    { key: 'zoom', to: 1, beat: 2, len: 1.0, ease: 'inout' },
+    { key: 'camX', to: 540, beat: 2, len: 1.0, ease: 'inout' },
+    { key: 'camY', to: 781, beat: 2, len: 1.0, ease: 'inout' },
+    { key: 'forks', to: 1, beat: 2, off: 0.3, len: 2.4, ease: 'inout' },
+    // the real job: the author drawing his own proof
+    { key: 'zoom', to: 1.6, beat: 3, len: 1.0, ease: 'inout' },
+    { key: 'camX', to: 420, beat: 3, len: 1.0, ease: 'inout' },
+    { key: 'camY', to: 720, beat: 3, len: 1.0, ease: 'inout' },
+    { key: 'sketch', to: 0.8, beat: 3, off: 0.5, len: 3.0, ease: 'linear' },
+    // the answer to the hook: the whole crowded mountain
+    { key: 'zoom', to: 1, beat: 4, len: 1.4, ease: 'inout' },
+    { key: 'camX', to: 540, beat: 4, len: 1.4, ease: 'inout' },
+    { key: 'camY', to: 790, beat: 4, len: 1.4, ease: 'inout' },
   ],
 };
 

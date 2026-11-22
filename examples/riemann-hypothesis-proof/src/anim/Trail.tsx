@@ -375,6 +375,12 @@ export const Trail: React.FC<AnimProps & TrailProps> = (p) => {
       </Canvas>
       {p.vertical && (
         <>
+          {s.news > 0 && (
+            <img
+              src={staticFile('cast/newspapers.png')}
+              style={{ position: 'absolute', left: 140, top: 330, width: 800, opacity: s.news, transform: `scale(${0.85 + 0.15 * s.news}) rotate(${-4 + 4 * s.news}deg)`, filter: 'drop-shadow(0 18px 30px rgba(0,0,0,0.55))' }}
+            />
+          )}
           {s.taste > 0 && (
             <div style={{ position: 'absolute', left: 0, right: 0, top: 262, textAlign: 'center', opacity: s.taste, transform: `scale(${0.9 + 0.1 * s.taste})`, fontFamily, fontSize: 150, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, ...gradientText }}>
               taste
