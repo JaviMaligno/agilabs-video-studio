@@ -39,8 +39,15 @@ const build = (): Cuts => ({
       say(0, '"We are still here."', ''),
     ]),
     anim('map', 'Trail', { mode: 'map' }, [say(0.15, 'Within a day there was a public map of the proof, drawn with AI.', '')]),
-    anim('catchup', 'Trail', { mode: 'catchup' }, [say(0.15, 'Understanding is behind.', ''), say(0, 'AI is how it catches up.', '')]),
-    anim('closer', 'Trail', { mode: 'closer' }, [say(0.15, 'My view: mathematics is more alive than it has ever been.', '')], { min: 6.2 }),
+    anim('catchup', 'Trail', { mode: 'catchup' }, [say(0.15, 'Understanding is behind, and AI is how it catches up.', '')]),
+    anim('closer', 'Trail', { mode: 'closer' }, [
+      say(0.3, 'A problem about prime numbers made the front pages.', ''),
+      say(0.4, 'Trying a new route used to cost a career.', ''),
+      say(0.1, 'Now it costs weeks, so far more routes get tried.', ''),
+      say(0.4, "The real job was always picking what's worth proving, and explaining why it's true.", ''),
+      say(0.5, "So no, math isn't dead.", ''),
+      say(0.1, "I think it's more alive than ever.", ''),
+    ], { min: 6.2 }),
     // Silent card: badge, address, title and the credit line (SETTINGS.credit).
     outro('outro', [], 5.5),
   ]),

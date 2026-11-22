@@ -1,4 +1,4 @@
-# The Riemann hypothesis has a proof nobody has read — article video (EN) · script v0.4 (v0.3 approved by the author, 2026-11-22; v0.4 = v0.3 after the cold read and lint, changes listed below)
+# The Riemann hypothesis has a proof nobody has read — article video (EN) · script v0.5 (v0.3 approved by the author, 2026-11-22; v0.4 = v0.3 after the cold read and lint; v0.5 = new ending at the author's request, see "v0.5" below)
 
 Article: riemann-hypothesis-proof (javieraguilar.ai, EN, scheduled for 2026-11-24).
 Vertical 9:16, about 60 s. Format: **concept**: what the humans did in the week of the proof,
@@ -85,6 +85,29 @@ viewer's wider suggestions (explain the hypothesis, name the author, cut the sec
 mathematician) would rewrite an approved script and are left to the author.
 
 **Word count (EN), as built:** 149 spoken words; 63.1 s with the silent outro.
+
+## v0.5: the ending (author's notes, 2026-11-22)
+
+The author: "My view" sounded unnatural, the lines broke the rhythm, and it was not clear why he
+thinks mathematics is more alive than ever. Rows 11-12 rewritten from the article's three reasons,
+reasons first and short, ending on the answer to the hook. Rows 1-10 unchanged.
+
+| Row | Before (v0.4) | After (v0.5) | Source sentence |
+|---|---|---|---|
+| 11 | Understanding is behind. / AI is how it catches up. (two takes) | Understanding is behind, and AI is how it catches up. (one take) | linkedinSummary |
+| 12a | My view: mathematics is more alive than it has ever been. | A problem about prime numbers made the front pages. | "A problem about the zeros of a function was front-page news" |
+| 12b | | Trying a new route used to cost a career. | "trying it by hand would have cost a career" |
+| 12c | | Now it costs weeks, so far more routes get tried. | "When exploring a route costs weeks, far more routes, tools and connections get explored" |
+| 12d | | The real job was always picking what's worth proving, and explaining why it's true. | "Choosing what is worth proving ... and explaining why something is true were always most of the job" |
+| 12e | | So no, math isn't dead. / I think it's more alive than ever. | "My view is that mathematics is more alive than it has ever been" |
+
+Cold read of a first draft (viewer + expert): the expert flagged "What has ended is the race to be
+first" (contradicts row 9, where two proofs appear the same afternoon; the article says the *idea*
+that being first is the job ended), so it was cut; the viewer wanted the reasons before the
+verdict, one per line, the hook answered last, and the robot at the summit not to be the last
+image of the argument. Both applied. Open viewer notes on rows 2, 5, 9 and 10 (Lean, "a pile a
+rival lab had published", who the second mathematician is, "a map of a proof") are outside what
+the author asked to change and are left to him. As built: ~79 s.
 
 ## Long version (YouTube, landscape, ~6-8 min): outline only
 
