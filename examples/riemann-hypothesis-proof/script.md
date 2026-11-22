@@ -1,4 +1,4 @@
-# The Riemann hypothesis has a proof nobody has read — article video (EN) · script v0.3 (approved by the author, 2026-11-22)
+# The Riemann hypothesis has a proof nobody has read — article video (EN) · script v0.4 (v0.3 approved by the author, 2026-11-22; v0.4 = v0.3 after the cold read and lint, changes listed below)
 
 Article: riemann-hypothesis-proof (javieraguilar.ai, EN, scheduled for 2026-11-24).
 Vertical 9:16, about 60 s. Format: **concept**: what the humans did in the week of the proof,
@@ -7,8 +7,8 @@ not an experiment of mine: the proof is never presented as mine, and what the au
 attributed to him ("he says so himself"). First person only for my own view (rows 1 and 12).
 ES cut: pending.
 
-Status: script approved. Not built and not narrated yet; the cold read (`reel-viewer` +
-`reel-expert`) is still to run before the build.
+Status: built, narrated (Cartesia, the author's cloned EN voice) and rendered. The cold read
+(`reel-viewer` + `reel-expert`) ran before the build; see "Cold read and changes since v0.3".
 
 ## Premise (v0.2: the human side first, as the author asked)
 
@@ -36,8 +36,8 @@ thing the map is being drawn over.
 
 | # | Narration (EN) | Visual | Component | Source sentence |
 |---|---|---|---|---|
-| 1 | "Math is dead." I read that a lot this week. | Title card; the phrase typed, then struck through with a "?" | intro (hook card) | "## \"Math is dead\""; "I have read that sentence a lot this week" |
-| 2 | A proof of the Riemann hypothesis was published. Machines checked it in about a day. Nobody has read it. | The stack of files scanned teal; counter "read by: 0" | bespoke `FileStack` | "Lean files: 175,187"; "Everything a machine can check was checked within about a day"; "## A proof nobody has read" |
+| 1 | "Math is dead." I read that a lot this week. | Cold open: the stack of files still piling up, the hook over it (no strike-through: it gave the verdict away) | intro (cold open on `FileStack`, mode `loom`) | "## \"Math is dead\""; "I have read that sentence a lot this week" |
+| 2 | A mathematician, working with an AI model, published a proof of the Riemann hypothesis. Machines checked it in about a day. Nobody has read it. | The stack counted (175,187 Lean files), scanned by the checker; "read by: 0" | bespoke `FileStack` (mode `count`) | "I believe I have, working with Claude, discovered a proof of the Riemann Hypothesis."; "Lean files: 175,187"; "Everything a machine can check was checked within about a day"; "## A proof nobody has read" |
 | 3 | But look at what the humans did. | Camera leaves the stack and finds the trail and the walker | bespoke `Trail` (mode `open`) | "**A human chose the route and the model finished it.**" |
 | 4 | The author had planned his whole career around this problem. | The trail behind the walker stretches far back, with small year marks | `Trail` (mode `past`) | "A mathematician who had planned his whole career around this problem set the direction" |
 | 5 | His clue was a paper almost nobody discussed, in a pile a rival lab had published. | A pile of sheets; one glows faintly at the bottom and is picked up | `Trail` (mode `pick`) | "a direct descendant of a neighbouring paper that almost nobody discussed"; "a mathematician at the other lab found the thread that mattered in the part nobody was talking about" |
@@ -46,12 +46,45 @@ thing the map is being drawn over.
 | 8 | Now his job is to understand his own proof. | The walker starts drawing the steep stretch on a sheet | `Trail` (mode `draw`) | "He also says he cannot yet explain the last stretch, and that understanding it is the work that starts now." |
 | 9 | The same afternoon, a mathematician with twelve years of work and no AI published his draft. "We are still here." | A second figure arrives carrying a thick hand-written manuscript; quote on screen | `Trail` (mode `second`) + quote | "the work took twelve years"; "\"It is all human, with no AI\""; "\"we are still here. We are very much alive. We are not going anywhere.\"" |
 | 10 | Within a day there was a public map of the proof, drawn with AI. | Many small figures arrive; a map of the unread stretch fills in | `Trail` (mode `map`) | "Within a day of the announcement there was a public map of the proof's architecture... all produced with AI assistance." |
-| 11 | Understanding is behind. AI is how it catches up. | The map reaches the light at the top | `Trail` (mode `catchup`) | "Understanding is the part that is behind, and AI is the main reason it will not stay behind for long." |
+| 11 | Understanding is behind. AI is how it catches up. | The map climbs towards the light and stays short of it | `Trail` (mode `catchup`) | "Understanding is the part that is behind, and AI is the main reason it will not stay behind for long." |
 | 12 | My view: mathematics is more alive than it has ever been. | Pull back: the whole trail, crowded, with new forks opening | `Trail` (mode `closer`) | "My view is that mathematics is more alive than it has ever been." |
 | 13 | (no narration) | Outro card: AGILabs badge, javieraguilar.ai, title, credit "Proof: Levent Alpöge with Claude · Human draft: Alessandro Masullo · Independent checks: A. Sutherland and the Lean community" | outro | names as in the article |
 
 **Word count (EN):** about 150 spoken words, around 60 s at 2.5 words/s plus the silent outro.
 No cap to hit: cut only lines that repeat.
+
+## Cold read and changes since v0.3
+
+Both readers ran on v0.3 (independent sessions; the viewer saw only the numbered narration with
+the visuals in brackets, the expert also a factual summary of the article).
+
+- **reel-viewer:** retold the video correctly; best line "Now his job is to understand his own
+  proof"; non-obvious takeaway: a man has to study his own proof. Lost at "the model" in row 7
+  (the AI had not been introduced), at row 9 ("a draft of what?") and at rows 6 and 11 as
+  abstract. Scroll point: row 5. Red flags: the struck-through title with a "?" gives the answer
+  away; rows 9-10 read as a second story.
+- **reel-expert:** the point survives. Flagged: row 2 never says an AI was involved; row 6
+  ("Nobody automated it") stronger than the article's body; row 9 leaves out that the human draft
+  is unchecked and under revision; the visual of row 11 (the map reaching the light) contradicts
+  "understanding is behind"; the second figure should not arrive at the same summit.
+
+What changed:
+
+| Row | Before (v0.3) | After (v0.4) | Why |
+|---|---|---|---|
+| 2 (narration) | A proof of the Riemann hypothesis was published. | A mathematician, working with an AI model, published a proof of the Riemann hypothesis. | Both readers: "the model" of row 7 came from nowhere. No stronger than the article ("I believe I have, working with Claude, discovered a proof"). |
+| 9 (narration) | one sentence in one take | the same words in two takes: "The same afternoon," / "a mathematician with twelve years of work and no AI published his draft." | Lint: spoken in one go, the first caption ran at 18.7 chars/s (limit 17). No word changed. |
+| 1 (visual) | phrase struck through with a "?" | cold open on the stack, no strike-through | Viewer: it gave the verdict away; and a text-only frame 0. |
+| 9 (visual) | second figure arrives at the same trail | arrives on a path of its own, away from the summit | Expert: its route is unverified and is not the same proof. |
+| 11 (visual) | the map reaches the light | the map climbs towards the light and stops short | Expert: "understanding is behind". |
+
+Kept as approved, with the reason: row 6 ("That is taste. Nobody automated it.") follows the
+article's own `linkedinSummary` ("That is taste, and it is the part no one automated."); row 9's
+status is carried by the word "draft" and the outro credit "Human draft", not by a new line; the
+viewer's wider suggestions (explain the hypothesis, name the author, cut the second
+mathematician) would rewrite an approved script and are left to the author.
+
+**Word count (EN), as built:** 149 spoken words; 63.1 s with the silent outro.
 
 ## Long version (YouTube, landscape, ~6-8 min): outline only
 
