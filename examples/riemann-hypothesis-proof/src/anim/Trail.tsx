@@ -1,4 +1,5 @@
 import React from 'react';
+import { staticFile } from 'remotion';
 import { C, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
@@ -117,6 +118,31 @@ const Piece: React.FC<{ x: number; y: number; s?: number; body: string; head: st
   </g>
 );
 
+/** Trimmed sizes of the Codex cast in public/cast (feet at the bottom centre). */
+const CAST = {
+  walker: [485, 890], 'walker-pick': [556, 816], 'walker-stop': [334, 879], 'walker-draw': [622, 783],
+  'robot-climb': [530, 667], 'second-math': [508, 885], 'paper-pile': [747, 652],
+  'mapper-1': [264, 570], 'mapper-2': [239, 576], 'mapper-3': [264, 563], 'mapper-4': [257, 567], 'mapper-5': [287, 563],
+} as const;
+type CastName = keyof typeof CAST;
+
+/** A drawn figure standing at (x, y): `h` tall in world units, mirrored when `flip`. */
+const Fig: React.FC<{ src: CastName; x: number; y: number; h: number; flip?: boolean; lift?: number; rot?: number; opacity?: number; shadow?: boolean }> = ({ src, x, y, h, flip, lift = 0, rot = 0, opacity = 1, shadow = true }) => {
+  const [w0, h0] = CAST[src];
+  const w = (h * w0) / h0;
+  return (
+    <g opacity={opacity} transform={`translate(${x} ${y})`}>
+      {shadow && <ellipse cx={0} cy={1} rx={w * 0.32} ry={h * 0.035} fill={alpha('#000000', 0.45)} />}
+      <g transform={`translate(0 ${-lift}) rotate(${rot}) scale(${flip ? -1 : 1} 1)`}>
+        <image href={staticFile(`cast/${src}.png`)} x={-w / 2} y={-h} width={w} height={h} />
+      </g>
+    </g>
+  );
+};
+
+/** The painted mountain of pages (public/bg), placed so its summit sits on SUMMIT. */
+const BG = { x: -106, y: 205, w: 1160, h: 1740 };
+
 const Trailline: React.FC<{ pts: Pt[]; colour?: string; width?: number; glow?: string }> = ({ pts, colour = C.text, width = 7, glow = C.accent }) =>
   pts.length < 2 ? null : (
     <>
@@ -169,7 +195,7 @@ export const Trail: React.FC<AnimProps & TrailProps> = (p) => {
     w: 60 + (22 - 60) * s.pick,
     h: 7 + (28 - 7) * s.pick,
   };
-  const easel = { x: STOP[0] - 100, y: STOP[1] - 108, w: 64, h: 90 };
+  const easel = { x: STOP[0] - 150, y: STOP[1] - 118, w: 64, h: 90 };
   const mini = (pt: Pt): Pt => [easel.x + 12 + (pt[0] - 400) * 0.2, easel.y + 82 + (pt[1] - 800) * 0.155];
   const sketchTip = pointAt(STEEP, s.sketch);
   return (
@@ -190,6 +216,17 @@ export const Trail: React.FC<AnimProps & TrailProps> = (p) => {
         </defs>
         <g mask="url(#tr-mask)">
           <g transform={cam}>
+            {/* the painted mountain of pages, faded into the dark at its edges */}
+            <defs>
+              <radialGradient id="tr-bgfade" cx="0.5" cy="0.34" r="0.62">
+                <stop offset="0.55" stopColor="#fff" stopOpacity="1" />
+                <stop offset="1" stopColor="#fff" stopOpacity="0" />
+              </radialGradient>
+              <mask id="tr-bgmask" maskUnits="userSpaceOnUse" x={BG.x} y={BG.y} width={BG.w} height={BG.h}>
+                <rect x={BG.x} y={BG.y} width={BG.w} height={BG.h} fill="url(#tr-bgfade)" />
+              </mask>
+            </defs>
+            <image href={staticFile('bg/bg-mountain-v.jpg')} x={BG.x} y={BG.y} width={BG.w} height={BG.h} preserveAspectRatio="xMidYMid slice" mask="url(#tr-bgmask)" opacity={0.7} />
             {/* ground */}
             {Array.from({ length: 70 }, (_, i) => (
               <circle key={i} cx={40 + hash(i) * 1000} cy={820 + hash(i + 200) * 560} r={2.2} fill={alpha(C.text, 0.07 + hash(i + 400) * 0.06)} />
@@ -217,8 +254,8 @@ export const Trail: React.FC<AnimProps & TrailProps> = (p) => {
                   width={TILE.w}
                   height={TILE.h}
                   rx={4}
-                  fill={charted ? alpha(C.accent2, 0.42) : lit ? alpha(C.accentText, 0.34) : alpha(C.accent, 0.07)}
-                  stroke={charted ? alpha(C.text, 0.75) : lit ? alpha(C.accentText, 0.7) : alpha(C.text, 0.13)}
+                  fill={charted ? alpha(C.accent2, 0.5) : lit ? alpha(C.accentText, 0.4) : 'none'}
+                  stroke={charted ? alpha(C.text, 0.85) : lit ? alpha(C.accentText, 0.8) : 'none'}
                   strokeWidth={1.5}
                 />
               );
@@ -271,10 +308,8 @@ export const Trail: React.FC<AnimProps & TrailProps> = (p) => {
 
             {/* the pile a rival lab had published */}
             {s.pile > 0 && (
-              <g opacity={s.pile} transform={`translate(${pileAt.x} ${pileAt.y + (1 - s.pile) * 10})`}>
-                {Array.from({ length: 7 }, (_, i) => (
-                  <rect key={i} x={-30 + (hash(i + 7) - 0.5) * 8} y={-13 - i * 9} width={60} height={7} rx={2} fill={alpha(C.text, 0.5 + hash(i) * 0.2)} transform={`rotate(${(hash(i + 20) - 0.5) * 5})`} />
-                ))}
+              <g opacity={s.pile} transform={`translate(0 ${(1 - s.pile) * 10})`}>
+                <Fig src="paper-pile" x={pileAt.x} y={pileAt.y + 8} h={96} />
               </g>
             )}
             {s.pile > 0 && s.unfold < 1 && (
@@ -298,24 +333,15 @@ export const Trail: React.FC<AnimProps & TrailProps> = (p) => {
                 const idle = prog >= 1 ? Math.max(0, Math.sin(s.T * 3 + i * 1.7)) * 2.5 : Math.abs(Math.sin(prog * 14)) * 4;
                 return (
                   <g key={i}>
-                    <Piece x={x} y={y} s={1} body={alpha(C.muted, 0.95)} head={alpha(C.text, 0.9)} lift={idle} />
-                    {s.map > 0 && prog >= 1 && <rect x={x + 12} y={y - 34} width={15} height={19} rx={2} fill={C.text} stroke={C.accent2} strokeWidth={2} />}
+                    <Fig src={`mapper-${(i % 5) + 1}` as CastName} x={x} y={y} h={70} flip={c.to[0] < c.from[0]} lift={idle} />
+                    
                   </g>
                 );
               })}
 
             {/* the second figure, with twelve years of manuscript */}
             {s.second > 0 && (
-              <g>
-                <Piece x={s.secondAt.x} y={s.secondAt.y} s={1.6} body={C.accent2} head={C.text} lift={s.second < 1 ? Math.abs(Math.sin(s.second * 22)) * 4 : 0} />
-                <g transform={`translate(${s.secondAt.x - 44} ${s.secondAt.y - 56 - (s.second < 1 ? Math.abs(Math.sin(s.second * 22)) * 4 : 0)}) scale(1.35)`}>
-                  <rect x={0} y={0} width={30} height={36} rx={3} fill={C.text} stroke={C.accent2} strokeWidth={3} />
-                  {[6, 11, 16, 21, 26, 31].map((yy) => (
-                    <line key={yy} x1={3} y1={yy} x2={27} y2={yy} stroke={alpha(C.bg0, 0.45)} strokeWidth={1.6} />
-                  ))}
-                  <rect x={-7} y={3} width={7} height={36} rx={2} fill={alpha(C.text, 0.75)} />
-                </g>
-              </g>
+              <Fig src="second-math" x={s.secondAt.x} y={s.secondAt.y} h={128} flip lift={s.second < 1 ? Math.abs(Math.sin(s.second * 22)) * 4 : 0} />
             )}
 
             {/* the walker's own sheet: he starts to draw the stretch he could not follow */}
@@ -331,13 +357,17 @@ export const Trail: React.FC<AnimProps & TrailProps> = (p) => {
             )}
 
             {/* the walker */}
-            <Piece x={w.x} y={w.y} s={1.6} body={C.accent} head={C.text} lean={step * 3 * w.dir} lift={Math.abs(step) * 3} />
+            {(() => {
+              const pose: CastName = s.sheet > 0.3 ? 'walker-draw' : s.light > 0.2 ? 'walker-stop' : s.pick > 0.02 && s.unfold < 0.05 ? 'walker-pick' : 'walker';
+              const walking = pose === 'walker';
+              return <Fig src={pose} x={w.x} y={w.y} h={pose === 'walker-draw' ? 104 : pose === 'walker-pick' ? 112 : 124} flip={walking && w.dir < 0} rot={walking ? step * 2 * w.dir : 0} lift={walking ? Math.abs(step) * 3 : 0} />;
+            })()}
 
             {/* the light: the model */}
             {s.light > 0 && (
               <g opacity={s.light}>
                 <circle cx={s.lightAt.x} cy={s.lightAt.y} r={44 * flicker} fill="url(#tr-light)" opacity={0.85} />
-                <circle cx={s.lightAt.x} cy={s.lightAt.y} r={8} fill={C.text} />
+                <Fig src="robot-climb" x={s.lightAt.x - 8} y={s.lightAt.y + 36} h={92} shadow={false} />
               </g>
             )}
           </g>

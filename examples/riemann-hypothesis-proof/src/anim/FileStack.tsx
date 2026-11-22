@@ -1,4 +1,5 @@
 import React from 'react';
+import { staticFile } from 'remotion';
 import { C, GRADIENT, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
@@ -107,6 +108,13 @@ export const FileStack: React.FC<AnimProps & FileStackProps> = (p) => {
             </g>
           )}
         </g>
+        {/* Cold open: the hook drawn, a gravestone for mathematics in front of the growing stack. */}
+        {p.mode === 'loom' && (
+          <g transform={`translate(540 ${600 + 4 * Math.sin(s.T * 1.3)}) rotate(${-3 + 0.6 * Math.sin(s.T * 0.9)})`}>
+            <ellipse cx={0} cy={0} rx={150} ry={16} fill={alpha('#000000', 0.5)} />
+            <image href={staticFile('cast/tombstone.png')} x={-148} y={-350} width={296} height={350} />
+          </g>
+        )}
       </Canvas>
       {p.vertical && (
         <>
