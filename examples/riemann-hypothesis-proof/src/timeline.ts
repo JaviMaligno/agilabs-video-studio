@@ -42,7 +42,7 @@ const build = (): Cuts => ({
     anim('catchup', 'Trail', { mode: 'catchup' }, [say(0.15, 'Understanding is behind.', ''), say(0, 'AI is how it catches up.', '')]),
     anim('closer', 'Trail', { mode: 'closer' }, [say(0.15, 'My view: mathematics is more alive than it has ever been.', '')], { min: 6.2 }),
     // Silent card: badge, address, title and the credit line (SETTINGS.credit).
-    outro('outro', [], 4.5),
+    outro('outro', [], 5.5),
   ]),
 });
 

@@ -49,8 +49,8 @@ export function frameState(p: FileStackProps, time: number, beats: number[], dur
   const b0 = Math.max(HOLD, beatAt(beats, 0));
   const b1 = Math.max(b0, beatAt(beats, 1));
   const b2 = Math.max(b1, beatAt(beats, 2));
-  // The number arrives with "published a proof", late in the first line.
-  const numStart = beats.length > 1 ? Math.max(b0, b1 - 1.9) : b0 + 0.4;
+  // The number arrives with "published a proof", half way through the first line.
+  const numStart = beats.length > 1 ? Math.max(b0, b1 - 2.7) : b0 + 0.4;
   const counting = count ? easeOutCubic(progress(t, numStart, 1.1)) : 0;
   const scan = count ? progress(t, b1 + 0.1, 1.5) : 0;
   return {

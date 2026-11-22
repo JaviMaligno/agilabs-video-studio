@@ -83,9 +83,10 @@ export const FileStack: React.FC<AnimProps & FileStackProps> = (p) => {
             const x = STACK.x + col * (TILE.w + TILE.gap);
             const y = STACK.top + row * (TILE.h + TILE.gap);
             const checked = done || (s.scanOn > 0 && y + TILE.h / 2 < scanY);
+            // Tiles fade in below the badge: nothing falls across it.
             const drop = (1 - landed) * -260;
             return (
-              <g key={k} transform={`translate(${x} ${y + drop})`} opacity={Math.min(1, landed * 3)}>
+              <g key={k} transform={`translate(${x} ${y + drop})`} opacity={Math.min(1, landed * 3, Math.max(0, (STACK.top + (y + drop - STACK.top) * s.zoom - 240) / 60))}>
                 <rect
                   width={TILE.w}
                   height={TILE.h}

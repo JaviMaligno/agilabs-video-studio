@@ -177,7 +177,8 @@ export const SCRIPT: Record<TrailMode, Tween[]> = {
   ],
   // "Now his job is to understand his own proof."
   draw: [
-    { key: 'quote', to: 0, len: 0.3 },
+    // His words stay up long enough to be read.
+    { key: 'quote', to: 0, off: 0.9, len: 0.3 },
     { key: 'zoom', to: 1.3, len: 1.0, ease: 'inout' },
     { key: 'camX', to: 470, len: 1.0, ease: 'inout' },
     { key: 'camY', to: 650, len: 1.0, ease: 'inout' },
