@@ -89,8 +89,14 @@ when installed as a plugin; next to `skills/` in the plugin repo).
 10. **Render:** `npm run render` (vertical EN). `-- --es` for the Spanish cut, `-- --landscape`
     for 1920x1080 (the long format renders only this one). Then `npm run audio-qa` again to
     measure the mix (-16 LUFS integrated). Videos over 3 min render in chunks joined without
-    re-encoding (`CHUNK_SECONDS` to tune); an interrupted chunked render resumes from the
-    finished chunks. The music bed is made as long as the video.
+    re-encoding (`CHUNK_SECONDS` to tune). Each chunk is kept in `out/_parts/` under a key of
+    the scenes, code, images and voice takes it shows, so after a change only the chunks it
+    touches render again (an interrupted render resumes the same way); `-- --fresh` renders all.
+    The music bed is made as long as the video. One Chrome tab by default (`CONCURRENCY`):
+    with several, frames under the chalk filter come out half painted and flicker.
+    **Flicker check:** every render ends with one (`npm run flicker` on its own). A run of
+    suspect frames is a glitch, not the animation: render again with one tab. Look at a lone
+    hit; on a fade it is fine.
     **Before anyone sees it:** `npm run review-frames` and the `reel-watcher` agent (see *After
     every render* in `explainer-animation`). Fix what it flags, re-render and run it again until
     nothing fails; only then open the video for the author, with one line on what the watcher
