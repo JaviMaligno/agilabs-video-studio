@@ -15,6 +15,11 @@ const reX = (re: number) => ST.re0 + re * (ST.re1 - ST.re0);
 const imY = (im: number) => ST.y0 - (im / IM_MAX) * (ST.y0 - ST.yTop);
 const LINE_X = reX(0.5);
 const LABEL_X = 1250;
+const CHALK_DIM = alpha(CHALK, 0.6);
+// The negative axis is compressed (the real −2 would sit off the board): even spacing, a break mark.
+const AXIS_X0 = 330;
+const BREAK_X = 812;
+const TRIV_X = (re: number) => 740 + ((re + 2) / 2) * 120;
 
 const T_ = (props: React.SVGProps<SVGTextElement>) => <text fontWeight={700} fill={CHALK} textAnchor="middle" {...props} />;
 
@@ -61,22 +66,55 @@ export const CriticalLine: React.FC<AnimProps & CriticalLineProps> = (p) => {
           </g>
         </g>
 
-        {/* 1 · the critical strip, real part 0 to 1 */}
+        {/* 1 · the real axis; 0 at the strip's left edge */}
+        {s.axis > 0 && (
+          <g filter={chalk} opacity={Math.min(1, s.axis * 1.5)}>
+            <line x1={ST.re0 - (ST.re0 - AXIS_X0) * s.axis} y1={ST.y0} x2={ST.re0 + (ST.re1 + 130 - ST.re0) * s.axis} y2={ST.y0} stroke={CHALK} strokeWidth={5} strokeLinecap="round" />
+            <T_ x={ST.re0} y={ST.y0 + 52} fontSize={42} fontWeight={600}>0</T_>
+          </g>
+        )}
+
+        {/* 2-3 · the trivial zeros on the negative axis (compressed: the break marks it not to scale) */}
+        {s.trivial[0].pop > 0 && (
+          <g opacity={s.trivialOpacity}>
+            <g filter={chalk} stroke={CHALK} strokeWidth={4} strokeLinecap="round">
+              {[0, 16].map((dx) => (
+                <line key={dx} x1={BREAK_X - 12 + dx} y1={ST.y0 + 20} x2={BREAK_X + 4 + dx} y2={ST.y0 - 20} />
+              ))}
+            </g>
+            {s.trivial.map((z) =>
+              z.pop > 0 ? (
+                <g key={z.re} transform={`translate(${TRIV_X(z.re)} ${ST.y0})`} opacity={Math.min(1, z.pop * 2)}>
+                  <circle r={20 + 14 * z.pop * (1 - z.pop) * 4} fill={CHALK} opacity={0.3} filter={`url(#${id}-glow)`} />
+                  <circle r={11} fill={CHALK} />
+                  <g filter={chalk}>
+                    <T_ x={0} y={56} fontSize={42} fontWeight={600}>{`−${-z.re}`}</T_>
+                  </g>
+                </g>
+              ) : null,
+            )}
+            {s.trivialMore > 0 && (
+              <g filter={chalk} opacity={s.trivialMore}>
+                <T_ x={TRIV_X(-8)} y={ST.y0 + 14} fontSize={56} fontWeight={800}>…</T_>
+              </g>
+            )}
+          </g>
+        )}
+
+        {/* 4 · the critical strip, real part 0 to 1 */}
         {s.strip > 0 && (
           <g>
             <rect x={ST.re0} y={ST.y0 - (ST.y0 - ST.yTop) * s.strip} width={ST.re1 - ST.re0} height={(ST.y0 - ST.yTop) * s.strip} fill={alpha(C.accent, 0.14 + 0.03 * breathe)} />
             <g filter={chalk} opacity={Math.min(1, s.strip * 1.5)}>
-              <line x1={ST.re0 - 130} y1={ST.y0} x2={ST.re1 + 130} y2={ST.y0} stroke={CHALK} strokeWidth={5} strokeLinecap="round" />
               {[ST.re0, ST.re1].map((x) => (
                 <line key={x} x1={x} y1={ST.y0} x2={x} y2={ST.y0 - (ST.y0 - ST.yTop) * s.strip} stroke={CHALK} strokeWidth={4} strokeDasharray="14 12" />
               ))}
-              <T_ x={ST.re0} y={ST.y0 + 52} fontSize={42} fontWeight={600}>0</T_>
               <T_ x={ST.re1} y={ST.y0 + 52} fontSize={42} fontWeight={600}>1</T_>
             </g>
           </g>
         )}
 
-        {/* 2 · the middle line, real part ½ */}
+        {/* 5 · the middle line, real part ½ */}
         {s.line > 0 && (
           <g>
             <line x1={LINE_X} y1={ST.y0} x2={LINE_X} y2={ST.y0 - (ST.y0 - ST.yTop) * s.line} stroke={C.accentText} strokeWidth={22} opacity={0.35 + 0.2 * breathe} filter={`url(#${id}-glow)`} />
@@ -87,7 +125,7 @@ export const CriticalLine: React.FC<AnimProps & CriticalLineProps> = (p) => {
           </g>
         )}
 
-        {/* 3 · the first ten zeros drop onto the line */}
+        {/* 6 · the first ten zeros drop onto the line */}
         {s.zeros.map((z, i) => {
           if (z.drop <= 0) return null;
           const y = imY(z.im);
@@ -103,7 +141,7 @@ export const CriticalLine: React.FC<AnimProps & CriticalLineProps> = (p) => {
           );
         })}
 
-        {/* 4 · a pair off the line that would break it: flickers, fades */}
+        {/* 7 · a pair off the line that would break it: flickers, fades */}
         {s.offShown > 0 &&
           [-1, 1].map((side) => (
             <g key={side} transform={`translate(${reX(0.5 + side * OFF_RE)} ${imY(OFF_IM)})`} opacity={s.offOpacity}>
@@ -125,7 +163,10 @@ export const CriticalLine: React.FC<AnimProps & CriticalLineProps> = (p) => {
 
         {/* labels, one per line, on the right */}
         <g filter={chalk}>
-          <Label o={s.stripLabel} lines={['points where', 'it equals zero']} />
+          <Label o={s.pointsLabel} lines={['points where', 'it equals zero']} />
+          <Label o={s.trivialLabel} lines={['trivial zeros', '−2, −4, −6, …']} />
+          <Label o={s.simpleLabel} lines={['from a simple', 'factor']} fill={CHALK_DIM} />
+          <Label o={s.stripLabel} lines={['all the others', '(real part 0 to 1)']} />
           <Label o={s.lineLabel} lines={['the line', '(real part ½)']} fill={C.accentText} />
           <Label o={s.everyLabel} lines={['every zero', 'ever computed']} y={330} />
           <Label o={s.neverLabel} lines={['computing can', 'never prove it']} fill={C.accentText} y={590} />

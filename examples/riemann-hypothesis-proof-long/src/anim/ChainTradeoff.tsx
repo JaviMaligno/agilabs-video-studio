@@ -10,6 +10,9 @@ export { frameState };
 export type { ChainTradeoffProps };
 
 const F = 'url(#ct-chalk)';
+/** The credit scene's own filter id: the chain and credit scenes are mounted together (premount),
+ *  and two filters with one id make Chrome resolve some elements to the hidden scene's filter. */
+const F_CREDIT = 'url(#ctc-chalk)';
 
 // Graph geometry (landscape pixels). The chain lies along the m axis.
 const AX = { x0: 400, x1: 1480, y0: 740, top: 275 };
@@ -170,7 +173,7 @@ const RobotCredit: React.FC<{ s: Extract<ReturnType<typeof frameState>, { chain:
           √x
         </text>
       </g>
-      <g filter={F}>
+      <g filter={F_CREDIT}>
         <Arrow x1={790} y1={390} x2={690} y2={520} p={s.creditLabel} width={5} color={CHALK_DIM} />
         <ChalkText x={810} y={300} size={48} opacity={s.creditLabel}>
           suggested by Claude,
@@ -201,7 +204,7 @@ export const ChainTradeoff: React.FC<AnimProps & ChainTradeoffProps> = (p) => {
         '1969': [1, '1969'],
         simpler: [1, 'simpler'],
         twin: [1, 'twin'],
-        world: [2, 'world'],
+        world: [2, 'curves'],
         '1940s': [2, '1940s'],
         derivatives: [3, 'derivatives'],
         whole: [3, 'whole'],
@@ -221,7 +224,7 @@ export const ChainTradeoff: React.FC<AnimProps & ChainTradeoffProps> = (p) => {
       <>
         <Board vertical={p.vertical} T={T} />
         <Canvas vertical={p.vertical}>
-          <ChalkDefs id="ct" />
+          <ChalkDefs id="ctc" />
           <Fit vertical={p.vertical}>
             <RobotCredit s={s} />
           </Fit>
@@ -267,14 +270,19 @@ export const ChainTradeoff: React.FC<AnimProps & ChainTradeoffProps> = (p) => {
 
           {/* Lines 2-3: the twin in a simpler world, Weil's toolbox and Stepanov's pencil. */}
           {s.history > 0 && (
-            <g opacity={s.history} filter={F}>
+            <g opacity={s.history}>
+              {/* Small filtered groups, not one: Chrome drops part of a large filtered group when
+                  several tabs render at once (the flicker of the first long cut). */}
+              <g filter={F}>
               <TwinCurve p={s.curve} T={T} />
               <ChalkText x={960} y={290} size={46} anchor="middle" opacity={s.twin} fill={C.accentText}>
                 a twin of the hypothesis
               </ChalkText>
               <ChalkText x={960} y={730} size={44} anchor="middle" opacity={s.world} fill={CHALK_DIM}>
-                in a simpler world
+                curves over finite fields
               </ChalkText>
+              </g>
+              <g filter={F}>
               <Toolbox x={390} y={560 + 3 * Math.sin(T * 1.1)} o={s.weil} />
               <ChalkText x={390} y={690} size={58} anchor="middle" opacity={s.weil} weight={800}>
                 1940s · Weil
@@ -282,6 +290,8 @@ export const ChainTradeoff: React.FC<AnimProps & ChainTradeoffProps> = (p) => {
               <ChalkText x={390} y={748} size={42} anchor="middle" opacity={s.weil} fill={CHALK_DIM}>
                 heavy machinery
               </ChalkText>
+              </g>
+              <g filter={F}>
               <Pencil x={1530} y={500} o={s.stepanov} T={T} />
               <ChalkText x={1530} y={690} size={58} anchor="middle" opacity={s.stepanov} weight={800}>
                 1969 · Stepanov
@@ -289,12 +299,14 @@ export const ChainTradeoff: React.FC<AnimProps & ChainTradeoffProps> = (p) => {
               <ChalkText x={1530} y={748} size={42} anchor="middle" opacity={s.simpler} fill={C.accentText}>
                 much simpler proof
               </ChalkText>
+              </g>
             </g>
           )}
 
           {/* Line 4: no derivatives for whole numbers. */}
           {s.seven > 0 && s.derivPanel > 0 && (
-            <g opacity={s.derivPanel} filter={F}>
+            <g opacity={s.derivPanel}>
+              <g filter={F}>
               <g transform={`translate(1060 ${600 + 6 * hit}) rotate(${4 * hit})`} opacity={s.seven}>
                 <text x={0} y={0} fontSize={300} fontWeight={800} fill={CHALK} textAnchor="middle">
                   7
@@ -312,7 +324,8 @@ export const ChainTradeoff: React.FC<AnimProps & ChainTradeoffProps> = (p) => {
                   <line x1={905} y1={570} x2={870} y2={600} />
                 </g>
               )}
-              <ChalkText x={960} y={300} size={56} anchor="middle" opacity={s.noDeriv} weight={800}>
+              </g>
+              <ChalkText x={960} y={300} size={56} anchor="middle" opacity={s.noDeriv} weight={800} filter={F}>
                 no derivatives for whole numbers
               </ChalkText>
             </g>

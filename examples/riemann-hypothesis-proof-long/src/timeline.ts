@@ -11,7 +11,7 @@
 //   Trail      overview | open | past | pick | unfold | outrun | draw | second | twoquote |
 //              revised | mountain | crowd | map | catchup | forks | closer
 //   PrimeLine  claimed                            rows 6-9
-//   CriticalLine zeros                            row 10
+//   CriticalLine zeros                            row 10 (+ trivial zeros, strip)
 //   ClaimPile  history | runit                    rows 11-15
 //   PaperTower tower | slop                       rows 16-18
 //   Checklist  checks                             rows 19-23
@@ -38,6 +38,7 @@ const CONFIDENT = { emotion: 'confident' } as const;
 const CURIOUS = { emotion: 'curious' } as const;
 const SKEPTICAL = { emotion: 'skeptical' } as const;
 const AMAZED = { emotion: 'amazed' } as const;
+const HAPPY = { emotion: 'happy' } as const;
 
 const build = (): Cuts => ({
   main: withClock([
@@ -59,33 +60,36 @@ const build = (): Cuts => ({
       say(0.2, 'Nobody has read it.', '', undefined, CONFIDENT),
     ]),
     anim('overview', 'Trail', { mode: 'overview' }, [
-      say(0.3, 'In this video: why anyone took it seriously, what the humans did,', ''),
+      say(0.3, "In this video I'll tell you why anyone took it seriously, what the humans did,", ''),
       say(0, 'and the idea at its heart, which fits in one sentence.', ''),
       say(0.2, 'Because I think "math is dead" points the wrong way.', '', undefined, CONFIDENT),
     ]),
 
     // 1 · What was claimed
     anim('claimed', 'PrimeLine', { mode: 'claimed' }, [
-      say(0.2, 'The Riemann hypothesis is the most famous open problem in mathematics:', ''),
-      say(0, '167 years old, with a million-dollar prize.', '', { en: 'a hundred and sixty-seven years old, with a million-dollar prize.' }),
+      say(0.2, 'The Riemann hypothesis is the most famous open problem in mathematics.', ''),
+      say(0, "It's 167 years old, and it carries a million-dollar prize.", '', { en: "It's a hundred and sixty-seven years old, and it carries a million-dollar prize." }),
       say(0.3, 'In one line, it says the prime numbers are spread as evenly as they possibly could be.', ''),
       say(0.3, 'Near a million, about one number in fourteen is prime.', ''),
       say(0, 'In the 1,000 numbers after a million, that guess gives 72 primes.', '', { en: 'In the thousand numbers after a million, that guess gives seventy-two primes.' }),
       say(0.2, 'There are 75.', '', { en: 'There are seventy-five.' }, AMAZED),
-      say(0.3, 'The guess is never exact. The hypothesis is about how far off it can drift:', ''),
+      say(0.3, 'The guess is never exact. The hypothesis says it can only drift off', ''),
       say(0, "by not much more than the square root of how far you've counted.", ''),
     ], { chapter: L('What was claimed', '') }),
     anim('zeros', 'CriticalLine', { mode: 'zeros' }, [
       say(0.2, 'Riemann tied that drift to one function, the zeta function,', ''),
       say(0, 'and the points where it equals zero.', ''),
-      say(0.2, 'The hypothesis says those zeros all sit on one line.', ''),
+      say(0.2, 'Some of them are called trivial, at −2, −4, −6 and so on.', '', { en: 'Some of them are called trivial, at minus two, minus four, minus six, and so on.' }),
+      say(0, 'They come from a simple factor in its formula, and barely touch the primes.', ''),
+      say(0.3, 'All the others lie in a narrow strip.', ''),
+      say(0.2, 'The hypothesis says they all sit on its middle line, at one half.', ''),
       say(0.2, 'Every zero ever computed is on it,', ''),
       say(0, 'but computing them can never prove it.', '', undefined, SKEPTICAL),
     ]),
 
     // 2 · Proved before
     anim('history', 'ClaimPile', { mode: 'history' }, [
-      say(0.2, 'And it had been "proved" before. Many times.', '', undefined, SKEPTICAL),
+      say(0.2, 'And it had been "proved" before. Many times.', '', { en: 'And it had been, quote unquote, proved before. Many times.' }, SKEPTICAL),
       say(0.3, "In 1885, Thomas Stieltjes wrote to a colleague that he'd proved something that would imply it.", ''),
       say(0, 'He never published a proof. Many others have tried since.', ''),
       say(0.3, 'In 2018, Michael Atiyah, one of the most decorated mathematicians alive, claimed a proof at a conference.', ''),
@@ -146,7 +150,7 @@ const build = (): Cuts => ({
     anim('second', 'Trail', { mode: 'second' }, [say(0.2, 'The same afternoon, a second proof appeared.', '')], { chapter: L('The other proof', '') }),
     anim('twoquote', 'Trail', { mode: 'twoquote' }, [
       say(0.15, 'A draft by Alessandro Masullo. Twelve years of work, all human, no AI.', ''),
-      say(0.2, 'His message to discouraged mathematicians:', ''),
+      say(0.2, 'And he had a message for discouraged mathematicians.', ''),
       say(0, '"We are still here. We are very much alive."', ''),
     ]),
     anim('revised', 'Trail', { mode: 'revised' }, [
@@ -165,7 +169,7 @@ const build = (): Cuts => ({
 
     // 6 · The idea in one sentence
     anim('idea', 'PrimeBox', { mode: 'idea' }, [
-      say(0.2, "Back to the proof itself. Here's the surprise:", ''),
+      say(0.2, 'Back to the proof itself. The surprise is that', ''),
       say(0, 'the idea behind all those lines fits in one sentence.', '', undefined, CURIOUS),
       say(0.4, 'A whole number divisible by many primes cannot be small.', '', undefined, CONFIDENT),
       say(0.4, 'Every prime dividing a number takes up some of its size.', ''),
@@ -179,8 +183,8 @@ const build = (): Cuts => ({
     anim('waves', 'PrimeCurve', { mode: 'waves' }, [
       say(0.2, 'Why does a ceiling help? Each zero adds a wave to the count of primes,', '', undefined, CURIOUS),
       say(0, 'and if the zeros are all on the line, every wave stays small.', ''),
-      say(0.3, 'You can watch the waves with nothing but a list of primes:', ''),
-      say(0, 'count them up to 10 million, subtract what you expect, divide by the square root.', '', { en: 'count them up to ten million, subtract what you expect, divide by the square root.' }),
+      say(0.3, 'You can watch the waves with nothing but a list of primes.', ''),
+      say(0, 'Count them up to 10 million, subtract what you expect, and divide by the square root.', '', { en: 'Count them up to ten million, subtract what you expect, and divide by the square root.' }),
       say(0.4, 'It wobbles, but it never leaves a narrow band.', ''),
       say(0, 'The hypothesis says it stays inside forever.', ''),
       say(0.4, 'A wave too big would swing up as well as down, and break through the top.', ''),
@@ -192,14 +196,14 @@ const build = (): Cuts => ({
     anim('chain', 'ChainTradeoff', { mode: 'chain' }, [
       say(0.2, 'Still no square root. The second idea gives it.', ''),
       say(0.4, "Remember Stepanov's trick? In 1969 it gave a much simpler proof of a twin of the hypothesis,", '', undefined, CURIOUS),
-      say(0, 'in a simpler world, already proved in the 1940s.', ''),
+      say(0, 'in a simpler world, curves over finite fields, already proved by Weil in the 1940s.', ''),
       say(0.2, 'The missing ingredient is something like derivatives, and whole numbers have none.', ''),
-      say(0.4, "Alpöge's substitute is a chain:", ''),
+      say(0.4, "Alpöge's substitute is a chain,", ''),
       say(0, 'a construction applied again and again, each time making the number more divisible.', ''),
       say(0.2, 'A longer chain gives a sharper ceiling.', ''),
       say(0.3, 'But every link also adds a little error.', ''),
       say(0.2, 'Too short, and the ceiling is blunt. Too long, and the errors pile up.', ''),
-      say(0.4, 'The best is where they meet: the square root.', ''),
+      say(0.4, 'The best length is where they meet, at the square root.', ''),
       say(0.2, 'And the square root is exactly what the hypothesis needs.', '', undefined, AMAZED),
     ], { chapter: L('Where the square root comes from', '') }),
     anim('credit', 'ChainTradeoff', { mode: 'credit' }, [
@@ -233,7 +237,7 @@ const build = (): Cuts => ({
     ]),
     anim('closer', 'Trail', { mode: 'closer' }, [
       say(0.4, "So no, math isn't dead.", '', undefined, CONFIDENT),
-      say(0.1, "I think it's more alive than ever.", '', undefined, CONFIDENT),
+      say(0.1, "I think it's more alive than ever.", '', undefined, HAPPY),
     ], { min: 5.5 }),
     // Silent card: badge, address, title and the credit line (SETTINGS.credit).
     outro('outro', [], 6),
