@@ -154,8 +154,14 @@ export const ClaimPile: React.FC<AnimProps & ClaimPileProps> = (p) => {
                   Riemann Hypothesis
                 </text>
               </g>
-              <Chip cx={1514} y={392} w={400} opacity={s.atiyah}>
-                <text x={1514} y={450} textAnchor="middle" fontSize={48} fontWeight={800} fill={C.text}>
+              {/* Atiyah behind his own lectern, drawn over the stage's: it fades in with his name. */}
+              {s.atiyah > 0 && (
+                <g opacity={s.atiyah} transform={`translate(0 ${(1 - s.atiyah) * 30})`}>
+                  <image href={staticFile('cast/atiyah-lectern.png')} x={1309} y={226} width={477} height={583} />
+                </g>
+              )}
+              <Chip cx={1540} y={140} w={400} opacity={s.atiyah}>
+                <text x={1540} y={198} textAnchor="middle" fontSize={48} fontWeight={800} fill={C.text}>
                   Michael Atiyah
                 </text>
               </Chip>
