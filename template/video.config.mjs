@@ -6,9 +6,12 @@ export const JAVIER_POST =
 
 export default {
   tts: {
-    // 'auto': Cartesia when a key is available and the service answers, else the local Kokoro
-    // voice for the whole language. 'cartesia' fails instead of switching; 'kokoro' stays offline.
-    engine: 'auto',
+    // 'kokoro' until the author approves the video: drafts and every revision use the local, free
+    // voice. Then switch to 'cartesia' (his cloned voice, paid per character) and voice once; from
+    // then on only edited lines are re-voiced (see the narration skill, "Kokoro until approved").
+    // 'auto': Cartesia when a key is available and the service answers, else Kokoro for the whole
+    // language. 'cartesia' fails instead of switching; 'kokoro' stays offline.
+    engine: 'kokoro',
     model: 'sonic-3.6-2026-08-27',
     speed: 1,
     // Default Cartesia emotion for every English line (unset = inferred from the text). 'excited'

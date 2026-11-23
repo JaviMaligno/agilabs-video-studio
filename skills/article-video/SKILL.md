@@ -10,7 +10,7 @@ detail; load them at the step that needs them:
 
 - `explainer-script`: writing the script and picking a visual per scene.
 - `explainer-animation`: the component catalogue, the timeline, bespoke components, stills.
-- `narration`: TTS (Cartesia, Kokoro fallback), pronunciation, audio QA.
+- `narration`: TTS (Kokoro until the author approves, then Cartesia with local changes only), pronunciation, audio QA.
 
 The Remotion project lives in the plugin's `template/` folder (`${CLAUDE_PLUGIN_ROOT}/template`
 when installed as a plugin; next to `skills/` in the plugin repo).
@@ -81,8 +81,10 @@ when installed as a plugin; next to `skills/` in the plugin repo).
 6. **Lint:** `npm run lint`. Fix every finding (length, caption speed, unknown component).
    Run `npm test` too when a component was added or changed.
 7. **Fact-check** against the article and write `factcheck.md` (see above).
-8. **Narrate:** `npm run tts`, then `npm run audio-qa` (see `narration`). Listen to anything
-   it flags. Run `npm run lint` again: real line lengths replace the estimates.
+8. **Narrate with Kokoro:** `npm run tts` with `tts.engine: 'kokoro'` (the default), then
+   `npm run audio-qa` (see `narration`). Listen to anything it flags. Run `npm run lint` again:
+   real line lengths replace the estimates. Every revision before the author's approval stays on
+   Kokoro; the cloned voice comes after (step 10b).
 9. **Stills, and look at them.** Render one still per scene plus one every ~3 s and Read every
    PNG. Check the brand, the safe areas, nothing overflowing, numbers equal to the article, and
    captions matching the beat on screen. A clean build is not proof that a frame looks right.
@@ -95,6 +97,10 @@ when installed as a plugin; next to `skills/` in the plugin repo).
     every render* in `explainer-animation`). Fix what it flags, re-render and run it again until
     nothing fails; only then open the video for the author, with one line on what the watcher
     caught. This holds for every re-render too. The author still watches and approves the video.
+10b. **Switch to the author's voice** once they approve the Kokoro video: `tts.engine:
+    'cartesia'`, `npm run tts -- --dry-run` (check the count), `npm run tts`, `audio-qa`, `lint`
+    (fix a too-fast caption by trimming that line only), render, watcher, and open it for the
+    author. From here on, changes are local (see `narration`, cost rule).
 11. **Deliver:** `npm run deliver` writes the poster PNG, the SRT and `out/manifest.json`. Look
     at the poster. The cover the platform shows is designed separately (see *The cover is a designed
     image* in `explainer-animation`) and checked inside the profile grid. Offer two or three cover
@@ -108,7 +114,8 @@ when installed as a plugin; next to `skills/` in the plugin repo).
 ## Re-rendering an existing video
 
 Open its folder, run `npm ci` if `node_modules` is missing, change `src/timeline.ts` or the
-settings, then repeat from step 6. TTS only re-voices lines whose text changed.
+settings, then repeat from step 6. TTS only re-voices lines whose text changed; on a Cartesia-voiced
+video, run `npm run tts -- --dry-run` first and check it lists only the lines you edited.
 
 **Changing what the author pointed at.** The approved version is the one in git. Start from it, write
 the list of lines that change (before → after) and change exactly those; when you hand the change

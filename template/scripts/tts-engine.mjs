@@ -74,3 +74,30 @@ export function colonsAsStops(text) {
     .replace(/:\s+/g, '. ')
     .replace(/:$/, '.');
 }
+
+// ── Cost guard. The cloned voice is paid per character, so changes to an approved Cartesia
+// narration are local: only the lines whose text (or tone) changed are voiced again. A run that
+// would re-voice many lines that already have a Cartesia take means something global changed
+// (model, default emotion or speed, voice id, the post chain): that needs the author's explicit
+// go-ahead (`--revoice-all`). Voicing lines for the first time (the switch after approval, new
+// lines) is never blocked.
+/** Most existing Cartesia takes a run may replace without `--revoice-all`. */
+export const MAX_REVOICE = 10;
+
+/**
+ * @param {{ key: string; text: string; hadCartesia: boolean }[]} pending lines the run would voice
+ * @param {{ revoiceAll?: boolean; limit?: number }} [opts]
+ * @returns {{ lines: number; chars: number; revoiced: string[]; blocked: string | null }}
+ */
+export function revoiceCheck(pending, opts = {}) {
+  const limit = opts.limit ?? MAX_REVOICE;
+  const revoiced = pending.filter((p) => p.hadCartesia).map((p) => p.key);
+  const chars = pending.reduce((n, p) => n + p.text.length, 0);
+  const blocked =
+    !opts.revoiceAll && revoiced.length > limit
+      ? `this run would re-voice ${revoiced.length} lines that already have a Cartesia take (limit ${limit}). ` +
+        'Something global changed (model, default emotion or speed, voice, post chain)? Changes to the ' +
+        'cloned voice are local: revert it, or rerun with --revoice-all once the author has agreed.'
+      : null;
+  return { lines: pending.length, chars, revoiced, blocked };
+}

@@ -1,6 +1,6 @@
 ---
 name: narration
-description: Voice the narration of an article explainer video - Cartesia TTS with word timestamps (key lookup, voice ids, model), the local Kokoro fallback, pronunciation tips for numbers and symbols, choosing a Spanish voice, and the audio QA thresholds (clipping, garbled lines, -16 LUFS). Use when running or debugging npm run tts / npm run audio-qa, or when the narration sounds wrong.
+description: Voice the narration of an article explainer video - Kokoro (local, free) for every draft until the author approves the video, then Cartesia with word timestamps (key lookup, voice ids, model) and only local re-voicing after that, pronunciation tips for numbers and symbols, choosing a Spanish voice, and the audio QA thresholds (clipping, garbled lines, -16 LUFS). Use when running or debugging npm run tts / npm run audio-qa, or when the narration sounds wrong.
 ---
 
 # Narration
@@ -9,6 +9,30 @@ description: Voice the narration of an article explainer video - Cartesia TTS wi
 Cartesia's word timestamps in `<key>.words.json`, and rewrites `src/audio.generated.ts` with the
 real line lengths. Lines are cached by engine, voice, model, speed, emotion, text and the voice's `post` chain: only new or edited
 lines are voiced again. `npm run tts -- en` or `-- es` limits it to one language.
+
+## Kokoro until approved, then local changes only (cost rule)
+
+The cloned voice (Cartesia) is paid per character; Kokoro is local and free. So:
+
+1. **Every draft is voiced with Kokoro** (`tts.engine: 'kokoro'`, the template default): the first
+   narration, script rewrites, caption-speed trims, re-renders. The author reviews and approves the
+   video with the Kokoro voice. Kokoro has no word timestamps, so captions are timed
+   proportionally until the switch; that is fine for a draft.
+2. **Switch to Cartesia only after the author's go-ahead** on that video ("approved", "pasa a mi
+   voz"). Set `tts.engine: 'cartesia'`, run `npm run tts -- --dry-run` (lines and characters it
+   would voice, nothing sent), then `npm run tts` once, `audio-qa`, `lint`, render, and hand the
+   final video over. An approved script is not an approved video.
+3. **After the switch, every change is local.** Re-voice only the lines whose words changed:
+   - Batch the edits and run `npm run tts` once, not once per tweak. Before it, `--dry-run` must
+     list exactly the lines you edited.
+   - Never touch what every line hashes (model, default `emotion` or `speed`, voice `id`, the
+     `post` chain) to fix one line; give that line its own `tone` instead.
+   - The script refuses a run that would replace more than `MAX_REVOICE` (10) existing Cartesia
+     takes. If that fires, something global changed: revert it. `--revoice-all` is only for a
+     re-voice the author asked for.
+   - A caption that reads too fast after the switch is fixed by trimming that line's words, not by
+     re-voicing the scene.
+
 
 ## Cartesia setup
 
@@ -48,12 +72,14 @@ Javier's mic is weak, so his clone uses the approved "version B" chain (`JAVIER_
 
 `tts.engine` in `video.config.mjs`:
 
-- `auto` (default): Cartesia when a key is found and the service answers; otherwise the whole
+- `kokoro` (template default): every draft until the author approves the video (see the cost
+  rule above).
+- `auto`: Cartesia when a key is found and the service answers; otherwise the whole
   language is voiced with Kokoro (local, free) and a warning is printed. A language is never a
   mix of two voices: if Cartesia drops out half way, the whole language is redone with Kokoro,
   and the next run with Cartesia back redoes it again.
 - `cartesia`: fail instead of falling back.
-- `kokoro`: stay offline. Voices: `af_bella` (EN), `ef_dora` (ES). Kokoro gives no word
+- Kokoro voices: `af_bella` (EN), `ef_dora` (ES). Kokoro gives no word
   timestamps, so captions are timed proportionally.
 
 A warning about Kokoro in the output means the video does not have the Cartesia voice: say so

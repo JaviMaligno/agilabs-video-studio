@@ -4,7 +4,9 @@
 // only new or edited lines are voiced again. A voice's optional `post` (an ffmpeg -af chain) is
 // applied to each line right after synthesis; it must keep the line's length (word timestamps). One engine per language (see tts-engine.mjs): if Cartesia drops out half way,
 // the whole language is redone with Kokoro, and the next run with Cartesia back redoes it again.
-// Usage: npm run tts [-- en|es]
+// Usage: npm run tts [-- en|es] [-- --dry-run] [-- --revoice-all]
+//   --dry-run      list what would be voiced (lines, characters, Cartesia takes replaced); voice nothing
+//   --revoice-all  allow replacing more than MAX_REVOICE existing Cartesia takes (author's go-ahead)
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -13,7 +15,7 @@ import { SETTINGS } from '../src/settings.ts';
 import { spokenText, type Lang, type Tone, type Word } from '../src/types.ts';
 import config from '../video.config.mjs';
 import { at, secret, findFfmpeg, wavSeconds, CARTESIA, cartesiaHeaders } from './lib.mjs';
-import { chooseEngine, cartesiaUnavailable, postChain, lineHash, colonsAsStops } from './tts-engine.mjs';
+import { chooseEngine, cartesiaUnavailable, postChain, lineHash, colonsAsStops, revoiceCheck } from './tts-engine.mjs';
 
 type CartesiaVoice = { id: string; language?: string; post?: string };
 type KokoroVoice = { voice: string; lang: string; post?: string };
@@ -22,6 +24,8 @@ const TTS = config.tts;
 const ENGINE = TTS.engine as 'cartesia' | 'kokoro' | 'auto';
 const RATE = CARTESIA.sampleRate;
 const requested = process.argv.slice(2).filter((a): a is Lang => a === 'en' || a === 'es');
+const DRY_RUN = process.argv.includes('--dry-run');
+const REVOICE_ALL = process.argv.includes('--revoice-all');
 const langs = SETTINGS.voices.filter((l) => !requested.length || requested.includes(l));
 const key = ENGINE === 'kokoro' ? undefined : secret('CARTESIA_API_KEY', false);
 
@@ -171,13 +175,27 @@ for (const lang of langs) {
   let choice = chooseEngine(ENGINE, !!key, cvoice?.id ? undefined : `no Cartesia voice set for "${lang}" in video.config.mjs`);
 
   if (choice.engine === 'cartesia') {
+    // What this run would send to Cartesia, worked out before any call: the cost guard and --dry-run.
+    // A line "had Cartesia" when its words.json exists (only Cartesia writes one; Kokoro removes it).
+    const pending: { key: string; text: string; hash: string; hadCartesia: boolean }[] = [];
+    for (const [k, { text, tone }] of lines) {
+      const t = toneOf(tone, lang);
+      // The emotion joins the hash only when set, so lines voiced before emotions keep their hash.
+      const hash = lineHash(['cartesia', cvoice!.id, TTS.model, t.speed, ...(t.emotion ? [t.emotion] : [])], text, cpost);
+      if (cache[k] === hash && fs.existsSync(path.join(dir, `${k}.wav`))) continue;
+      pending.push({ key: k, text, hash, hadCartesia: fs.existsSync(path.join(dir, `${k}.words.json`)) });
+    }
+    const check = revoiceCheck(pending, { revoiceAll: REVOICE_ALL });
+    console.log(`${lang}: Cartesia would voice ${check.lines}/${lines.size} lines, ${check.chars} characters (${check.revoiced.length} replace an existing Cartesia take)`);
+    if (DRY_RUN) {
+      for (const p of pending) console.log(`  ${p.key}${p.hadCartesia ? ' (replaces take)' : ''}: ${p.text}`);
+      continue;
+    }
+    if (check.blocked) throw new Error(`${lang}: ${check.blocked}`);
     try {
-      for (const [k, { text, tone }] of lines) {
+      for (const { key: k, text, hash } of pending) {
         const file = path.join(dir, `${k}.wav`);
-        const t = toneOf(tone, lang);
-        // The emotion joins the hash only when set, so lines voiced before emotions keep their hash.
-        const hash = lineHash(['cartesia', cvoice!.id, TTS.model, t.speed, ...(t.emotion ? [t.emotion] : [])], text, cpost);
-        if (cache[k] === hash && fs.existsSync(file)) continue;
+        const t = toneOf(lines.get(k)!.tone, lang);
         const { audio, words } = await cartesiaLine(text, cvoice!, t);
         fs.writeFileSync(file, audio);
         applyPost(file, cpost);
@@ -203,6 +221,10 @@ for (const lang of langs) {
       if (cache[k] === hash && fs.existsSync(out)) continue;
       jobs.push({ key: k, hash, text, out });
     }
+    if (DRY_RUN) {
+      console.log(`${lang}: Kokoro would voice ${jobs.length}/${lines.size} lines (local, free)`);
+      continue;
+    }
     kokoroBatch(jobs, kvoice);
     for (const j of jobs) {
       applyPost(j.out, kpost);
@@ -215,6 +237,8 @@ for (const lang of langs) {
   }
   console.log(`${lang}: ${lines.size} lines, ${made} voiced (${choice.engine})`);
 }
+
+if (DRY_RUN) process.exit(0);
 
 // ── src/audio.generated.ts from the files on disk, for every narration language.
 const AUDIO: Partial<Record<Lang, Record<string, number>>> = {};
