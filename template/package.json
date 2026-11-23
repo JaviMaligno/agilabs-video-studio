@@ -15,6 +15,7 @@
     "music": "node scripts/music.mjs",
     "srt": "node scripts/srt.ts",
     "render": "node scripts/render.mjs",
+    "flicker": "node scripts/flicker.mjs",
     "review-frames": "node scripts/review-frames.ts",
     "deliver": "node scripts/deliver.mjs"
   },
