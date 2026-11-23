@@ -1,8 +1,13 @@
 // Pure state of the book of what the model knows (rows 5-6, 21-23, 29-30). No Remotion or React.
 // - school: books stream into one huge book in the robot's hands ("pre-training (school)"), a
-//   price tag "$$$$$$" on "millions"; line 2: the thin chapter "manners" is added and the sticky
-//   note "One line, please" is pinned on it.
-//   Marks: [school, packed, millions, manners, line].
+//   price tag "$$$$$$" on "millions". Line 2 is a different, second stage: as it starts ("Then a
+//   second, much shorter training") the price tag and the pile of books leave and the label
+//   becomes "instruction tuning (manners)", named like every stage (it glows on "That's
+//   instruction tuning"); on "conversations" three small chat cards slide in one after another
+//   (the third on "one line, please"), then on "instruction tuning" they fly into the back of the
+//   book, where they become the thin chapter "manners" (lit on the word); the sticky note
+//   "One line, please" is pinned on it on "Remember that one".
+//   Marks: [school, packed, millions, conversations, manners, line, tuning, remember].
 // - finetune: example cards (customer question → your reply) stream into the book; the pen
 //   rewrites lines on every page ("full fine-tuning (rewriting the book)"); then the cracked door
 //   from the intro, which opens onto the book. Marks: [examples, rewritten, damage].
@@ -20,6 +25,10 @@ export const STREAM_BOOKS = 10;
 export const EXAMPLE_CARDS = 6;
 /** Pages turned while the pen rewrites. */
 export const FLIPS = 3;
+/** school, line 2: the chat cards of the second training (the "manners" lessons). */
+export const CHAT_CARDS = 3;
+/** The pre-training label leaves in DIP seconds, then the "instruction tuning" label comes in. */
+export const LABEL_DIP = 0.3;
 
 export type KnowledgeBookState = {
   mode: KnowledgeBookMode;
@@ -39,10 +48,14 @@ export type KnowledgeBookState = {
   };
   cap: number;
   label: { opacity: number; pop: number };
+  /** school, line 2: the "instruction tuning (manners)" label (in, and its glow when it is named),
+   *  each chat card slid in (0..1) and the cards' flight into the back of the book (0..1). */
+  second: { label: number; lit: number; cards: number[]; flow: number };
   pile: { opacity: number };
   /** Books streaming in, 0..1. */
   stream: number;
-  price: { pop: number; swing: number };
+  /** pop: in on "millions"; leave: out as the second training starts. */
+  price: { pop: number; swing: number; leave: number };
   sticky: { opacity: number; drop: number; pin: number; glow: number; fall: number };
   cards: { opacity: number; stream: number };
   pen: { opacity: number; write: number; bob: number; stop: number; question: number };
@@ -61,9 +74,10 @@ const empty = (mode: KnowledgeBookMode): KnowledgeBookState => ({
   book: { grow: 1, fill: 1, manners: 1, mannersLit: 0, blur: 0, rewrite: 0, flip: 0, flipOn: 0, glow: 0, hurt: 0 },
   cap: 0,
   label: { opacity: 0, pop: 0 },
+  second: { label: 0, lit: 0, cards: Array.from({ length: CHAT_CARDS }, () => 0), flow: 0 },
   pile: { opacity: 0 },
   stream: 0,
-  price: { pop: 0, swing: 0 },
+  price: { pop: 0, swing: 0, leave: 0 },
   sticky: { opacity: 1, drop: 1, pin: 1, glow: 0, fall: 0 },
   cards: { opacity: 0, stream: 0 },
   pen: { opacity: 0, write: 0, bob: 0, stop: 0, question: 0 },
@@ -88,25 +102,46 @@ export function frameState(props: KnowledgeBookProps, t: number, beats: number[]
     const school = fit(after(mark(m, 0, b0 + 2.5), b0), 0.5, D);
     const packed = after(mark(m, 1, school + 4), school + 1.5);
     const millions = fit(after(mark(m, 2, b1 - 1.2), packed), 0.6, D);
-    const manners = fit(after(mark(m, 3, b1 + 2.2), b1), 0.9, D);
-    const line = fit(after(mark(m, 4, manners + 4), manners + 0.6), 1.3, D);
+    // line 2: the second training. The label swaps as the line starts (its first words, "Then a
+    // second, much shorter training"), the chat cards come on "conversations"
+    const swap = fit(b1, 0.8, D);
+    const convo = fit(after(mark(m, 3, b1 + 5), swap + LABEL_DIP + 0.4), 3.5, D);
+    // "…an instruction like 'one line, please'": the third card lands on "line"
+    const card0 = convo + 0.15;
+    const card2 = Math.max(card0 + 1.2, mark(m, 5, card0 + 3) - 0.35);
+    const cardAt = [card0, (card0 + card2) / 2, card2];
+    // "That's instruction tuning" (the mark is "tuning"; the first "instruction" is the cards'):
+    // the label glows on the name and the cards fly into the book, becoming the chapter, lit on
+    // "manners"
+    const tuning = fit(after(mark(m, 6, card2 + 2.6), card2 + 1.2), 1.6, D);
+    const manners = fit(after(mark(m, 4, tuning + 1.4), tuning + 0.6), 0.9, D);
+    const flowFrom = Math.max(card2 + 0.8, tuning - 0.9);
+    const flowLen = Math.max(0.5, Math.min(1.2, manners - 0.3 - flowFrom));
+    // the sticky note on "Remember that one", after the chapter has been named
+    const line = fit(after(mark(m, 7, manners + 0.8), manners + 0.5), 1.3, D);
     const streamLen = Math.max(0.6, packed - school - 0.2);
     const stream = progress(T, fit(school + 0.2, streamLen, D), streamLen);
     s.book = {
       ...s.book,
       grow: ease(T, fit(school + 0.2, streamLen, D), streamLen),
       fill: stream,
-      manners: ease(T, manners - 0.1, 0.9),
+      manners: ease(T, flowFrom + flowLen * 0.6, 0.7),
       mannersLit: bump(T, manners, 1.6),
       glow: Math.max(bump(T, packed - 0.2, 1.2), 0.5 * bump(T, manners, 1.4)),
     };
     s.cap = ease(T, school - 0.15, 0.45);
-    s.label = { opacity: 1, pop: ease(T, school - 0.15, 0.45) };
-    s.pile = { opacity: ease(T, school - 0.4, 0.4) * (1 - 0.6 * ease(T, manners - 0.3, 0.6)) };
+    s.label = { opacity: 1 - ease(T, swap, LABEL_DIP), pop: ease(T, school - 0.15, 0.45) };
+    s.second = {
+      label: ease(T, swap + LABEL_DIP - 0.05, 0.45),
+      lit: bump(T, tuning - 0.4, 1.4),
+      cards: cardAt.map((at) => ease(T, at - 0.1, 0.5)),
+      flow: progress(T, flowFrom, flowLen),
+    };
+    s.pile = { opacity: ease(T, school - 0.4, 0.4) * (1 - ease(T, swap, 0.6)) };
     s.stream = stream;
     const pp = ease(T, millions - 0.15, 0.5);
     const since = Math.max(0, Math.min(T, D) - millions);
-    s.price = { pop: pp, swing: pp * 12 * Math.exp(-1.6 * since) * Math.sin(5 * since) };
+    s.price = { pop: pp, swing: pp * 12 * Math.exp(-1.6 * since) * Math.sin(5 * since), leave: ease(T, swap, 0.5) };
     s.sticky = {
       opacity: ease(T, line - 0.15, 0.25),
       drop: ease(T, line - 0.1, 0.5),

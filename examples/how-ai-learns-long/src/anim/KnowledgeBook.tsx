@@ -9,26 +9,31 @@ import { Canvas } from './Canvas.tsx';
 import { place } from './canvas.ts';
 import { Badge, Clock, Crack, glow } from './office.tsx';
 import { Bubble, bubbleSize } from './chat.tsx';
-import { Book, NameLabel, Pen, PolicyCard, REWRITE_LINES, RobotWithBook, bookH, linePoint, robotForBook, CHAR_W } from './book.tsx';
-import { EXAMPLE_CARDS, STREAM_BOOKS, frameState, type KnowledgeBookProps } from './KnowledgeBook.state.ts';
+import { Book, NameLabel, Pen, PolicyCard, REWRITE_LINES, RobotWithBook, bookH, labelWidth, linePoint, robotForBook, CHAR_W } from './book.tsx';
+import { CHAT_CARDS, EXAMPLE_CARDS, STREAM_BOOKS, frameState, type KnowledgeBookProps } from './KnowledgeBook.state.ts';
 
 export { frameState };
 export type { KnowledgeBookProps };
+
+/** The two stages of school, each with its technical name and its everyday one. */
+const LABEL1 = 'pre-training (school)';
+const LABEL2 = 'instruction tuning (manners)';
 
 const BOOK_COLOURS = [C.accent, C.ok, C.warm, C.accent2, C.accentText, C.muted, C.ok, C.accent2, C.warm, C.accent, C.accentText, C.ok];
 
 /**
  * Per format and mode: the book (top left of its pages and width), the label, the props.
  * Landscape: the stage is x 160-1760, y 140-830. Vertical: a stacked layout inside y 236-1300.
+ * school: the second label is right-aligned with the first (it is longer), so it stays inside the stage.
  */
 const LAYOUT = {
   l: {
-    school: { book: { x: 450, y: 372, w: 720 }, label: { x: 1180, y: 176 }, pile: { x: 180, y: 808 }, tag: { x: 1500, y: 520 } },
+    school: { book: { x: 450, y: 372, w: 720 }, label: { x: 1180, y: 176 }, label2: { x: 0, y: 176, right: true }, pile: { x: 180, y: 808 }, tag: { x: 1500, y: 520 }, chats: { x: 1270, y: 292, w: 470, fs: 28, dx: 0, dy: 178 } },
     finetune: { book: { x: 800, y: 372, w: 720 }, label: { x: 180, y: 158 }, deck: { x: 190, y: 300 }, door: { x: 1010, y: 170, w: 480, h: 640 } },
     retrain: { book: { x: 470, y: 372, w: 720 }, policy: { x: 1530, y: 470, w: 410 }, clock: { x: 1400, y: 245, r: 72 }, chips: { x: 1330, y: 618 } },
   },
   v: {
-    school: { book: { x: 160, y: 720, w: 760 }, label: { x: 90, y: 250 }, pile: { x: 90, y: 1290 }, tag: { x: 800, y: 380 } },
+    school: { book: { x: 160, y: 720, w: 760 }, label: { x: 90, y: 250 }, label2: { x: 90, y: 250, right: false }, pile: { x: 90, y: 1290 }, tag: { x: 800, y: 380 }, chats: { x: 90, y: 1215, w: 290, fs: 24, dx: 310, dy: 0 } },
     finetune: { book: { x: 160, y: 760, w: 760 }, label: { x: 90, y: 250 }, deck: { x: 330, y: 300 }, door: { x: 250, y: 540, w: 580, h: 740 } },
     retrain: { book: { x: 160, y: 820, w: 760 }, policy: { x: 540, y: 420, w: 560 }, clock: { x: 200, y: 640, r: 70 }, chips: { x: 600, y: 620 } },
   },
@@ -48,14 +53,15 @@ const Cap: React.FC<{ x: number; y: number; s: number; pop: number }> = ({ x, y,
   );
 };
 
-/** The price tag "$$$$$$" hanging on a string from (ax, ay), centred on (x, y). */
-const PriceTag: React.FC<{ ax: number; ay: number; x: number; y: number; pop: number; swing: number }> = ({ ax, ay, x, y, pop, swing }) => {
-  if (pop <= 0) return null;
+/** The price tag "$$$$$$" hanging on a string from (ax, ay), centred on (x, y); `leave` fades it out. */
+const PriceTag: React.FC<{ ax: number; ay: number; x: number; y: number; pop: number; swing: number; leave?: number }> = ({ ax, ay, x, y, pop, swing, leave = 0 }) => {
+  const o = Math.min(1, pop * 1.5) * (1 - leave);
+  if (o <= 0) return null;
   const w = 390;
   const h = 130;
   const hole = { x: x - w / 2 + 34, y };
   return (
-    <g opacity={Math.min(1, pop * 1.5)}>
+    <g opacity={o}>
       <path d={`M ${ax} ${ay} Q ${(ax + hole.x) / 2} ${Math.max(ay, hole.y) + 60} ${hole.x} ${hole.y}`} fill="none" stroke={alpha(C.text, 0.7)} strokeWidth={3} />
       <g transform={`rotate(${swing} ${hole.x} ${hole.y}) translate(${hole.x} ${hole.y}) scale(${1.3 - 0.3 * pop}) translate(${-hole.x} ${-hole.y})`} style={glow(C.warm, 0.4 * pop)}>
         <path d={`M ${x - w / 2} ${y} L ${x - w / 2 + 50} ${y - h / 2} H ${x + w / 2} V ${y + h / 2} H ${x - w / 2 + 50} Z`} fill={C.warm} stroke={C.bg0} strokeWidth={3} />
@@ -76,6 +82,32 @@ const EXAMPLES: [string, string][] = [
   ['Any size 46?', 'Yes, in black and brown.'],
   ['Can I pay later?', 'Yes, at checkout.'],
 ];
+
+/** The second training's lessons (school, line 2): example conversations, the last one the
+ *  instruction "one line, please" followed to the letter (a tick). */
+const CHATS: [string, string, boolean][] = [
+  ['Opening hours?', '9 to 6.', false],
+  ['Summarise this', 'In short: …', false],
+  ['One line, please', 'One line.', true],
+];
+
+/** One example conversation of the second training: a question bubble and its answer, top left at (x, y). */
+const ChatCard: React.FC<{ x: number; y: number; w: number; fs: number; q: string; a: string; tick: boolean; scale?: number; opacity?: number }> = ({ x, y, w, fs, q, a, tick, scale = 1, opacity = 1 }) => {
+  if (opacity <= 0) return null;
+  const pad = Math.round(fs * 0.55);
+  const maxW = w - 2 * pad - fs;
+  const bq = bubbleSize(q, fs, maxW);
+  const h = pad + bq.h + fs * 0.35 + bubbleSize(a, fs, maxW, tick).h + pad;
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+  return (
+    <g opacity={Math.min(1, opacity)} transform={`translate(${cx} ${cy}) scale(${scale}) translate(${-cx} ${-cy})`}>
+      <rect x={x} y={y} width={w} height={h} rx={fs * 0.7} fill={C.bg1} stroke={alpha(C.accentText, 0.55)} strokeWidth={3} />
+      <Bubble x={x + w - pad} y={y + pad} side="user" text={q} size={fs} maxW={maxW} />
+      <Bubble x={x + pad} y={y + pad + bq.h + fs * 0.35} side="ai" text={a} size={fs} maxW={maxW} tick={tick} lit={tick ? 0.5 : 0} />
+    </g>
+  );
+};
 
 const CARD_W = 420;
 const CARD_FS = 30;
@@ -195,8 +227,32 @@ export const KnowledgeBook: React.FC<AnimProps & KnowledgeBookProps> = (p) => {
               />
             );
           })}
-          <PriceTag ax={x + w + 4} ay={y + 4} x={Ls.tag.x} y={Ls.tag.y} pop={s.price.pop} swing={s.price.swing} />
-          <NameLabel x={Ls.label.x} y={Ls.label.y} text="pre-training (school)" size={42} pop={s.label.pop} />
+          <PriceTag ax={x + w + 4} ay={y + 4} x={Ls.tag.x} y={Ls.tag.y} pop={s.price.pop} swing={s.price.swing} leave={s.price.leave} />
+          {/* the second training: example conversations slide in, then fly into the back of the book */}
+          {CHATS.slice(0, CHAT_CARDS).map(([q, a, tick], i) => {
+            const k = s.second.cards[i] ?? 0;
+            if (k <= 0) return null;
+            const C2 = Ls.chats;
+            // they fly in order, the first one first, each over 60 % of the flight
+            const f = Math.min(1, Math.max(0, (s.second.flow - i * 0.2) / 0.6));
+            if (f >= 1) return null;
+            const sx = C2.x + i * C2.dx + 60 * (1 - k);
+            const sy = C2.y + i * C2.dy;
+            const to = { x: x + w * 0.72 - C2.w / 2, y: y + h * 0.62 };
+            const bx = lerp(sx, to.x, f);
+            const by = lerp(sy, to.y, f) - 90 * Math.sin(Math.PI * f);
+            return <ChatCard key={i} x={bx} y={by} w={C2.w} fs={C2.fs} q={q} a={a} tick={tick} scale={lerp(1, 0.2, f)} opacity={Math.min(1, k * 1.5) * (1 - Math.max(0, (f - 0.7) / 0.3))} />;
+          })}
+          <NameLabel x={Ls.label.x} y={Ls.label.y} text={LABEL1} size={42} opacity={s.label.opacity} pop={s.label.pop} />
+          <g style={glow(C.accentText, 0.8 * s.second.lit)}>
+            <NameLabel
+              x={Ls.label2.right ? Ls.label.x + labelWidth(LABEL1, 42) - labelWidth(LABEL2, 42) : Ls.label2.x}
+              y={Ls.label2.y}
+              text={LABEL2}
+              size={42}
+              pop={s.second.label}
+            />
+          </g>
         </Canvas>
       </AbsoluteFill>
     );

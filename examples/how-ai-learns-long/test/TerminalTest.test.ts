@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DIP, LESSONS, QUIZ_LEAD, QUIZ_OPTIONS, QUIZ_RIGHT, STAT_HOLD, frameState, XF } from '../src/anim/TerminalTest.state.ts';
+import { DIP, LESSONS, QUIZ_LEAD, QUIZ_OPTIONS, QUIZ_RIGHT, STAT_HOLD, frameState } from '../src/anim/TerminalTest.state.ts';
 
 const FREE = new Set(['index']);
 
@@ -118,10 +118,9 @@ test('lora: same ticks on both sides; only the rewritten book loses its manners;
 
 test('full: the stage is never empty for long and panels overlap only in a transition', () => {
   const { beats, marks, dur } = REAL.full;
-  // a crossfade at the unseen commands; short dips into and out of the quiz card and into the close-up
-  const starts = [beats[4]];
+  // every switch is a short dip: into and out of the quiz card, into the close-up, into the unseen commands
   const quizIn = marks[2] - QUIZ_LEAD;
-  const dips = [quizIn - DIP, beats[2] - 0.1, beats[3] + STAT_HOLD];
+  const dips = [quizIn - DIP, beats[2] - 0.1, beats[3] + STAT_HOLD, beats[4] - 0.1];
   let empty = 0;
   for (let t = 0; t <= dur; t += 0.02) {
     const p = frameState({ mode: 'full', marks: [...marks] }, t, [...beats], dur).panels;
@@ -134,13 +133,29 @@ test('full: the stage is never empty for long and panels overlap only in a trans
     } else empty = 0;
     const shown = vals.filter((v) => v > 0.001).length;
     assert.ok(shown <= 2, `${shown} panels at ${t.toFixed(2)}`);
-    if (shown === 2) assert.ok(inDip || starts.some((b) => t >= b - 0.1 && t <= b + XF), `two panels outside a transition at ${t.toFixed(2)}`);
+    if (shown === 2) assert.ok(inDip, `two panels outside a dip at ${t.toFixed(2)}`);
     // in a dip the two drawings never pile up: while one is half on, the other is barely there
     if (inDip && shown === 2) assert.ok(Math.min(...vals.filter((v) => v > 0.001)) < 0.35, `two panels cross in a dip at ${t.toFixed(2)}`);
   }
   // the outgoing panel is still fully on until it starts to leave
-  for (const b of [...starts, ...dips.map((d) => d + 0.1)]) {
+  for (const b of dips.map((d) => d + 0.1)) {
     const p = frameState({ mode: 'full', marks: [...marks] }, b - 0.15, [...beats], dur).panels;
     assert.ok(Math.max(...Object.values(p)) === 1, `a panel holds at ${(b - 0.15).toFixed(2)}`);
   }
+});
+
+test('full: no panel switch is a crossfade: one panel is gone before the next one shows', () => {
+  const { beats, marks, dur } = REAL.full;
+  const at = (t: number) => frameState({ mode: 'full', marks: [...marks] }, t, [...beats], dur).panels;
+  for (let t = 0; t <= dur; t += 0.01) {
+    const on = Object.values(at(t)).filter((v) => v > 0.001);
+    if (on.length === 2) assert.ok(Math.min(...on) < 0.02, `two panels on top of each other at ${t.toFixed(2)}: ${on.map((v) => v.toFixed(2))}`);
+  }
+  // the rewritten page -> the unseen commands ("And it learned the job narrowly"): the white page
+  // has left before the desk comes in
+  const b3 = beats[4];
+  assert.equal(at(b3 - 0.15).page, 1, 'the page holds to the end of its line');
+  assert.equal(at(b3 + 0.2).page, 0, 'and is gone just after the next line starts');
+  assert.ok(at(b3 + 0.1).unseen < 0.02, 'the desk waits for the page to go');
+  assert.equal(at(b3 + 0.5).unseen, 1);
 });

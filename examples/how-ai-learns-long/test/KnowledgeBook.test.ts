@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { frameState } from '../src/anim/KnowledgeBook.state.ts';
+import { CHAT_CARDS, frameState } from '../src/anim/KnowledgeBook.state.ts';
 
 // Numbers that are not [0, 1] progress: angles, oscillations.
 const FREE = new Set(['swing', 'turn', 'bob']);
@@ -16,7 +16,9 @@ const check = (value: unknown, path: string) => {
 
 // Real beats and marks (scene seconds) from the narrated timeline, plus broken variants.
 const REAL = {
-  school: { beats: [1.2, 13.15], marks: [3.8, 7.72, 11.96, 15.43, 19.51], dur: 22.1 },
+  // marks: [school, packed, millions, conversations, manners, line, tuning, remember]
+  // (said in the order conversations, line, tuning, manners, remember)
+  school: { beats: [1.2, 17.47], marks: [3.64, 7.16, 12.76, 22.23, 31.35, 26.79, 29.75, 32.143], dur: 33.71 },
   finetune: { beats: [1.2, 10.19, 21.9], marks: [3.24, 16.39, 24.74], dur: 26.13 },
   retrain: { beats: [0.2, 10.23], marks: [3.04, 6.56, 8.48, 12.75], dur: 14.87 },
 } as const;
@@ -41,22 +43,85 @@ test('KnowledgeBook is total over [-1, dur + 1] with normal, missing, late and N
   check(frameState({ mode: 'nope' }, 1, [], 4), 'unknown mode');
 });
 
-test('school: books stream in on "school", the tag on "millions", manners then the sticky note on line 2', () => {
+test('school: books stream in on "school", the tag on "millions"', () => {
   const { beats, marks, dur } = REAL.school;
   const at = (t: number) => frameState({ mode: 'school', marks: [...marks] }, t, [...beats], dur);
   assert.equal(at(0).book.manners, 0);
   assert.equal(at(0).sticky.opacity, 0);
   assert.equal(at(0).label.pop, 0);
   assert.ok(at(5.5).stream > 0 && at(5.5).stream < 1, 'streaming between school and packed');
-  assert.equal(at(11).price.pop, 0);
-  assert.equal(at(13).price.pop, 1);
-  assert.equal(at(15).book.manners, 0);
-  assert.equal(at(17).book.manners, 1);
-  assert.equal(at(19).sticky.opacity, 0);
+  assert.equal(at(12).price.pop, 0);
+  assert.equal(at(14).price.pop, 1);
+  assert.equal(at(14).label.opacity, 1);
+  assert.equal(at(14).second.label, 0);
   const end = at(dur);
   assert.equal(end.book.grow, 1);
   assert.equal(end.sticky.pin, 1);
-  assert.equal(end.label.pop, 1);
+});
+
+test('school, line 2: a distinct second stage: tag and books leave, the label changes, chat cards become the manners chapter', () => {
+  const { beats, marks, dur } = REAL.school;
+  const at = (t: number) => frameState({ mode: 'school', marks: [...marks] }, t, [...beats], dur);
+  const b1 = beats[1];
+  // still the first stage until the line starts
+  const before = at(b1 - 0.1);
+  assert.equal(before.price.leave, 0);
+  assert.equal(before.label.opacity, 1);
+  assert.ok(before.pile.opacity > 0.9);
+  // as "Then a second, much shorter training" is said: the old label, the price tag and the pile go
+  const s1 = at(b1 + 1);
+  assert.equal(s1.price.leave, 1, 'the price tag has left');
+  assert.equal(s1.pile.opacity, 0, 'the pile of books has left');
+  assert.equal(s1.label.opacity, 0, '"pre-training (school)" has gone');
+  assert.equal(s1.second.label, 1, '"instruction tuning (manners)" is in');
+  assert.equal(s1.second.lit, 0, 'it is not lit before it is named');
+  // the two labels never show together (a dip, not a crossfade)
+  for (let t = b1 - 0.2; t <= b1 + 1; t += 0.01) {
+    const s = at(t);
+    assert.ok(Math.min(s.label.opacity, s.second.label) < 0.02, `two labels at ${t.toFixed(2)}`);
+  }
+  // no cards before "conversations"; then they slide in one after another
+  assert.deepEqual(at(marks[3] - 0.1).second.cards, [0, 0, 0]);
+  assert.equal(CHAT_CARDS, 3);
+  const c1 = at(marks[3] + 0.8).second.cards;
+  assert.ok(c1[0] === 1 && c1[1] === 0 && c1[2] === 0, `first card only: ${c1}`);
+  const c2 = at(25.6).second.cards;
+  assert.ok(c2[0] === 1 && c2[1] === 1 && c2[2] === 0, `two cards on "a good answer": ${c2}`);
+  assert.equal(at(marks[5] - 0.6).second.cards[2], 0, 'the third card waits for "one line"');
+  assert.deepEqual(at(marks[5] + 0.4).second.cards, [1, 1, 1], 'the third card is in on "line"');
+  // they stay on screen (not flying) while the line is read, then fly into the book
+  assert.equal(at(marks[5] + 0.5).second.flow, 0);
+  assert.equal(at(marks[5] + 0.5).book.manners, 0, 'no chapter before the cards have flown in');
+  // they stay while "…followed to the letter" is said, and fly in on "That's instruction tuning"
+  const tuning = marks[6];
+  assert.equal(at(tuning - 1).second.flow, 0, 'still on screen on "followed to the letter"');
+  assert.ok(at(tuning).second.flow > 0 && at(tuning).second.flow < 1, 'flying into the book on "instruction tuning"');
+  assert.ok(at(tuning).second.lit > 0.5, 'the label glows when it is named');
+  assert.equal(at(tuning - 1).second.lit, 0);
+  assert.ok(at(marks[4]).second.lit < 0.01, 'and the glow is over by "manners"');
+  // the chapter "manners" is there and lit on the word
+  const named = at(marks[4] + 0.3);
+  assert.equal(named.second.flow, 1, 'the cards have gone into the book by "manners"');
+  assert.equal(named.book.manners, 1);
+  assert.ok(named.book.mannersLit > 0.5);
+  assert.equal(named.sticky.opacity, 0, 'the sticky note waits for "Remember that one"');
+  // the sticky note "One line, please" on "Remember that one"
+  assert.equal(at(marks[7] - 0.2).sticky.opacity, 0);
+  assert.ok(at(marks[7] + 0.3).sticky.opacity > 0.9);
+  assert.equal(at(dur).sticky.opacity, 1);
+  assert.equal(at(dur).sticky.pin, 1);
+  assert.equal(at(dur).second.label, 1);
+});
+
+test('school: without marks the second stage still plays in order inside line 2', () => {
+  const { beats, dur } = REAL.school;
+  const at = (t: number) => frameState({ mode: 'school' }, t, [...beats], dur);
+  assert.equal(at(beats[1] + 1).second.label, 1);
+  const end = at(dur);
+  assert.deepEqual(end.second.cards, [1, 1, 1]);
+  assert.equal(end.second.flow, 1);
+  assert.equal(end.book.manners, 1);
+  assert.equal(end.sticky.opacity, 1);
 });
 
 test('finetune: cards before the rewrite, the pen rewrites every line, then the door opens', () => {

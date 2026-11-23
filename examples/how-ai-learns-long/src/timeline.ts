@@ -46,10 +46,10 @@ const build = (): Cuts => ({
     anim(
       'school',
       'KnowledgeBook',
-      { mode: 'school', marks: [[0, 'school'], [0, 'packed'], [0, 'millions'], [1, 'manners'], [1, 'line']] },
+      { mode: 'school', marks: [[0, 'school'], [0, 'packed'], [0, 'millions'], [1, 'conversations'], [1, 'manners'], [1, 'line'], [1, 'tuning'], [1, 'remember']] },
       [
         say(0.2, 'Before you ever chat with an AI, it has been to school. It read a huge amount of text, and what it learned got packed into the model. That\'s pre-training. You won\'t be doing it: for the big models, it costs millions. Small ones cost far less, but they also know far less.', ''),
-        say(0, 'Then comes a shorter second school: manners. Answering questions, following instructions like "one line, please". Remember that one.', ''),
+        say(0, 'Then a second, much shorter training turns it into an assistant. It\'s shown example conversations: a question, a good answer, an instruction like "one line, please" followed to the letter. That\'s instruction tuning. Think of it as its manners. Remember that one.', ''),
       ],
       { chapter: 'Two ways to teach' },
     ),

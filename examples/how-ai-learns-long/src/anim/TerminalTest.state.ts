@@ -46,8 +46,8 @@ export const LOST_LEAD = 0.3;
 /** The quiz card comes in this long before "quiz" (on "general knowledge"), not at the line start:
  *  during "How did I check what it lost?" the terminal stays, so the answer never shows first. */
 export const QUIZ_LEAD = 0.75;
-/** In and out of the quiz card the two panels do not cross: the outgoing one leaves in DIP seconds,
- *  the incoming one comes in as it goes (a short dip), so two drawings never pile up. */
+/** Every panel switch is a dip, never a crossfade: the outgoing panel leaves in DIP seconds and the
+ *  incoming one comes in as it goes, so two drawings (or two texts) never show on top of each other. */
 export const DIP = 0.3;
 
 export type TerminalTestState = {
@@ -80,8 +80,6 @@ export type TerminalTestState = {
 };
 
 const after = (x: number, min: number) => Math.max(x, min);
-/** Length of the crossfade between two panels, in seconds. */
-export const XF = 0.4;
 /** The book panel (with "more than ⅓ worse") stays this long into line 3 so the figure can be read. */
 export const STAT_HOLD = 1.2;
 
@@ -122,11 +120,7 @@ export function frameState(props: TerminalTestProps, t: number, beats: number[],
     const third = fit(after(mark(m, 6, b1 + 6), worse + 0.6), 0.8, D);
     const forget = fit(after(mark(m, 7, b2 + 4.5), b2 + 0.6), 1.2, D);
     const none = fit(after(mark(m, 8, b3 + 5), b3 + 0.8), 0.5, D);
-    // crossfade on each line start: the outgoing panel holds until the next line begins (its last
-    // word has been said), then leaves while the next one comes in, so the stage is never empty
-    const out = (at: number) => 1 - ease(T, at, XF);
-    const inn = (at: number) => ease(T, at - 0.1, XF);
-    // the quiz card enters on "general knowledge quiz" (not on "How did I check…") and leaves with
+    // the quiz card enters on "general knowledge quiz" (not on "How did I check…"); every switch is
     // a dip: the outgoing panel goes, then the incoming one comes in
     const quizIn = Math.max(q + DIP, quiz - QUIZ_LEAD);
     const quizOut = b1 - 0.1;
@@ -138,8 +132,9 @@ export function frameState(props: TerminalTestProps, t: number, beats: number[],
       // the book (with the before/after bars) leaves in a dip too: the close-up of the page only
       // comes in once the bars have gone, so it never shows through them
       book: dipIn(quizOut + DIP) * dipOut(b2 + STAT_HOLD),
-      page: dipIn(b2 + STAT_HOLD + DIP) * out(b3),
-      unseen: inn(b3),
+      // the white page leaves before the desk with the unseen commands comes in (no see-through card)
+      page: dipIn(b2 + STAT_HOLD + DIP) * dipOut(b3 - 0.1),
+      unseen: dipIn(b3 - 0.1 + DIP),
     };
     // the first lesson is shown slowly while the voice sets up the test, then the lessons speed up
     const first = fit(b0 + 2.2, 4, D);
