@@ -1,0 +1,13 @@
+exit 0 robot-handsoff
+exit 0 robot-magnifier
+exit 0 drawer-locked
+exit 0 keyring
+exit 0 phone-night
+exit 0 house-neighbour
+exit 0 avatar-coffee
+exit 0 friend-relax
+exit 0 fridge-note
+exit 0 robot-cloud-desk
+exit 0 avatar-bus
+exit 0 laptop-buzz
+ALLDONE
