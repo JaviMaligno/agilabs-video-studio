@@ -25,6 +25,27 @@ export const sceneStarts = (scenes: Scene[]): { starts: number[]; total: number 
   return { starts, total: at };
 };
 
+/** One reading of a clock and how much of it shows (the weights of a frame sum to 1). */
+export type ClockLayer = { seconds: number; weight: number };
+
+/**
+ * The scene clock at video frame `frame`: seconds since the current scene started, and across each
+ * cross-fade both scenes' clocks, the outgoing one fading out as the incoming one fades in. It
+ * depends only on scene lengths, never on where a scene falls in the video, so what is drawn with
+ * it is the same wherever the scene lands (chunked renders cache chunks by what they show).
+ */
+export const sceneClock = (frame: number, starts: number[]): ClockLayer[] => {
+  let k = 0;
+  while (k + 1 < starts.length && starts[k + 1] <= frame) k++;
+  const local = frame - starts[k];
+  if (k === 0 || local >= SCENE_TRANSITION) return [{ seconds: local / FPS, weight: 1 }];
+  const p = local / SCENE_TRANSITION;
+  return [
+    { seconds: (frame - starts[k - 1]) / FPS, weight: 1 - p },
+    { seconds: local / FPS, weight: p },
+  ];
+};
+
 /** Every narration line with its start in video seconds (scene start + line start). */
 export const linesInVideo = (scenes: Scene[]): { scene: Scene; line: Scene['lines'][number]; at: number }[] => {
   const { starts } = sceneStarts(scenes);
