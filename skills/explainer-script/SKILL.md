@@ -126,6 +126,16 @@ inspiration, not a template. Same premise card and cold reads, plus:
   illustration with one focal point and a 3-5 word headline set in code (honest clickbait: "Your
   AI has 5 memories."), saved as `cover/thumbnail-<voice>.png`; `npm run deliver` uses it
   instead of a frame. Offer two or three finished candidates, opened side by side.
+- **The description links everything the narration names.** Every person, concept, paper,
+  repo or news item the voice mentions gets a link, grouped by chapter in the order it comes up,
+  after a two-or-three-sentence hook, the article link (`SETTINGS.articleUrl`) and the chapter
+  list. `npm run deliver` writes the skeleton to `out/youtube-description-<voice>.draft.txt` with
+  the names it hears per chapter; that list is a hint, so read each chapter's narration for the
+  concepts too (a "zeta function", a "finite field"). Start from the article's own links; add
+  Wikipedia or the official page for what only the video says. Check every URL answers (a 403
+  from a news site is usually a bot block, not a dead link). What the video does not name goes in
+  a last "More context" block, if anywhere. Save the result as
+  `out/youtube-description-<voice>.txt`; deliver warns when its chapters no longer match the render.
 
 ## Voice
 

@@ -17,6 +17,8 @@ export type Settings = {
   thumbnail?: null | { scene: string; second: number };
   /** Title of the source article, shown in muted text on the outro card. */
   articleTitle: Label;
+  /** URL of the source article, for the YouTube description draft (`npm run deliver`). */
+  articleUrl?: Label;
   /**
    * Optional author avatar (round, under public/), shown on the outro card. Cameos read their
    * cut-outs from public/avatar/avatar-<pose>.png. null = no avatar.
