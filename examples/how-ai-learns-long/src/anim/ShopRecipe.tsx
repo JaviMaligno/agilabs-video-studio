@@ -58,7 +58,7 @@ export const ShopRecipe: React.FC<AnimProps & ShopRecipeProps> = (p) => {
           {pics.binder > 0 && (
             <g opacity={pics.binder}>
               <Binder x={PIC.cx - 155} y={240} w={290} h={390} glowA={0.6} />
-              <Label y={710} text="looking it up (the manual)" color={C.ok} size={30} />
+              <Label y={710} text="retrieval (the manual)" color={C.ok} size={30} />
             </g>
           )}
           {pics.book > 0 && (

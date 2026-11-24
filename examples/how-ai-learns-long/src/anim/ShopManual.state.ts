@@ -19,7 +19,7 @@ import { clamp01, sceneTime } from './steps.ts';
 export type ShopManualProps = { marks?: number[] };
 
 /** Texts on screen. */
-export const MANUAL_LABEL = 'looking it up (the manual)';
+export const MANUAL_LABEL = 'retrieval (the manual)';
 export const NOTE_LABEL = 'the prompt (the note)';
 export const QUESTION = 'Can I return worn shoes?';
 export const GOOD_ANSWER = 'Sorry, unworn only, within 30 days.';

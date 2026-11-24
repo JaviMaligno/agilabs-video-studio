@@ -1,5 +1,6 @@
-// Pure state of "the prompt (the note)" (script rows 9-14). No Remotion or React here.
-// Six lines, six marks: [note, employee, code, edit, buried, catalogue].
+// Pure state of "the prompt (the note)" (script rows 9-14, with 13b). No Remotion or React here.
+// Seven lines, nine marks, read by position: [note, employee, code, edit, buried, read, fits, room,
+// catalogue] (line 5 carries three: "read", "fits" and "room").
 // - line 0 (mark "note"): the robot by its desk; the note slides onto the desk and its rows light as
 //   they are named (policy, tone, one good answer); the tag "the prompt (the note)".
 // - line 1 (mark "employee"): a shop counter at opening time; Nadia (the cast cutout) pops up behind it
@@ -11,7 +12,13 @@
 // - line 4 (mark "buried"): back at the desk; the note grows into a long scroll that spills off the
 //   desk to the floor, grey rows pile in above the policy line and push it down; on "buried" it sinks
 //   and dims.
-// - line 5 (mark "catalogue"): shoe boxes drop into stacks behind the desk and hundreds of product
+// - line 5 (marks "read", "fits", "room"): on "read" ("can only read so much at once") a frame
+//   labelled "context window" is drawn over the still-long scroll and the desk fades; the scroll's
+//   lower part sticks out below the frame's dashed edge, dimmed: what does not fit. On "fits" ("even
+//   when the note fits") the scroll rolls back up into a note that lifts into the frame's top part;
+//   on "room" the empty lower part is labelled "room for the chat" and two small chat bubbles appear
+//   in it. The frame lifts away early in line 6, before the boxes drop.
+// - line 6 (mark "catalogue"): shoe boxes drop into stacks behind the desk and hundreds of product
 //   cards pile up behind them.
 import { beatOr, bump, ease, mark } from './memory.ts';
 import { clamp01, progress, sceneTime } from './steps.ts';
@@ -25,12 +32,16 @@ export const EXAMPLE = '"Sure! Unworn and boxed? Send them back."';
 export const PANELS = ['Instructions', 'Project', 'GPT'] as const;
 export const CHAT_Q = 'How long do I have to return shoes?';
 export const CHAT_A = '14 days, unworn, in the box.';
+/** Line 5: the frame around what the AI reads and its empty lower part. */
+export const WINDOW_LABEL = 'context window';
+export const ROOM_LABEL = 'room for the chat';
+export const ROOM_CHAT = ['Can I return these?', 'Sure, within 14 days!'] as const;
 /** Shoe boxes in the stacks behind the desk, and product cards piled behind them. */
 export const BOXES = 14;
 export const CARDS = 180;
 
 export type BriefingNoteState = {
-  /** Phase opacities: the desk scene (lines 0, 4, 5), the counters (1), the panels (2), the edit (3). */
+  /** Phase opacities: the desk scene (lines 0, 4, 5, 6), the counters (1), the panels (2), the edit (3). */
   desk: number;
   counters: number;
   panels: number;
@@ -55,7 +66,15 @@ export type BriefingNoteState = {
   sink: number;
   dim: number;
   ring: number;
-  /** Line 5: boxes landed (0..BOXES), product cards shown (0..CARDS), the robot's alarm. */
+  /** Line 5: the context-window frame (desk faded), the part of the long scroll left outside it
+   * dimmed, the scroll rolled back up into a note lifted into the frame, its "room for the chat"
+   * label and the two chat bubbles in that room. */
+  window: number;
+  outside: number;
+  fit: number;
+  room: number;
+  bubbles: number[];
+  /** Line 6: boxes landed (0..BOXES), product cards shown (0..CARDS), the robot's alarm. */
   boxes: number;
   cards: number;
   alarm: number;
@@ -65,22 +84,26 @@ export function frameState(props: BriefingNoteProps, t: number, beats: number[],
   const T = sceneTime(Number.isFinite(t) ? t : 0, dur);
   const m = props.marks;
   // Beats, kept in order even when some are missing or out of order.
-  const b = [0, 1, 2, 3, 4, 5].reduce<number[]>((acc, i) => {
+  const b = [0, 1, 2, 3, 4, 5, 6].reduce<number[]>((acc, i) => {
     const prev = i === 0 ? 0 : acc[i - 1];
     const fb = i === 0 ? 1.2 : prev + 6.5;
     acc.push(Math.max(i === 0 ? 0 : prev + 1.5, beatOr(beats, i, fb)));
     return acc;
   }, []);
-  const end = (i: number) => (i < 5 ? b[i + 1] - 0.35 : b[5] + 3.6);
+  const end = (i: number) => (i < 6 ? b[i + 1] - 0.35 : b[6] + 3.6);
   const at = (i: number, frac: number) => b[i] + frac * Math.max(0.5, end(i) - b[i]);
-  const mk = (i: number, frac: number) => Math.min(end(i), Math.max(b[i], mark(m, i, at(i, frac))));
+  // Line `i`'s mark: marks are positional, and line 5 has two, so `mi` can differ from `i`.
+  const mk = (i: number, frac: number, mi = i) => Math.min(end(i), Math.max(b[i], mark(m, mi, at(i, frac))));
 
   const noteAt = mk(0, 0.13);
   const employee = mk(1, 0.26);
   const code = mk(2, 0.3);
   const editAt = mk(3, 0.48);
   const buried = Math.min(end(4) + 0.5, Math.max(b[4] + 1.2, mark(m, 4, at(4, 0.92))));
-  const catalogue = mk(5, 0.36);
+  const windowAt = mk(5, 0.14);
+  const fitsAt = Math.max(windowAt + 2.0, mk(5, 0.6, 6));
+  const roomAt = Math.max(fitsAt + 1.0, mk(5, 0.8, 7));
+  const catalogue = mk(6, 0.36, 8);
 
   // Phase cross-fades on the beats.
   const toCounters = ease(T, b[1] - 0.2, 0.5);
@@ -112,6 +135,11 @@ export function frameState(props: BriefingNoteProps, t: number, beats: number[],
 
   const nextChat = Math.min(end(3) - 1.6, editAt + 0.9);
   const grow = Math.max(b[4] + 1.0, Math.min(buried - 2.6, at(4, 0.42)));
+  // Line 5: the frame is drawn over the long scroll on "read", the scroll rolls back up on "fits";
+  // the frame holds into line 6 and lifts just before the boxes start to drop on "catalogue".
+  const fit = ease(T, Math.max(buried + 0.6, fitsAt - 0.1), 1.0);
+  const lift = 1 - ease(T, Math.max(b[6] - 0.3, catalogue - 0.9), 0.5);
+  const windowOn = ease(T, windowAt - 0.15, 0.5) * lift;
 
   return {
     desk,
@@ -129,12 +157,17 @@ export function frameState(props: BriefingNoteProps, t: number, beats: number[],
     chat: ease(T, nextChat - 0.2, 0.5),
     answer: progress(T, nextChat + 0.2, 0.7),
     tick: ease(T, nextChat + 1.0, 0.35),
-    scroll: ease(T, grow, Math.max(0.8, buried - 0.4 - grow)),
-    sink: ease(T, grow + 0.3, Math.max(0.8, buried - 0.1 - grow)),
-    dim: ease(T, buried - 0.3, 0.5),
+    scroll: ease(T, grow, Math.max(0.8, buried - 0.4 - grow)) * (1 - fit),
+    sink: ease(T, grow + 0.3, Math.max(0.8, buried - 0.1 - grow)) * (1 - fit),
+    dim: ease(T, buried - 0.3, 0.5) * (1 - fit),
     ring: bump(T, buried - 0.1, 1.2),
     boxes: BOXES * progress(T, catalogue - 0.5, 2.2),
     cards: CARDS * progress(T, catalogue, 2.4),
+    window: windowOn,
+    outside: windowOn * (1 - fit),
+    fit,
+    room: ease(T, roomAt - 0.1, 0.4) * lift,
+    bubbles: [0, 1].map((i) => ease(T, roomAt + 0.2 + i * 0.45, 0.35) * lift),
     alarm: ease(T, catalogue + 0.6, 0.5),
   };
 }

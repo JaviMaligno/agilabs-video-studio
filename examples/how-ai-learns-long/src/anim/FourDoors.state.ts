@@ -22,7 +22,7 @@ export const TITLE = 'How an AI learns';
 /** The fixed names, term and analogy. */
 export const DOOR_LABELS = [
   ['the prompt', '(the note)'],
-  ['looking it up', '(the manual)'],
+  ['retrieval', '(the manual)'],
   ['full fine-tuning', '(rewriting the book)'],
   ['LoRA', '(the clear sheet)'],
 ] as const;

@@ -62,13 +62,14 @@ const build = (): Cuts => ({
     anim(
       'note',
       'BriefingNote',
-      { marks: [[0, 'note'], [1, 'employee'], [2, 'code'], [3, 'edit'], [4, 'buried'], [5, 'catalogue']] },
+      { marks: [[0, 'note'], [1, 'employee'], [2, 'code'], [3, 'edit'], [4, 'buried'], [5, 'read'], [5, 'fits'], [5, 'room'], [6, 'catalogue']] },
       [
         say(0.2, 'The simplest way is a note. Before every chat, the AI gets a few lines from you: your policy, your tone, one example of a good answer. That\'s the prompt.', ''),
         say(0, "It's like the briefing you give a new employee each morning. They read all of it, every time, before they start.", ''),
         say(0, 'Most apps let you write it without any code: custom instructions, a project, a custom GPT.', ''),
         say(0, 'The policy changes to fourteen days? You edit one line. Next chat, it knows.', ''),
         say(0, 'The catch: the longer the note, the more the line that matters competes with everything else. Coding assistants run on notes thousands of words long, and they work. How long is too long depends on the model.', ''),
+        say(0, 'Every model can only read so much at once: its context window. And even when the note fits, you want to leave plenty of room for the conversation itself.', ''),
         say(0, 'So what about your whole catalogue, far too big for a note?', '', undefined, CURIOUS),
       ],
       { chapter: 'The prompt' },
@@ -80,7 +81,7 @@ const build = (): Cuts => ({
       'ShopManual',
       { marks: [[0, 'manual'], [1, 'whole'], [2, 'upload'], [3, 'swap'], [4, 'wrong'], [5, 'inside']] },
       [
-        say(0.2, "Then you give it a manual. Your catalogue and policies stay in documents, and when a question comes in, the AI looks up the pages it needs and reads just those. Engineers call it RAG. I'll call it looking it up.", '', { en: "Then you give it a manual. Your catalogue and policies stay in documents, and when a question comes in, the AI looks up the pages it needs and reads just those. Engineers call it rag. I'll call it looking it up." }),
+        say(0.2, "Then you give it a manual. Your catalogue and policies stay in documents, and when a question comes in, the AI looks up the pages it needs and reads just those. Engineers call this retrieval. RAG is the best-known way to do it. I'll call it looking it up.", '', { en: "Then you give it a manual. Your catalogue and policies stay in documents, and when a question comes in, the AI looks up the pages it needs and reads just those. Engineers call this retrieval. Rag is the best-known way to do it. I'll call it looking it up." }),
         say(0, 'The difference from the note: the note is read whole, every time. The manual is opened only when needed, at the right page.', ''),
         say(0, 'When you upload files to a project or a GPT, it works roughly like this: with big files, the app searches them and hands the AI the parts that seem relevant.', ''),
         say(0, 'The policy changes? You swap the page. Nothing to retrain.', ''),
@@ -148,7 +149,7 @@ const build = (): Cuts => ({
       [say(0.2, 'So when someone says they trained an AI on their data, ask which one. Often it\'s a note or a manual. Sometimes it\'s a fine-tune.', '', undefined, CONFIDENT)],
       { chapter: 'What to use' },
     ),
-    anim('recipe', 'ShopRecipe', { mode: 'recipe', marks: [[0, 'prompt'], [1, 'looking'], [2, 'LoRA'], [3, 'ordinary'], [4, 'check'], [3, 'general'], [3, 'manners']] }, [
+    anim('recipe', 'ShopRecipe', { mode: 'recipe', marks: [[0, 'prompt'], [1, 'facts'], [2, 'LoRA'], [3, 'ordinary'], [4, 'check'], [3, 'general'], [3, 'manners']] }, [
       say(0.2, 'For your shop, start with the prompt: your policy, your tone, one good answer.', ''),
       say(0, 'When the facts are many, or change often, add looking it up.', ''),
       say(0, "Fine-tune only for something asking can't get you: a style, a format, a skill. And try LoRA before full fine-tuning.", '', LORA("Fine-tune only for something asking can't get you: a style, a format, a skill. And try LoRA before full fine-tuning.")),
