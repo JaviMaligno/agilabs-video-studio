@@ -31,7 +31,7 @@ export const SETTINGS: Settings = {
   music: { src: 'music/bed.wav', volume: 0.2, duck: 0.3 },
   // Long YouTube version (landscape, 7 chapters): script v2 counts 1,141 words, ~6.8 min.
   // From the first Cartesia pass (6.46 min).
-  targetSeconds: 388,
+  targetSeconds: 432,
   // The cold open: the shop chat with the three-paragraph answer, "One line, please" in red.
   poster: { scene: 'cold', second: 0.4 },
   thumbnail: { scene: 'cold', second: 0.4 },
