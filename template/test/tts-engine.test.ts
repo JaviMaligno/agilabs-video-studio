@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { chooseEngine, postChain, lineHash, colonsAsStops } from '../scripts/tts-engine.mjs';
+import { chooseEngine, postChain, lineHash, colonsAsStops, revoiceCheck, MAX_REVOICE } from '../scripts/tts-engine.mjs';
 import config, { JAVIER_POST } from '../video.config.mjs';
 
 test('auto falls back per language', () => {
@@ -67,4 +67,20 @@ test('colons are voiced as full stops, captions untouched', () => {
   assert.equal(colonsAsStops('No colon here.'), 'No colon here.');
   // The template turns it on by default.
   assert.equal(config.tts.colonsAsStops, true);
+});
+
+test('the cost guard lets new lines through and stops a mass re-voice of Cartesia takes', () => {
+  const line = (i: number, hadCartesia: boolean) => ({ key: `s-${i}`, text: 'abcde', hadCartesia });
+  // The switch after approval: every line is new to Cartesia, never blocked.
+  const first = revoiceCheck(Array.from({ length: 120 }, (_, i) => line(i, false)));
+  assert.equal(first.blocked, null);
+  assert.equal(first.lines, 120);
+  assert.equal(first.chars, 600);
+  // A local fix: a few edited lines.
+  assert.equal(revoiceCheck(Array.from({ length: MAX_REVOICE }, (_, i) => line(i, true))).blocked, null);
+  // A global change: every take would be replaced.
+  const all = Array.from({ length: MAX_REVOICE + 1 }, (_, i) => line(i, true));
+  assert.match(revoiceCheck(all).blocked ?? '', /--revoice-all/);
+  assert.equal(revoiceCheck(all).revoiced.length, MAX_REVOICE + 1);
+  assert.equal(revoiceCheck(all, { revoiceAll: true }).blocked, null);
 });
