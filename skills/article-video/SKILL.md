@@ -1,6 +1,6 @@
 ---
 name: article-video
-description: Turn a published blog article into a short narrated, animated vertical explainer video (usually 45-90 s, 1080x1920) in the AGILabs brand, rendered locally with Remotion. Use when asked to make a video, reel, short or explainer from an article or blog post, or to re-render one made with this plugin (a folder with video.config.mjs and src/timeline.ts).
+description: Turn a published blog article into a narrated, animated explainer video in the AGILabs brand, rendered locally with Remotion - a short vertical reel (usually 45-90 s, 1080x1920) or a long landscape YouTube video (~5-10 min, 1920x1080, chapters, thumbnail, description with links). Use when asked to make a video, reel, short, explainer or YouTube video from an article, blog post or topic the author has written about, from any repo, or to re-render one made with this plugin (a folder with video.config.mjs and src/timeline.ts).
 ---
 
 # Article video
@@ -63,8 +63,11 @@ when installed as a plugin; next to `skills/` in the plugin repo).
 3. **Overview of the route.** Show the overview (see above) and continue. When the author answers
    with changes, apply them and keep building.
 4. **Create the video folder.** Copy the template without its generated files:
-   - inside the plugin repo: `examples/<article-slug>/`;
-   - from any other repo: `./video/<article-slug>/`.
+   - where the author keeps his videos, when his instructions or memory name a place (a folder,
+     a repo with one branch per video): use it from whatever repo the session is in, so the
+     videos do not end up inside an unrelated project;
+   - otherwise, inside the plugin repo: `examples/<article-slug>/`;
+   - otherwise, from any other repo: `./video/<article-slug>/`.
 
    ```bash
    rsync -a --exclude node_modules --exclude out --exclude public/audio --exclude public/music \
@@ -115,7 +118,10 @@ when installed as a plugin; next to `skills/` in the plugin repo).
     When the landscape cut exists it also writes `out/youtube-chapters-<voice>.txt` (paste into
     the description; fix any warning: YouTube needs at least 3 chapters of 10 s or more) and
     `out/thumbnail-<voice>.png` (1280x720): the designed `cover/thumbnail-<voice>.png` when it
-    exists (see "Long format" in `explainer-script`), else a frame at `SETTINGS.thumbnail`.
+    exists (see "Long format" in `explainer-script`), else a frame at `SETTINGS.thumbnail`,
+    and `out/youtube-description-<voice>.draft.txt`: finish it into
+    `out/youtube-description-<voice>.txt` with a link for everything the narration names (see
+    "Long format" in `explainer-script`) before handing the video over.
 
 ## Re-rendering an existing video
 

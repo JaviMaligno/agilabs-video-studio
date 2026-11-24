@@ -3,7 +3,8 @@
 // has played),
 // SRT captions, and out/manifest.json with durations, sizes and loudness.
 // When the landscape cut exists (YouTube): out/youtube-chapters-<voice>.txt for the description
-// (from the chapter scenes) and out/thumbnail-<voice>.png, 1280x720, from the landscape
+// (from the chapter scenes), out/youtube-description-<voice>.draft.txt (the description's
+// skeleton: hook, article link, chapters, the names heard per chapter to link) and out/thumbnail-<voice>.png, 1280x720, from the landscape
 // composition at SETTINGS.thumbnail (else the poster frame), without captions.
 // Run after `npm run render`. Lint issues are printed as a reminder; they do not stop delivery.
 // Usage: npm run deliver
@@ -16,6 +17,7 @@ const { VIDEOS } = await import('../src/timeline.ts');
 const { FPS, sceneStarts, sceneFrames } = await import('../src/timing.ts');
 const { tx } = await import('../src/types.ts');
 const { youtubeChapters } = await import('../src/chapters.ts');
+const { youtubeDescriptionDraft, chapterLines } = await import('../src/description.ts');
 const { writeSrt } = await import('./srt.ts');
 
 spawnSync('node', [at('scripts', 'lint.ts')], { stdio: 'inherit', cwd: at() });
@@ -91,6 +93,21 @@ for (const voice of SETTINGS.voices) {
       console.warn(`${chaptersFile}: the render lasts ${info.seconds.toFixed(1)} s but the timeline ${timelineSeconds.toFixed(1)} s: re-render before using the chapters`);
     }
     manifest.youtubeChapters.push({ file: chaptersFile, voice, chapters: yt.chapters, warnings: yt.warnings });
+
+    // The description: a draft to finish by hand (link every name the narration says, per
+    // chapter); the finished one, out/youtube-description-<voice>.txt, is never overwritten, only
+    // checked against the render's chapters.
+    const url = SETTINGS.articleUrl ? tx(SETTINGS.articleUrl, voice) : undefined;
+    fs.writeFileSync(at('out', `youtube-description-${voice}.draft.txt`), youtubeDescriptionDraft(scenes, voice, { articleUrl: url }));
+    const finished = at('out', `youtube-description-${voice}.txt`);
+    if (fs.existsSync(finished)) {
+      const want = chapterLines(yt.text).join('\n');
+      if (chapterLines(fs.readFileSync(finished, 'utf8')).join('\n') !== want) {
+        console.warn(`youtube-description-${voice}.txt: its chapters differ from this render's; paste ${chaptersFile} into it`);
+      }
+    } else {
+      console.warn(`youtube-description-${voice}.txt is missing: finish youtube-description-${voice}.draft.txt (see "Long format" in explainer-script)`);
+    }
 
     // YouTube thumbnail, 1280x720. A designed one (cover/thumbnail-<voice>.png: illustrated art plus
     // a headline, see "The cover is a designed image") wins; otherwise the landscape composition
