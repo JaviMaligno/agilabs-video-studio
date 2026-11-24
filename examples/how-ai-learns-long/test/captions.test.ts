@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cuesOf, cueRows, GLUE } from '../src/captions.ts';
+import { cuesOf, cueRows, cueRowTokens, GLUE, sentenceCuesOf } from '../src/captions.ts';
 import { WORDS } from '../src/audio.generated.ts';
 import type { Line, Word } from '../src/types.ts';
 
@@ -162,5 +162,24 @@ test('a cue closes at a sentence end once half full, and never ends on "into"', 
   for (let max = 8; max <= 40; max++) {
     const cues = cuesOf(long, 'en', max);
     for (const c of cues.slice(0, -1)) assert.notEqual(bare(c.tokens.at(-1)!.text), 'into', `maxChars ${max}: "${c.text}"`);
+  }
+});
+
+test('sentenceCuesOf: one sentence per cue, never more than two rows, tiling the line', () => {
+  const hook = "You taught your AI your shop's returns policy. It quotes it perfectly. But you asked for one line, and it wrote three paragraphs.";
+  for (const maxChars of [44, 30, 26]) {
+    const l = line('no-such-key-01', hook, 0.1, 7.92);
+    const cues = sentenceCuesOf(l, 'en', maxChars);
+    assert.equal(cues.map((c) => c.text).join(' '), hook);
+    for (const c of cues) {
+      assert.ok(cueRowTokens(c, maxChars).length <= 2, `${maxChars}: "${c.text}" fits two rows`);
+      assert.ok(c.text.split(/[.!?] /).length === 1, `${maxChars}: "${c.text}" holds at most one sentence`);
+    }
+    near(cues[0].start, 0.1);
+    near(cues.at(-1)!.end, 8.02);
+    cues.slice(1).forEach((c, i) => near(c.start, cues[i].end));
+    if (maxChars === 44) {
+      assert.deepEqual(cues.map((c) => c.text), ["You taught your AI your shop's returns policy.", 'It quotes it perfectly.', 'But you asked for one line, and it wrote three paragraphs.']);
+    }
   }
 });

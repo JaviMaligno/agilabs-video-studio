@@ -208,6 +208,38 @@ export const cuesOf = (line: Line, subs: Lang, maxChars = 32): Cue[] => {
 };
 
 /**
+ * Cues of one sentence each (a sentence longer than two rows of `maxChars` is split into cues of
+ * at most two rows). Used by the cold-open hook, which shows its line in big type one sentence at a
+ * time instead of the whole line at once. Cues tile the line like `cuesOf`.
+ */
+export const sentenceCuesOf = (line: Line, subs: Lang, maxChars: number): Cue[] => {
+  const toks = tokensOf(line, subs).flatMap((t) => splitLong(t, maxChars));
+  const sentences: Token[][] = [];
+  let cur: Token[] = [];
+  toks.forEach((t) => {
+    cur.push(t);
+    if (SENTENCE_END.test(t.text)) {
+      sentences.push(cur);
+      cur = [];
+    }
+  });
+  if (cur.length) sentences.push(cur);
+  const groups = sentences.flatMap((g) => {
+    const rows = fillRows(g, maxChars);
+    const out: Token[][] = [];
+    for (let k = 0; k < rows.length; k += 2) out.push(rows.slice(k, k + 2).flat());
+    return out;
+  });
+  const lineEnd = line.start + line.dur;
+  return groups.map((g, i) => ({
+    start: i === 0 ? line.start : g[0].start,
+    end: i + 1 < groups.length ? groups[i + 1][0].start : lineEnd,
+    text: joinTokens(g),
+    tokens: g,
+  }));
+};
+
+/**
  * How long the last cue of a line stays up after the voice stops, in seconds: a short closing
  * phrase ("Can you tell where it is?") would otherwise flash by faster than it can be read.
  * Never past the start of the next line, nor past `until` (where the scene starts handing over

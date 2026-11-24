@@ -29,7 +29,7 @@ const LORA = (en: string) => ({ en: en.replace(/LoRA/g, 'Lora') });
 
 const build = (): Cuts => ({
   main: finish([
-    // 0 · Intro (cold open: the three-paragraph answer is already there on frame 0)
+    // 0 · Intro (cold open: the question alone on frame 0; the answer quotes the policy, then grows into three paragraphs)
     intro(
       'cold',
       [say(0.1, "You taught your AI your shop's returns policy. It quotes it perfectly. But you asked for one line, and it wrote three paragraphs.", '')],
