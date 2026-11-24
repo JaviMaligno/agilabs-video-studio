@@ -97,6 +97,15 @@ when installed as a plugin; next to `skills/` in the plugin repo).
     re-encoding (`CHUNK_SECONDS` to tune). Each chunk is kept in `out/_parts/` under a key of
     the scenes, code, images and voice takes it shows, so after a change only the chunks it
     touches render again (an interrupted render resumes the same way); `-- --fresh` renders all.
+    **Plan before every render of a long video:** `npm run render -- [flags] --plan` lists each
+    chunk as `reuse` or `RENDER` with the time it would take, and renders nothing. Read it before
+    launching and before telling the author an ETA. A chunk you expect to reuse that says `RENDER`
+    is a bug to find first (which scene's props, code, assets or takes changed?), never something
+    to discover once the render is running. **Several cuts of one video** (a chapter in or out)
+    share `out/_parts/main-<voice>-<format>/`: keep the cut's name out of the chunk key and the
+    parts folder (only output names carry it), and keep scene props free of whole-video data (see
+    *Scene props are per scene* in `explainer-animation`); the second cut then renders only the
+    chunks that differ.
     The music bed is made as long as the video. One Chrome tab by default (`CONCURRENCY`):
     with several, frames under the chalk filter come out half painted and flicker.
     **Flicker check:** every render ends with one (`npm run flicker` on its own). A run of

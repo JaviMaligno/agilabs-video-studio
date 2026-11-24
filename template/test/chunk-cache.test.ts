@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { chunkKey, importClosure, partPaths, relativeImports, sceneSpans, scenesInRange, staticPaths } from '../scripts/chunk-cache.mjs';
+import { chunkKey, importClosure, keysInUse, partPaths, recordKeys, relativeImports, sceneSpans, scenesInRange, staticPaths } from '../scripts/chunk-cache.mjs';
 
 test('relative imports and literal static files are found; packages and dynamic paths are not', () => {
   const src = `import React from 'react';\nimport { a } from './a.ts';\nexport { b } from '../b.tsx';\nimport './c.css';\n` +
@@ -49,4 +49,19 @@ test('a part lives under its chunk index and key; older keys of that chunk are s
   const { file, stale } = partPaths(dir, 0, 'new');
   assert.equal(file, path.join(dir, '00-new.mkv'));
   assert.deepEqual(stale, [path.join(dir, '00-old.mkv')]);
+});
+
+test('two cuts share one parts folder: a cut never deletes the chunks the other cut uses', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cuts-'));
+  for (const f of ['00-shared.mkv', '02-without.mkv', '02-older.mkv']) fs.writeFileSync(path.join(dir, f), '');
+  recordKeys(dir, 'main-en-landscape-without', ['shared', 'x', 'without']);
+  // The "with" cut renders its own chunk 3: the "without" chunk 3 is in use, the older one is not.
+  const keep = keysInUse(dir, 'main-en-landscape-with');
+  assert.ok(keep.has('without') && keep.has('shared'));
+  const { stale } = partPaths(dir, 2, 'with', keep);
+  assert.deepEqual(stale, [path.join(dir, '02-older.mkv')]);
+  // A cut's own record does not protect its own stale parts.
+  assert.equal(keysInUse(dir, 'main-en-landscape-without').size, 0);
+  // Same key, same file, whichever cut asks: chunk 1 is reused, not rendered twice.
+  assert.equal(partPaths(dir, 0, 'shared').file, path.join(dir, '00-shared.mkv'));
 });

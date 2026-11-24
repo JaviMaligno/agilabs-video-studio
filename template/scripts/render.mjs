@@ -1,6 +1,8 @@
 // Renders the main cut and normalises its loudness: out/main-{en|es}-{vertical|landscape}.mp4
 // (+ the matching .srt). Two-pass loudnorm to -16 LUFS integrated, true peak -1.5 dBTP.
-// Usage: npm run render [-- --es] [-- --landscape] [-- --fresh]
+// Usage: npm run render [-- --es] [-- --landscape] [-- --fresh] [-- --plan]
+// --plan prints which chunks would be reused and which rendered, with the time it would take, and
+// exits: run it before every render of a long video, and before telling anyone how long it takes.
 // Env: CONCURRENCY=n Chrome tabs rendering at once (default 1, see below);
 //      CHUNK_SECONDS=s chunk length for long videos (default 180: longer videos render in chunks).
 // Long videos keep each chunk in out/_parts/<name>/ under a key of what it shows (chunk-cache.mjs):
@@ -9,7 +11,7 @@
 import fs from 'node:fs';
 import { at, chunkRanges, concatParts, ffmpegReport, loudness, probe, LOUDNESS, remotion } from './lib.mjs';
 import { ensureMusicBed } from './music.mjs';
-import { chunkKeys, partPaths } from './chunk-cache.mjs';
+import { chunkKeys, keysInUse, partPaths, recordKeys } from './chunk-cache.mjs';
 import { flickerReport } from './flicker.mjs';
 
 /** Videos longer than this render in chunks of this length (override with CHUNK_SECONDS). */
@@ -19,6 +21,7 @@ const args = process.argv.slice(2);
 const voice = args.includes('--es') ? 'es' : 'en';
 const format = args.includes('--landscape') ? 'landscape' : 'vertical';
 const fresh = args.includes('--fresh');
+const plan = args.includes('--plan');
 const { SETTINGS } = await import('../src/settings.ts');
 const { VIDEOS } = await import('../src/timeline.ts');
 const { FPS, SCENE_TRANSITION, sceneStarts } = await import('../src/timing.ts');
@@ -45,12 +48,19 @@ const concurrency = process.env.CONCURRENCY ?? '1';
 const chunkFrames = Math.round((Number(process.env.CHUNK_SECONDS) || DEFAULT_CHUNK_SECONDS) * FPS);
 const ranges = chunkRanges(frames, chunkFrames);
 let raw;
+if (plan && ranges.length === 1) {
+  console.log(`plan: one piece, ${frames} frames (~${Math.ceil(frames / 9 / 60)} min at 9 fps); short videos are not cached`);
+  process.exit(0);
+}
 if (ranges.length === 1) {
   raw = at('out', `_raw-${name}.mp4`);
   remotion(['render', 'src/index.ts', id, raw, '--crf=18', `--concurrency=${concurrency}`]);
 } else {
   raw = at('out', `_raw-${name}.mkv`);
-  const partsDir = at('out', '_parts', name);
+  // One parts folder per voice and format. A video with several cuts (a chapter in or out) keeps
+  // this folder and `id` free of the cut's name, so chunks the cuts share are rendered once; only
+  // the output file names carry the cut. The keys say what a chunk shows, nothing else.
+  const partsDir = at('out', '_parts', `main-${voice}-${format}`);
   fs.mkdirSync(partsDir, { recursive: true });
   const { starts } = sceneStarts(VIDEOS[voice].main);
   const keys = chunkKeys({
@@ -64,9 +74,19 @@ if (ranges.length === 1) {
     ranges,
     margin: 2 * FPS,
   });
+  // The plan, printed before any work: what is cached, what renders, roughly how long (~9 fps at
+  // 1080p with one tab). A chunk you expected to reuse that says RENDER means a scene it overlaps
+  // changed its props, code, assets or takes: find which before launching.
+  const keep = keysInUse(partsDir, name);
+  const cached = keys.map((key, k) => !fresh && fs.existsSync(partPaths(partsDir, k, key).file));
+  const todo = ranges.reduce((n, [a, b], k) => n + (cached[k] ? 0 : b - a + 1), 0);
+  console.log(`plan: ${cached.filter(Boolean).length}/${ranges.length} chunks reused, ${todo} frames to render (~${Math.ceil(todo / 9 / 60)} min at 9 fps)`);
+  ranges.forEach(([a, b], k) => console.log(`  chunk ${k + 1}: ${(a / FPS).toFixed(0)}-${((b + 1) / FPS).toFixed(0)} s  ${cached[k] ? 'reuse ' : 'RENDER'}  ${keys[k]}`));
+  if (plan) process.exit(0);
+  recordKeys(partsDir, name, keys);
   const parts = ranges.map(([a, b], k) => {
     const label = `chunk ${k + 1}/${ranges.length}: frames ${a}-${b} (${(a / FPS).toFixed(0)}-${((b + 1) / FPS).toFixed(0)} s)`;
-    const { file, stale } = partPaths(partsDir, k, keys[k]);
+    const { file, stale } = partPaths(partsDir, k, keys[k], keep);
     // A chunk whose key matches was rendered from the same scenes, code, assets and voice takes.
     // Parts render to a temp name and are renamed only when complete, so a crash never leaves a
     // half chunk behind under a valid key.

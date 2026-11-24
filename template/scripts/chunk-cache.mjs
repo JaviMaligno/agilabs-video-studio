@@ -123,10 +123,35 @@ export const chunkKeys = ({ root, id, voice, scenes, starts, total, transition, 
   return ranges.map((range) => chunkKey({ range, id, shared, scenes: scenesInRange(spans, range, margin).map((i) => sceneInfo(scenes[i], i)) }));
 };
 
-/** Cached part path for chunk `k` with `key`, and every older part of that chunk (to delete). */
-export const partPaths = (dir, k, key) => {
+/**
+ * Cached part path for chunk `k` with `key`, and every older part of that chunk (to delete).
+ * `keep`: keys another cut of the same video still uses (see `keysInUse`), never stale.
+ */
+export const partPaths = (dir, k, key, keep = new Set()) => {
   const prefix = `${String(k).padStart(2, '0')}-`;
   const file = path.join(dir, `${prefix}${key}.mkv`);
-  const stale = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.startsWith(prefix) && f !== path.basename(file)).map((f) => path.join(dir, f)) : [];
+  const stale = fs.existsSync(dir)
+    ? fs
+        .readdirSync(dir)
+        .filter((f) => f.startsWith(prefix) && f.endsWith('.mkv') && f !== path.basename(file) && !keep.has(f.slice(prefix.length, -'.mkv'.length)))
+        .map((f) => path.join(dir, f))
+    : [];
   return { file, stale };
 };
+
+/**
+ * Several cuts of one video (a chapter in or out, two lengths) share one parts folder: a chunk is
+ * found by its key, which is what it shows, never by the cut that asked for it. Each cut records
+ * the keys it uses in `used-<cut>.json`; the keys the other cuts record are kept when this cut
+ * cleans up its stale parts.
+ */
+export const recordKeys = (dir, cut, keys) => fs.writeFileSync(path.join(dir, `used-${cut}.json`), JSON.stringify(keys));
+export const keysInUse = (dir, cut) =>
+  new Set(
+    fs.existsSync(dir)
+      ? fs
+          .readdirSync(dir)
+          .filter((f) => /^used-.+\.json$/.test(f) && f !== `used-${cut}.json`)
+          .flatMap((f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')))
+      : [],
+  );

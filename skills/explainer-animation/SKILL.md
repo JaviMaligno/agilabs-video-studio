@@ -251,6 +251,16 @@ picture, so the cover and the first second promise the same thing.
   (above the two caption rows), 936 px wide. `Stage` / `stageOf()` give you that box.
 - Captions sit below the stage, at most two rows of ~32 characters, within ~900 px.
 
+## Scene props are per scene
+
+Long videos render in chunks cached under a key of the scenes they show, props included. Give a
+scene only the data it draws: a shared keyframe list goes to each scene as the slice it can reach
+(every keyframe up to its last frame when a value integrates from the start, such as a spin angle,
+plus the first one after it), never as the whole video's list. Otherwise any change near the end,
+or a chapter inserted in a second cut, changes every scene's props and every chunk renders again.
+`npm run render -- --plan` shows it before it costs anything. Values that depend on the video's
+length (a cap at 600 s, a total) must not freeze or shift what an earlier scene draws.
+
 ## Landscape and both formats
 
 Every video has a landscape composition too (`Main-EN-landscape`, 1920x1080; the long YouTube
