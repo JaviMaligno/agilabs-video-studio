@@ -1,6 +1,6 @@
 ---
 name: article-video
-description: Turn a published blog article into a short narrated, animated vertical explainer video (usually 45-90 s, 1080x1920) in the AGILabs brand, rendered locally with Remotion. Use when asked to make a video, reel, short or explainer from an article or blog post, or to re-render one made with this plugin (a folder with video.config.mjs and src/timeline.ts).
+description: Turn a published blog article into a narrated, animated explainer video in the AGILabs brand, rendered locally with Remotion - a short vertical reel (usually 45-90 s, 1080x1920) or a long landscape YouTube video (~5-10 min, 1920x1080, chapters, thumbnail, description with links). Use when asked to make a video, reel, short, explainer or YouTube video from an article, blog post or topic the author has written about, from any repo, or to re-render one made with this plugin (a folder with video.config.mjs and src/timeline.ts).
 ---
 
 # Article video
