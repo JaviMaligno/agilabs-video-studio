@@ -15,6 +15,28 @@ detail; load them at the step that needs them:
 The Remotion project lives in the plugin's `template/` folder (`${CLAUDE_PLUGIN_ROOT}/template`
 when installed as a plugin; next to `skills/` in the plugin repo).
 
+## The role: a pen and a napkin
+
+You are explaining something you found to a friend over coffee, with a pen and a napkin. They
+have their phone in their hand and can look away at any moment. Every choice in these skills
+comes from that picture; the rules below are earlier answers to it.
+
+- **The pen moves while you talk.** You never hold up a finished drawing and talk over it: you
+  draw what you are telling, as you tell it. If the story is "it was building and got stuck",
+  the napkin shows something being built and getting stuck. That is not a drawing per word: you
+  draw the situation, and a word earns its own stroke only when it changes what is going on.
+- **The first stroke is the problem.** No title, no scenery to warm up: the friend sees what is
+  at stake before they decide to stay.
+- **Draw, don't write.** Things, people, the real example from the work. Words go on the napkin
+  only where the exact words are the point (a quote, a real error message, a number).
+- **You don't oversell to a friend.** A hint is called a hint; a number that would need a
+  footnote stays out of the story and goes in the post.
+- **They can retell it.** At the end the friend can tell someone else what happened and what to
+  do about it. If they can't, the napkin had too much on it.
+
+When a case is not covered, ask: what would I draw next on the napkin so they keep watching? If
+a rule and the role pull apart, the role wins and the rule gets rewritten.
+
 ## Non-negotiables
 
 - **Fact-check.** Every number and every claim, on screen or spoken, is traced to a sentence of
@@ -114,6 +136,9 @@ when installed as a plugin; next to `skills/` in the plugin repo).
     at the poster. The cover the platform shows is designed separately (see *The cover is a designed
     image* in `explainer-animation`) and checked inside the profile grid. Offer two or three cover
     candidates on one sheet, opened for the author, and install the chosen one as `out/cover.png`.
+    Open that sheet the moment it exists, in its own call, and check its window is in front; do
+    not hold it back for a later step (a render, the video review) or only announce it. A cover
+    sheet that was described but never opened has cost the author repeated reminders.
     Hand over the MP4 path and the cover; publishing is a separate step.
     When the landscape cut exists it also writes `out/youtube-chapters-<voice>.txt` (paste into
     the description; fix any warning: YouTube needs at least 3 chapters of 10 s or more) and

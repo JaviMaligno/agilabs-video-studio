@@ -5,6 +5,9 @@ description: Build the scenes of an article explainer video in Remotion - write 
 
 # Explainer animation
 
+Work in the role set out in `article-video` (*The role: a pen and a napkin*): the friend with the
+phone in their hand, the pen that keeps moving while you talk.
+
 A video is an ordered list of scenes in `src/timeline.ts`. Three kinds:
 
 - `intro`: the hook card. Its first line is the hook, shown big, its words lighting up as they
@@ -203,6 +206,22 @@ the before/after decision.
   Check at review: with the sound off, does frame 0 already show what the first line claims?
   Does the picture fill the stage rather than sit in a small box between dark bands? Does the
   conflict appear within the first 2 s, not after a calm establishing shot?
+- **Check every action at full size, not on a contact sheet.** A thumbnail grid shows that
+  something moves, not that it happens: a hand that waves near a button reads as a press in a
+  thumbnail and as nothing at full size. For each action the story depends on (a press, a hit, a
+  piece that won't fit), pull the frames around it at full resolution and check contact, cause and
+  effect: the hand touches the button, the button sinks, the thing it triggers starts after.
+- **Give every text room.** No label touches a drawing or another label, none sits in the caption
+  band at the bottom of the stage, and a scene uses the whole stage instead of crowding one corner.
+  Check the last frame of every scene (when all its texts are on screen) at full size.
+- **Frame 0 asks; it never answers.** Show the tension, not the result: no measured numbers, no
+  verdict cards, no "before → after" on frame 0. Whatever the narration is about to tell has not
+  happened yet (the note is still in the hand, not on the alarm), and what triggers it is drawn
+  (the line written twice that sets the alarm off). Make it eye-catching: one big subject that
+  fills the stage, in motion, with one strong contrast or mystery (pages slipping out of a proud
+  robot's head under a "?"). Two text cards and a small character next to them is a report, not a
+  hook. Check at review: could a viewer guess the ending from frame 0? Then it gives the answer
+  away.
 - **Draw the example's parts and light them as they are named.** A long spoken example is hard to
   hold by ear: put each element on screen as a drawing (the person, the day, the reason, the
   object) and light it on the word that names it. Generate them with Codex in the cast style
@@ -216,6 +235,24 @@ the before/after decision.
   script, not by slowing the voice.
 - **Fill the screen with meaning, not decoration.** Half an empty screen is a place to draw the
   example, not to repeat the opening.
+
+- **Show what happens, not the code that describes it.** A rule an AI wrote, a program, a
+  physics model: draw its behaviour (the path, the stop, the region) rather than typing its code on
+  screen. Code appears only when the code itself is the point, and then briefly.
+- **People are the cast.** Never draw a generic person in SVG: the author's and the recurring
+  characters' cut-outs (`public/avatar/`, and any other cast folder) cover "you", the narrator and
+  the bystander. A real third party the video is about (the author of a cited post) is not given a
+  cast face: use their own public photo from the cited material, small and round, as the post shows it.
+- **A cited post is shown, not retyped.** Capture the public page with a headless browser, remove
+  the sign-in modal and the cookie banner in the DOM, crop to the header and the lines that matter,
+  and zoom into the lines as the voice names them. Third-party captures stay out of git (ignore
+  their folder under `public/`, like the avatar).
+- **One picture across lines, no cut.** When several lines describe the same moment (the same
+  chat, the same table, the same bridge), keep one picture and advance it: `blend: true` on the
+  following scenes, so it carries on without a dip to black. A dip says "new place"; between two
+  lines about the same picture it reads as a glitch. Before rendering, walk the timeline pair by
+  pair and ask of each join whether the picture changes, and test that the state at the end of one
+  scene equals the state at the start of the next.
 
 ## Cover (poster)
 

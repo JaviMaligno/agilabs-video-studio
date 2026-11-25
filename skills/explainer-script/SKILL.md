@@ -5,6 +5,9 @@ description: Write the script for a short narrated explainer video of a blog art
 
 # Explainer script
 
+Work in the role set out in `article-video` (*The role: a pen and a napkin*): the friend with the
+phone in their hand, the pen that keeps moving while you talk.
+
 A script is a short list of scenes. Each scene has one or more narration lines and one visual.
 It is written for a viewer scrolling with the sound off, so every line must also work as a
 caption.
@@ -35,16 +38,37 @@ In a batch, show the cards of every reel at once.
 - The cloned voice reads about 2.5 EN words per second plus pauses: count the words to
   estimate. Spanish runs about 15-20 % longer for the same content.
 
-## Two formats
+## Pick the kind of reel first
 
-`article-video` picks the format first. **Experiment** videos follow "Structure" below.
-**Concept** videos follow "Concept videos" further down and share everything else (voice,
-captions, visuals, cold read, script format).
+There is no single mould. Before writing a line, decide what this reel is, from what made the
+article worth writing:
+
+- **Experiment**, told as research: "I tried it, here is what happened". Fine when the setup can be
+  shown as something that happens (a cart that crashes, a note that gets passed on). It follows
+  "Structure" below.
+- **Concept**: a question or a phenomenon, explained without the experiment. Often the best fit
+  when the article's experiment tests something next to the question that hooks people: then the
+  experiment lives in the caption and the article, never shoehorned into the narration. It follows
+  "Concept videos" further down and shares everything else (voice, captions, visuals, cold read,
+  script format).
+- **Everyday**, **curiosity**, **history**, **what's coming**: the same toolkit, a different promise.
+
+`article-video` makes this choice first. The test is not "is it understood?" but "would I want to
+watch it?". Rules taken from one reel (add a story, remove the numbers, open with a question) are
+checked against the reels that did well before they are applied to the next; none applies
+everywhere.
 
 ## Structure (experiment video)
 
 1. **Hook, within the first 3 s.** The surprising finding or a concrete question. Never "In
    this video...", "Today I want to talk about...", or a greeting. Intro card.
+   - **An opening only opens.** The first line raises the question and stops there; if the second
+     line already gives the answer away, the opening has closed itself. Curious phrasing ("What
+     happens when…?", "Can an AI…?") over sweeping claims ("Everyone worries that…").
+   - **Keep the hook's promise.** The rest of the video answers the question the hook asked. A hook
+     about one problem and a body about another is bait-and-switch, however well each half is made.
+   - **When the idea comes from someone else** (a post, a tweet, a talk), show their post on screen
+     and credit them in the caption; the voice says "a post on LinkedIn asked…", not their name.
 2. **The story, right after the hook (~10 s, two or three lines).** The viewer's story, told in
    plain words: a situation they recognise from their own work or life, what goes wrong in it,
    and why it matters to them. The author's own case enters when it is the example that makes
@@ -246,9 +270,11 @@ what they said:
 - `reel-viewer`: a generic Reels viewer. Give it **only** the numbered narration with the visuals
   in brackets. It returns its retelling, the lines it lost, the obvious questions, the line where
   it would scroll away, whether anything surprised it, and its best line.
-- `reel-expert`: an expert in the field. Give it the script **and** a factual summary of the
-  experiment (setup, numbers, what was and was not measured). It flags only errors that change the
-  conclusion; narrative rounding is fine.
+- `reel-expert`: an expert in the field. Give it the script **and the path to the source** (the
+  article, plus the paper or result files when there are any). It reads the source itself: a summary
+  written by the script's author can carry the same mistake as the script. If it cannot open the
+  source, fix that (or use a general agent with read access in the same role) rather than reviewing
+  in its place. It flags only errors that change the conclusion; narrative rounding is fine.
 
 Read them as signals, not votes: one viewer run varies. Iterate until the viewer stays to the end
 (or close) and names something non-obvious as its takeaway. Lessons that came out of these reads:
@@ -277,6 +303,23 @@ Read them as signals, not votes: one viewer run varies. Iterate until the viewer
 - **One example, start to finish.** A second example that appears out of nowhere ("the key under
   the flowerpot" in a video about a dinner message) loses the viewer. Totals go on screen, not in
   the voice ("18 chains per AI" as a caption, "I ran it many times" spoken).
+- **Real examples or none.** When the script shows examples of something (invented words, wrong
+  answers), they come from a real source: the cited post, the experiment's outputs, the author's own
+  material. If the source is not public, draw the slot empty (blank chips, grey bars) rather than
+  writing plausible fakes. Small counts found on the way are reported as they are, even when they
+  cut against the story; they go in the caption or nowhere, not inflated in the voice.
+- **Show one of everything you name.** Every test, task or failure the script names ("a general
+  knowledge quiz", "following instructions", "commands it had never seen") gets one concrete,
+  real instance on screen or in the voice: a question from the benchmark, an instruction from the
+  test set, the command and what it prints. Gather two or three per item from the data (the
+  experiment's repo, the public benchmark files) before the v1, and pick the ones that read without
+  context. A cold reader asking "like what?" or "give me an example" means one is missing; answer
+  it with the instance, not with new wording. An illustrative example that was not in the test
+  (a made-up instruction) is not shown as if it were.
+- **The viewer can try it.** A concept reel can close by telling the viewer how to test the idea
+  themselves today, as long as the test is one they can actually run.
+- **Agreed wording stays.** Once the author has agreed a line, it is not rephrased in passing; a
+  change is proposed explicitly, with its reason.
 - **When an AI's "fix" is factually right** (red wine has sulphites too), the script says what it
   broke ("nobody asked it to decide, and the instruction was gone"), or viewers side with the AI.
 
