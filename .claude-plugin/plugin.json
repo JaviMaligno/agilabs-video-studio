@@ -1,7 +1,7 @@
 {
   "name": "agilabs-video-studio",
   "description": "Turn a blog article into a narrated, animated explainer video with Remotion, as a short vertical reel or a long YouTube video with chapters: script, animated scenes, TTS narration, burned-in captions, render and delivery.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "AGILabs"
   },
