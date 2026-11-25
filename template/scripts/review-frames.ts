@@ -183,14 +183,22 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const fileOf = (f: number) => path.join(dir, 'frames', `f${String(f).padStart(5, '0')}.jpg`);
   // One decoding pass: select the wanted frame numbers, write them in order, then name them.
   const wanted = [...new Set(shots.map((s) => s.frame))].sort((a, b) => a - b);
-  const pass = path.join(dir, 'frames', 'pass-%05d.jpg');
-  const select = wanted.map((f) => `eq(n,${f})`).join('+');
-  ffmpegReport(['-y', '-i', video, '-an', '-vf', `select='${select}'`, '-fps_mode', 'passthrough', '-q:v', '2', pass]);
-  wanted.forEach((f, i) => {
-    const got = path.join(dir, 'frames', `pass-${String(i + 1).padStart(5, '0')}.jpg`);
-    if (!fs.existsSync(got)) throw new Error(`frame ${f} was not extracted (the video has ${totalFrames} frames)`);
-    fs.renameSync(got, fileOf(f));
-  });
+  // In batches: one select expression with every frame of a 10-minute video makes ffmpeg fail to
+  // build the filter ("Cannot allocate memory"). Each batch decodes from just before its first frame.
+  const BATCH = 80;
+  for (let b = 0; b < wanted.length; b += BATCH) {
+    const group = wanted.slice(b, b + BATCH);
+    const start = Math.max(0, group[0] - 2 * fps);
+    const pass = path.join(dir, 'frames', `pass-${b}-%05d.jpg`);
+    const select = group.map((f) => `eq(n,${f - start})`).join('+');
+    ffmpegReport(['-y', '-ss', (start / fps).toFixed(4), '-i', video, '-an', '-vf', `select='${select}'`, '-fps_mode', 'passthrough', '-q:v', '2', pass]);
+    group.forEach((f, i) => {
+      const got = path.join(dir, 'frames', `pass-${b}-${String(i + 1).padStart(5, '0')}.jpg`);
+      if (!fs.existsSync(got)) throw new Error(`frame ${f} was not extracted (the video has ${totalFrames} frames)`);
+      fs.renameSync(got, fileOf(f));
+    });
+  }
+
 
   // One contact sheet per section (at most 24 frames each), in the order of the index.
   const sheets: string[] = [];

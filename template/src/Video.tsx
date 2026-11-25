@@ -5,7 +5,7 @@ import { TransitionSeries, linearTiming } from '@remotion/transitions';
 import { AUDIO, WORDS } from './audio.generated.ts';
 import { resolveMark } from './marks.ts';
 import { VIDEOS } from './timeline.ts';
-import { FPS, SCENE_TRANSITION, chapterNumbers, handOverAt, linesInVideo, sceneFrames } from './timing.ts';
+import { FPS, SCENE_TRANSITION, chapterNumbers, handOverAt, linesInVideo, sceneClock, sceneFrames, sceneStarts } from './timing.ts';
 import { SETTINGS } from './settings.ts';
 import { musicVolume } from './music.ts';
 import { C } from './brand.ts';
@@ -19,8 +19,13 @@ import { Badge } from './components/Brand.tsx';
 import { dip, fade } from './components/Dip.tsx';
 import type { Lang, Scene } from './types.ts';
 
-/** noSubs: no captions (poster frames and thumbnails). */
-export type ArticleVideoProps = { voice: Lang; subs: Lang; vertical: boolean; noSubs?: boolean };
+/**
+ * noSubs: no captions (poster frames and thumbnails).
+ * chunked: a long render in cached chunks (render.mjs) leaves out what runs on the whole video's
+ * clock, so a chunk shows the same wherever it falls: no music bed (render.mjs mixes it after the
+ * join, same ducking) and the background glow on the scene clock instead of the video's.
+ */
+export type ArticleVideoProps = { voice: Lang; subs: Lang; vertical: boolean; noSubs?: boolean; chunked?: boolean };
 
 export const scenesFor = (voice: Lang): Scene[] => {
   const cuts = VIDEOS[voice];
@@ -136,10 +141,11 @@ const sameWorld = (a: Scene, b: Scene | undefined): boolean => !!b && !!a.anim &
 export const ArticleVideo: React.FC<ArticleVideoProps> = (p) => {
   const scenes = scenesFor(p.voice);
   const chapters = chapterNumbers(scenes);
+  const { starts } = React.useMemo(() => sceneStarts(scenes), [scenes]);
   return (
     <AbsoluteFill style={{ background: C.bg0 }}>
-      <Background />
-      <Music scenes={scenes} />
+      <Background clock={p.chunked ? (f) => sceneClock(f, starts) : undefined} />
+      {!p.chunked && <Music scenes={scenes} />}
       <TransitionSeries>
         {scenes.map((scene, i) => (
           <React.Fragment key={scene.id}>

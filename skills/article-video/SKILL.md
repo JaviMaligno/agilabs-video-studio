@@ -115,10 +115,25 @@ a rule and the role pull apart, the role wins and the rule gets rewritten.
    captions matching the beat on screen. A clean build is not proof that a frame looks right.
 10. **Render:** `npm run render` (vertical EN). `-- --es` for the Spanish cut, `-- --landscape`
     for 1920x1080 (the long format renders only this one). Then `npm run audio-qa` again to
-    measure the mix (-16 LUFS integrated). Videos over 3 min render in chunks joined without
-    re-encoding (`CHUNK_SECONDS` to tune). Each chunk is kept in `out/_parts/` under a key of
-    the scenes, code, images and voice takes it shows, so after a change only the chunks it
-    touches render again (an interrupted render resumes the same way); `-- --fresh` renders all.
+    measure the mix (-16 LUFS integrated). Videos over 3 min render in chunks of whole scenes,
+    about 30 s each (`CHUNK_SECONDS` to tune), joined without re-encoding. Each chunk is kept in
+    `out/_parts/` under a key of what it shows from its own first frame: its scenes (props,
+    lines, lengths, voice takes, code, images) and the scene that cross-fades out over its start.
+    No absolute time goes in the key, so editing one line renders again only the chunk holding
+    that scene (and the next one when the scene ends its chunk), and a scene that gets longer or
+    shorter leaves later chunks cached. For that, chunks carry no music (the bed is mixed after the
+    join with the same ducking) and their background glow runs on the scene clock, not the
+    video's. An interrupted render resumes the same way; `-- --fresh` renders all.
+    **Plan before every render of a long video:** `npm run render -- [flags] --plan` lists each
+    chunk with its time range, its scenes and `reuse` or `RENDER`, with the time it would take,
+    and renders nothing. Read it before launching and before telling the author an ETA. A chunk
+    you expect to reuse that says `RENDER` is a bug to find first (which of its scenes, or the one
+    fading out at its start, changed props, code, assets or takes?), never something to discover
+    once the render is running. **Several cuts of one video** (a chapter in or out) share
+    `out/_parts/main-<voice>-<format>/`, where a part is named by its key alone: keep the cut's
+    name out of the chunk key and the parts folder (only output names carry it), and keep scene
+    props free of whole-video data such as a shared clock (see *Scene props are per scene* in
+    `explainer-animation`); the second cut then renders only the chunks that differ.
     The music bed is made as long as the video. One Chrome tab by default (`CONCURRENCY`):
     with several, frames under the chalk filter come out half painted and flicker.
     **Flicker check:** every render ends with one (`npm run flicker` on its own). A run of

@@ -1,4 +1,5 @@
 // Helpers shared by the scripts: secrets, ffmpeg, Cartesia endpoint.
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -108,15 +109,58 @@ export const cartesiaHeaders = (key, json = true) => ({
 export const remotion = (args) =>
   execFileSync(process.execPath, [at('node_modules', '@remotion', 'cli', 'remotion-cli.js'), ...args], { stdio: 'inherit', cwd: at() });
 
+/** Whether a scene id is an anchor: a place where a chunk may end once it is long enough. */
+export const isAnchor = (id) => (crypto.createHash('sha256').update(String(id)).digest()[0] & 1) === 0;
+
 /**
- * Frame ranges for a chunked render, inclusive like Remotion's `--frames=a-b`: consecutive,
- * covering 0..frames-1 once, each at most `chunkFrames` long.
+ * Chunks for a long render: runs of whole scenes, each about `target` frames, with the frame range
+ * each covers (inclusive like Remotion's `--frames=a-b`): consecutive, covering 0..total-1 once.
+ *
+ * Boundary: a chunk starts on the first frame of its first scene's cross-fade in (the scene's start
+ * frame, where the previous scene still shows and fades out) and ends on the frame before the
+ * cross-fade out of its last scene. So no cross-fade is ever split: each lives whole in the chunk of
+ * the scene it fades into, and that chunk's key also holds the scene that fades out (its tail is
+ * on screen and its last line may still be heard). The other choice (end a chunk after the fade
+ * out) costs the same, one neighbour in the key; this one puts every boundary on a scene start.
+ *
+ * Where to cut is decided by the content, not by the position, so that a scene that gets longer
+ * or shorter regroups at most the chunks around it, never every later one (with fixed lengths
+ * counted from frame 0, or with "cut when the run reaches the target", one shift moves every later
+ * boundary). A run may end before scene j when it is at least target/2 long and scene j is an
+ * anchor (a hash of its id: about every other scene, stable across edits, cuts and languages). A
+ * run is cut before it would pass 2 x target, and a scene of `target` or more is a chunk of its own.
+ * After a change the two groupings meet again at the next anchor both reach.
+ *
+ * @param {object} o
+ * @param {number[]} o.lengths frames of each scene (sceneFrames)
+ * @param {string[]} o.ids scene ids
+ * @param {number} o.transition frames two consecutive scenes overlap
+ * @param {number} o.target chunk length to aim at, in frames
+ * @returns {{first: number, last: number, range: [number, number]}[]}
  */
-export const chunkRanges = (frames, chunkFrames) => {
-  if (!(frames >= 1) || !(chunkFrames >= 1)) throw new Error(`chunkRanges: need frames and chunk size >= 1 (got ${frames}, ${chunkFrames})`);
-  const out = [];
-  for (let a = 0; a < frames; a += chunkFrames) out.push([a, Math.min(frames, a + chunkFrames) - 1]);
-  return out;
+export const sceneChunks = ({ lengths, ids, transition, target }) => {
+  const n = lengths.length;
+  if (!(n >= 1) || ids.length !== n || !(target >= 1)) throw new Error(`sceneChunks: need scenes with ids and a target >= 1 (got ${n} scenes, ${ids.length} ids, target ${target})`);
+  const starts = [];
+  let at = 0;
+  lengths.forEach((len, i) => {
+    starts.push(at);
+    at += len - (i < n - 1 ? transition : 0);
+  });
+  const total = Math.max(1, at);
+  const runs = [[0, 0]];
+  for (let j = 1; j < n; j++) {
+    const run = runs.at(-1);
+    const held = starts[j] - starts[run[0]];
+    const cut =
+      lengths[j] >= target ||
+      lengths[j - 1] >= target ||
+      (held >= target / 2 && isAnchor(ids[j])) ||
+      held + lengths[j] - transition > 2 * target;
+    if (cut) runs.push([j, j]);
+    else run[1] = j;
+  }
+  return runs.map(([first, last]) => ({ first, last, range: [starts[first], last + 1 < n ? starts[last + 1] - 1 : total - 1] }));
 };
 
 /** An ffmpeg concat-demuxer list for `files` (forward slashes, single quotes escaped). */
