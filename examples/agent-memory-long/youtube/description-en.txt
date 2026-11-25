@@ -1,0 +1,46 @@
+Why Your AI Forgets: the Memory That Sounds Safest Fails
+
+You told your AI the plan changed. It said "got it", and an hour later it booked the old plan. This video walks through the kinds of memory an AI agent has (what it learned in training, its desk, a summary, a searchable notebook, a form), how each one loses things, and what months of my own experiments say about which ones to combine. The one that sounds safest did the worst.
+
+The experiments behind it, with every number and source:
+https://javieraguilar.ai/en/blog/compact-or-look-it-up
+https://javieraguilar.ai/en/blog/when-the-fact-stops-being-true
+https://javieraguilar.ai/en/blog/explicit-state-misremembers
+https://javieraguilar.ai/en/blog/forgetting-you-dont-measure
+
+0:00 Intro
+0:24 Training
+0:52 The desk
+1:36 The summary
+2:17 The notebook
+3:20 The form
+4:22 What to combine
+
+Links, in the order they come up
+
+Training
+Why retraining can make a model worse at what it knew (catastrophic forgetting): https://en.wikipedia.org/wiki/Catastrophic_interference
+My experiment on it: https://javieraguilar.ai/en/blog/forgetting-you-dont-measure
+
+The desk
+The context window: https://en.wikipedia.org/wiki/Large_language_model#Context_window
+"One slip in six hundred decisions" and "a quarter wrong": https://javieraguilar.ai/en/blog/when-the-fact-stops-being-true
+
+The summary
+Compaction in coding assistants (Claude Code): https://docs.anthropic.com/en/docs/claude-code/costs#reduce-token-usage
+The test of summary vs. search: https://javieraguilar.ai/en/blog/compact-or-look-it-up
+Code: https://github.com/JaviMaligno/delayed-relevance/tree/exp/compaction-vs-transcript
+
+The notebook
+Same experiment (searches found the correction about once in forty): https://javieraguilar.ai/en/blog/compact-or-look-it-up
+
+The form
+SKILL.state, the paper that replaces the chat history with fixed fields: https://arxiv.org/abs/2608.26263
+My replication: https://javieraguilar.ai/en/blog/when-the-fact-stops-being-true
+Where a form misremembers: https://javieraguilar.ai/en/blog/explicit-state-misremembers
+Code: https://github.com/JaviMaligno/delayed-relevance
+ChatGPT memory: https://help.openai.com/en/articles/8590148-memory-faq
+Claude memory: https://support.anthropic.com/en/articles/11817273-using-claude-s-chat-search-and-memory-to-build-on-previous-context
+
+More context
+Agents and what has already happened: https://javieraguilar.ai/en/blog/what-has-already-happened
