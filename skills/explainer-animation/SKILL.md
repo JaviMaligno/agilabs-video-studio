@@ -5,6 +5,9 @@ description: Build the scenes of an article explainer video in Remotion - write 
 
 # Explainer animation
 
+Work in the role set out in `article-video` (*The role: a pen and a napkin*): the friend with the
+phone in their hand, the pen that keeps moving while you talk.
+
 A video is an ordered list of scenes in `src/timeline.ts`. Three kinds:
 
 - `intro`: the hook card. Its first line is the hook, shown big, its words lighting up as they
@@ -203,6 +206,18 @@ the before/after decision.
   Check at review: with the sound off, does frame 0 already show what the first line claims?
   Does the picture fill the stage rather than sit in a small box between dark bands? Does the
   conflict appear within the first 2 s, not after a calm establishing shot?
+- **Check every action at full size, not on a contact sheet.** A thumbnail grid shows that
+  something moves, not that it happens: a hand that waves near a button reads as a press in a
+  thumbnail and as nothing at full size. For each action the story depends on (a press, a hit, a
+  piece that won't fit), pull the frames around it at full resolution and check contact, cause and
+  effect: the hand touches the button, the button sinks, the thing it triggers starts after.
+- **Same picture, no cut.** When the next scene keeps the same picture (the same chat, the same
+  table, the same bridge), mark it `blend: true` in the timeline so it carries on without a dip to
+  black. A dip says "new place"; between two lines about the same picture it reads as a glitch.
+  Before rendering, walk the timeline pair by pair and ask of each join: does the picture change?
+- **Give every text room.** No label touches a drawing or another label, none sits in the caption
+  band at the bottom of the stage, and a scene uses the whole stage instead of crowding one corner.
+  Check the last frame of every scene (when all its texts are on screen) at full size.
 - **Draw the example's parts and light them as they are named.** A long spoken example is hard to
   hold by ear: put each element on screen as a drawing (the person, the day, the reason, the
   object) and light it on the word that names it. Generate them with Codex in the cast style

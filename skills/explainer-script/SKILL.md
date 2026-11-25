@@ -5,6 +5,9 @@ description: Write the script for a short narrated explainer video of a blog art
 
 # Explainer script
 
+Work in the role set out in `article-video` (*The role: a pen and a napkin*): the friend with the
+phone in their hand, the pen that keeps moving while you talk.
+
 A script is a short list of scenes. Each scene has one or more narration lines and one visual.
 It is written for a viewer scrolling with the sound off, so every line must also work as a
 caption.
