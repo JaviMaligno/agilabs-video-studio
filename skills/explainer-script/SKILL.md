@@ -174,6 +174,12 @@ inspiration, not a template. Same premise card and cold reads, plus:
   from a news site is usually a bot block, not a dead link). What the video does not name goes in
   a last "More context" block, if anywhere. Save the result as
   `out/youtube-description-<voice>.txt`; deliver warns when its chapters no longer match the render.
+  **YouTube caps the description at 5,000 characters** and rejects `<` and `>` in it. Its count
+  runs above a local one (a description of ~4,160 characters by a local count was refused as over
+  5,000), so deliver warns from 4,000 and on any angle bracket. A long video with a link per concept gets there fast: keep every distinct link and cut
+  the prose instead (a two-sentence hook, short link labels, a one-line closing note), and never
+  list a source twice (the same statement under two chapters, the announcement in "Sources" and
+  again later). Aim for about 3,500 characters so later additions still fit.
 
 - **Leave room for the end screen.** YouTube's end screen (a next-video box and a subscribe
   circle the author places in Studio) covers the last 5-20 s, so the long cut ends with a silent

@@ -17,7 +17,7 @@ const { VIDEOS } = await import('../src/timeline.ts');
 const { FPS, sceneStarts, sceneFrames } = await import('../src/timing.ts');
 const { tx } = await import('../src/types.ts');
 const { youtubeChapters } = await import('../src/chapters.ts');
-const { youtubeDescriptionDraft, chapterLines } = await import('../src/description.ts');
+const { youtubeDescriptionDraft, chapterLines, descriptionIssues } = await import('../src/description.ts');
 const { writeSrt } = await import('./srt.ts');
 
 spawnSync('node', [at('scripts', 'lint.ts')], { stdio: 'inherit', cwd: at() });
@@ -102,7 +102,9 @@ for (const voice of SETTINGS.voices) {
     const finished = at('out', `youtube-description-${voice}.txt`);
     if (fs.existsSync(finished)) {
       const want = chapterLines(yt.text).join('\n');
-      if (chapterLines(fs.readFileSync(finished, 'utf8')).join('\n') !== want) {
+      const text = fs.readFileSync(finished, 'utf8');
+      for (const issue of descriptionIssues(text)) console.warn(`youtube-description-${voice}.txt: ${issue}`);
+      if (chapterLines(text).join('\n') !== want) {
         console.warn(`youtube-description-${voice}.txt: its chapters differ from this render's; paste ${chaptersFile} into it`);
       }
     } else {

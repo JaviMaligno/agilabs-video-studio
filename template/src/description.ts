@@ -70,3 +70,27 @@ export function youtubeDescriptionDraft(scenes: Scene[], lang: Lang, input: Desc
 
 /** The "m:ss Title" chapter lines of a finished description, to compare with the render's. */
 export const chapterLines = (text: string): string[] => text.split('\n').filter((l) => /^\d+:\d\d(?::\d\d)? \S/.test(l.trim())).map((l) => l.trim());
+
+/** YouTube refuses a description over 5,000 characters, or one that contains "<" or ">". */
+export const DESCRIPTION_MAX = 5000;
+/**
+ * YouTube's own count runs above a local character count: a description of about 4,160
+ * characters (by this count) was refused as over 5,000. Warn from here, with room to spare.
+ */
+export const DESCRIPTION_SAFE = 4000;
+
+/**
+ * Problems YouTube would reject in a finished description. When the file starts with the video
+ * title on its own line (short, no link, then a blank line), that line is not part of the
+ * description and is left out of the count.
+ */
+export function descriptionIssues(text: string): string[] {
+  const m = text.match(/^([^\n]{1,100})\n\n/);
+  const body = m && !/https?:\/\//.test(m[1]) ? text.slice(m[0].length) : text;
+  const chars = [...body.trim()].length;
+  const out: string[] = [];
+  if (chars > DESCRIPTION_SAFE)
+    out.push(`${chars} characters: YouTube allows ${DESCRIPTION_MAX} by its own count, which runs higher than this one (keep under ${DESCRIPTION_SAFE}). Shorten the prose (hook, link labels, final note) and drop repeated sources; keep every distinct link`);
+  if (/[<>]/.test(body)) out.push('contains "<" or ">": YouTube rejects them in a description');
+  return out;
+}

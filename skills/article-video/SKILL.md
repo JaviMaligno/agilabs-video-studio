@@ -160,7 +160,8 @@ a rule and the role pull apart, the role wins and the rule gets rewritten.
     `out/thumbnail-<voice>.png` (1280x720): the designed `cover/thumbnail-<voice>.png` when it
     exists (see "Long format" in `explainer-script`), else a frame at `SETTINGS.thumbnail`,
     and `out/youtube-description-<voice>.draft.txt`: finish it into
-    `out/youtube-description-<voice>.txt` with a link for everything the narration names (see
+    `out/youtube-description-<voice>.txt` (YouTube's limit is 5,000 characters by its own count,
+    which runs higher than a local one: keep it under 4,000; deliver warns) with a link for everything the narration names (see
     "Long format" in `explainer-script`) before handing the video over.
 
 ## Re-rendering an existing video
