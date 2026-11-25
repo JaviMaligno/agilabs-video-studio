@@ -76,12 +76,12 @@ test('sceneStarts overlaps scenes by the transition', () => {
 test('settings and timeline of this video', () => {
   assert.deepEqual(SETTINGS.voices, ['en']);
   assert.deepEqual(SETTINGS.subtitles, ['en']);
-  assert.equal(SETTINGS.targetSeconds, 83);
+  assert.equal(SETTINGS.targetSeconds, 50);
   assert.deepEqual(SETTINGS.music, { src: 'music/bed.wav', volume: 0.2, duck: 0.3 });
   assert.equal(TIMELINE.at(-1)?.kind, 'outro');
   // Cold open: an intro over the hook animation, then anim scenes.
   assert.equal(TIMELINE[0].kind, 'intro');
-  assert.equal(TIMELINE[0].anim?.name, 'PieceInspector');
+  assert.equal(TIMELINE[0].anim?.name, 'RepairFork');
   assert.ok(TIMELINE.slice(1, -1).every((s) => s.kind === 'anim'));
   assert.ok(TIMELINE.some((s) => s.id === SETTINGS.poster?.scene));
   assert.equal(VIDEOS.en.main, TIMELINE);

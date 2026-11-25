@@ -7,7 +7,7 @@ import { frameState as quoteState } from './KeyQuote.state.ts';
 import { easeInOut } from './motion.ts';
 import { beatAt, clamp01, easeOutCubic, fit, progress, sceneTime } from './steps.ts';
 
-export type RFMode = 'teaser' | 'fork' | 'arms' | 'measure' | 'bars' | 'hold' | 'turns' | 'verdict';
+export type RFMode = 'teaser' | 'fork' | 'arms' | 'measure' | 'bars' | 'hold' | 'turns' | 'ask' | 'verdict';
 
 export type Arm = { user: Label; value: number; display: string };
 
@@ -31,7 +31,13 @@ export type RFProps = {
   p2?: Label;
   quote?: { text: Label; emphasis?: string[] };
   turns?: { labels: [Label, Label, Label]; values: [string, string, string]; tag?: Label };
-  verdict?: { no: Label; yes: Label; stamp: Label; also: Label };
+  /** verdict: `also` (first ✓), `yes` (the boxed ✓), `no` (struck ✗), in that spoken order. */
+  verdict?: { no: Label; yes: Label; stamp?: Label; also: Label };
+  /** ask mode: the clarifying reply (illustrative) and its tag; then the real reply, its tag and a card. */
+  ask?: { before: string; names: string; after: string };
+  tag?: Label;
+  real?: Label;
+  card?: Label;
   ghost?: Label;
   continues?: boolean;
 };
@@ -84,24 +90,27 @@ export function frameState(p: RFProps, t0: number, beats: number[], dur: number,
 
   switch (p.mode) {
     case 'teaser': {
+      // Cold open (reel 12, 2026-11-12): message and reply on screen from frame 0; the paste's
+      // names in the reply start pulsing at once.
       s.rows.appear = [1, 1, 1];
-      s.user.appear = [0, easeOutCubic(at(0.15, 0.3)), 0];
-      s.reply.typed = [0, at(0.55, 0.8), 0];
-      s.reply.glow = [0, at(1.2, 0.3) * pulse, 0];
+      s.user.appear = [0, 1, 0];
+      s.reply.typed = [0, 1, 0];
+      s.reply.glow = [0, (0.5 + 0.5 * at(0, 0.6)) * pulse, 0];
       // The x6 shows for a moment and goes: it is paid off later.
       s.ghost.opacity = at(1.5, 0.2) * (1 - at(2.3, 0.4)) * (0.7 + 0.3 * Math.sin(t * 30));
       break;
     }
     case 'fork': {
       s.rows.appear = [1, 1, 1];
-      s.fork.progress = easeInOut(at(b0 + 1.6, 0.9));
+      // With two lines, the fork lands on the second ("Then tried three ways to move on").
+      s.fork.progress = easeInOut(at(beats.length > 1 ? b1 + 0.2 : b0 + 1.6, 0.9));
       break;
     }
     case 'arms': {
       s.strip.opacity = 1;
       s.rows.appear = [1, 1, 1];
       s.fork.progress = 1;
-      const ats = p.at ?? [b0 + 0.1, b0 + 1.0, b0 + 2.0];
+      const ats = p.at ?? (beats.length > 2 ? [b0 + 0.1, b1 + 0.1, b2 + 0.1] : [b0 + 0.1, b0 + 1.0, b0 + 2.0]);
       s.user.appear = ats.map((a) => easeOutCubic(at(a, 0.3)));
       break;
     }
@@ -143,11 +152,22 @@ export function frameState(p: RFProps, t0: number, beats: number[], dur: number,
       s.turns.tag = at(b0 + 2.4, 0.35);
       break;
     }
+    case 'ask': {
+      // Beat 0: "Ignore that." and the clarifying question naming the paste (illustrative).
+      // Beat 1: the real reply that promises to drop it, by name; then the card.
+      s.user.appear = [0, easeOutCubic(at(0, 0.3)), 0];
+      s.reply.typed = [at(b0 + 0.3, 1.0), at(b1 + 0.1, 0.9), 0];
+      s.reply.glow = [at(b0 + 1.3, 0.3) * pulse, at(b1 + 0.9, 0.3) * pulse, 0];
+      s.chip.opacity = at(b0 + 1.5, 0.35);
+      s.tags.appear = [easeOutCubic(at(b1 + 1.0, 0.3)), 0, 0];
+      s.card.pop = easeOutCubic(at(b1 + 1.4, 0.4));
+      break;
+    }
     case 'verdict': {
-      // Beats: "don't just say ignore it" · "say where to go instead" · "or simply carry on".
+      // Beats: "just carry on" · "or say back to the race plan" · "not just ignore that".
       s.verdict.appear = [easeOutCubic(at(b0 + 0.05, 0.35)), easeOutCubic(at(b1 + 0.05, 0.4)), easeOutCubic(at(b2 + 0.1, 0.4))];
-      s.verdict.strike = easeOutCubic(at(b0 + 0.9, 0.35));
-      s.verdict.stamp = easeOutCubic(at(b1 + 0.9, 0.35));
+      s.verdict.strike = easeOutCubic(at(b2 + 0.8, 0.35));
+      s.verdict.stamp = p.verdict?.stamp ? easeOutCubic(at(b1 + 0.9, 0.35)) : 0;
       break;
     }
   }
