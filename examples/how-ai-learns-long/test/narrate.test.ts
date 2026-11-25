@@ -76,10 +76,19 @@ test('sceneStarts overlaps scenes by the transition', () => {
 test('settings and timeline of the long version (7 chapters, landscape)', () => {
   assert.deepEqual(SETTINGS.voices, ['en']);
   assert.deepEqual(SETTINGS.subtitles, ['en']);
-  assert.equal(SETTINGS.targetSeconds, 388);
+  assert.equal(SETTINGS.targetSeconds, 450);
   assert.deepEqual(SETTINGS.articleTitle, { en: 'How an AI learns', es: '' });
   assert.equal(TIMELINE[0].kind, 'intro');
-  assert.equal(TIMELINE.at(-1)?.kind, 'outro');
+  // Long cut: no centred outro card; the recipe closes it with the spoken site and then an 18 s
+  // narration-free end-screen tail (YouTube end screen, plugin PR #32).
+  const last = TIMELINE.at(-1)!;
+  assert.equal(last.kind, 'anim');
+  assert.equal(last.anim?.name, 'ShopRecipe');
+  assert.deepEqual(last.anim?.props, { mode: 'endtail' });
+  assert.equal(last.lines.length, 1);
+  const l = last.lines[0];
+  const tail = (last.minSeconds ?? 0) - (l.start + l.dur);
+  assert.ok(tail >= 18 - 1e-9, `tail after the last line: ${tail} s`);
   const chapters = TIMELINE.filter((s) => s.chapter !== undefined).map((s) => (typeof s.chapter === 'string' ? s.chapter : s.chapter!.en));
   assert.deepEqual(chapters, ['Two ways to teach', 'The prompt', 'Looking it up', 'Full fine-tuning', 'LoRA', 'What to use']);
   assert.equal(VIDEOS.en.main, TIMELINE);

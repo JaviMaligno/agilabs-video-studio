@@ -8,7 +8,8 @@
 // Each anim scene passes a `mode`; its lines are the beats the component plays on.
 // Marks ([line, word]) are estimated from the text until real TTS exists.
 import type { Cuts, Scene } from './types.ts';
-import { anim, intro, outro, say, videos, voice } from './narrate.ts';
+import { anim, intro, say, videos, voice } from './narrate.ts';
+import { END_TAIL } from './anim/ShopRecipe.state.ts';
 import { WORDS } from './audio.generated.ts';
 import { resolveMark, type MarkSpec } from './marks.ts';
 
@@ -164,7 +165,11 @@ const build = (): Cuts => ({
       say(0.2, 'Something you can do today: write the note, and try it on ten real questions from your customers. You may find you can stop right there.', ''),
       say(0, "Teaching an AI isn't one thing. Start with the cheapest way. And if you go deeper, check what already worked, not just what's new.", '', undefined, CONFIDENT),
     ]),
-    outro('outro', [say(0.15, 'More at javieraguilar.ai.', '', { en: 'More at javier aguilar dot A I.' })]),
+    // YouTube end screen (plugin rule, PR #32): the recipe stays while the site is spoken, then
+    // END_TAIL (18 s) without narration, dimmed, with the avatar pointing at the free upper right and
+    // the site and credits in a low band, in place of the centred outro card the boxes would cover.
+    // Id kept as 'outro' so the spoken line keeps its take (outro-01).
+    anim('outro', 'ShopRecipe', { mode: 'endtail' }, [say(0.15, 'More at javieraguilar.ai.', '', { en: 'More at javier aguilar dot A I.' })], { min: 0.15 + 2.4 + END_TAIL }),
   ]),
 });
 

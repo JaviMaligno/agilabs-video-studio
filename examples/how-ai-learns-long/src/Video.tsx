@@ -74,6 +74,19 @@ const Cameos: React.FC<{ scene: Scene; vertical: boolean }> = ({ scene, vertical
   );
 };
 
+/**
+ * Held captions stop at the hand-over, except before a long silent tail (the YouTube end screen):
+ * there the last caption leaves 0.5 s after its line, before the end-screen band comes up.
+ */
+const END_TAIL_MIN = 10;
+const captionsUntil = (scene: Scene): number => {
+  const last = scene.lines.at(-1);
+  const hand = handOverAt(scene);
+  if (!last) return hand;
+  const end = last.start + last.dur;
+  return hand - end >= END_TAIL_MIN ? Math.min(hand, end + 0.5) : hand;
+};
+
 const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps; chapterNo?: number }> = ({ scene, p, chapterNo }) => {
   // The intro shows its first line as the big hook, so the captions start from the second line.
   const captioned = scene.kind === 'intro' ? scene.lines.slice(1) : scene.lines;
@@ -101,7 +114,7 @@ const SceneView: React.FC<{ scene: Scene; p: ArticleVideoProps; chapterNo?: numb
           {chapterNo !== undefined && scene.chapter !== undefined && <ChapterCard n={chapterNo} label={scene.chapter} lang={p.subs} vertical={p.vertical} />}
         </>
       )}
-      {!p.noSubs && <Captions lines={captioned} lang={p.subs} vertical={p.vertical} until={handOverAt(scene)} />}
+      {!p.noSubs && <Captions lines={captioned} lang={p.subs} vertical={p.vertical} until={captionsUntil(scene)} />}
       {/* Before the TTS script has run there is no audio: the scene plays silent on estimated timing. */}
       {scene.lines
         .filter((l) => AUDIO[l.voice]?.[l.key] !== undefined)

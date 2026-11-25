@@ -14,11 +14,18 @@
 // - today: the note and a checklist of 10 customer questions ticking one by one (marks "note",
 //   "ten"); then the full recipe with the clear sheet over the book in the corner, the prompt lit on
 //   "cheapest" and the check lit on "check". Marks: [note, ten, cheapest, check].
+// - endtail: the YouTube end screen (plugin rule, PR #32). The last picture of today stays as it
+//   ended (check lit) while "More at javieraguilar.ai" is spoken; then, for the last END_TAIL
+//   seconds (no narration), it dims (the list goes), the book with the clear sheet slides
+//   out of the boxes to the middle, the author's avatar stands on the left pointing at the free
+//   upper right (next-video box) and the site and credits rise in a low band.
 // No Remotion or React here.
 import { beatOr, ease, mark, pickMode } from './memory.ts';
 import { clamp01, sceneTime } from './steps.ts';
 
-export const RECIPE_MODES = ['recipe', 'today'] as const;
+export const RECIPE_MODES = ['recipe', 'today', 'endtail'] as const;
+/** Seconds of the silent end-screen tail at the end of the endtail scene. */
+export const END_TAIL = 18;
 export type RecipeMode = (typeof RECIPE_MODES)[number];
 export type ShopRecipeProps = { mode?: RecipeMode; marks?: number[] };
 
@@ -69,7 +76,12 @@ export type ShopRecipeState = {
   /** today: the note and the checklist panel, and each question's tick. */
   /** `note` lights the note (it is on screen from the start); `rows` bring in the empty checklist. */
   check: { panel: number; note: number; rows: number[]; ticks: number[] };
+  /** endtail: the picture dimming, the pointing avatar and the low band (site and credits). */
+  /** `slide` moves the book with the clear sheet out of the end-screen boxes, beside the avatar. */
+  end: { dim: number; avatar: number; band: number; slide: number };
 };
+
+const NO_END = { dim: 0, avatar: 0, band: 0, slide: 0 };
 
 /** Shown from its own start until the next starts (cross-fade 0.4 s). */
 const between = (T: number, a: number, b: number): number => clamp01(ease(T, a - 0.2, 0.4) * (1 - ease(T, b - 0.2, 0.4)));
@@ -131,6 +143,27 @@ export function frameState(props: ShopRecipeProps, t: number, beats: number[], d
         cross: ease(T, sManners - 0.05, 0.4),
       },
       check: { panel: 0, note: 0, rows: QUESTIONS.map(() => 0), ticks: QUESTIONS.map(() => 0) },
+      end: NO_END,
+    };
+  }
+
+  if (mode === 'endtail') {
+    // Opens on today's last frame (same picture, no cut); the tail is the last END_TAIL seconds.
+    const D = Number.isFinite(dur) && dur > 0 ? dur : END_TAIL;
+    const tail = Math.max(0, D - END_TAIL);
+    return {
+      mode,
+      list: 1,
+      items: [0, 1, 2, 3].map((i) => ({ appear: 1, lit: i === 3 ? 1 : 0 })),
+      lora: 1,
+      replay: { appear: 1, lit: 0 },
+      pics: { note: 0, binder: 0, book: 0, stack: 0, floor: 0, corner: 1 },
+      sheet: 1,
+      ordinary: 1,
+      fall: 1,
+      mix: { knowledge: 0, recover: 0, tick: 0, manners: 0, cross: 0 },
+      check: { panel: 0, note: 0, rows: QUESTIONS.map(() => 0), ticks: QUESTIONS.map(() => 0) },
+      end: { dim: ease(T, tail + 0.4, 1.0), avatar: ease(T, tail + 0.7, 0.7), band: ease(T, tail + 0.9, 0.6), slide: ease(T, tail + 0.4, 1.2) },
     };
   }
 
@@ -165,5 +198,6 @@ export function frameState(props: ShopRecipeProps, t: number, beats: number[], d
       rows: QUESTIONS.map((_, i) => ease(T, b0 + i * 0.08, 0.3)),
       ticks: QUESTIONS.map((_, i) => ease(T, ten + i * step, 0.25)),
     },
+    end: NO_END,
   };
 }
