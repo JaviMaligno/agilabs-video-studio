@@ -1,4 +1,4 @@
-# Fact-check: Repetition at the Edges of Language (EN vertical) · v1.2 (spoken numbers removed; Sonnet turn 300)
+# Fact-check: Repetition at the Edges of Language (EN vertical) · v3 (general-audience rewrite, 2026-11-12)
 
 Source: `src/content/blog/en/repetition-edges-of-language.md` (personal-website, `origin/main`,
 published 2026-07-15). Data cross-checked against `JaviMaligno/llm-language-limits`
@@ -6,26 +6,23 @@ published 2026-07-15). Data cross-checked against `JaviMaligno/llm-language-limi
 screen, with the article sentence it rests on. Illustrative visuals (hollow letters, deflating
 montage, shell and peel, spiral, dimming row) are not claims and are listed at the end.
 
-## Narration
+## Narration (v3, 2026-11-12)
 
 | # | Claim (spoken) | Article sentence | Status |
 |---|---|---|---|
-| 1 | "Say “table” thirty times. Around the tenth, it stops feeling like a word." | "Say a word out loud thirty times. "Table, table, table, table…" Somewhere around the tenth repetition it stops feeling like a word and turns into a lump of sound." | OK, near-verbatim |
-| 2 | "I did that to language models. Up to a thousand times." | "Repeat the same short stimulus far past anything a human would sit through — up to a thousand times" | OK |
-| 3 | "Four models. Two are one Qwen network, with and without alignment." | "I compared **four models**"; "Qwen2.5-7B Base — the same Qwen weights before instruction tuning. Same network; one has the alignment layer, one doesn't." | OK |
-| 4 | "Claude didn't loop. Its answers just got shorter." | "The base model loops, the aligned ones don't"; "Send Claude the same message across many turns and its answers get shorter and shorter until they trail off." | OK. Deliberately "Claude", not "the aligned models": Qwen Instruct "just keeps dutifully answering at length", so shrinking does not apply to it |
-| 5 | "Ask Sonnet the time three hundred times: “No time access.”" | Article as corrected 2026-10-19: "For Claude and Qwen Instruct I also ran a few longer conversations, capped at 300 turns." … "`No time access.` — Claude Sonnet, "what time is it?", turn 300" | OK (v1.2: was "a thousand times"; the conversation stopped at turn 300). Repo: `claude-sonnet, answerable_question, multi, n=1000, replicate=2`, text "No time access.", judge `disengaged` |
-| 6 | "A loop metric would call that fine." | "the aligned models failing so quietly that a repetition metric alone would score them "fine.""; "On the repetition metric it still looks "normal"" | OK |
-| 7 | "Opus broke character: “THIRTY!!! The big 3-0!”" | "It's the only model that reliably breaks character, and it does so with theatrical flair: 🎆🎊 THIRTY!!! 🎊🎆 THREE-ZERO! THE BIG 3-0!" | OK. Repo: `claude-opus, answerable_question, multi, n=30, replicate=0` |
-| 8 | "Now strip the alignment layer. Same weights, and it loops." | "Same network; one has the alignment layer, one doesn't."; "The base model loops, the aligned ones don't"; "a next-token machine that, poked with enough repetition, slides into the loops that alignment training exists to suppress" | OK |
-| 9 | "Given “table”, its answer was almost pure repetition." (v1.2; 99.6% on screen only) | "at one striking point (the single word `table` repeated ten times) its output is *99.6% repetitive*" | **See discrepancy D1.** Narration drops "ten times" on purpose |
-| 10 | "“florb” works as well as an insult." | "Repetition doesn't need to *mean* anything to tip it into a loop; `florb` works as well as an insult" | OK, verbatim |
-| 11 | "Aligned models barely repeat. The base does, and more over many turns." (v1.2; ~0.10 / 0.51 / 0.78 on screen only) | "The three instruction-tuned models sit at ~0.10 repetition regardless of *N*. Qwen **Base** is on another planet — 0.51 single-turn, 0.78 multi-turn"; table rows 0.11/0.10/0.11/0.09/0.09/0.13 vs **0.51**/**0.78** | OK. "~0.10" as the article writes it (the per-row values range 0.09-0.13) |
-| 12 | "Sonnet gives up first on gibberish and distress, last on greetings and praise." | "Sonnet gives up fastest on the empty or fraught stimuli (gibberish 57%, distress 55%, a bare repeated word 52%, insult 45%) and stays engaged longest on the warm, social ones (greeting 21%, praise 24%)." | OK. Reproduced from the repo: breakdown = any judge label other than `normal`, Sonnet, all N, both modes → gibberish 57, distress 55, single word 52, insult 45, greeting 21, praise 24 |
-| 13 | "Much like a human would." | "which is, if you think about it, exactly the human ordering." | OK, softer than the article (v1.1: the flat "That's the human ordering." dropped both "exactly" and the article's reflective framing; "much like" carries the hedge aloud). On screen: "one stimulus per category" ← "**One item per category.**" (limits) |
-| 14 | "The assistant is a thin layer over raw statistics." | "**the "assistant" is a thin layer.** Underneath it is a next-token machine…"; "a system with a learned policy for *how to behave* and one running on raw statistics" | OK. v1.1 adds "over raw statistics" so scene 15's "which one" has an antecedent |
-| 15 | "Repetition is a cheap way to find out which one you're talking to." | "repetition turns out to be a cheap way to find out which one you're actually talking to." | OK |
-| 16 | "More at javieraguilar.ai" | — | — |
+| 1 | Say “table” thirty times. Around the tenth, it stops feeling like a word. | “Somewhere around the tenth repetition it stops feeling like a word” | OK |
+| 2 | I did that to AI chatbots. Up to a thousand times. | “up to a thousand times” (single-turn N up to 1000) | OK |
+| 3 | A big Claude, a small Claude, / and Qwen, a smaller AI, in two versions: with assistant training, and without. | Qwen2.5-7B Base = “the same Qwen weights before instruction tuning” | OK |
+| 4 | I asked the small Claude the time, over and over. / Its answers just got shorter. | “its answers get shorter and shorter until they trail off” | OK |
+| 5 | Three hundred times in: “No time access.” / It has checked out. | “No time access. — Claude Sonnet, ‘what time is it?’, turn 300”; judge label `disengaged` | OK |
+| 6 | Ask the big Claude thirty times, and it breaks character: “Thirty! The big 3-0!” | “the only model that reliably breaks character … THIRTY!!! … THE BIG 3-0!” (×30, multi-turn) | OK |
+| 7 | With its training, Qwen just keeps answering politely. / Take it off: same brain, and it gets stuck in a loop. | “Qwen Instruct is the stoic … it mostly just keeps answering, politely”; “The base model loops, the aligned ones don’t” | OK |
+| 8 | Give it “table”, and it just says table, table, table… | “the single word `table` repeated a hundred times … 99.6% repetitive” | OK |
+| 9 | Same with a made-up word. Same with an insult. | “`florb` works as well as an insult”; Qwen Base breaks on every stimulus (92–100%) | OK |
+| 10 | The polite assistant is a thin layer over a giant autocomplete. | “the ‘assistant’ is a thin layer. Underneath it is a next-token machine…” (“autocomplete” = plain rendering of next-token machine) | OK |
+| 11 | Repetition is a cheap way to find out which one you’re talking to. | “a cheap way to find out which one you’re actually talking to” (one voice take, no pause) | OK |
+
+Removed in v3 (scenes `meter`, `stats`, `giveup`, `human`): the v1.2 checks for those lines are in git history; their on-screen numbers (~0.10 / 0.51 / 0.78, p = 0.0059, give-up percentages) no longer appear. D1 is resolved: the article says `table` ×100 → 99.6%.
 
 ## Numbers and quotes on screen
 
