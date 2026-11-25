@@ -161,6 +161,18 @@ inspiration, not a template. Same premise card and cold reads, plus:
   a last "More context" block, if anywhere. Save the result as
   `out/youtube-description-<voice>.txt`; deliver warns when its chapters no longer match the render.
 
+- **Leave room for the end screen.** YouTube's end screen (a next-video box and a subscribe
+  circle the author places in Studio) covers the last 5-20 s, so the long cut ends with a silent
+  tail of 15-20 s after the last line's ending, designed for it instead of a centred credits card
+  the boxes would hide. While the channel has few videos: the last story picture stays, dimmed,
+  the author's avatar points at the free side, and the site and credits move to a low band; the
+  upper right (about 720x400 px) and a circle under it stay free of text and key drawing. Once
+  there are three or more videos: a dark card with the avatar and "Keep watching" on the left and
+  two video boxes plus the subscribe circle on the right ("next video" and YouTube's "best for
+  viewer"). No spoken line in the tail. Check the last frame with the boxes drawn on top before
+  the final render; YouTube does not let you swap the file of an uploaded video, so this cannot be
+  fixed after upload.
+
 ## Voice
 
 - First person, as the article is written: "I gave the planner...", "What I found...".
