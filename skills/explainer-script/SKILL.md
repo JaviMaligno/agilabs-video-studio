@@ -146,6 +146,20 @@ inspiration, not a template. Same premise card and cold reads, plus:
 - **Length from the voice.** The cloned voice reads about 2.9 EN words per second at speed 1
   (house standard, never slowed): ~1000 words is about 5.5 min with chapter cards. Set
   `targetSeconds` from the first TTS pass.
+- **The title is designed with the thumbnail, as a pair.** On YouTube the title and the
+  thumbnail decide the click together, so they are written together, never the article's title
+  pasted in. Offer three candidates next to the chosen thumbnail and let the author pick:
+  - **Complement, don't repeat.** The thumbnail asks the question in 3-5 words; the title adds
+    what it leaves out (who, the stakes, the twist). The same words twice waste the pair.
+  - **The searched name first.** Put the term people type (Navier–Stokes, Riemann hypothesis,
+    the model's name) in the first half; YouTube search and suggestions read it from there.
+  - **Short enough to survive.** At most ~60 characters, so the end is not cut in the feed.
+  - **Honest curiosity.** Point at the video's real surprise ("Here's what actually broke");
+    never a claim the video itself takes back (if the video says "not in real water", the title
+    cannot say water went infinitely fast).
+  - Write the chosen title on the first line of `out/youtube-description-<voice>.txt` (the
+    author pastes title and description together). A title can be changed after upload; the
+    thumbnail and title are the first things to revisit when a video's click-through is low.
 - **The thumbnail sells the concept, not the example.** 1280x720, a full-bleed Codex
   illustration with one focal point and a 3-5 word headline set in code (honest clickbait: "Your
   AI has 5 memories."), saved as `cover/thumbnail-<voice>.png`; `npm run deliver` uses it
