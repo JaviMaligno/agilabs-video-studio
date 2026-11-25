@@ -36,3 +36,15 @@ test('the draft has the article link, the chapters and the names per chapter', (
 test('chapter lines are read from a finished description', () => {
   assert.deepEqual(chapterLines('Hook.\n\n0:00 Intro\n1:05 Two\n10:00 Ten\nnot 1:00\n'), ['0:00 Intro', '1:05 Two', '10:00 Ten']);
 });
+
+test('descriptionIssues: YouTube limits (5,000 characters, no angle brackets); a title line is not counted', async () => {
+  const { descriptionIssues, DESCRIPTION_SAFE } = await import('../src/description.ts');
+  const ok = 'Hook.\n\nhttps://example.com/a\n0:00 Intro';
+  assert.deepEqual(descriptionIssues(ok), []);
+  const long = 'x'.repeat(DESCRIPTION_SAFE + 1);
+  assert.equal(descriptionIssues(long).length, 1);
+  assert.match(descriptionIssues(long)[0], /5000/);
+  // A title on the first line (short, no link, blank line after) is left out of the count.
+  assert.deepEqual(descriptionIssues('My title\n\n' + 'x'.repeat(DESCRIPTION_SAFE)), []);
+  assert.equal(descriptionIssues('Hook <b>bold</b>').length, 1);
+});
