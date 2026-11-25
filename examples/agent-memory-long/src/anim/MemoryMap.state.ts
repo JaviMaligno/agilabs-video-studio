@@ -10,13 +10,17 @@
 //   own chapter).
 // - `recipe: true` (the closing scene): the recipe from chapter 6 stays on screen, small, beside
 //   the map (from frame 0, since it carries over from the scene before).
+// - `endtail: true` (YouTube end-screen tail, no narration; plugin rule PR #32): starts from the
+//   closing scene, the recipe fades out, the map dims and shrinks to the left out of the
+//   next-video box, then the avatar (pointing at the free upper right) and a low band with the
+//   site and the sources come in.
 // No Remotion or React here.
 import { beatOr, blinkAt, bump, ease, loopTime, mark, pickMode } from './memory.ts';
 import { clamp01, sceneTime } from './steps.ts';
 
 export const MAP_MODES = ['all', 'reveal'] as const;
 export type MapMode = (typeof MAP_MODES)[number];
-export type MemoryMapProps = { mode?: MapMode; marks?: number[]; recipe?: boolean; labels?: boolean };
+export type MemoryMapProps = { mode?: MapMode; marks?: number[]; recipe?: boolean; labels?: boolean; endtail?: boolean };
 
 /** The five tiles, in the order the script names them. */
 export const TILES = [
@@ -58,6 +62,8 @@ export type MapState = {
   flicker: number;
   /** Tile names shown (0 with `labels: false`). */
   labels: number;
+  /** End-screen tail: the map's move to the left and its dimming (0..1), and the avatar and band (0..1). */
+  tail: { move: number; band: number };
 };
 
 export function frameState(props: MemoryMapProps, t: number, beats: number[], dur: number): MapState {
@@ -71,7 +77,23 @@ export function frameState(props: MemoryMapProps, t: number, beats: number[], du
     slip: { glow: 0.45 + 0.35 * Math.sin(tm * 3) },
     recipe: props.recipe === true ? 1 : 0,
     labels: props.labels === false ? 0 : 1,
+    tail: { move: 0, band: 0 },
   };
+
+  if (props.endtail === true) {
+    return {
+      frames: 1,
+      opacity: TILES.map(() => 1),
+      emphasis: TILES.map(() => HOLD),
+      title: 1,
+      question: 0,
+      flicker: 0,
+      ...idle,
+      // Nothing moves until the cross-fade from the closing scene is over (0.6 s), or the map doubles.
+      recipe: 1 - ease(T, 0.7, 0.6),
+      tail: { move: ease(T, 0.7, 1.2), band: ease(T, 1.5, 0.8) },
+    };
+  }
 
   if (mode === 'all') {
     return { frames: 1, opacity: TILES.map(() => 1), emphasis: TILES.map(() => HOLD), title: 1, question: 0, flicker: 0, ...idle };

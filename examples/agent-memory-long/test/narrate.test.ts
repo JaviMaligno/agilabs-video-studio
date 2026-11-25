@@ -79,7 +79,9 @@ test('settings and timeline of the long version (7 chapters, landscape)', () => 
   assert.equal(SETTINGS.targetSeconds, 375);
   assert.deepEqual(SETTINGS.articleTitle, { en: 'How an AI agent forgets', es: '' });
   assert.equal(TIMELINE[0].kind, 'intro');
-  assert.equal(TIMELINE.at(-1)?.kind, 'outro');
+  // Long cut: no centred outro card; a narration-free end-screen tail closes it (YouTube end screen).
+  assert.equal(TIMELINE.at(-1)?.id, 'endscreen');
+  assert.equal(TIMELINE.at(-1)?.lines.length, 0);
   const chapters = TIMELINE.filter((s) => s.chapter !== undefined).map((s) => (typeof s.chapter === 'string' ? s.chapter : s.chapter!.en));
   assert.deepEqual(chapters, ['Training', 'The desk', 'The summary', 'The notebook', 'The form', 'What to combine']);
   assert.equal(VIDEOS.en.main, TIMELINE);

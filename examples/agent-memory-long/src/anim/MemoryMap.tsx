@@ -1,7 +1,7 @@
 // The memory map: the robot with the red slip and five tiles (training, the desk, the summary, the
 // notebook, the form), each a one-word name over a drawing of how it fails. See MemoryMap.state.ts.
 import React from 'react';
-import { AbsoluteFill } from 'remotion';
+import { AbsoluteFill, staticFile } from 'remotion';
 import { C, alpha } from '../brand.ts';
 import { fontFamily } from '../theme.ts';
 import type { AnimProps } from './types.ts';
@@ -135,13 +135,51 @@ const Picture: React.FC<{ kind: TileKind; q?: number }> = ({ kind, q = 0 }) => {
   );
 };
 
+/**
+ * YouTube end-screen tail (landscape only), in frame pixels (1920x1080). Free for YouTube: the
+ * next-video box (x 1000-1720, y 120-525) and the subscribe circle (centre 1360, 690, r 85).
+ * The map (recipe layout: title top ~150, tiles x 190-1204) shrinks by MAP_K about its top left
+ * corner and lands at END_MAP, so it ends left of x ~930.
+ */
+const MAP_K = 0.85;
+const MAP_FROM = { x: 190, y: 150 };
+const END_MAP = { x: 70, y: 110 };
+const END_BAND_Y = 845;
+const AV = 350;
+const SOURCES = [
+  'From my experiments: Compact or Look It Up · Explicit State Doesn\'t Forget. It Misremembers.',
+  'When the Fact Stops Being True · The Forgetting You Don\'t Measure · Your Agent Doesn\'t Know What Has Already Happened',
+];
+const EndTail: React.FC<{ o: number }> = ({ o }) =>
+  o <= 0 ? null : (
+    <g opacity={o}>
+      <image href={staticFile('cast/avatar-pointing.png')} x={930} y={END_BAND_Y - AV + 22 + (1 - o) * 30} width={AV} height={AV} />
+      <rect x={0} y={END_BAND_Y} width={1920} height={1080 - END_BAND_Y} fill={C.bg0} opacity={0.96} />
+      <text x={120} y={END_BAND_Y + 78} fontSize={56} fontWeight={800} fill={C.accentText}>
+        javieraguilar.ai
+      </text>
+      {SOURCES.map((r, i) => (
+        <text key={i} x={120} y={END_BAND_Y + 132 + i * 40} fontSize={28} fontWeight={500} fill={C.muted}>
+          {r}
+        </text>
+      ))}
+    </g>
+  );
+
 export const MemoryMap: React.FC<AnimProps & MemoryMapProps> = (p) => {
   const s = frameState(p, p.t, p.beats, p.dur);
-  const L = p.recipe ? place(p.vertical, LAYOUT_RECIPE) : { ...place(p.vertical, LAYOUT), recipe: null };
+  const L = p.recipe || p.endtail ? place(p.vertical, LAYOUT_RECIPE) : { ...place(p.vertical, LAYOUT), recipe: null };
   const R = L.recipe;
+  const tailOn = !p.vertical && s.tail.move > 0;
+  const m = s.tail.move;
+  const k = 1 + (MAP_K - 1) * m;
+  const mapTransform = tailOn
+    ? `translate(${MAP_FROM.x + (END_MAP.x - MAP_FROM.x) * m} ${MAP_FROM.y + (END_MAP.y - MAP_FROM.y) * m}) scale(${k}) translate(${-MAP_FROM.x} ${-MAP_FROM.y})`
+    : undefined;
   return (
     <AbsoluteFill style={{ fontFamily }}>
       <Frame vertical={p.vertical} design="both">
+        <g transform={mapTransform} opacity={tailOn ? 1 - 0.5 * m : 1}>
         {TILES.map((tile, i) => {
           const { x, y: y0 } = L.tiles[i];
           const y = y0 + s.float[i];
@@ -224,6 +262,8 @@ export const MemoryMap: React.FC<AnimProps & MemoryMapProps> = (p) => {
             })}
           </g>
         )}
+        </g>
+        {!p.vertical && <EndTail o={s.tail.band} />}
       </Frame>
     </AbsoluteFill>
   );

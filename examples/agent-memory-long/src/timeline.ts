@@ -7,7 +7,7 @@
 // Chapters: `chapter` on the first scene of each one draws the chapter card and becomes a YouTube
 // chapter (npm run deliver -> out/youtube-chapters-en.txt).
 import type { Cuts, Scene } from './types.ts';
-import { anim, intro, outro, say, videos, voice } from './narrate.ts';
+import { anim, intro, say, videos, voice } from './narrate.ts';
 import { WORDS } from './audio.generated.ts';
 import { resolveMark, type MarkSpec } from './marks.ts';
 
@@ -198,7 +198,9 @@ const build = (): Cuts => ({
     anim('close', 'MemoryMap', { recipe: true }, [
       say(0.2, 'Every AI forgets. What matters is what it forgets, and whether anything notices. Tell me in the comments which one has bitten you.', ''),
     ]),
-    outro('outro', [say(0.15, 'More at javieraguilar.ai.', '', { en: 'More at javier aguilar dot A I.' })]),
+    // YouTube end screen: 18 s without narration after the last line (plugin rule, PR #32), in
+    // place of the centred outro card the end-screen boxes would cover. The site is in its band.
+    anim('endscreen', 'MemoryMap', { endtail: true }, [], { min: 18 }),
   ]),
 });
 
