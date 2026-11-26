@@ -12,7 +12,7 @@ scheduled entries is always the person's step (it is permanent).
 
 ## 0. Gate: only approved, final videos
 
-Nothing is uploaded or scheduled, not even as a draft in the composer, unless both hold:
+Nothing is uploaded or scheduled, not even as a draft in the composer, unless all three hold:
 
 - **The author approved this video**, the rendered mp4 itself, in so many words, after watching
   it. An approved script is not an approved video, and "yes" to a plan that ends in "and I'll
@@ -21,8 +21,13 @@ Nothing is uploaded or scheduled, not even as a draft in the composer, unless bo
 - **It has the final voice.** A video voiced with the Kokoro fallback, or with any voice marked
   preliminary, is a draft for review only (see `narration`). It is re-voiced and re-rendered
   before scheduling, and the author sees that version too if anything changed beyond the voice.
+- **It has an approved cover.** The cover can only be set while creating the reel (see step 4),
+  so a reel scheduled without its cover, or with a placeholder, has to be uploaded again. The
+  author approved this cover image, the file itself (`out/cover.png` or its copy in the hand-off
+  folder), and it matches the current cut: a cover made for an earlier version is not approved
+  for a remake. Open the file before uploading it, since a frame with the same name is not the cover.
 
-If either is missing, stop at handing the video over and say what is still pending.
+If any is missing, stop at handing the video over and say what is still pending.
 
 ## 1. Prepare the hand-off folder
 
